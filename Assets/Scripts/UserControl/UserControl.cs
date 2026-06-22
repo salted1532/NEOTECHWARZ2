@@ -3,12 +3,25 @@ using UnityEngine.EventSystems;
 
 public class UserControl : MonoBehaviour
 {
-    [Header("Selection")]
-    [SerializeField] private LayerMask layerUnit;
-    [SerializeField] private Camera mainCamera;
+    [SerializeField]
+    private LayerMask layerUnit;
+    [SerializeField]
+    private LayerMask layerGround;
+    [SerializeField]
+    private LayerMask layerEnemy;
+    [SerializeField]
+    private LayerMask layerBuilding;
+    [SerializeField]
+    private LayerMask layerOre;
 
-    [Header("Drag UI")]
-    [SerializeField] private RectTransform dragRectangle;
+    [SerializeField] 
+    private Camera mainCamera;
+
+    [SerializeField] 
+    private RectTransform dragRectangle;
+
+    [SerializeField]
+    private GameObject pointerPrefab;
 
     private RTSUnitController rtsUnitController;
 
@@ -30,6 +43,18 @@ public class UserControl : MonoBehaviour
     private void Update()
     {
         HandleMouseSelection();
+        if (Input.GetMouseButtonDown(1))
+		{
+			RaycastHit hit;
+			Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+            // 유닛 오브젝트(layerGround)를 클릭했을 때
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerGround))
+            {
+                rtsUnitController.MoveSelectedUnits(hit.point);
+                GameObject Pointer = Instantiate(pointerPrefab, hit.point, Quaternion.identity);
+            }
+        }
     }
 
     private void HandleMouseSelection()

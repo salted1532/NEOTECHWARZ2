@@ -91,4 +91,11 @@ public class RTSUnitController : MonoBehaviour
     {
         return selectedUnitList;
     }
+    public void MoveSelectedUnits(Vector3 end)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].MoveTo(end);
+        }
+    }
 }
