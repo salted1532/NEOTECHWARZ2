@@ -9,6 +9,16 @@ public class RTSUnitController : MonoBehaviour
     // 맵에 존재하는 모든 유닛
     public List<UnitController> UnitList;
 
+
+    // 선택 상태
+    public bool SelectMode = false;
+    public bool isUnitSelect = false;
+    public bool isBuildingSelect = false;
+    public bool isOreSelect = false;
+    public bool isEnemySelect = false;
+    public bool MainBaseSelect = false;
+    public bool BuildMode = false;
+
     private void Awake()
     {
         selectedUnitList = new List<UnitController>();
@@ -49,7 +59,7 @@ public class RTSUnitController : MonoBehaviour
         if (!selectedUnitList.Contains(newUnit))
         {
             SelectUnit(newUnit);
-            Debug.Log("드래그 선택");
+
         }
     }
 
@@ -92,10 +102,32 @@ public class RTSUnitController : MonoBehaviour
         return selectedUnitList;
     }
     public void MoveSelectedUnits(Vector3 end)
-    {
+    { 
         for (int i = 0; i < selectedUnitList.Count; ++i)
         {
             selectedUnitList[i].MoveTo(end);
+        }
+    }
+
+    /// <summary>
+    /// 선택된 유닛 공격
+    /// </summary>
+    public void AttackSelectedUnits(Vector3 end)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].AttackToUnit(end);
+        }
+    }
+
+    /// <summary>
+    /// 바닥 공격 명령
+    /// </summary>
+    public void AttackGroundSelectedUnits(Vector3 end)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].AttackToGround(end);
         }
     }
 }

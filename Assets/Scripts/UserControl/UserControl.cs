@@ -1,5 +1,6 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.EventSystems;
+
 
 public class UserControl : MonoBehaviour
 {
@@ -14,52 +15,84 @@ public class UserControl : MonoBehaviour
     [SerializeField]
     private LayerMask layerOre;
 
-    [SerializeField] 
+    [SerializeField]
     private Camera mainCamera;
 
-    [SerializeField] 
+    [SerializeField]
     private RectTransform dragRectangle;
+
+
+    private GameObject pointer;
+
+    private GameObject attackPointer;
+    private GameObject movePointer;
 
     [SerializeField]
     private GameObject pointerPrefab;
+    [SerializeField]
+    private GameObject attackPointerPrefab;
 
     private RTSUnitController rtsUnitController;
 
     private Vector2 start;
     private Vector2 end;
     private Rect dragRect;
+    private Vector3 mousePos;
+
+    [SerializeField]
+    private bool attackMode = false;
+    [SerializeField]
+    private bool moveMode = false;
+    [SerializeField]
+    private bool patrolMode = false;
+    [SerializeField]
+    private bool rallyMode = false;
+    [SerializeField]
+    private bool modeOn = false;
+
+    private enum PointerType
+    {
+        None,
+        Attack,
+        Basic
+    }
+
+    private PointerType currentPointer = PointerType.None;
 
     private void Awake()
     {
         mainCamera = Camera.main;
         rtsUnitController = GetComponent<RTSUnitController>();
 
+        attackPointer = Instantiate(attackPointerPrefab);
+        movePointer = Instantiate(pointerPrefab);
+
+        attackPointer.SetActive(false);
+        movePointer.SetActive(false);
+
         start = Vector2.zero;
         end = Vector2.zero;
+
+
 
         DrawDragRectangle();
     }
 
     private void Update()
     {
-        HandleMouseSelection();
-        if (Input.GetMouseButtonDown(1))
-		{
-			RaycastHit hit;
-			Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        //ë§ˆìš°ìŠ¤ ì…ë ¥ ê´€ë¦¬
+        HandleMouse();
+        //í‚¤ë³´ë“œ ì…ë ¥ ê´€ë¦¬
+        HandlekeyBoard();
 
-            // À¯´Ö ¿ÀºêÁ§Æ®(layerGround)¸¦ Å¬¸¯ÇßÀ» ¶§
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerGround))
-            {
-                rtsUnitController.MoveSelectedUnits(hit.point);
-                GameObject Pointer = Instantiate(pointerPrefab, hit.point, Quaternion.identity);
-            }
-        }
+        // ì…ë ¥ ìƒí™©ì— ë”°ë¼ í¬ì¸í„° ìƒì„±
+        UpdatePointer();
     }
 
-    private void HandleMouseSelection()
+    private void HandleMouse()
     {
-        // µå·¡±× ½ÃÀÛ
+        // ì¢Œí´ë¦­ ì‹œ
+        // ë“œë˜ê·¸ ì‹œì‘
         if (Input.GetMouseButtonDown(0))
         {
             start = Input.mousePosition;
@@ -68,79 +101,118 @@ public class UserControl : MonoBehaviour
             if (EventSystem.current.IsPointerOverGameObject())
                 return;
 
-            TryClickSelectUnit();
-            Debug.Log("µå·¡±× ½ÃÀÛ");
+            HandleLeftClick();
         }
 
-        // µå·¡±× Áß
+        // ë“œë˜ê·¸ ì¤‘
         if (Input.GetMouseButton(0))
         {
             end = Input.mousePosition;
             DrawDragRectangle();
         }
 
-        // µå·¡±× Á¾·á
+        // ë“œë˜ê·¸ ì¢…ë£Œ
         if (Input.GetMouseButtonUp(0))
         {
             CalculateDragRect();
             SelectUnits();
 
-            Debug.Log("µå·¡±× Á¾·á");
             start = Vector2.zero;
             end = Vector2.zero;
 
             DrawDragRectangle();
         }
+
+        // ìš°í´ë¦­ ì‹œ
+        if (Input.GetMouseButtonDown(1))
+        {
+            RaycastHit hit;
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+            // ìœ ë‹› ì˜¤ë¸Œì íŠ¸(layerGround)ë¥¼ í´ë¦­í–ˆì„ ë•Œ
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerGround))
+            {
+                rtsUnitController.MoveSelectedUnits(hit.point);
+                
+                moveModeOn();
+                UpdatePointer();
+                movePointer.transform.position = hit.point;
+                movePointer.SetActive(true);
+
+                AllModeOff();
+            }
+        }
+    }
+
+    private void HandlekeyBoard()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            attackModeOn();
+        }
     }
 
     /// <summary>
-    /// Å¬¸¯ ¼±ÅÃ
+    /// í´ë¦­ ì„ íƒ
     /// </summary>
-    private void TryClickSelectUnit()
+    private void HandleLeftClick()
     {
-        RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hitUnit;
+        RaycastHit hitGround;
 
-        if (Physics.Raycast(ray, out  hit, Mathf.Infinity, layerUnit))
+        bool clickedUnit = Physics.Raycast(ray, out hitUnit, Mathf.Infinity, layerUnit);
+        bool clickedGround = Physics.Raycast(ray, out hitGround, Mathf.Infinity, layerGround);
+
+        // 1. ìœ ë‹› í´ë¦­
+        if (clickedUnit)
         {
-            UnitController unit = hit.transform.GetComponent<UnitController>();
+            UnitController unit = hitUnit.transform.GetComponent<UnitController>();
 
-            if (unit == null)
+            if (unit != null)
             {
+                if (Input.GetKey(KeyCode.LeftShift))
+                    rtsUnitController.ShiftClickSelectUnit(unit);
+                else
+                    rtsUnitController.ClickSelectUnit(unit);
+
+                return; // ğŸ‘‰ ì¤‘ìš”: ì—¬ê¸°ì„œ ì¢…ë£Œ (ëª…ë ¹ ì•ˆ í•¨)
+            }
+        }
+
+        // 2. ë•… í´ë¦­ = ëª…ë ¹ ì²˜ë¦¬
+        if (clickedGround)  
+        {
+            if (attackMode)
+            {
+                rtsUnitController.AttackGroundSelectedUnits(hitGround.point);
+
+                attackPointer.transform.position = hitGround.point;
+                attackPointer.SetActive(true);
+
+                AllModeOff();
+
                 return;
             }
+        }
 
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                rtsUnitController.ShiftClickSelectUnit(unit);
-            }
-            else
-            {
-                rtsUnitController.ClickSelectUnit(unit);
-            }
-        }
-        else
-        {
-            if (!Input.GetKey(KeyCode.LeftShift))
-            {
-                rtsUnitController.DeselectAll();
-            }
-        }
+       // 3. ì•„ë¬´ê²ƒë„ ì•„ë‹Œ ê³³ í´ë¦­ = ì„ íƒ í•´ì œ
+        rtsUnitController.DeselectAll();
     }
 
     /// <summary>
-    /// µå·¡±× ¹Ú½º Ç¥½Ã
+    /// ë“œë˜ê·¸ ë°•ìŠ¤ í‘œì‹œ
     /// </summary>
     private void DrawDragRectangle()
     {
-        // µå·¡±× ¹üÀ§¸¦ ³ªÅ¸³»´Â Image UIÀÇ À§Ä¡
+        // ë“œë˜ê·¸ ë²”ìœ„ë¥¼ ë‚˜íƒ€ë‚´ëŠ” Image UIì˜ ìœ„ì¹˜
         dragRectangle.position = (start + end) * 0.5f;
-        // µå·¡±× ¹üÀ§¸¦ ³ªÅ¸³»´Â Image UIÀÇ Å©±â
+        // ë“œë˜ê·¸ ë²”ìœ„ë¥¼ ë‚˜íƒ€ë‚´ëŠ” Image UIì˜ í¬ê¸°
         dragRectangle.sizeDelta = new Vector2(Mathf.Abs(start.x - end.x), Mathf.Abs(start.y - end.y));
     }
 
     /// <summary>
-    /// µå·¡±× ¿µ¿ª °è»ê
+    /// ë“œë˜ê·¸ ì˜ì—­ ê³„ì‚°
     /// </summary>
     private void CalculateDragRect()
     {
@@ -168,29 +240,83 @@ public class UserControl : MonoBehaviour
     }
 
     /// <summary>
-    /// µå·¡±× ¹üÀ§ ³» À¯´Ö ¼±ÅÃ
+    /// ë“œë˜ê·¸ ë²”ìœ„ ë‚´ ìœ ë‹› ì„ íƒ
     /// </summary>
     private void SelectUnits()
     {
-        Debug.Log("SelectUnits ½ÇÇà");
-
-        Debug.Log("UnitList °³¼ö : " + rtsUnitController.UnitList.Count);
-
         foreach (UnitController unit in rtsUnitController.UnitList)
         {
             Vector3 screenPos =
                 mainCamera.WorldToScreenPoint(unit.transform.position);
 
-            Debug.Log(unit.name);
-            Debug.Log(screenPos);
-            Debug.Log(dragRect);
-
             if (dragRect.Contains(screenPos))
             {
-                Debug.Log(unit.name + " ¼±ÅÃ¹üÀ§ Æ÷ÇÔ");
-
                 rtsUnitController.DragSelectUnit(unit);
             }
+        }
+    }
+
+    private void AllModeOff()
+    {
+        attackMode = false;
+        moveMode = false;
+        patrolMode = false;
+        rallyMode = false;
+    }
+
+    //ì…ë ¥ ìƒíƒœ ë³€í™”
+    private void attackModeOn()
+    {
+        attackMode = true;
+        moveMode = false;
+        patrolMode = false;
+        rallyMode = false;
+    }
+    private void moveModeOn()
+    {
+        attackMode = false;
+        moveMode = true;
+        patrolMode = false;
+        rallyMode = false;
+    }
+    private void patrolModeOn()
+    {
+        attackMode = false;
+        moveMode = false;
+        patrolMode = true;
+        rallyMode = false;
+    }
+    private void rallyModeOn()
+    {
+        attackMode = false;
+        moveMode = false;
+        patrolMode = false;
+        rallyMode = true;
+    }
+    private void UpdatePointer()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+        if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerGround))
+            return;
+
+        if (attackMode)
+        {
+            attackPointer.SetActive(true);
+            movePointer.SetActive(false);
+
+            attackPointer.transform.position = hit.point;
+        }
+        else if (moveMode || patrolMode || rallyMode)
+        {
+            movePointer.SetActive(true);
+            attackPointer.SetActive(false);
+
+            movePointer.transform.position = hit.point;
+        }
+        else
+        {
+
         }
     }
 }

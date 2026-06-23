@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 861018106349373404}
   - component: {fileID: 8143100185975861809}
   m_Layer: 0
-  m_Name: TestPointer
+  m_Name: TestAttackPointer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2974572680955987084
 Transform:
   m_ObjectHideFlags: 0
@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 2934299905608118493}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.125782, y: 3.3473687e-17, z: -7.537604}
+  m_LocalPosition: {x: -10.932694, y: 7.1210675e-17, z: -16.035217}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 467c9713a5cff324abe1a0b22e256caf, type: 2}
+  - {fileID: 2100000, guid: 96bc84ee02e191a44b53f0b8a5124caf, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
