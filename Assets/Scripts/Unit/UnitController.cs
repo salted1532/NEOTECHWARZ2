@@ -15,8 +15,8 @@ public class UnitController : MonoBehaviour
     [SerializeField]
     private float moveSpeed = 10f;
     private Vector3 targetPosition;
+    [SerializeField]
     private bool isMovingAirUnit = false;
-    private bool airMovementLocked = false;
     [SerializeField]
     private bool isAirUnit;
 
@@ -25,12 +25,13 @@ public class UnitController : MonoBehaviour
     {
         Idle,
         Move,
-        Chase,
         Attack
     }
 
+    [SerializeField]
     private UnitState currentState = UnitState.Idle;
 
+    private bool arrived = false;
     public bool alreadyAttacked = false;
     public float timeBetweenAttacks;
 
@@ -40,7 +41,7 @@ public class UnitController : MonoBehaviour
             navMeshAgent = GetComponent<NavMeshAgent>();
         else
         {
-            targetPosition = targetPosition + Vector3.up * 5f;
+            targetPosition = transform.position + Vector3.up * 5f;
             isMovingAirUnit = true;
         }
     }
@@ -59,7 +60,7 @@ public class UnitController : MonoBehaviour
     void Update()
     {
         //공중 유닛 일 경우
-        if (isAirUnit && isMovingAirUnit && !airMovementLocked)
+        if (isAirUnit && isMovingAirUnit)
         {
             transform.position = Vector3.MoveTowards(
                 transform.position,
@@ -77,7 +78,26 @@ public class UnitController : MonoBehaviour
             }
 
             if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+            {
                 isMovingAirUnit = false;
+                currentState = UnitState.Idle;
+                Debug.Log("공중유닛 도착 !");
+            }
+        }
+        //지상 유닛 일 경우
+        if (!isAirUnit)
+        {
+            if (!arrived &&
+                !navMeshAgent.pathPending &&
+                navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+            {
+                if (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude < 0f)
+                {
+                    arrived = true;
+                    currentState = UnitState.Idle;
+                    Debug.Log("지상유닛 도착 !");
+                }
+            }
         }
     }
 
@@ -95,8 +115,7 @@ public class UnitController : MonoBehaviour
 
     public void MoveTo(Vector3 end)
     {
-        airMovementLocked = false;
-
+        arrived = false;
         currentState = UnitState.Move;
 
         if (!isAirUnit)
@@ -113,6 +132,7 @@ public class UnitController : MonoBehaviour
 
     public void AttackToGround(Vector3 end)
     {
+        arrived = false;
         //idle 모드로 변경(적 발견시 바로 공격)
         currentState = UnitState.Idle;
         if (isAirUnit == false)
@@ -132,6 +152,7 @@ public class UnitController : MonoBehaviour
 
     public void AttackToUnit(Vector3 end)
     {
+        arrived = false;
         currentState = UnitState.Attack;
         if (isAirUnit == false)
         {
@@ -143,7 +164,7 @@ public class UnitController : MonoBehaviour
         }
         else
         {
-            targetPosition = end + Vector3.up * 5f;
+            targetPosition = end + Vector3.up * 5f; ;
             isMovingAirUnit = true;
         }
 
@@ -155,10 +176,8 @@ public class UnitController : MonoBehaviour
     // ======================
     public void ChaseTarget(Vector3 pos)
     {
-        airMovementLocked = false;
-
-        currentState = UnitState.Chase;
-
+        arrived = false;
+        currentState = UnitState.Idle;
         if (!isAirUnit)
         {
             navMeshAgent.isStopped = false;
@@ -171,29 +190,28 @@ public class UnitController : MonoBehaviour
         }
     }
 
-    public void Attack(Vector3 end, int damage)
+    public void Attack(Vector3 end, int damage, GameObject enemy)
     {
-        currentState = UnitState.Attack;
-
         if (!isAirUnit)
         {
             navMeshAgent.isStopped = true;
         }
         else
         {
-            airMovementLocked = true;   // ⭐ 핵심
+            targetPosition = transform.position + Vector3.up * 5f;
             isMovingAirUnit = false;
         }
+
+        RotateYOnly(end);
+
 
         if (alreadyAttacked)
             return;
 
-        RotateYOnly(end);
+        Debug.Log("공격성공!");
 
         alreadyAttacked = true;
         Invoke(nameof(ResetAttack), timeBetweenAttacks);
-
-        Debug.Log("공격 성공!");
     }
 
     //공격 리셋
@@ -226,6 +244,7 @@ public class UnitController : MonoBehaviour
     // 상태 확인용 (AttackRange용)
     // ======================
     public bool IsIdle() => currentState == UnitState.Idle;
-    public bool IsChasing() => currentState == UnitState.Chase;
-    public bool IsAttacking() => currentState == UnitState.Attack;
+
+    public bool IsMove() => currentState == UnitState.Move;
+    public bool IsAttack() => currentState == UnitState.Attack;
 }
