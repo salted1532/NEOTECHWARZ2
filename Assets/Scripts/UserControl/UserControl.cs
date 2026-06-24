@@ -39,25 +39,17 @@ public class UserControl : MonoBehaviour
     private Rect dragRect;
     private Vector3 mousePos;
 
-    [SerializeField]
-    private bool attackMode = false;
-    [SerializeField]
-    private bool moveMode = false;
-    [SerializeField]
-    private bool patrolMode = false;
-    [SerializeField]
-    private bool rallyMode = false;
-    [SerializeField]
-    private bool modeOn = false;
-
-    private enum PointerType
+    private enum OrderState
     {
         None,
         Attack,
-        Basic
+        Move,
+        Patrol,
+        Rally
     }
 
-    private PointerType currentPointer = PointerType.None;
+    [SerializeField]
+    private OrderState UsercurrentState = OrderState.None;
 
     private void Awake()
     {
@@ -133,22 +125,14 @@ public class UserControl : MonoBehaviour
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerGround))
             {
                 rtsUnitController.MoveSelectedUnits(hit.point);
-                
-                moveModeOn();
+
+                UsercurrentState = OrderState.Move;
                 UpdatePointer();
                 movePointer.transform.position = hit.point;
                 movePointer.SetActive(true);
 
-                AllModeOff();
+                UsercurrentState = OrderState.None;
             }
-        }
-    }
-
-    private void HandlekeyBoard()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            attackModeOn();
         }
     }
 
@@ -158,20 +142,26 @@ public class UserControl : MonoBehaviour
     private void HandleLeftClick()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hitUnit;
-        RaycastHit hitGround;
+        RaycastHit unitHit;
+        RaycastHit groundHit;
+        RaycastHit enemyHit;
+        RaycastHit BuildingHit;
+        RaycastHit OreHit;
 
-        bool clickedUnit = Physics.Raycast(ray, out hitUnit, Mathf.Infinity, layerUnit);
-        bool clickedGround = Physics.Raycast(ray, out hitGround, Mathf.Infinity, layerGround);
+        bool clickedUnit = Physics.Raycast(ray, out unitHit, Mathf.Infinity, layerUnit);
+        bool clickedGround = Physics.Raycast(ray, out groundHit, Mathf.Infinity, layerGround);
+        bool clickedEnemy = Physics.Raycast(ray, out enemyHit, Mathf.Infinity, layerEnemy);
+        bool clickedBuilding = Physics.Raycast(ray, out BuildingHit, Mathf.Infinity, layerBuilding);
+        bool clickedOre = Physics.Raycast(ray, out OreHit, Mathf.Infinity, layerOre);
 
         // 1. 유닛 클릭
         if (clickedUnit)
         {
-            UnitController unit = hitUnit.transform.GetComponent<UnitController>();
+            UnitController unit = unitHit.transform.GetComponent<UnitController>();
 
             if (unit != null)
             {
-                if (Input.GetKey(KeyCode.LeftShift))
+                if (Input.GetKey(KeyCode.LeftShift))        
                     rtsUnitController.ShiftClickSelectUnit(unit);
                 else
                     rtsUnitController.ClickSelectUnit(unit);
@@ -183,22 +173,85 @@ public class UserControl : MonoBehaviour
         // 2. 땅 클릭 = 명령 처리
         if (clickedGround)  
         {
-            if (attackMode)
+            if (UsercurrentState == OrderState.Attack)
             {
-                rtsUnitController.AttackGroundSelectedUnits(hitGround.point);
+                rtsUnitController.AttackGroundSelectedUnits(groundHit.point);
 
-                attackPointer.transform.position = hitGround.point;
+                attackPointer.transform.position = groundHit.point;
                 attackPointer.SetActive(true);
 
-                AllModeOff();
+                UsercurrentState = OrderState.None;
+
+                return;
+            }
+
+            if (UsercurrentState == OrderState.Patrol)
+            {
+                rtsUnitController.PatrolSelectedUnits(groundHit.point);
+
+                movePointer.transform.position = groundHit.point;
+                movePointer.SetActive(true);
+
+                UsercurrentState = OrderState.None;
 
                 return;
             }
         }
 
-       // 3. 아무것도 아닌 곳 클릭 = 선택 해제
+        // 3. 적 클릭 = 명령 처리
+        if (clickedEnemy)
+        {
+
+        }
+
+        // 4. 건물 클릭 = 명령 처리
+        if (clickedBuilding)
+        {
+
+        }
+
+        // 5. 광물 클릭 = 명령 처리
+        if (clickedOre)
+        {
+
+        }
+
+        // 6. 아무것도 아닌 곳 클릭 = 선택 해제
         rtsUnitController.DeselectAll();
     }
+    private void HandlekeyBoard()
+    {
+
+        if(rtsUnitController.IsUnitSelect())
+        {
+            // 공격모드 변화
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                UsercurrentState = OrderState.Attack;
+            }
+
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                rtsUnitController.StopSelectedUnits();
+            }
+
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                rtsUnitController.HoldSelectedUnits();
+            }
+            // 순찰모드 변화
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                UsercurrentState = OrderState.Patrol;
+            }
+            // 이동모드 변화
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                UsercurrentState = OrderState.Move;
+            }
+        }
+    }
+
 
     /// <summary>
     /// 드래그 박스 표시
@@ -256,43 +309,6 @@ public class UserControl : MonoBehaviour
         }
     }
 
-    private void AllModeOff()
-    {
-        attackMode = false;
-        moveMode = false;
-        patrolMode = false;
-        rallyMode = false;
-    }
-
-    //입력 상태 변화
-    private void attackModeOn()
-    {
-        attackMode = true;
-        moveMode = false;
-        patrolMode = false;
-        rallyMode = false;
-    }
-    private void moveModeOn()
-    {
-        attackMode = false;
-        moveMode = true;
-        patrolMode = false;
-        rallyMode = false;
-    }
-    private void patrolModeOn()
-    {
-        attackMode = false;
-        moveMode = false;
-        patrolMode = true;
-        rallyMode = false;
-    }
-    private void rallyModeOn()
-    {
-        attackMode = false;
-        moveMode = false;
-        patrolMode = false;
-        rallyMode = true;
-    }
     private void UpdatePointer()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -300,14 +316,14 @@ public class UserControl : MonoBehaviour
         if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerGround))
             return;
 
-        if (attackMode)
+        if (UsercurrentState == OrderState.Attack)
         {
             attackPointer.SetActive(true);
             movePointer.SetActive(false);
 
             attackPointer.transform.position = hit.point;
         }
-        else if (moveMode || patrolMode || rallyMode)
+        else if (UsercurrentState == OrderState.Move || UsercurrentState == OrderState.Patrol || UsercurrentState == OrderState.Rally)
         {
             movePointer.SetActive(true);
             attackPointer.SetActive(false);

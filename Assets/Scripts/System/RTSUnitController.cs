@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Net.Sockets;
+using UnityEditor;
 using UnityEngine;
 
 public class RTSUnitController : MonoBehaviour
@@ -9,15 +11,20 @@ public class RTSUnitController : MonoBehaviour
     // 맵에 존재하는 모든 유닛
     public List<UnitController> UnitList;
 
+    // ===== 상태 하나로 통합 =====
+    public enum SelectState
+    {
+        None,
+        UnitSelect,
+        BuildingSelect,
+        EnemySelect,
+        OreSelect,
+        MainBaseSelect,
+        BuildMode
 
-    // 선택 상태
-    public bool SelectMode = false;
-    public bool isUnitSelect = false;
-    public bool isBuildingSelect = false;
-    public bool isOreSelect = false;
-    public bool isEnemySelect = false;
-    public bool MainBaseSelect = false;
-    public bool BuildMode = false;
+    }
+
+    public SelectState RTScurrentSate = SelectState.None;
 
     private void Awake()
     {
@@ -68,11 +75,13 @@ public class RTSUnitController : MonoBehaviour
     /// </summary>
     public void DeselectAll()
     {
+
         foreach (UnitController unit in selectedUnitList)
         {
             unit.DeselectUnit();
         }
 
+        RTScurrentSate = SelectState.None;
         selectedUnitList.Clear();
     }
 
@@ -81,6 +90,7 @@ public class RTSUnitController : MonoBehaviour
     /// </summary>
     private void SelectUnit(UnitController unit)
     {
+        RTScurrentSate = SelectState.UnitSelect;
         unit.SelectUnit();
         selectedUnitList.Add(unit);
     }
@@ -90,6 +100,7 @@ public class RTSUnitController : MonoBehaviour
     /// </summary>
     private void DeselectUnit(UnitController unit)
     {
+        RTScurrentSate = SelectState.None;
         unit.DeselectUnit();
         selectedUnitList.Remove(unit);
     }
@@ -101,6 +112,7 @@ public class RTSUnitController : MonoBehaviour
     {
         return selectedUnitList;
     }
+
     public void MoveSelectedUnits(Vector3 end)
     { 
         for (int i = 0; i < selectedUnitList.Count; ++i)
@@ -130,4 +142,35 @@ public class RTSUnitController : MonoBehaviour
             selectedUnitList[i].AttackToGround(end);
         }
     }
+    public void StopSelectedUnits()
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].StopUnit();
+        }
+    }
+    public void HoldSelectedUnits()
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].HoldUnit();
+        }
+    }
+
+    public void PatrolSelectedUnits(Vector3 end)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].PatrolUnit(end);
+        }
+    }
+
+    // 상태 확인용
+    public bool IsNone() => RTScurrentSate == SelectState.None;
+    public bool IsUnitSelect() => RTScurrentSate == SelectState.UnitSelect;
+    public bool IsBuildingSelect() => RTScurrentSate == SelectState.BuildingSelect;
+    public bool IsEnemySelect() => RTScurrentSate == SelectState.EnemySelect;
+    public bool IsOreSelect() => RTScurrentSate == SelectState.OreSelect;
+    public bool IsMainBaseSelect() => RTScurrentSate == SelectState.MainBaseSelect;
+    public bool IsBuildMode() => RTScurrentSate == SelectState.BuildMode;
 }

@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Net;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Audio;
@@ -29,21 +30,30 @@ public class UnitController : MonoBehaviour
     }
 
     [SerializeField]
-    private UnitState currentState = UnitState.Idle;
+    private UnitState UnitcurrentState = UnitState.Idle;
 
     private bool arrived = false;
     public bool alreadyAttacked = false;
     public float timeBetweenAttacks;
 
+    private bool patrolling = false;
+    private bool goingToEnd = true;
+
+    private Vector3 startPoint;
+    private Vector3 endPoint;
+
     private void Awake()
     {
         if (!isAirUnit)
+        {
             navMeshAgent = GetComponent<NavMeshAgent>();
+        }
         else
         {
             targetPosition = transform.position + Vector3.up * 5f;
             isMovingAirUnit = true;
         }
+
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -80,7 +90,7 @@ public class UnitController : MonoBehaviour
             if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
             {
                 isMovingAirUnit = false;
-                currentState = UnitState.Idle;
+                UnitcurrentState = UnitState.Idle;
                 Debug.Log("공중유닛 도착 !");
             }
         }
@@ -94,11 +104,13 @@ public class UnitController : MonoBehaviour
                 if (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude < 0f)
                 {
                     arrived = true;
-                    currentState = UnitState.Idle;
+                    UnitcurrentState = UnitState.Idle;
                     Debug.Log("지상유닛 도착 !");
                 }
             }
         }
+
+        PatrolTick();
     }
 
     public void SelectUnit()
@@ -116,7 +128,7 @@ public class UnitController : MonoBehaviour
     public void MoveTo(Vector3 end)
     {
         arrived = false;
-        currentState = UnitState.Move;
+        UnitcurrentState = UnitState.Move;
 
         if (!isAirUnit)
         {
@@ -134,7 +146,7 @@ public class UnitController : MonoBehaviour
     {
         arrived = false;
         //idle 모드로 변경(적 발견시 바로 공격)
-        currentState = UnitState.Idle;
+        UnitcurrentState = UnitState.Idle;
         if (isAirUnit == false)
         {
             navMeshAgent.isStopped = false;
@@ -153,7 +165,7 @@ public class UnitController : MonoBehaviour
     public void AttackToUnit(Vector3 end)
     {
         arrived = false;
-        currentState = UnitState.Attack;
+        UnitcurrentState = UnitState.Attack;
         if (isAirUnit == false)
         {
             navMeshAgent.isStopped = false;
@@ -177,7 +189,7 @@ public class UnitController : MonoBehaviour
     public void ChaseTarget(Vector3 pos)
     {
         arrived = false;
-        currentState = UnitState.Idle;
+        UnitcurrentState = UnitState.Idle;
         if (!isAirUnit)
         {
             navMeshAgent.isStopped = false;
@@ -240,11 +252,104 @@ public class UnitController : MonoBehaviour
         );
     }
 
+    public void StopUnit()
+    {
+        UnitcurrentState = UnitState.Idle;
+
+        if (!isAirUnit)
+        {
+            navMeshAgent.isStopped = true;
+        }
+        else
+        {
+            targetPosition = transform.position + Vector3.up * 5f;
+            isMovingAirUnit = false;
+        }
+ 
+
+    }
+    public void PatrolUnit(Vector3 end)
+    {
+        UnitcurrentState = UnitState.Move;
+
+        startPoint = transform.position;
+        endPoint = end;
+
+        patrolling = true;
+        goingToEnd = true;
+
+        arrived = false;   // 🔥 중요 (버그 방지)
+
+        if (!isAirUnit)
+        {
+            navMeshAgent.isStopped = false;
+            navMeshAgent.SetDestination(endPoint);
+        }
+        else
+        {
+            targetPosition = endPoint + Vector3.up * 5f;
+            isMovingAirUnit = true;
+        }
+    }
+
+    void PatrolTick()
+    {
+        if (!patrolling)
+            return;
+
+        bool arrivedGround =
+            !isAirUnit &&
+            !navMeshAgent.pathPending &&
+            navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance;
+
+        bool arrivedAir =
+            isAirUnit &&
+            (targetPosition - transform.position).sqrMagnitude < 0.5f;
+
+        if (!arrivedGround && !arrivedAir)
+            return;
+
+        arrived = false; // 🔥 다음 이동 준비
+
+        if (goingToEnd)
+        {
+            goingToEnd = false;
+
+            if (!isAirUnit)
+                navMeshAgent.SetDestination(startPoint);
+            else
+                targetPosition = startPoint;
+        }
+        else
+        {
+            goingToEnd = true;
+
+            if (!isAirUnit)
+                navMeshAgent.SetDestination(endPoint);
+            else
+                targetPosition = endPoint + Vector3.up * 5f;
+        }
+    }
+
+    public void HoldUnit()
+    {
+        UnitcurrentState = UnitState.Attack;
+
+        if (!isAirUnit)
+        {
+            navMeshAgent.isStopped = true;
+        }
+        else
+        {
+            targetPosition = transform.position + Vector3.up * 5f;
+            isMovingAirUnit = false;
+        }
+    }
+
     // ======================
     // 상태 확인용 (AttackRange용)
     // ======================
-    public bool IsIdle() => currentState == UnitState.Idle;
-
-    public bool IsMove() => currentState == UnitState.Move;
-    public bool IsAttack() => currentState == UnitState.Attack;
+    public bool IsIdle() => UnitcurrentState == UnitState.Idle;
+    public bool IsMove() => UnitcurrentState == UnitState.Move;
+    public bool IsAttack() => UnitcurrentState == UnitState.Attack;
 }
