@@ -115,23 +115,26 @@ public class UserControl : MonoBehaviour
             DrawDragRectangle();
         }
 
-        // 우클릭 시
-        if (Input.GetMouseButtonDown(1))
+        if (rtsUnitController.IsUnitSelect())
         {
-            RaycastHit hit;
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-
-            // 유닛 오브젝트(layerGround)를 클릭했을 때
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerGround))
+            // 우클릭 시
+            if (Input.GetMouseButtonDown(1))
             {
-                rtsUnitController.MoveSelectedUnits(hit.point);
+                RaycastHit hit;
+                Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-                UsercurrentState = OrderState.Move;
-                UpdatePointer();
-                movePointer.transform.position = hit.point;
-                movePointer.SetActive(true);
+                // 유닛 오브젝트(layerGround)를 클릭했을 때
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerGround))
+                {
+                    rtsUnitController.MoveSelectedUnits(hit.point);
 
-                UsercurrentState = OrderState.None;
+                    UsercurrentState = OrderState.Move;
+                    UpdatePointer();
+                    movePointer.transform.position = hit.point;
+                    movePointer.SetActive(true);
+
+                    UsercurrentState = OrderState.None;
+                }
             }
         }
     }
