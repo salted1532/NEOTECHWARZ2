@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using UnityEditor;
 using UnityEngine;
@@ -7,9 +8,11 @@ public class RTSUnitController : MonoBehaviour
 {
     // 현재 선택된 유닛들
     public List<UnitController> selectedUnitList;
+    public List<BuildingController> selectedBuildingList;
 
     // 맵에 존재하는 모든 유닛
     public List<UnitController> UnitList;
+    public List<BuildingController> BuildingList;
 
     // ===== 상태 하나로 통합 =====
     public enum SelectState
@@ -31,6 +34,14 @@ public class RTSUnitController : MonoBehaviour
         selectedUnitList = new List<UnitController>();
         UnitList = new List<UnitController>();
     }
+
+    private void Update()
+    {
+        UnitList.RemoveAll(unit => unit == null);
+        BuildingList.RemoveAll(building => building == null);
+    }
+
+    #region Unit선택 명령
 
     /// <summary>
     /// 좌클릭 단일 선택
@@ -68,21 +79,6 @@ public class RTSUnitController : MonoBehaviour
             SelectUnit(newUnit);
 
         }
-    }
-
-    /// <summary>
-    /// 모든 선택 해제
-    /// </summary>
-    public void DeselectAll()
-    {
-
-        foreach (UnitController unit in selectedUnitList)
-        {
-            unit.DeselectUnit();
-        }
-
-        RTScurrentSate = SelectState.None;
-        selectedUnitList.Clear();
     }
 
     /// <summary>
@@ -163,6 +159,89 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].PatrolUnit(end);
         }
+    }
+
+    #endregion
+
+    #region Building선택 명령
+
+    /// <summary>
+    /// 좌클릭 단일 선택
+    /// </summary>
+    public void ClickSelectBuilding(BuildingController newbuilding)
+    {
+        DeselectAll();
+        Selectbuilding(newbuilding);
+
+        Debug.Log("건물 단일 선택");
+    }
+
+    /// <summary>
+    /// Shift + 클릭
+    /// </summary>
+    public void ShiftClickSelectBuilding(BuildingController newbuilding)
+    {
+        if (selectedBuildingList.Contains(newbuilding))
+        {
+            Deselectbuilding(newbuilding);
+        }
+        else
+        {
+            Selectbuilding(newbuilding);
+        }
+    }
+
+    /// <summary>
+    /// 드래그 선택
+    /// </summary>
+    public void DragSelectBuilding(BuildingController newbuilding)
+    {
+        if (!selectedBuildingList.Contains(newbuilding))
+        {
+            Selectbuilding(newbuilding);
+        }
+    }
+
+    /// <summary>
+    /// 유닛 선택
+    /// </summary>
+    private void Selectbuilding(BuildingController building)
+    {
+        RTScurrentSate = SelectState.BuildingSelect;
+        building.SelectBuilding();
+        selectedBuildingList.Add(building);
+    }
+
+    /// <summary>
+    /// 특정 유닛 선택 해제
+    /// </summary>
+    private void Deselectbuilding(BuildingController building)
+    {
+        RTScurrentSate = SelectState.None;
+        building.DeselecBuilding();
+        selectedBuildingList.Remove(building);
+    }
+
+    #endregion
+
+    /// <summary>
+    /// 모든 선택 해제
+    /// </summary>
+    public void DeselectAll()
+    {
+        foreach (UnitController unit in selectedUnitList)
+        {
+            unit.DeselectUnit();
+        }
+
+        foreach (BuildingController building in selectedBuildingList)
+        {
+            building.DeselecBuilding();
+        }
+
+        RTScurrentSate = SelectState.None;
+        selectedUnitList.Clear();
+        selectedBuildingList.Clear();
     }
 
     // 상태 확인용

@@ -107,7 +107,7 @@ public class UserControl : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             CalculateDragRect();
-            SelectUnits();
+            SelectObject();
 
             start = Vector2.zero;
             end = Vector2.zero;
@@ -161,7 +161,7 @@ public class UserControl : MonoBehaviour
         if (clickedUnit)
         {
             UnitController unit = unitHit.transform.GetComponent<UnitController>();
-
+            
             if (unit != null)
             {
                 if (Input.GetKey(KeyCode.LeftShift))        
@@ -210,7 +210,17 @@ public class UserControl : MonoBehaviour
         // 4. 건물 클릭 = 명령 처리
         if (clickedBuilding)
         {
+            BuildingController building = BuildingHit.transform.GetComponent<BuildingController>();
 
+            if (building != null)
+            {
+                if (Input.GetKey(KeyCode.LeftShift))
+                    rtsUnitController.ShiftClickSelectBuilding(building);
+                else
+                    rtsUnitController.ClickSelectBuilding(building);
+
+                return; // 👉 중요: 여기서 종료 (명령 안 함)
+            }
         }
 
         // 5. 광물 클릭 = 명령 처리
@@ -296,10 +306,23 @@ public class UserControl : MonoBehaviour
     }
 
     /// <summary>
-    /// 드래그 범위 내 유닛 선택
+    /// 드래그 범위 내 모든것 선택
     /// </summary>
-    private void SelectUnits()
+    private void SelectObject()
     {
+        //건물 선택
+        foreach (BuildingController building in rtsUnitController.BuildingList)
+        {
+            Vector3 screenPos =
+                mainCamera.WorldToScreenPoint(building.transform.position);
+
+            if (dragRect.Contains(screenPos))
+            {
+                rtsUnitController.DragSelectBuilding(building);
+            }
+        }
+
+        //유닛 선택
         foreach (UnitController unit in rtsUnitController.UnitList)
         {
             Vector3 screenPos =
