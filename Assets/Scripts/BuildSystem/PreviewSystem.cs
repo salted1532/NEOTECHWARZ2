@@ -30,6 +30,13 @@ public class PreviewSystem : MonoBehaviour
         cellIndicator.SetActive(true);
     }
 
+    public void StartBuildModeCursor()
+    {
+        cellIndicator.SetActive(true);
+
+        PrepareCursor(Vector2Int.one);
+    }
+
     private void PrepareCursor(Vector2Int size)
     {
         if (size.x > 0 || size.y > 0)

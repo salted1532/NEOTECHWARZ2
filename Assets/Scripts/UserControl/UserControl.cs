@@ -262,6 +262,11 @@ public class UserControl : MonoBehaviour
             {
                 UsercurrentState = OrderState.Move;
             }
+
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                //건설 모드 전환
+            }
         }
     }
 

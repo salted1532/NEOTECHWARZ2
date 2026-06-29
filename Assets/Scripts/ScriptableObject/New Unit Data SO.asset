@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92c9da5dc3b1c624dba21816b696e695, type: 3}
+  m_Name: New Unit Data SO
+  m_EditorClassIdentifier: Assembly-CSharp::UnitDataSO
+  unitData:
+  - <unitName>k__BackingField: TestGroundUnit
+    <ID>k__BackingField: 1
+    <hp>k__BackingField: 50
+    <attackDamge>k__BackingField: 5
+    <attackRange>k__BackingField: 5
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 8311135cf5a7a1f4da476c34a1195cfb, type: 3}
+  - <unitName>k__BackingField: TestAirUnit
+    <ID>k__BackingField: 2
+    <hp>k__BackingField: 50
+    <attackDamge>k__BackingField: 5
+    <attackRange>k__BackingField: 7
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 99aa8bdc07b774540a0ff31040a41361, type: 3}

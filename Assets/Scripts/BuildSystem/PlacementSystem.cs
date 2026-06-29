@@ -10,7 +10,7 @@ public class PlacementSystem : MonoBehaviour
     [SerializeField] private GameObject mouseIndicator, cellIndicator;
     [SerializeField] private InputManager inputManager;
     [SerializeField] private Grid grid;
-    [SerializeField] private ObjectDatabaseSO database;
+    [SerializeField] private BuildingDataSO database;
     [SerializeField] private GameObject gridVisualization;
     [SerializeField] private PreviewSystem preview;
 
@@ -34,7 +34,7 @@ public class PlacementSystem : MonoBehaviour
     {
         StopPlacement();
 
-        selectedObjectIndex = database.objectData.FindIndex(d => d.ID == ID);
+        selectedObjectIndex = database.buildingData.FindIndex(d => d.ID == ID);
 
         if (selectedObjectIndex < 0)
         {
@@ -51,8 +51,8 @@ public class PlacementSystem : MonoBehaviour
         gridVisualization.SetActive(true);
 
         preview.StartShowingPlacementPreview(
-            database.objectData[selectedObjectIndex].Prefab,
-            database.objectData[selectedObjectIndex].Size
+            database.buildingData[selectedObjectIndex].Prefab,
+            database.buildingData[selectedObjectIndex].Size
         );
 
         inputManager.OnClicked += PlaceStructure;
@@ -67,7 +67,7 @@ public class PlacementSystem : MonoBehaviour
         Vector3 mousePos = inputManager.GetSelectedMapPosition();
         Vector3Int gridPos = grid.WorldToCell(mousePos);
 
-        var data = database.objectData[selectedObjectIndex];
+        var data = database.buildingData[selectedObjectIndex];
 
         if (!StructureData.CanPlaceObejctAt(gridPos, data.Size))
             return;
@@ -127,10 +127,12 @@ public class PlacementSystem : MonoBehaviour
 
         Vector3 center = GetPlacementWorldPosition(grid.WorldToCell(worldPos), size);
 
+        const float margin = 0.02f;
+
         Vector3 halfExtents = new Vector3(
-            size.x * cellSize.x * 0.5f,
+            size.x * cellSize.x * 0.5f - margin,
             1f,
-            size.y * cellSize.z * 0.5f
+            size.y * cellSize.z * 0.5f - margin
         );
 
         Collider[] hits = Physics.OverlapBox(
@@ -139,6 +141,13 @@ public class PlacementSystem : MonoBehaviour
             Quaternion.identity,
             blockingLayers
         );
+
+        foreach (Collider hit in hits)
+        {
+            Debug.Log(
+                $"Blocked by : {hit.name} | Layer : {LayerMask.LayerToName(hit.gameObject.layer)}"
+            );
+        }
 
         return hits.Length > 0;
     }
@@ -158,8 +167,13 @@ public class PlacementSystem : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.V)) StartPlacement(1);
-        if (Input.GetKeyDown(KeyCode.B)) StartPlacement(2);
+        if (Input.GetKeyDown(KeyCode.B))
+            StartPlacement(1);
+
+        if (Input.GetKeyDown(KeyCode.S))
+            StartPlacement(2);
+
+
 
         if (selectedObjectIndex < 0) return;
 
@@ -168,7 +182,7 @@ public class PlacementSystem : MonoBehaviour
 
         if (lastDectectedPosition != gridPos)
         {
-            var data = database.objectData[selectedObjectIndex];
+            var data = database.buildingData[selectedObjectIndex];
 
             bool valid = StructureData.CanPlaceObejctAt(gridPos, data.Size) && !IsBlocked(mousePos, data.Size);
 
