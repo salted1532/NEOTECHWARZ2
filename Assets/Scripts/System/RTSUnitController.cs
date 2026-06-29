@@ -3,6 +3,8 @@ using System.Linq;
 using System.Net.Sockets;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static RTSUnitController;
 
 public class RTSUnitController : MonoBehaviour
 {
@@ -14,6 +16,11 @@ public class RTSUnitController : MonoBehaviour
     public List<UnitController> UnitList;
     public List<BuildingController> BuildingList;
 
+    [SerializeField]
+    private UserControl userControl;
+    [SerializeField]
+    private UIController uIController;
+
     // ===== 상태 하나로 통합 =====
     public enum SelectState
     {
@@ -22,12 +29,31 @@ public class RTSUnitController : MonoBehaviour
         BuildingSelect,
         EnemySelect,
         OreSelect,
-        MainBaseSelect,
         BuildMode
+    }
+
+    public enum UnitState
+    {
+        None,
+        Worker,
+        AttackUnit 
+    }
+
+    public enum BuildingState
+    {
+        None,
+        MainBaseSelect,
+        Tier1Select,
+        Tier2Select,
+        Tier3Select,
+        SupplyDepot,
+        Lab
 
     }
 
     public SelectState RTScurrentSate = SelectState.None;
+    public BuildingState BuildingSelectState = BuildingState.None;
+    public UnitState UnitSelectState = UnitState.None;
 
     private void Awake()
     {
@@ -39,6 +65,61 @@ public class RTSUnitController : MonoBehaviour
     {
         UnitList.RemoveAll(unit => unit == null);
         BuildingList.RemoveAll(building => building == null);
+
+        switch (RTScurrentSate)
+        {
+            case SelectState.UnitSelect:
+                switch (UnitSelectState)
+                {
+                    case UnitState.Worker:
+                        uIController.ShowWorkerPanel(EnterMoveMode, EnterAttackMode, StopSelectedUnits, EnterPatrolMode, HoldSelectedUnits,EnterReturnMode, BuildModeOn);
+                        break;
+                    default:
+                        uIController.ShowAttackUnitPanel(EnterMoveMode, EnterAttackMode, StopSelectedUnits, EnterPatrolMode, HoldSelectedUnits);
+                        break;
+                }
+                break;
+
+            case SelectState.BuildingSelect:
+
+                switch (BuildingSelectState)
+                {
+                    case BuildingState.MainBaseSelect:
+                        break;
+
+                    case BuildingState.Tier1Select:
+                        break;
+
+                    case BuildingState.Tier2Select:
+                        break;
+
+                    case BuildingState.Tier3Select:
+                        break;
+
+                    case BuildingState.SupplyDepot:
+                        break;
+
+                    case BuildingState.Lab:
+                        break;
+                    case BuildingState.None:
+                        uIController.ClearPanel();
+                        break;
+                }
+                break;
+
+            case SelectState.EnemySelect:
+                break;
+
+            case SelectState.OreSelect:
+                break;
+
+            case SelectState.BuildMode:
+                break;
+
+            case SelectState.None:
+                uIController.ClearPanel();
+                break;
+        }
     }
 
     #region Unit선택 명령
@@ -87,6 +168,16 @@ public class RTSUnitController : MonoBehaviour
     private void SelectUnit(UnitController unit)
     {
         RTScurrentSate = SelectState.UnitSelect;
+
+        switch (unit.tag)
+        {
+            case "Worker":
+                UnitSelectState = UnitState.Worker;
+                break;
+            default:
+                UnitSelectState = UnitState.AttackUnit;
+                break;
+        }
         unit.SelectUnit();
         selectedUnitList.Add(unit);
     }
@@ -171,7 +262,7 @@ public class RTSUnitController : MonoBehaviour
     public void ClickSelectBuilding(BuildingController newbuilding)
     {
         DeselectAll();
-        Selectbuilding(newbuilding);
+        SelectBuilding(newbuilding);
 
         Debug.Log("건물 단일 선택");
     }
@@ -187,7 +278,7 @@ public class RTSUnitController : MonoBehaviour
         }
         else
         {
-            Selectbuilding(newbuilding);
+            SelectBuilding(newbuilding);
         }
     }
 
@@ -198,16 +289,51 @@ public class RTSUnitController : MonoBehaviour
     {
         if (!selectedBuildingList.Contains(newbuilding))
         {
-            Selectbuilding(newbuilding);
+            SelectBuilding(newbuilding);
         }
     }
 
     /// <summary>
     /// 유닛 선택
     /// </summary>
-    private void Selectbuilding(BuildingController building)
+    public void SelectBuilding(BuildingController building)
     {
+        if (IsBuildMode())
+            return;
+
         RTScurrentSate = SelectState.BuildingSelect;
+
+        switch (building.tag)
+        {
+            case "MainBase":
+                BuildingSelectState = BuildingState.MainBaseSelect;
+                break;
+
+            case "Tier1":
+                BuildingSelectState = BuildingState.Tier1Select;
+                break;
+
+            case "Tier2":
+                BuildingSelectState = BuildingState.Tier2Select;
+                break;
+
+            case "Tier3":
+                BuildingSelectState = BuildingState.Tier3Select;
+                break;
+
+            case "SupplyDepot":
+                BuildingSelectState = BuildingState.SupplyDepot;
+                break;
+
+            case "Lab":
+                BuildingSelectState = BuildingState.Lab;
+                break;
+
+            default:
+                BuildingSelectState = BuildingState.None;
+                break;
+        }
+
         building.SelectBuilding();
         selectedBuildingList.Add(building);
     }
@@ -244,12 +370,63 @@ public class RTSUnitController : MonoBehaviour
         selectedBuildingList.Clear();
     }
 
+    #region UserControl 상태 변화
+
+    public void EnterMoveMode()
+    {
+        userControl.SetOrderState("Move");
+    }
+
+    public void EnterAttackMode()
+    {
+        userControl.SetOrderState("Attack");
+    }
+
+    public void EnterPatrolMode()
+    {
+        userControl.SetOrderState("Patrol");
+    }
+
+    public void EnterRallyMode()
+    {
+        userControl.SetOrderState("Rally");
+    }
+
+    public void EnterReturnMode()
+    {
+        //광물 채취후 복귀
+    }
+
+    #endregion
+
+    //건설모드로 변경
+    public void BuildModeOn()
+    {
+        RTScurrentSate = SelectState.BuildMode;
+    }
+
+
+    #region 선택 상태 확인
+
     // 상태 확인용
     public bool IsNone() => RTScurrentSate == SelectState.None;
     public bool IsUnitSelect() => RTScurrentSate == SelectState.UnitSelect;
     public bool IsBuildingSelect() => RTScurrentSate == SelectState.BuildingSelect;
     public bool IsEnemySelect() => RTScurrentSate == SelectState.EnemySelect;
     public bool IsOreSelect() => RTScurrentSate == SelectState.OreSelect;
-    public bool IsMainBaseSelect() => RTScurrentSate == SelectState.MainBaseSelect;
     public bool IsBuildMode() => RTScurrentSate == SelectState.BuildMode;
+
+    #endregion
+
+    #region Building 상태 확인
+
+    public bool IsBuildingNone() => BuildingSelectState == BuildingState.None;
+    public bool IsMainBase() => BuildingSelectState == BuildingState.MainBaseSelect;
+    public bool IsTier1Building() => BuildingSelectState == BuildingState.Tier1Select;
+    public bool IsTier2Building() => BuildingSelectState == BuildingState.Tier2Select;
+    public bool IsTier3Building() => BuildingSelectState == BuildingState.Tier3Select;
+    public bool IsSupplyDepot() => BuildingSelectState == BuildingState.SupplyDepot;
+    public bool IsLab() => BuildingSelectState == BuildingState.Lab;
+
+    #endregion
 }

@@ -128,6 +128,7 @@ public class UnitController : MonoBehaviour
     public void MoveTo(Vector3 end)
     {
         arrived = false;
+        patrolling = false;
         UnitcurrentState = UnitState.Move;
 
         if (!isAirUnit)
@@ -270,7 +271,7 @@ public class UnitController : MonoBehaviour
     }
     public void PatrolUnit(Vector3 end)
     {
-        UnitcurrentState = UnitState.Move;
+        UnitcurrentState = UnitState.Idle;
 
         startPoint = transform.position;
         endPoint = end;

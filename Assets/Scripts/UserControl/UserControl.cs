@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 
@@ -64,8 +65,6 @@ public class UserControl : MonoBehaviour
 
         start = Vector2.zero;
         end = Vector2.zero;
-
-
 
         DrawDragRectangle();
     }
@@ -176,6 +175,20 @@ public class UserControl : MonoBehaviour
         // 2. 땅 클릭 = 명령 처리
         if (clickedGround)  
         {
+            if (UsercurrentState == OrderState.Move)
+            {
+                rtsUnitController.MoveSelectedUnits(groundHit.point);
+
+                UsercurrentState = OrderState.Move;
+                UpdatePointer();
+                movePointer.transform.position = groundHit.point;
+                movePointer.SetActive(true);
+
+                UsercurrentState = OrderState.None;
+
+                return;
+            }
+
             if (UsercurrentState == OrderState.Attack)
             {
                 rtsUnitController.AttackGroundSelectedUnits(groundHit.point);
@@ -364,6 +377,18 @@ public class UserControl : MonoBehaviour
         else
         {
 
+        }
+    }
+
+    public void SetOrderState(string state)
+    {
+        if (Enum.TryParse(state, out OrderState orderState))
+        {
+            UsercurrentState = orderState;
+        }
+        else
+        {
+            Debug.LogWarning($"Unknown OrderState : {state}");
         }
     }
 }
