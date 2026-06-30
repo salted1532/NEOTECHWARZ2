@@ -13,15 +13,66 @@ MonoBehaviour:
   m_Name: New Unit Data SO
   m_EditorClassIdentifier: Assembly-CSharp::UnitDataSO
   unitData:
-  - <unitName>k__BackingField: TestGroundUnit
+  - <unitName>k__BackingField: Worker Drone
     <ID>k__BackingField: 1
-    <hp>k__BackingField: 50
+    <hp>k__BackingField: 40
+    <attackDamge>k__BackingField: 5
+    <attackRange>k__BackingField: 1
+    <mineral>k__BackingField: 50
+    <gas>k__BackingField: 0
+    <productionTime>k__BackingField: 12
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
+  - <unitName>k__BackingField: Assault Trooper
+    <ID>k__BackingField: 2
+    <hp>k__BackingField: 40
     <attackDamge>k__BackingField: 5
     <attackRange>k__BackingField: 5
-    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 8311135cf5a7a1f4da476c34a1195cfb, type: 3}
-  - <unitName>k__BackingField: TestAirUnit
-    <ID>k__BackingField: 2
-    <hp>k__BackingField: 50
+    <mineral>k__BackingField: 50
+    <gas>k__BackingField: 0
+    <productionTime>k__BackingField: 15
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+  - <unitName>k__BackingField: Scout Drone
+    <ID>k__BackingField: 3
+    <hp>k__BackingField: 75
     <attackDamge>k__BackingField: 5
+    <attackRange>k__BackingField: 6
+    <mineral>k__BackingField: 75
+    <gas>k__BackingField: 0
+    <productionTime>k__BackingField: 19
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
+  - <unitName>k__BackingField: Ranger IFV
+    <ID>k__BackingField: 4
+    <hp>k__BackingField: 100
+    <attackDamge>k__BackingField: 10
+    <attackRange>k__BackingField: 6
+    <mineral>k__BackingField: 100
+    <gas>k__BackingField: 50
+    <productionTime>k__BackingField: 25
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: d9657408020de9a44918eef6a3214c70, type: 3}
+  - <unitName>k__BackingField: Pulasr Tank
+    <ID>k__BackingField: 5
+    <hp>k__BackingField: 150
+    <attackDamge>k__BackingField: 20
     <attackRange>k__BackingField: 7
-    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 99aa8bdc07b774540a0ff31040a41361, type: 3}
+    <mineral>k__BackingField: 150
+    <gas>k__BackingField: 100
+    <productionTime>k__BackingField: 31
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
+  - <unitName>k__BackingField: Firehawk
+    <ID>k__BackingField: 6
+    <hp>k__BackingField: 150
+    <attackDamge>k__BackingField: 15
+    <attackRange>k__BackingField: 7
+    <mineral>k__BackingField: 150
+    <gas>k__BackingField: 100
+    <productionTime>k__BackingField: 37
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
+  - <unitName>k__BackingField: Guardian Drone
+    <ID>k__BackingField: 7
+    <hp>k__BackingField: 400
+    <attackDamge>k__BackingField: 30
+    <attackRange>k__BackingField: 7
+    <mineral>k__BackingField: 400
+    <gas>k__BackingField: 300
+    <productionTime>k__BackingField: 63
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7c8f9a4aa9f4bf74c8f9f9d9977dcc9f, type: 3}

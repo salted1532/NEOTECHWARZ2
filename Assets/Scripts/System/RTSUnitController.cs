@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static RTSUnitController;
+using static UIController;
 
 public class RTSUnitController : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class RTSUnitController : MonoBehaviour
     private UserControl userControl;
     [SerializeField]
     private UIController uIController;
-
+    [SerializeField]
+    private PlacementSystem PlacementSystem;
     // ===== 상태 하나로 통합 =====
     public enum SelectState
     {
@@ -54,6 +56,17 @@ public class RTSUnitController : MonoBehaviour
     public SelectState RTScurrentSate = SelectState.None;
     public BuildingState BuildingSelectState = BuildingState.None;
     public UnitState UnitSelectState = UnitState.None;
+    public static class UnitID
+    {
+        public const int Worker = 1;
+        public const int Marine = 2;
+        public const int Vulture = 3;
+        public const int Goliath = 4;
+        public const int Tank = 5;
+        public const int Wraith = 6;
+        public const int Guardian = 7;
+    }
+
 
     private void Awake()
     {
@@ -86,22 +99,22 @@ public class RTSUnitController : MonoBehaviour
                 switch (BuildingSelectState)
                 {
                     case BuildingState.MainBaseSelect:
-                        uIController.ShowMainBasePanel(TestMethod);
+                        uIController.ShowMainBasePanel(() => SpawnUnit(UnitID.Worker));
                         break;
 
                     case BuildingState.Tier1Select:
                         //마린, 벌처 생산 메소드 연결해야함
-                        uIController.ShowBarracksPanel(TestMethod, TestMethod);
+                        uIController.ShowBarracksPanel(() => SpawnUnit(UnitID.Marine), () => SpawnUnit(UnitID.Vulture));
                         break;
 
                     case BuildingState.Tier2Select:
                         //골리앗 탱크 생산 메소드 연결해야함
-                        uIController.ShowFactoryPanel(TestMethod, TestMethod);
+                        uIController.ShowFactoryPanel(() => SpawnUnit(UnitID.Goliath), () => SpawnUnit(UnitID.Tank));
                         break;
 
                     case BuildingState.Tier3Select:
                         //레이스 배틀 생산 메소드 연결해야함
-                        uIController.ShowAirportPanel(TestMethod, TestMethod);
+                        uIController.ShowAirportPanel(() => SpawnUnit(UnitID.Wraith), () => SpawnUnit(UnitID.Guardian));
                         break;
 
                     case BuildingState.SupplyDepot:
@@ -130,7 +143,18 @@ public class RTSUnitController : MonoBehaviour
                 break;
 
             case SelectState.BuildMode:
-                uIController.ShowBuildPanel(TestMethod, TestMethod, TestMethod, TestMethod, TestMethod, TestMethod, TestMethod);
+                uIController.ShowBuildPanel(
+                    () => PlacementSystem.StartPlacement(1), 
+                    () => PlacementSystem.StartPlacement(2), 
+                    () => PlacementSystem.StartPlacement(3), 
+                    () => PlacementSystem.StartPlacement(4), 
+                    () => PlacementSystem.StartPlacement(5), 
+                    () => PlacementSystem.StartPlacement(6),
+                    () =>
+                    {
+                        PlacementSystem.StopPlacement();
+                        ReturnState();
+                    });
                 break;
 
             case SelectState.None:
@@ -184,6 +208,9 @@ public class RTSUnitController : MonoBehaviour
     /// </summary>
     private void SelectUnit(UnitController unit)
     {
+        if (IsBuildMode())
+            return;
+
         RTScurrentSate = SelectState.UnitSelect;
 
         switch (unit.tag)
@@ -364,6 +391,13 @@ public class RTSUnitController : MonoBehaviour
         building.DeselecBuilding();
         selectedBuildingList.Remove(building);
     }
+    public void SetRallySelectBuilding(Vector3 position)
+    {
+        for (int i = 0; i < selectedBuildingList.Count; ++i)
+        {
+            selectedBuildingList[i].SetRallyPosition(position);
+        }
+    }
 
     #endregion
 
@@ -372,6 +406,9 @@ public class RTSUnitController : MonoBehaviour
     /// </summary>
     public void DeselectAll()
     {
+        if (IsBuildMode())
+            return;
+
         foreach (UnitController unit in selectedUnitList)
         {
             unit.DeselectUnit();
@@ -416,15 +453,42 @@ public class RTSUnitController : MonoBehaviour
 
     #endregion
 
+    #region 유닛 생산
 
-    /// <summary>
-    /// 테스트용
-    /// </summary>
+    public void SpawnUnit(int unitID)
+    {
+        if (selectedBuildingList.Count == 0)
+        {
+            Debug.LogWarning("No buildings selected for spawning units.");
+            return;
+        }
+
+        for (int i = 0; i < selectedBuildingList.Count; ++i)
+        {
+            BuildingController building = selectedBuildingList[i];
+
+            building.SpawnUnit(unitID);
+        }
+    }
+
+    #endregion
+
     //건설모드로 변경
     public void BuildModeOn()
     {
         RTScurrentSate = SelectState.BuildMode;
     }
+    //상태 초기화
+    public void ReturnState()
+    {
+        RTScurrentSate = SelectState.UnitSelect;
+    }
+
+    #region Test용
+
+    /// <summary>
+    /// 테스트용
+    /// </summary>
 
     //UI 버튼 매핑 테스트용
     public void TestMethod()
@@ -432,7 +496,7 @@ public class RTSUnitController : MonoBehaviour
         
     }
 
-
+    #endregion
 
     #region 선택 상태 확인
 

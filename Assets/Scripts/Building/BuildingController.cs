@@ -5,6 +5,10 @@ public class BuildingController : MonoBehaviour
     [SerializeField]
     private GameObject buildingMarker;
 
+    private UnitSpawner UnitSpawner;
+
+    private Vector3 RallyPosition;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -13,6 +17,10 @@ public class BuildingController : MonoBehaviour
         RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
 
         controller.BuildingList.Add(this);
+
+        UnitSpawner = GetComponentInChildren<UnitSpawner>();
+
+        RallyPosition = transform.position + new Vector3(0, 0, -2f);
     }
 
     // Update is called once per frame
@@ -30,5 +38,20 @@ public class BuildingController : MonoBehaviour
     {
         //Debug.Log(name + " 선택 해제");
         buildingMarker.SetActive(false);
+    }
+
+    public void SetRallyPosition(Vector3 position)
+    {
+        RallyPosition = position;
+    }
+
+    public void SpawnUnit(int unitID)
+    {
+        UnitSpawner.Enqueue(unitID);
+    }
+
+    public Vector3 GetRallyPos()
+    {
+        return RallyPosition;
     }
 }

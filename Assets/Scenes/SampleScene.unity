@@ -1983,7 +1983,7 @@ MonoBehaviour:
   tankIcon: {fileID: 21300000, guid: 2cf1e1b8455dc8346b3135d7ea2df0cd, type: 3}
   wraithIcon: {fileID: 21300000, guid: 06ad55446842ade4298efca8384bf7dc, type: 3}
   guardianIcon: {fileID: 21300000, guid: d6e905e97221d6141ae8f9bd7256fb0a, type: 3}
-  cancelIcon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  cancelIcon: {fileID: 21300000, guid: 9b8fb65b9bedc2041b19bd5262a50e27, type: 3}
   CurrentState: 0
 --- !u!4 &993264374
 Transform:
@@ -2366,6 +2366,7 @@ MonoBehaviour:
   BuildingList: []
   userControl: {fileID: 1214007159}
   uIController: {fileID: 993264373}
+  PlacementSystem: {fileID: 78305791}
   RTScurrentSate: 0
   BuildingSelectState: 0
   UnitSelectState: 0

@@ -28,5 +28,11 @@ public class UnitData
     public int attackRange { get; private set; }
 
     [field: SerializeField]
+    public int mineral { get; private set; }
+    [field: SerializeField]
+    public int gas { get; private set; }
+    [field: SerializeField]
+    public int productionTime { get; private set; }
+    [field: SerializeField]
     public GameObject Prefab { get; private set; }
 }

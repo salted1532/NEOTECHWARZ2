@@ -114,32 +114,16 @@ public class UserControl : MonoBehaviour
             DrawDragRectangle();
         }
 
-        if (rtsUnitController.IsUnitSelect())
+
+        // 우클릭 시
+        if (Input.GetMouseButtonDown(1))
         {
-            // 우클릭 시
-            if (Input.GetMouseButtonDown(1))
-            {
-                RaycastHit hit;
-                Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-
-                // 유닛 오브젝트(layerGround)를 클릭했을 때
-                if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerGround))
-                {
-                    rtsUnitController.MoveSelectedUnits(hit.point);
-
-                    UsercurrentState = OrderState.Move;
-                    UpdatePointer();
-                    movePointer.transform.position = hit.point;
-                    movePointer.SetActive(true);
-
-                    UsercurrentState = OrderState.None;
-                }
-            }
+            HandleRightClick();
         }
     }
 
     /// <summary>
-    /// 클릭 선택
+    /// 좌클릭 관리
     /// </summary>
     private void HandleLeftClick()
     {
@@ -212,6 +196,18 @@ public class UserControl : MonoBehaviour
 
                 return;
             }
+
+            if (UsercurrentState == OrderState.Rally)
+            {
+                rtsUnitController.SetRallySelectBuilding(groundHit.point);
+
+                movePointer.transform.position = groundHit.point;
+                movePointer.SetActive(true);
+
+                UsercurrentState = OrderState.None;
+
+                return;
+            }
         }
 
         // 3. 적 클릭 = 명령 처리
@@ -245,6 +241,60 @@ public class UserControl : MonoBehaviour
         // 6. 아무것도 아닌 곳 클릭 = 선택 해제
         rtsUnitController.DeselectAll();
     }
+
+    /// <summary>
+    /// 우클릭 관리
+    /// </summary>
+    private void HandleRightClick()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit unitHit;
+        RaycastHit groundHit;
+        RaycastHit enemyHit;
+        RaycastHit BuildingHit;
+        RaycastHit OreHit;
+
+        bool clickedUnit = Physics.Raycast(ray, out unitHit, Mathf.Infinity, layerUnit);
+        bool clickedGround = Physics.Raycast(ray, out groundHit, Mathf.Infinity, layerGround);
+        bool clickedEnemy = Physics.Raycast(ray, out enemyHit, Mathf.Infinity, layerEnemy);
+        bool clickedBuilding = Physics.Raycast(ray, out BuildingHit, Mathf.Infinity, layerBuilding);
+        bool clickedOre = Physics.Raycast(ray, out OreHit, Mathf.Infinity, layerOre);
+
+        if (clickedUnit)
+        {
+
+        }
+
+        // 2. 땅 클릭 = 명령 처리
+        if (clickedGround)
+        {
+            if(rtsUnitController.IsUnitSelect())
+            {
+                rtsUnitController.MoveSelectedUnits(groundHit.point);
+
+                UsercurrentState = OrderState.Move;
+                UpdatePointer();
+                movePointer.transform.position = groundHit.point;
+                movePointer.SetActive(true);
+
+                UsercurrentState = OrderState.None;
+            }
+
+            if (rtsUnitController.IsBuildingSelect())
+            {
+                rtsUnitController.SetRallySelectBuilding(groundHit.point);
+
+                UsercurrentState = OrderState.Rally;
+                UpdatePointer();
+                movePointer.transform.position = groundHit.point;
+                movePointer.SetActive(true);
+
+                UsercurrentState = OrderState.None;
+
+            }
+        }
+    }
+
     private void HandlekeyBoard()
     {
 
@@ -255,12 +305,12 @@ public class UserControl : MonoBehaviour
             {
                 UsercurrentState = OrderState.Attack;
             }
-
+            // 유닛 정지 명령
             if (Input.GetKeyDown(KeyCode.S))
             {
                 rtsUnitController.StopSelectedUnits();
             }
-
+            // 유닛 홀드 명령
             if (Input.GetKeyDown(KeyCode.H))
             {
                 rtsUnitController.HoldSelectedUnits();
@@ -275,10 +325,24 @@ public class UserControl : MonoBehaviour
             {
                 UsercurrentState = OrderState.Move;
             }
-
+            //건설모드 전환
             if (Input.GetKeyDown(KeyCode.V))
             {
                 //건설 모드 전환
+            }
+            //건물 랠리 설정
+            if (Input.GetKeyDown(KeyCode.Y))
+            {
+                UsercurrentState = OrderState.Rally;
+            }
+        }
+
+        if(rtsUnitController.IsBuildMode())
+        {
+            //건물 랠리 설정
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                rtsUnitController.ReturnState();
             }
         }
     }

@@ -207,8 +207,8 @@ Transform:
   m_GameObject: {fileID: 5286222370872261929}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.33333334, y: 0.3, z: 0}
-  m_LocalScale: {x: 1, y: 0.5, z: 0.5}
+  m_LocalPosition: {x: -0.33333334, y: 0.5, z: 0}
+  m_LocalScale: {x: 1, y: 0.2, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1456719043182467793}
@@ -374,6 +374,7 @@ GameObject:
   - component: {fileID: 530226741687852247}
   - component: {fileID: 875391073210738237}
   - component: {fileID: 3745819421430264317}
+  - component: {fileID: -4819241414651212883}
   m_Layer: 9
   m_Name: Tier3
   m_TagString: Tier3
@@ -507,3 +508,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingController
   buildingMarker: {fileID: 7296833267826986796}
+--- !u!114 &-4819241414651212883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2a2fb38d7183e84ba26dbf485b1b76f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitSpawner
+  database: {fileID: 11400000, guid: 9ddd87f106a53d84fa6f58363a4de5e8, type: 2}

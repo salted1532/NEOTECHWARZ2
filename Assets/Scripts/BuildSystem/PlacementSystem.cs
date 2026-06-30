@@ -153,7 +153,7 @@ public class PlacementSystem : MonoBehaviour
         return hits.Length > 0;
     }
 
-    private void StopPlacement()
+    public void StopPlacement()
     {
         selectedObjectIndex = -1;
 
@@ -168,21 +168,6 @@ public class PlacementSystem : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-            StartPlacement(1);
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-            StartPlacement(2);
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-            StartPlacement(3);
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-            StartPlacement(4);
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-            StartPlacement(5);
-        if (Input.GetKeyDown(KeyCode.Alpha6))
-            StartPlacement(6);
-
-
-
         if (selectedObjectIndex < 0) return;
 
         Vector3 mousePos = inputManager.GetSelectedMapPosition();
