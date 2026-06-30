@@ -66,6 +66,7 @@ public class RTSUnitController : MonoBehaviour
         UnitList.RemoveAll(unit => unit == null);
         BuildingList.RemoveAll(building => building == null);
 
+        //UIController에게 선택 상황에 맞게 UI창 변경 명령
         switch (RTScurrentSate)
         {
             case SelectState.UnitSelect:
@@ -74,7 +75,7 @@ public class RTSUnitController : MonoBehaviour
                     case UnitState.Worker:
                         uIController.ShowWorkerPanel(EnterMoveMode, EnterAttackMode, StopSelectedUnits, EnterPatrolMode, HoldSelectedUnits,EnterReturnMode, BuildModeOn);
                         break;
-                    default:
+                    case UnitState.AttackUnit:
                         uIController.ShowAttackUnitPanel(EnterMoveMode, EnterAttackMode, StopSelectedUnits, EnterPatrolMode, HoldSelectedUnits);
                         break;
                 }
@@ -85,21 +86,32 @@ public class RTSUnitController : MonoBehaviour
                 switch (BuildingSelectState)
                 {
                     case BuildingState.MainBaseSelect:
+                        uIController.ShowMainBasePanel(TestMethod);
                         break;
 
                     case BuildingState.Tier1Select:
+                        //마린, 벌처 생산 메소드 연결해야함
+                        uIController.ShowBarracksPanel(TestMethod, TestMethod);
                         break;
 
                     case BuildingState.Tier2Select:
+                        //골리앗 탱크 생산 메소드 연결해야함
+                        uIController.ShowFactoryPanel(TestMethod, TestMethod);
                         break;
 
                     case BuildingState.Tier3Select:
+                        //레이스 배틀 생산 메소드 연결해야함
+                        uIController.ShowAirportPanel(TestMethod, TestMethod);
                         break;
 
                     case BuildingState.SupplyDepot:
+                        //구현필요
+                        uIController.ClearPanel();
                         break;
 
                     case BuildingState.Lab:
+                        //구현필요
+                        uIController.ClearPanel();
                         break;
                     case BuildingState.None:
                         uIController.ClearPanel();
@@ -108,12 +120,17 @@ public class RTSUnitController : MonoBehaviour
                 break;
 
             case SelectState.EnemySelect:
+                //구현필요
+                uIController.ClearPanel();
                 break;
 
             case SelectState.OreSelect:
+                //구현필요
+                uIController.ClearPanel();
                 break;
 
             case SelectState.BuildMode:
+                uIController.ShowBuildPanel(TestMethod, TestMethod, TestMethod, TestMethod, TestMethod, TestMethod, TestMethod);
                 break;
 
             case SelectState.None:
@@ -399,11 +416,22 @@ public class RTSUnitController : MonoBehaviour
 
     #endregion
 
+
+    /// <summary>
+    /// 테스트용
+    /// </summary>
     //건설모드로 변경
     public void BuildModeOn()
     {
         RTScurrentSate = SelectState.BuildMode;
     }
+
+    //UI 버튼 매핑 테스트용
+    public void TestMethod()
+    {
+        
+    }
+
 
 
     #region 선택 상태 확인

@@ -125,7 +125,10 @@ public class PreviewSystem : MonoBehaviour
 
     private void MoveCursor(Vector3 position)
     {
-        cellIndicator.transform.position = position;
+        Vector3 cellPosition = position;
+        cellPosition.y -= 0.9f;
+
+        cellIndicator.transform.position = cellPosition;
     }
 
     private void MovePreview(Vector3 position)

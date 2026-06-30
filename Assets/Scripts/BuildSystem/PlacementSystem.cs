@@ -15,7 +15,8 @@ public class PlacementSystem : MonoBehaviour
     [SerializeField] private PreviewSystem preview;
 
     // ⭐ 건물 높이 오프셋 (프리뷰 + 실제 공통 적용)
-    [SerializeField] private float yOffset = 0.5f;
+    [SerializeField] 
+    private float yOffset = 1f;
 
     private int selectedObjectIndex = -1;
 
@@ -167,11 +168,18 @@ public class PlacementSystem : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.B))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
             StartPlacement(1);
-
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.Alpha2))
             StartPlacement(2);
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+            StartPlacement(3);
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+            StartPlacement(4);
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+            StartPlacement(5);
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+            StartPlacement(6);
 
 
 

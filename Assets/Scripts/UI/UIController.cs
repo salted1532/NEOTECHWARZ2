@@ -62,10 +62,9 @@ public class UIController : MonoBehaviour
     [Header("Unit Icons")]
     [SerializeField] private Sprite workerIcon;
     [SerializeField] private Sprite marineIcon;
-    [SerializeField] private Sprite firebatIcon;
     [SerializeField] private Sprite vultureIcon;
-    [SerializeField] private Sprite tankIcon;
     [SerializeField] private Sprite goliathIcon;
+    [SerializeField] private Sprite tankIcon;
     [SerializeField] private Sprite wraithIcon;
     [SerializeField] private Sprite guardianIcon;
 
@@ -248,23 +247,21 @@ public class UIController : MonoBehaviour
         SetCommands(
 
             new CommandButtonData(marineIcon, onMarine),
-            new CommandButtonData(firebatIcon, onFirebat)
+            new CommandButtonData(vultureIcon, onFirebat)
         );
     }
 
     //°øÀå 
     public void ShowFactoryPanel(
-    Action onVulture,
-    Action onTank,
-    Action onGoliath)
+    Action onGoliath,
+    Action onTank)
     {
         CurrentState = UISelectionState.Tier2Building;
 
         SetCommands(
 
-            new CommandButtonData(vultureIcon, onVulture),
-            new CommandButtonData(tankIcon, onTank),
-            new CommandButtonData(goliathIcon, onGoliath)
+            new CommandButtonData(goliathIcon, onGoliath),
+            new CommandButtonData(tankIcon, onTank)
         );
     }
 

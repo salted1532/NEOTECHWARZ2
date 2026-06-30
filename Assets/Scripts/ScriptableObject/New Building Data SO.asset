@@ -13,11 +13,27 @@ MonoBehaviour:
   m_Name: New Building Data SO
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDataSO
   buildingData:
-  - <Name>k__BackingField: tier1
+  - <Name>k__BackingField: MainBase
     <ID>k__BackingField: 1
     <Size>k__BackingField: {x: 3, y: 3}
-    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: 456d55d44ff8fc44eaacf0f2006a0076, type: 3}
-  - <Name>k__BackingField: supplyDepot
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: ed05f7d2714c7614486d64c65e4b1d79, type: 3}
+  - <Name>k__BackingField: SupplyDepot
     <ID>k__BackingField: 2
-    <Size>k__BackingField: {x: 3, y: 2}
-    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: 1335684423e90ff4da2a871e66e1a686, type: 3}
+    <Size>k__BackingField: {x: 2, y: 2}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: de4ee2a279dcb914b9bf5c3524d5df45, type: 3}
+  - <Name>k__BackingField: Tier1
+    <ID>k__BackingField: 3
+    <Size>k__BackingField: {x: 3, y: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: bfa5dd8a4e68b7643b799cd39793440d, type: 3}
+  - <Name>k__BackingField: Tier2
+    <ID>k__BackingField: 4
+    <Size>k__BackingField: {x: 3, y: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: a1afb913cb6c8e54388e6960d529804f, type: 3}
+  - <Name>k__BackingField: Tier3
+    <ID>k__BackingField: 5
+    <Size>k__BackingField: {x: 3, y: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: 8cf6ce7512319444aa0998b140fc187d, type: 3}
+  - <Name>k__BackingField: Lab
+    <ID>k__BackingField: 6
+    <Size>k__BackingField: {x: 2, y: 2}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: 24ad96dd4d0efae4cb55223a99cdca30, type: 3}
