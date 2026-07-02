@@ -104,29 +104,17 @@ public class UnitController : MonoBehaviour
         //지상 유닛 일 경우
         if (!isAirUnit)
         {
-            if (!arrived && !navMeshAgent.pathPending)
+            if (!arrived &&
+                !navMeshAgent.pathPending &&
+                navMeshAgent.remainingDistance <= arriveDistance)
             {
-                if (navMeshAgent.remainingDistance <= arriveDistance)
-                {
-                    FinishMove();
-                }
-
-                if (stuckTimer >= 1f)
-                {
-                    FinishMove();
-                }
+                arrived = true;
+                navMeshAgent.ResetPath();
+                UnitcurrentState = UnitState.Idle;
             }
         }
 
         PatrolTick();
-    }
-
-    private void FinishMove()
-    {
-        arrived = true;
-        navMeshAgent.ResetPath();
-        navMeshAgent.isStopped = true;
-        UnitcurrentState = UnitState.Idle;
     }
 
     public void SelectUnit()
