@@ -7,11 +7,15 @@ public class ProductionData
 {
     public int UnitID;
     public float RemainTime;
+    public float TotalTime;
+
+    public float Progress => 1f - (RemainTime / TotalTime);
 
     public ProductionData(int unitID, float productionTime)
     {
         UnitID = unitID;
         RemainTime = productionTime;
+        TotalTime = productionTime;
     }
 }
 
@@ -116,8 +120,13 @@ public class UnitSpawner : MonoBehaviour
             return;
 
         productionQueue.RemoveAt(index);
+        PrintQueue();
     }
+   
 
+    /// <summary>
+    /// 콘솔 디버그용 대기열
+    /// </summary>
     private void PrintQueue()
     {
         string log = "생산 대기열 : ";
@@ -138,5 +147,22 @@ public class UnitSpawner : MonoBehaviour
         }
 
         Debug.Log(log);
+    }
+
+    //대기열 반환
+    public IReadOnlyList<ProductionData> GetProductionQueue()
+    {
+        return productionQueue;
+    }
+
+    /// <summary>
+    /// 현재 생산중인 유닛의 진행률(0~1)
+    /// </summary>
+    public float GetProductionProgress()
+    {
+        if (productionQueue.Count == 0)
+            return 0f;
+
+        return productionQueue[0].Progress;
     }
 }

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
@@ -71,16 +73,31 @@ public class UIController : MonoBehaviour
     [Header("Common")]
     [SerializeField] private Sprite cancelIcon;
 
+    [Header("Queue Empty Icons")]
+    [SerializeField] private Sprite[] emptyQueueIcons; // 0=1, 1=2, 2=3, 3=4, 4=5
+
     public UISelectionState CurrentState = UISelectionState.None;
 
     private RTSUnitController rtsUnitController;
 
+    //대기열 관련
+    [SerializeField] private ProductionSlot[] queueSlots;
+    [SerializeField] private UnitDataSO database;
+    [SerializeField] private Slider progressSlider;
+
+    private IReadOnlyList<ProductionData> currentQueue;
+    private bool isShowingProductionQueue;
+
     private void Start()
     {
         ClearPanel();
+        HideProductionUI();
     }
 
-    
+    private void Update()
+    {
+        UpdateProductionProgress();
+    }
 
     public void ClearPanel()
     {
@@ -156,6 +173,95 @@ public class UIController : MonoBehaviour
         }
 
         return result;
+    }
+
+    //대기열 출력
+    public void UpdateQueue(
+    IReadOnlyList<ProductionData> queue,
+    Action<int> onCancel)
+    {
+        if (queue == null)
+        {
+            for (int i = 0; i < queueSlots.Length; i++)
+                SetEmptyQueueSlot(i);
+
+            return;
+        }
+
+        for (int i = 0; i < queueSlots.Length; i++)
+        {
+            if (i >= queue.Count)
+            {
+                SetEmptyQueueSlot(i);
+                continue;
+            }
+
+            int queueIndex = i;
+
+            int unitIndex = database.unitData.FindIndex(d => d.ID == queue[queueIndex].UnitID);
+
+            if (unitIndex == -1)
+            {
+                queueSlots[i].Clear();
+                continue;
+            }
+
+            UnitData data = database.unitData[unitIndex];
+
+            queueSlots[i].SetData(
+                new CommandButtonData(
+                    data.Icon,
+                    () => onCancel(queueIndex)
+                )
+            );
+        }
+    }
+    public void ShowProductionUI(
+        IReadOnlyList<ProductionData> queue,
+        Action<int> onCancel)
+    {
+        currentQueue = queue;
+        isShowingProductionQueue = true;
+
+        UpdateQueue(queue, onCancel);
+    }
+
+    //유닛 대기열 & 생산시간바 숨기기
+    public void HideProductionUI()
+    {
+        foreach (var slot in queueSlots)
+            slot.Clear();
+
+        progressSlider.gameObject.SetActive(false);
+
+        currentQueue = null;
+        isShowingProductionQueue = false;
+    }
+
+    private void SetEmptyQueueSlot(int index)
+    {
+        queueSlots[index].SetData(
+            new CommandButtonData(
+                emptyQueueIcons[index],
+                null,
+                false
+            )
+        );
+    }
+
+    //생산시간 표시 갱신
+    private void UpdateProductionProgress()
+    {
+        if (!isShowingProductionQueue ||
+            currentQueue == null ||
+            currentQueue.Count == 0)
+        {
+            progressSlider.gameObject.SetActive(false);
+            return;
+        }
+
+        progressSlider.gameObject.SetActive(true);
+        progressSlider.value = currentQueue[0].Progress;
     }
 
     //일꾼

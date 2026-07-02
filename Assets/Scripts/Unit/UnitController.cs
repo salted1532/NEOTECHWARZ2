@@ -15,6 +15,11 @@ public class UnitController : MonoBehaviour
 
     [SerializeField]
     private float moveSpeed = 10f;
+    [SerializeField]
+    private float arriveDistance = 0.5f;
+    [SerializeField]
+    private float stuckTimer; //갇히거나 행동 실행 불가시 타이머
+
     private Vector3 targetPosition;
     [SerializeField]
     private bool isMovingAirUnit = false;
@@ -41,6 +46,8 @@ public class UnitController : MonoBehaviour
 
     private Vector3 startPoint;
     private Vector3 endPoint;
+
+
 
     private void Awake()
     {
@@ -97,20 +104,29 @@ public class UnitController : MonoBehaviour
         //지상 유닛 일 경우
         if (!isAirUnit)
         {
-            if (!arrived &&
-                !navMeshAgent.pathPending &&
-                navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+            if (!arrived && !navMeshAgent.pathPending)
             {
-                if (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude < 0f)
+                if (navMeshAgent.remainingDistance <= arriveDistance)
                 {
-                    arrived = true;
-                    UnitcurrentState = UnitState.Idle;
-                    Debug.Log("지상유닛 도착 !");
+                    FinishMove();
+                }
+
+                if (stuckTimer >= 1f)
+                {
+                    FinishMove();
                 }
             }
         }
 
         PatrolTick();
+    }
+
+    private void FinishMove()
+    {
+        arrived = true;
+        navMeshAgent.ResetPath();
+        navMeshAgent.isStopped = true;
+        UnitcurrentState = UnitState.Idle;
     }
 
     public void SelectUnit()

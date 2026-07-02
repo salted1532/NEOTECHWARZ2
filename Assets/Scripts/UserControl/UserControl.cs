@@ -392,18 +392,6 @@ public class UserControl : MonoBehaviour
     /// </summary>
     private void SelectObject()
     {
-        //건물 선택
-        foreach (BuildingController building in rtsUnitController.BuildingList)
-        {
-            Vector3 screenPos =
-                mainCamera.WorldToScreenPoint(building.transform.position);
-
-            if (dragRect.Contains(screenPos))
-            {
-                rtsUnitController.DragSelectBuilding(building);
-            }
-        }
-
         //유닛 선택
         foreach (UnitController unit in rtsUnitController.UnitList)
         {

@@ -79,88 +79,8 @@ public class RTSUnitController : MonoBehaviour
         UnitList.RemoveAll(unit => unit == null);
         BuildingList.RemoveAll(building => building == null);
 
-        //UIController에게 선택 상황에 맞게 UI창 변경 명령
-        switch (RTScurrentSate)
-        {
-            case SelectState.UnitSelect:
-                switch (UnitSelectState)
-                {
-                    case UnitState.Worker:
-                        uIController.ShowWorkerPanel(EnterMoveMode, EnterAttackMode, StopSelectedUnits, EnterPatrolMode, HoldSelectedUnits,EnterReturnMode, BuildModeOn);
-                        break;
-                    case UnitState.AttackUnit:
-                        uIController.ShowAttackUnitPanel(EnterMoveMode, EnterAttackMode, StopSelectedUnits, EnterPatrolMode, HoldSelectedUnits);
-                        break;
-                }
-                break;
-
-            case SelectState.BuildingSelect:
-
-                switch (BuildingSelectState)
-                {
-                    case BuildingState.MainBaseSelect:
-                        uIController.ShowMainBasePanel(() => SpawnUnit(UnitID.Worker));
-                        break;
-
-                    case BuildingState.Tier1Select:
-                        //마린, 벌처 생산 메소드 연결해야함
-                        uIController.ShowBarracksPanel(() => SpawnUnit(UnitID.Marine), () => SpawnUnit(UnitID.Vulture));
-                        break;
-
-                    case BuildingState.Tier2Select:
-                        //골리앗 탱크 생산 메소드 연결해야함
-                        uIController.ShowFactoryPanel(() => SpawnUnit(UnitID.Goliath), () => SpawnUnit(UnitID.Tank));
-                        break;
-
-                    case BuildingState.Tier3Select:
-                        //레이스 배틀 생산 메소드 연결해야함
-                        uIController.ShowAirportPanel(() => SpawnUnit(UnitID.Wraith), () => SpawnUnit(UnitID.Guardian));
-                        break;
-
-                    case BuildingState.SupplyDepot:
-                        //구현필요
-                        uIController.ClearPanel();
-                        break;
-
-                    case BuildingState.Lab:
-                        //구현필요
-                        uIController.ClearPanel();
-                        break;
-                    case BuildingState.None:
-                        uIController.ClearPanel();
-                        break;
-                }
-                break;
-
-            case SelectState.EnemySelect:
-                //구현필요
-                uIController.ClearPanel();
-                break;
-
-            case SelectState.OreSelect:
-                //구현필요
-                uIController.ClearPanel();
-                break;
-
-            case SelectState.BuildMode:
-                uIController.ShowBuildPanel(
-                    () => PlacementSystem.StartPlacement(1), 
-                    () => PlacementSystem.StartPlacement(2), 
-                    () => PlacementSystem.StartPlacement(3), 
-                    () => PlacementSystem.StartPlacement(4), 
-                    () => PlacementSystem.StartPlacement(5), 
-                    () => PlacementSystem.StartPlacement(6),
-                    () =>
-                    {
-                        PlacementSystem.StopPlacement();
-                        ReturnState();
-                    });
-                break;
-
-            case SelectState.None:
-                uIController.ClearPanel();
-                break;
-        }
+        //UI 갱신
+        UpdateUI();
     }
 
     #region Unit선택 명령
@@ -327,17 +247,6 @@ public class RTSUnitController : MonoBehaviour
     }
 
     /// <summary>
-    /// 드래그 선택
-    /// </summary>
-    public void DragSelectBuilding(BuildingController newbuilding)
-    {
-        if (!selectedBuildingList.Contains(newbuilding))
-        {
-            SelectBuilding(newbuilding);
-        }
-    }
-
-    /// <summary>
     /// 유닛 선택
     /// </summary>
     public void SelectBuilding(BuildingController building)
@@ -471,7 +380,146 @@ public class RTSUnitController : MonoBehaviour
         }
     }
 
+    //건물별 대기열 상태 반환용
+    public IReadOnlyList<ProductionData> GetProductionQueue()
+    {
+        if (selectedBuildingList.Count == 0)
+            return null;
+
+        return selectedBuildingList[0].GetProductionQueue();
+    }
+
+    //유닛 생산 시간 반환
+    public float GetProductionProgress()
+    {
+        if (selectedBuildingList.Count == 0)
+            return 0f;
+
+        return selectedBuildingList[0].GetProductionProgress();
+    }
+
+    //대기열 삭제
+    public void CancelProduction(int index)
+    {
+        if (selectedBuildingList.Count == 0)
+            return;
+
+        selectedBuildingList[0].CancelProduction(index);
+    }
+
     #endregion
+
+    #region UI관리
+
+    private void UpdateUI()
+    {
+        //UIController에게 선택 상황에 맞게 UI창 변경 명령
+        switch (RTScurrentSate)
+        {
+            case SelectState.UnitSelect:
+                switch (UnitSelectState)
+                {
+                    case UnitState.Worker:
+                        uIController.ShowWorkerPanel(
+                            EnterMoveMode,
+                            EnterAttackMode,
+                            StopSelectedUnits,
+                            EnterPatrolMode,
+                            HoldSelectedUnits,
+                            EnterReturnMode,
+                            BuildModeOn);
+                        break;
+
+                    case UnitState.AttackUnit:
+                        uIController.ShowAttackUnitPanel(
+                            EnterMoveMode,
+                            EnterAttackMode,
+                            StopSelectedUnits,
+                            EnterPatrolMode,
+                            HoldSelectedUnits);
+                        break;
+                }
+
+                uIController.HideProductionUI();
+                break;
+
+            case SelectState.BuildingSelect:
+
+                switch (BuildingSelectState)
+                {
+                    case BuildingState.MainBaseSelect:
+                        uIController.ShowMainBasePanel(() => SpawnUnit(UnitID.Worker));
+                        uIController.ShowProductionUI(
+                            GetProductionQueue(),
+                            CancelProduction);
+                        break;
+
+                    case BuildingState.Tier1Select:
+                        uIController.ShowBarracksPanel(
+                            () => SpawnUnit(UnitID.Marine),
+                            () => SpawnUnit(UnitID.Vulture));
+
+                        uIController.ShowProductionUI(
+                            GetProductionQueue(),
+                            CancelProduction);
+                        break;
+
+                    case BuildingState.Tier2Select:
+                        uIController.ShowFactoryPanel(
+                            () => SpawnUnit(UnitID.Goliath),
+                            () => SpawnUnit(UnitID.Tank));
+
+                        uIController.ShowProductionUI(
+                            GetProductionQueue(),
+                            CancelProduction);
+                        break;
+
+                    case BuildingState.Tier3Select:
+                        uIController.ShowAirportPanel(
+                            () => SpawnUnit(UnitID.Wraith),
+                            () => SpawnUnit(UnitID.Guardian));
+
+                        uIController.ShowProductionUI(
+                            GetProductionQueue(),
+                            CancelProduction);
+                        break;
+
+                    case BuildingState.SupplyDepot:
+                    case BuildingState.Lab:
+                    case BuildingState.None:
+                        uIController.ClearPanel();
+                        uIController.HideProductionUI();
+                        break;
+                }
+                break;
+
+            case SelectState.BuildMode:
+                uIController.ShowBuildPanel(
+                    () => PlacementSystem.StartPlacement(1),
+                    () => PlacementSystem.StartPlacement(2),
+                    () => PlacementSystem.StartPlacement(3),
+                    () => PlacementSystem.StartPlacement(4),
+                    () => PlacementSystem.StartPlacement(5),
+                    () => PlacementSystem.StartPlacement(6),
+                    () =>
+                    {
+                        PlacementSystem.StopPlacement();
+                        ReturnState();
+                    });
+
+                uIController.HideProductionUI();
+                break;
+
+            default:
+                uIController.ClearPanel();
+                uIController.HideProductionUI();
+                break;
+        }
+    }
+
+    #endregion
+
+    #region RTSController 상태 변경
 
     //건설모드로 변경
     public void BuildModeOn()
@@ -483,6 +531,8 @@ public class RTSUnitController : MonoBehaviour
     {
         RTScurrentSate = SelectState.UnitSelect;
     }
+
+    #endregion
 
     #region Test용
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BuildingController : MonoBehaviour
@@ -53,5 +54,20 @@ public class BuildingController : MonoBehaviour
     public Vector3 GetRallyPos()
     {
         return RallyPosition;
+    }
+
+    public IReadOnlyList<ProductionData> GetProductionQueue()
+    {
+        return UnitSpawner.GetProductionQueue();
+    }
+
+    public float GetProductionProgress()
+    {
+        return UnitSpawner.GetProductionProgress();
+    }
+
+    public void CancelProduction(int index)
+    {
+        UnitSpawner.Cancel(index);
     }
 }
