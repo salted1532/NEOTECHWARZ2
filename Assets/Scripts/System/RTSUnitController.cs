@@ -7,6 +7,9 @@ using UnityEngine.UIElements;
 using static RTSUnitController;
 using static UIController;
 
+// RTS 게임 전체를 총괄하는 중앙 상태 관리자.
+// 유닛/건물 선택 상태, 전체 유닛/건물/자원노드 목록, UI 갱신, 생산/건설 자원 소모 검증 등
+// 여러 시스템(UserControl, UIController, PlacementSystem, ResourceManager)을 연결하는 허브 역할을 한다.
 public class RTSUnitController : MonoBehaviour
 {
     // 현재 선택된 유닛들

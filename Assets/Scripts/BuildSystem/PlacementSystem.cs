@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// 건물 배치 시스템의 핵심 컨트롤러.
+// 배치 모드 시작/취소, 그리드 위치 계산, 배치 가능 여부(겹침 + 유닛/장애물 충돌) 판정, 실제 건물 생성을 담당한다.
 public class PlacementSystem : MonoBehaviour
 {
     [SerializeField] private LayerMask blockingLayers;
@@ -31,6 +33,8 @@ public class PlacementSystem : MonoBehaviour
         StructureData = new();
     }
 
+    // ID에 해당하는 건물 데이터베이스 항목을 찾아 배치 모드를 시작한다 (프리뷰 표시 + 클릭/ESC 이벤트 구독).
+    // ID가 0이면 선택 해제로 취급한다.
     public void StartPlacement(int ID)
     {
         StopPlacement();
@@ -60,6 +64,8 @@ public class PlacementSystem : MonoBehaviour
         inputManager.OnExit += StopPlacement;
     }
 
+    // OnClicked 이벤트 핸들러: 현재 마우스 위치가 배치 가능하면(그리드 겹침 없음 + 장애물 없음)
+    // 실제 건물을 생성하고 그리드에 점유 정보를 등록한다.
     private void PlaceStructure()
     {
         if (selectedObjectIndex < 0) return;
@@ -122,6 +128,8 @@ public class PlacementSystem : MonoBehaviour
 
         return basePos + centerOffset + heightOffset;
     }
+    // 건물이 들어설 영역에 유닛/장애물 등 blockingLayers에 속한 콜라이더가 있는지 물리 박스 검사로 확인한다.
+    // 그리드 셀 점유 체크(StructureData)와 별개로, 실제 3D 공간상의 충돌까지 추가로 막기 위한 검사다.
     private bool IsBlocked(Vector3 worldPos, Vector2Int size)
     {
         Vector3 cellSize = grid.cellSize;
@@ -153,6 +161,7 @@ public class PlacementSystem : MonoBehaviour
         return hits.Length > 0;
     }
 
+    // 배치 모드를 종료하고 프리뷰/이벤트 구독을 정리한다. (취소 또는 배치 완료 후 재진입 대비)
     public void StopPlacement()
     {
         selectedObjectIndex = -1;
@@ -166,6 +175,7 @@ public class PlacementSystem : MonoBehaviour
         lastDectectedPosition = Vector3Int.zero;
     }
 
+    // 배치 모드일 때만 동작: 마우스가 새 그리드 셀로 이동하면 유효성(valid)을 재계산해 프리뷰 색상/위치를 갱신한다.
     void Update()
     {
         if (selectedObjectIndex < 0) return;

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public enum ResourceType { Ore, Gas }
 
+// 광물/가스 채취 지점. 여러 일꾼이 동시에 채취하지 못하도록 대기열(줄서기) 방식을 사용하며,
+// 남은 양에 따라 오브젝트 크기가 단계적으로 줄어들고 고갈되면 스스로 파괴된다.
 public class ResourceNode : MonoBehaviour
 {
     [SerializeField] private ResourceType resourceType;

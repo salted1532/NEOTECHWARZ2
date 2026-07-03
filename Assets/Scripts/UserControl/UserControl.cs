@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 
+// 플레이어의 마우스/키보드 입력을 해석하는 컨트롤러.
+// 좌클릭 선택(드래그 박스 포함), 우클릭/키보드 명령(이동·공격·순찰·정지·홀드·랠리) 발행,
+// 명령 대기 상태(OrderState)에 따른 커서 포인터 표시를 담당하며 실제 명령 실행은 RTSUnitController에 위임한다.
 public class UserControl : MonoBehaviour
 {
     [SerializeField]
@@ -82,6 +85,7 @@ public class UserControl : MonoBehaviour
         UpdatePointer();
     }
 
+    // 좌클릭(드래그 시작/중/종료)과 우클릭 입력을 처리한다.
     private void HandleMouse()
     {
         // 좌클릭 시
@@ -451,6 +455,7 @@ public class UserControl : MonoBehaviour
         }
     }
 
+    // 현재 명령 대기 상태(공격/이동/순찰/랠리)에 맞는 포인터 아이콘을 마우스가 가리키는 지면 위치에 표시한다.
     private void UpdatePointer()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -478,6 +483,7 @@ public class UserControl : MonoBehaviour
         }
     }
 
+    // 외부(RTSUnitController)에서 문자열로 명령 대기 상태를 전환할 때 사용 (예: "Move", "Attack", "Patrol", "Rally")
     public void SetOrderState(string state)
     {
         if (Enum.TryParse(state, out OrderState orderState))

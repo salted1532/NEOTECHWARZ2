@@ -7,6 +7,9 @@ using UnityEngine.Audio;
 using static UnityEditor.PlayerSettings;
 using static UnityEngine.GraphicsBuffer;
 
+// 개별 유닛(일꾼/전투유닛/공중유닛 포함)의 이동, 전투, 순찰, 자원 채취(일꾼 전용) 상태머신을 담당하는 핵심 컴포넌트.
+// NavMeshAgent 기반 지상 이동과 직접 좌표 보간 기반 공중 이동을 모두 지원하며,
+// AttackRange가 사거리 내 적을 감지하면 이 컴포넌트의 Attack/ChaseTarget을 호출한다.
 public class UnitController : MonoBehaviour
 {
     [SerializeField]
