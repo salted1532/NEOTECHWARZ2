@@ -20,6 +20,12 @@ public class ResourceNode : MonoBehaviour
         initialAmount = remainingAmount;
     }
 
+    private void Start()
+    {
+        RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
+        controller?.ResourceNodeList.Add(this);
+    }
+
     /// 채취 시도 시 실제로 얼마나 캐갈 수 있는지 (고갈 임박 시 amountPerTrip보다 적게 줄 수도 있음)
     public int Extract(int amountPerTrip)
     {

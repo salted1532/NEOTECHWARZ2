@@ -436,6 +436,39 @@ public class UnitController : MonoBehaviour
 
     private bool IsCarryingResource() => DepositOre.activeSelf || DepositGas.activeSelf;
 
+    // ===== Return Cargo 진입점 (UI "반환" 버튼) =====
+    public void ReturnCargo()
+    {
+        if (!isWorker || !IsCarryingResource())
+            return; // 일꾼이 아니거나 들고 있는 자원이 없으면 아무 것도 안 함
+
+        depositTargetTransform = FindNearestDepositBuilding();
+        if (depositTargetTransform == null)
+        {
+            CancelGathering(); // 반납할 건물이 없으면 그 자리에 멈춰서 Idle로
+            return;
+        }
+
+        patrolling = false;
+        gatherTargetNode = null; // 고정 목적지 없음 신호 → Deposit()이 최근접 노드를 새로 찾게 함
+        MoveTo(depositTargetTransform.position);
+        gatherState = GatherState.MovingToBase;
+    }
+
+    // ===== 건물 우클릭 명령 =====
+    // 일꾼이 자원을 들고 있으면 ReturnCargo()(반환 후 최근접 자원 채취)로 처리하고,
+    // 그 외(자원 없는 일꾼, 전투 유닛 등)에는 그냥 건물 위치로 이동만 한다.
+    public void MoveToBuilding(BuildingController building)
+    {
+        if (isWorker && IsCarryingResource())
+        {
+            ReturnCargo();
+            return;
+        }
+
+        MoveTo(building.transform.position);
+    }
+
     // 채취 중단 + 그 자리에 멈춰서 Idle로 (반납 건물이 없거나, 채취 중이던 노드가 파괴된 경우 등)
     private void CancelGathering()
     {
@@ -544,12 +577,36 @@ public class UnitController : MonoBehaviour
 
         if (gatherTargetNode == null || gatherTargetNode.IsDepleted)
         {
-            CancelGathering(); // 캐던 노드가 없어졌으면(고갈/파괴) 그 자리에 멈춰서 Idle로
-            return;
+            gatherTargetNode = FindNearestResourceNode();
+            if (gatherTargetNode == null)
+            {
+                CancelGathering(); // 근처에 캘 자원이 아예 없으면 그 자리에 멈춰서 Idle로
+                return;
+            }
         }
 
         MoveTo(gatherTargetNode.transform.position);
         gatherState = GatherState.MovingToResource;
+    }
+
+    private ResourceNode FindNearestResourceNode()
+    {
+        ResourceNode nearest = null;
+        float nearestSqrDist = float.MaxValue;
+
+        foreach (ResourceNode node in rtsController.ResourceNodeList)
+        {
+            if (node == null || node.IsDepleted) continue;
+
+            float sqrDist = (node.transform.position - transform.position).sqrMagnitude;
+            if (sqrDist < nearestSqrDist)
+            {
+                nearestSqrDist = sqrDist;
+                nearest = node;
+            }
+        }
+
+        return nearest;
     }
 
     // 건물처럼 콜라이더가 큰 대상은 피벗(중심)이 아니라 표면(가장 가까운 지점) 기준으로 거리 판정

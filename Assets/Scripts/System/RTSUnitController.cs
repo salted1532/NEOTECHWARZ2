@@ -13,9 +13,10 @@ public class RTSUnitController : MonoBehaviour
     public List<UnitController> selectedUnitList;
     public List<BuildingController> selectedBuildingList;
 
-    // 맵에 존재하는 모든 유닛
+    // 맵에 존재하는 모든 유닛/건물/자원 노드
     public List<UnitController> UnitList;
     public List<BuildingController> BuildingList;
+    public List<ResourceNode> ResourceNodeList;
 
     [SerializeField]
     private UserControl userControl;
@@ -81,12 +82,14 @@ public class RTSUnitController : MonoBehaviour
         selectedBuildingList = new List<BuildingController>();
         UnitList = new List<UnitController>();
         BuildingList = new List<BuildingController>();
+        ResourceNodeList = new List<ResourceNode>();
     }
 
     private void Update()
     {
         UnitList.RemoveAll(unit => unit == null);
         BuildingList.RemoveAll(building => building == null);
+        ResourceNodeList.RemoveAll(node => node == null);
 
         //UI 갱신
         UpdateUI();
@@ -217,6 +220,15 @@ public class RTSUnitController : MonoBehaviour
         }
     }
 
+    //자원 반환(Return Cargo) 명령
+    public void EnterReturnMode()
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].ReturnCargo();
+        }
+    }
+
     public void PatrolSelectedUnits(Vector3 end)
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
@@ -231,6 +243,15 @@ public class RTSUnitController : MonoBehaviour
         for (int i = 0; i < selectedUnitList.Count; ++i)
         {
             selectedUnitList[i].Gather(node);
+        }
+    }
+
+    //건물 우클릭 명령 (일꾼이 자원을 들고 있으면 반환, 아니면 그냥 이동)
+    public void MoveToBuildingSelectedUnits(BuildingController building)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].MoveToBuilding(building);
         }
     }
 
@@ -371,11 +392,6 @@ public class RTSUnitController : MonoBehaviour
     public void EnterRallyMode()
     {
         userControl.SetOrderState("Rally");
-    }
-
-    public void EnterReturnMode()
-    {
-        //귀환 명령 (아직 미구현)
     }
 
     #endregion

@@ -306,6 +306,24 @@ public class UserControl : MonoBehaviour
             }
         }
 
+        // 건물 우클릭
+        if(clickedBuilding)
+        {
+            BuildingController building = BuildingHit.transform.GetComponent<BuildingController>();
+
+            if (building != null && rtsUnitController.IsUnitSelect())
+            {
+                rtsUnitController.MoveToBuildingSelectedUnits(building);
+
+                UsercurrentState = OrderState.Move;
+                UpdatePointer();
+                movePointer.transform.position = building.transform.position;
+                movePointer.SetActive(true);
+
+                UsercurrentState = OrderState.None;
+            }
+        }
+
         // 5. 광물 클릭 = 명령 처리
         if (clickedOre)
         {
