@@ -1,28 +1,29 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
-    // ÇöÀç UI°¡ ¾î¶² »óÅÂÀÎÁö
+    // ï¿½ï¿½ï¿½ï¿½ UIï¿½ï¿½ ï¿½î¶² ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     public enum UISelectionState
     {
         None,
 
-        Worker,            // ÀÏ²Û ¼±ÅÃ
-        CombatUnit,        // °ø°Ý À¯´Ö ¼±ÅÃ
+        Worker,            // ï¿½Ï²ï¿½ ï¿½ï¿½ï¿½ï¿½
+        CombatUnit,        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-        BuildMode,         // °Ç¼³ ¸ðµå
+        BuildMode,         // ï¿½Ç¼ï¿½ ï¿½ï¿½ï¿½
 
-        Tier1Building,     // ¹è·° µî
+        Tier1Building,     // ï¿½è·° ï¿½ï¿½
         Tier2Building,
         Tier3Building,
 
-        MainBase           // Ä¿¸Çµå¼¾ÅÍ
+        MainBase           // Ä¿ï¿½Çµå¼¾ï¿½ï¿½
     }
 
-    // ¹öÆ° µ¥ÀÌÅÍ
+    // ï¿½ï¿½Æ° ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     public struct CommandButtonData
     {
         public Sprite Icon { get; }
@@ -76,11 +77,15 @@ public class UIController : MonoBehaviour
     [Header("Queue Empty Icons")]
     [SerializeField] private Sprite[] emptyQueueIcons; // 0=1, 1=2, 2=3, 3=4, 4=5
 
+    [SerializeField] private TextMeshProUGUI OreText;
+    [SerializeField] private TextMeshProUGUI GasText;
+    [SerializeField] private TextMeshProUGUI PopulationText;
+
     public UISelectionState CurrentState = UISelectionState.None;
 
     private RTSUnitController rtsUnitController;
 
-    //´ë±â¿­ °ü·Ã
+    //ï¿½ï¿½â¿­ ï¿½ï¿½ï¿½ï¿½
     [SerializeField] private ProductionSlot[] queueSlots;
     [SerializeField] private UnitDataSO database;
     [SerializeField] private Slider progressSlider;
@@ -90,6 +95,8 @@ public class UIController : MonoBehaviour
 
     private void Start()
     {
+        rtsUnitController = FindFirstObjectByType<RTSUnitController>();
+
         ClearPanel();
         HideProductionUI();
     }
@@ -97,6 +104,17 @@ public class UIController : MonoBehaviour
     private void Update()
     {
         UpdateProductionProgress();
+        UpdateResourceUI();
+    }
+
+    private void UpdateResourceUI()
+    {
+        if (rtsUnitController == null)
+            return;
+
+        OreText.text = rtsUnitController.GetOre().ToString();
+        GasText.text = rtsUnitController.GetGas().ToString();
+        PopulationText.text = $"{rtsUnitController.GetPopulation()}/{rtsUnitController.GetMaxPopulation()}";
     }
 
     public void ClearPanel()
@@ -114,7 +132,7 @@ public class UIController : MonoBehaviour
     }
 
     /// <summary>
-    /// ÀÏ¹Ý ÆÐ³Î Ç¥½Ã
+    /// ï¿½Ï¹ï¿½ ï¿½Ð³ï¿½ Ç¥ï¿½ï¿½
     /// </summary>
     public void ShowPanel(UISelectionState state, params CommandButtonData[] commands)
     {
@@ -124,7 +142,7 @@ public class UIController : MonoBehaviour
     }
 
     /// <summary>
-    /// °Ç¼³¸ðµå Ç¥½Ã (Ãë¼Ò ¹öÆ° ÀÚµ¿ Ãß°¡)
+    /// ï¿½Ç¼ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ (ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½Úµï¿½ ï¿½ß°ï¿½)
     /// </summary>
     public void ShowBuildPanel(CommandButtonData[] buildingCommands, Action onCancel)
     {
@@ -175,7 +193,7 @@ public class UIController : MonoBehaviour
         return result;
     }
 
-    //´ë±â¿­ Ãâ·Â
+    //ï¿½ï¿½â¿­ ï¿½ï¿½ï¿½
     public void UpdateQueue(
     IReadOnlyList<ProductionData> queue,
     Action<int> onCancel)
@@ -226,7 +244,7 @@ public class UIController : MonoBehaviour
         UpdateQueue(queue, onCancel);
     }
 
-    //À¯´Ö ´ë±â¿­ & »ý»ê½Ã°£¹Ù ¼û±â±â
+    //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½â¿­ & ï¿½ï¿½ï¿½ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
     public void HideProductionUI()
     {
         foreach (var slot in queueSlots)
@@ -249,7 +267,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //»ý»ê½Ã°£ Ç¥½Ã °»½Å
+    //ï¿½ï¿½ï¿½ï¿½Ã°ï¿½ Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     private void UpdateProductionProgress()
     {
         if (!isShowingProductionQueue ||
@@ -264,7 +282,7 @@ public class UIController : MonoBehaviour
         progressSlider.value = currentQueue[0].Progress;
     }
 
-    //ÀÏ²Û
+    //ï¿½Ï²ï¿½
     public void ShowWorkerPanel(
     Action onMove,
     Action onAttack,
@@ -288,7 +306,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //°ø°ÝÀ¯´Ö
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     public void ShowAttackUnitPanel(
     Action onMove,
     Action onAttack,
@@ -308,7 +326,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //°Ç¼³¸ðµå
+    //ï¿½Ç¼ï¿½ï¿½ï¿½ï¿½
     public void ShowBuildPanel(
     Action onCommandCenter,
     Action onSupplyDepot,
@@ -332,7 +350,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //¸ÞÀÎ±âÁö
+    //ï¿½ï¿½ï¿½Î±ï¿½ï¿½ï¿½
     public void ShowMainBasePanel(Action onTrainWorker)
     {
         CurrentState = UISelectionState.MainBase;
@@ -343,7 +361,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //º´¿µ
+    //ï¿½ï¿½ï¿½ï¿½
     public void ShowBarracksPanel(
     Action onMarine,
     Action onFirebat)
@@ -357,7 +375,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //°øÀå 
+    //ï¿½ï¿½ï¿½ï¿½ 
     public void ShowFactoryPanel(
     Action onGoliath,
     Action onTank)
@@ -371,7 +389,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //°øÇ×
+    //ï¿½ï¿½ï¿½ï¿½
     public void ShowAirportPanel(
     Action onWraith,
     Action onGuardian)

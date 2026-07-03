@@ -32,6 +32,8 @@ public class UnitData
     [field: SerializeField]
     public int gas { get; private set; }
     [field: SerializeField]
+    public int population { get; private set; }
+    [field: SerializeField]
     public int productionTime { get; private set; }
     [field: SerializeField]
     public Sprite Icon { get; private set; }

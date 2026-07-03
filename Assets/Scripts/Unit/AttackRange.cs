@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class AttackRange : MonoBehaviour
 {
@@ -6,41 +7,71 @@ public class AttackRange : MonoBehaviour
     public int AttackDamage;
 
     private UnitController unitController;
+    private readonly List<GameObject> enemiesInRange = new List<GameObject>();
 
     private void Awake()
     {
         unitController = transform.parent.GetComponent<UnitController>();
     }
 
-    void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Enemy"))
             return;
 
-        Vector3 enemyPos = other.transform.position;
-        GameObject enemyObject = other.gameObject;
-    
-        float distance = Vector3.Distance(transform.position, enemyPos);
+        if (!enemiesInRange.Contains(other.gameObject))
+            enemiesInRange.Add(other.gameObject);
+    }
 
-        if (unitController.IsAttack() == true)
+    private void OnTriggerExit(Collider other)
+    {
+        if (!other.CompareTag("Enemy"))
+            return;
+
+        enemiesInRange.Remove(other.gameObject);
+    }
+
+    private void Update()
+    {
+        enemiesInRange.RemoveAll(enemy => enemy == null); // 이미 죽어서 destroy된 대상 정리
+
+        GameObject target = GetClosestEnemy();
+        if (target == null)
+            return;
+
+        float distance = Vector3.Distance(transform.position, target.transform.position);
+
+        if (unitController.IsAttack() || unitController.IsIdle())
         {
             if (distance <= UnitRange)
             {
-                unitController.Attack(enemyPos, AttackDamage, enemyObject);
+                unitController.Attack(target.transform.position, AttackDamage, target);
+            }
+            else if (unitController.IsIdle())
+            {
+                unitController.ChaseTarget(target.transform.position);
             }
         }
+    }
 
-        if (unitController.IsIdle() == true)
+    private GameObject GetClosestEnemy()
+    {
+        GameObject closest = null;
+        float closestSqrDist = float.MaxValue;
+
+        foreach (GameObject enemy in enemiesInRange)
         {
-            if (distance <= UnitRange)
+            if (enemy == null)
+                continue;
+
+            float sqrDist = (enemy.transform.position - transform.position).sqrMagnitude;
+            if (sqrDist < closestSqrDist)
             {
-                unitController.Attack(enemyPos, AttackDamage, enemyObject);
-            }
-            else
-            {
-                unitController.ChaseTarget(enemyPos);
+                closestSqrDist = sqrDist;
+                closest = enemy;
             }
         }
 
+        return closest;
     }
 }

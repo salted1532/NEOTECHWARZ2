@@ -70,4 +70,12 @@ public class BuildingController : MonoBehaviour
     {
         UnitSpawner.Cancel(index);
     }
+
+    public void Die()
+    {
+        RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
+        controller?.BuildingList.Remove(this);
+
+        Destroy(gameObject);
+    }
 }

@@ -15,6 +15,8 @@ public class UserControl : MonoBehaviour
     private LayerMask layerBuilding;
     [SerializeField]
     private LayerMask layerOre;
+    [SerializeField]
+    private LayerMask layerGas;
 
     [SerializeField]
     private Camera mainCamera;
@@ -133,12 +135,14 @@ public class UserControl : MonoBehaviour
         RaycastHit enemyHit;
         RaycastHit BuildingHit;
         RaycastHit OreHit;
+        RaycastHit GasHit;
 
         bool clickedUnit = Physics.Raycast(ray, out unitHit, Mathf.Infinity, layerUnit);
         bool clickedGround = Physics.Raycast(ray, out groundHit, Mathf.Infinity, layerGround);
         bool clickedEnemy = Physics.Raycast(ray, out enemyHit, Mathf.Infinity, layerEnemy);
         bool clickedBuilding = Physics.Raycast(ray, out BuildingHit, Mathf.Infinity, layerBuilding);
         bool clickedOre = Physics.Raycast(ray, out OreHit, Mathf.Infinity, layerOre);
+        bool clickedGas = Physics.Raycast(ray, out GasHit, Mathf.Infinity, layerGas);
 
         // 1. 유닛 클릭
         if (clickedUnit)
@@ -238,6 +242,12 @@ public class UserControl : MonoBehaviour
 
         }
 
+        // 5. 가스 클릭 = 명령 처리
+        if (clickedGas)
+        {
+
+        }
+
         // 6. 아무것도 아닌 곳 클릭 = 선택 해제
         rtsUnitController.DeselectAll();
     }
@@ -253,12 +263,14 @@ public class UserControl : MonoBehaviour
         RaycastHit enemyHit;
         RaycastHit BuildingHit;
         RaycastHit OreHit;
+        RaycastHit GasHit;
 
         bool clickedUnit = Physics.Raycast(ray, out unitHit, Mathf.Infinity, layerUnit);
         bool clickedGround = Physics.Raycast(ray, out groundHit, Mathf.Infinity, layerGround);
         bool clickedEnemy = Physics.Raycast(ray, out enemyHit, Mathf.Infinity, layerEnemy);
         bool clickedBuilding = Physics.Raycast(ray, out BuildingHit, Mathf.Infinity, layerBuilding);
         bool clickedOre = Physics.Raycast(ray, out OreHit, Mathf.Infinity, layerOre);
+        bool clickedGas = Physics.Raycast(ray, out GasHit, Mathf.Infinity, layerGas);
 
         if (clickedUnit)
         {
@@ -268,7 +280,7 @@ public class UserControl : MonoBehaviour
         // 2. 땅 클릭 = 명령 처리
         if (clickedGround)
         {
-            if(rtsUnitController.IsUnitSelect())
+            if (rtsUnitController.IsUnitSelect())
             {
                 rtsUnitController.MoveSelectedUnits(groundHit.point);
 
@@ -292,6 +304,22 @@ public class UserControl : MonoBehaviour
                 UsercurrentState = OrderState.None;
 
             }
+        }
+
+        // 5. 광물 클릭 = 명령 처리
+        if (clickedOre)
+        {
+            ResourceNode node = OreHit.transform.GetComponent<ResourceNode>();
+            if (node != null)
+                rtsUnitController.GatherSelectedUnits(node);
+        }
+
+        // 5. 가스 클릭 = 명령 처리
+        if (clickedGas)
+        {
+            ResourceNode node = GasHit.transform.GetComponent<ResourceNode>();
+            if (node != null)
+                rtsUnitController.GatherSelectedUnits(node);
         }
     }
 

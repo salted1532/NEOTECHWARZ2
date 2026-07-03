@@ -23,6 +23,8 @@ public class BuildingData
     [field: SerializeField]
     public int gas { get; private set; }
     [field: SerializeField]
+    public int population { get; private set; }
+    [field: SerializeField]
     public int productionTime { get; private set; }
     [field: SerializeField]
     public GameObject Prefab { get; private set; }
