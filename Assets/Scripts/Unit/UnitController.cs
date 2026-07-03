@@ -51,11 +51,13 @@ public class UnitController : MonoBehaviour
     // ===== 필드 추가 =====
     private bool isWorker;
 
-    private enum GatherState { None, MovingToResource, Gathering, MovingToBase, Depositing }
+    private enum GatherState { None, MovingToResource, WaitingInQueue, Gathering, MovingToBase, Depositing }
     private GatherState gatherState = GatherState.None;
 
     private int amountPerTrip = 5; //자원 채취량
     private float gatherDuration = 3f; //자원 채취 시간
+
+    private const float alternateResourceSearchRadius = 10f; // 목표 자원 대기열이 꽉 찼을 때 대체 자원을 찾는 반경
 
     private ResourceNode gatherTargetNode;
     private float gatherTimer;
@@ -411,6 +413,10 @@ public class UnitController : MonoBehaviour
             return;
         }
 
+        // 새 채취 명령이므로, 기존에 대기열에 들어가 있던 노드가 있다면 자리부터 비워준다
+        // (gatherTargetNode를 새 목표로 덮어쓰기 전에 반드시 먼저 호출해야 함)
+        CancelGatheringForNewCommand();
+
         // 이미 자원을 들고 있는 상태(Deposit 못 하고 중간에 새 채취 명령을 받은 경우)면
         // 다시 캐러 가지 말고 바로 반납하러 감
         if (IsCarryingResource())
@@ -428,10 +434,47 @@ public class UnitController : MonoBehaviour
             return;
         }
 
+        // 대기열 확인은 도착한 뒤에 한다 (일단 이동부터 시작)
         patrolling = false;
         gatherTargetNode = node;
         MoveTo(node.transform.position);
         gatherState = GatherState.MovingToResource;
+    }
+
+    // 목표 노드에 도착했지만 대기열이 꽉 찼거나(혹은 목표 노드 자체가 사라졌을) 때,
+    // 자신 기준 alternateResourceSearchRadius 이내에서 대기열 여유가 있는 다른 자원 노드를 찾아 그쪽으로 재이동한다.
+    // 성공하면 true를 반환하고(이동 시작, 도착하면 다시 대기열을 확인하게 됨), 근처에 대체 자원이 없으면 false를 반환한다.
+    private bool TryRedirectToNearbyResource(ResourceNode exclude)
+    {
+        ResourceNode alt = FindNearestAvailableResourceNode(alternateResourceSearchRadius, exclude);
+        if (alt == null)
+            return false;
+
+        gatherTargetNode = alt;
+        MoveTo(alt.transform.position);
+        gatherState = GatherState.MovingToResource;
+        return true;
+    }
+
+    private ResourceNode FindNearestAvailableResourceNode(float maxDistance, ResourceNode exclude)
+    {
+        ResourceNode nearest = null;
+        float nearestSqrDist = maxDistance * maxDistance;
+
+        foreach (ResourceNode node in rtsController.ResourceNodeList)
+        {
+            if (node == null || node == exclude || node.IsDepleted || node.IsCrowded)
+                continue;
+
+            float sqrDist = (node.transform.position - transform.position).sqrMagnitude;
+            if (sqrDist < nearestSqrDist)
+            {
+                nearestSqrDist = sqrDist;
+                nearest = node;
+            }
+        }
+
+        return nearest;
     }
 
     private bool IsCarryingResource() => DepositOre.activeSelf || DepositGas.activeSelf;
@@ -479,6 +522,15 @@ public class UnitController : MonoBehaviour
     // 이동/공격/정지 등 다른 명령이 들어와서 채취를 중단시킬 때 호출 (반경만 원상복구, Idle 전환은 각 명령이 알아서 함)
     private void CancelGatheringForNewCommand()
     {
+        // 대기열 등록은 노드에 "도착한 뒤"(WaitingInQueue)에만 이뤄지므로, MovingToResource 중에는 대기열에 없다.
+        // WaitingInQueue(대기 중)나 Gathering(채취 중, 즉 대기열 맨 앞)에서 중단되면 자리를 비워줘야
+        // 다음 일꾼이 그 자리를 이어받을 수 있다. MovingToBase 이후에는 이미 GatherTick에서 LeaveQueue가 호출된 상태다.
+        if ((gatherState == GatherState.WaitingInQueue || gatherState == GatherState.Gathering)
+            && gatherTargetNode != null)
+        {
+            gatherTargetNode.LeaveQueue(this);
+        }
+
         gatherState = GatherState.None;
 
         if (!isAirUnit)
@@ -495,11 +547,13 @@ public class UnitController : MonoBehaviour
         if (!isAirUnit)
             navMeshAgent.radius = gatherAgentRadius;
 
-        // 채취 도중 노드가 고갈되어 파괴된 경우(다른 유닛이 마저 캐간 경우 등) 방어
-        if ((gatherState == GatherState.MovingToResource || gatherState == GatherState.Gathering)
+        // 채취 도중(혹은 대기 중) 노드가 고갈되어 파괴된 경우(다른 유닛이 마저 캐간 경우 등) 방어
+        // 그냥 멈추지 않고, 자신 기준 10 거리 이내에 대체 자원이 있으면 그쪽으로 재이동한다
+        if ((gatherState == GatherState.MovingToResource || gatherState == GatherState.WaitingInQueue || gatherState == GatherState.Gathering)
             && gatherTargetNode == null)
         {
-            CancelGathering();
+            if (!TryRedirectToNearbyResource(null))
+                CancelGathering();
             return;
         }
 
@@ -511,6 +565,25 @@ public class UnitController : MonoBehaviour
                     if (!isAirUnit)
                         navMeshAgent.isStopped = true; // 장애물 경계에서 계속 재탐색하며 맴도는 것 방지
 
+                    // 도착했으니 이제 대기열을 확인한다.
+                    // 대기열이 혼잡하면(waitWorkerCount 이상) 우선 근처(10 이내)에 더 한가한 자원을 찾아보고,
+                    // 대체 자원을 못 찾으면 인원 제한 없이 그냥 이 노드의 대기열에 줄을 선다.
+                    if (gatherTargetNode.IsCrowded && TryRedirectToNearbyResource(gatherTargetNode))
+                    {
+                        break; // 대체 자원으로 재이동 시작 (그쪽에 도착하면 다시 이 로직을 탄다)
+                    }
+
+                    gatherTargetNode.JoinQueue(this);
+                    gatherState = GatherState.WaitingInQueue;
+                }
+                break;
+
+            // 대기열에 등록은 됐지만 아직 자기 차례가 아닌 상태 (다른 일꾼이 채취 중)
+            case GatherState.WaitingInQueue:
+                RotateYOnly(gatherTargetNode.transform.position);
+
+                if (gatherTargetNode.IsTurnToGather(this))
+                {
                     gatherTimer = gatherDuration;
                     gatherState = GatherState.Gathering;
                 }
@@ -524,6 +597,7 @@ public class UnitController : MonoBehaviour
                 {
                     carryingType = gatherTargetNode.Type; // 노드가 파괴되기 전에 타입을 미리 캐싱
                     carryingAmount = gatherTargetNode.Extract(amountPerTrip);
+                    gatherTargetNode.LeaveQueue(this); // 채취 완료 → 대기열 자리 반납, 다음 일꾼 차례로
 
                     if (carryingType == ResourceType.Ore)
                         DepositOre.SetActive(true);
@@ -575,38 +649,19 @@ public class UnitController : MonoBehaviour
 
         carryingAmount = 0;
 
-        if (gatherTargetNode == null || gatherTargetNode.IsDepleted)
+        if (gatherTargetNode != null && !gatherTargetNode.IsDepleted)
         {
-            gatherTargetNode = FindNearestResourceNode();
-            if (gatherTargetNode == null)
-            {
-                CancelGathering(); // 근처에 캘 자원이 아예 없으면 그 자리에 멈춰서 Idle로
-                return;
-            }
+            // 원래 캐던 노드가 아직 남아있으면 그대로 복귀한다 (도착하면 다시 대기열을 확인하게 됨)
+            MoveTo(gatherTargetNode.transform.position);
+            gatherState = GatherState.MovingToResource;
+            return;
         }
 
-        MoveTo(gatherTargetNode.transform.position);
-        gatherState = GatherState.MovingToResource;
-    }
-
-    private ResourceNode FindNearestResourceNode()
-    {
-        ResourceNode nearest = null;
-        float nearestSqrDist = float.MaxValue;
-
-        foreach (ResourceNode node in rtsController.ResourceNodeList)
+        // 원래 노드가 고갈됐거나(혹은 ReturnCargo로 목표 없이 반납한 경우) 자신 기준 10 이내에서 새 자원을 찾는다
+        if (!TryRedirectToNearbyResource(gatherTargetNode))
         {
-            if (node == null || node.IsDepleted) continue;
-
-            float sqrDist = (node.transform.position - transform.position).sqrMagnitude;
-            if (sqrDist < nearestSqrDist)
-            {
-                nearestSqrDist = sqrDist;
-                nearest = node;
-            }
+            CancelGathering(); // 근처(10 이내)에 캘 자원이 없으면 그 자리에 멈춰서 Idle로
         }
-
-        return nearest;
     }
 
     // 건물처럼 콜라이더가 큰 대상은 피벗(중심)이 아니라 표면(가장 가까운 지점) 기준으로 거리 판정
@@ -640,6 +695,8 @@ public class UnitController : MonoBehaviour
 
     public void Die()
     {
+        gatherTargetNode?.LeaveQueue(this); // 대기열/채취 중에 사망해도 자리를 비워줌
+
         RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
         controller?.UnitList.Remove(this);
 
