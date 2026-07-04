@@ -46,20 +46,20 @@ public class UIController : MonoBehaviour
         }
     }
 
-    [Header("Panel")]
+    [Header("Command Panel")]
     [SerializeField] private GameObject panelRoot;
     [SerializeField] private ProductionSlot[] slots;
 
-    [Header("Command Icons")]
+    [Header("Command Icons (ShowWorkerPanel / ShowAttackUnitPanel)")]
     [SerializeField] private Sprite moveIcon;
     [SerializeField] private Sprite attackIcon;
     [SerializeField] private Sprite stopIcon;
     [SerializeField] private Sprite patrolIcon;
     [SerializeField] private Sprite holdIcon;
-    [SerializeField] private Sprite returnIcon;
-    [SerializeField] private Sprite buildIcon;
+    [SerializeField] private Sprite returnIcon; // ShowWorkerPanel 전용
+    [SerializeField] private Sprite buildIcon;  // ShowWorkerPanel 전용 (건설모드 진입)
 
-    [Header("Building Icons")]
+    [Header("Building Icons (ShowBuildPanel)")]
     [SerializeField] private Sprite commandCenterIcon;
     [SerializeField] private Sprite supplyDepotIcon;
     [SerializeField] private Sprite barracksIcon;
@@ -67,14 +67,14 @@ public class UIController : MonoBehaviour
     [SerializeField] private Sprite airportIcon;
     [SerializeField] private Sprite labIcon;
 
-    [Header("Unit Icons")]
-    [SerializeField] private Sprite workerIcon;
-    [SerializeField] private Sprite marineIcon;
-    [SerializeField] private Sprite vultureIcon;
-    [SerializeField] private Sprite goliathIcon;
-    [SerializeField] private Sprite tankIcon;
-    [SerializeField] private Sprite wraithIcon;
-    [SerializeField] private Sprite guardianIcon;
+    [Header("Unit Icons (ShowMainBasePanel / ShowBarracksPanel / ShowFactoryPanel / ShowAirportPanel)")]
+    [SerializeField] private Sprite workerIcon;   // ShowMainBasePanel
+    [SerializeField] private Sprite marineIcon;   // ShowBarracksPanel
+    [SerializeField] private Sprite vultureIcon;  // ShowBarracksPanel
+    [SerializeField] private Sprite goliathIcon;  // ShowFactoryPanel
+    [SerializeField] private Sprite tankIcon;     // ShowFactoryPanel
+    [SerializeField] private Sprite wraithIcon;   // ShowAirportPanel
+    [SerializeField] private Sprite guardianIcon; // ShowAirportPanel
 
     [Header("Common")]
     [SerializeField] private Sprite cancelIcon;
@@ -82,6 +82,7 @@ public class UIController : MonoBehaviour
     [Header("Queue Empty Icons")]
     [SerializeField] private Sprite[] emptyQueueIcons; // 0=1, 1=2, 2=3, 3=4, 4=5
 
+    [Header("Resource Text")]
     [SerializeField] private TextMeshProUGUI OreText;
     [SerializeField] private TextMeshProUGUI GasText;
     [SerializeField] private TextMeshProUGUI PopulationText;
@@ -90,7 +91,8 @@ public class UIController : MonoBehaviour
 
     private RTSUnitController rtsUnitController;
 
-    // Production queue
+    [Header("Production Queue Panel (SelectInfo)")]
+    [SerializeField] private GameObject productionPanel;
     [SerializeField] private ProductionSlot[] queueSlots;
     [SerializeField] private UnitDataSO database;
     [SerializeField] private Slider progressSlider;
@@ -98,12 +100,25 @@ public class UIController : MonoBehaviour
     private IReadOnlyList<ProductionData> currentQueue;
     private bool isShowingProductionQueue;
 
+    [Header("Info Panel (SelectInfo)")]
+    [SerializeField] private GameObject infoPanel;
+    [SerializeField] private Image infoIcon;
+    [SerializeField] private TextMeshProUGUI infoHpText;
+
+    private HealthManager infoBoundHealth; // 현재 Info_panel이 구독 중인 대상 (선택이 바뀌면 구독 해제 후 갈아끼움)
+
+    [Header("Squad Panel (SelectInfo)")]
+    [SerializeField] private GameObject squadPanel;
+    [SerializeField] private ProductionSlot[] squadSlots; // 인스펙터에서 12개(slot0~11) 연결
+
     private void Start()
     {
         rtsUnitController = FindFirstObjectByType<RTSUnitController>();
 
         ClearPanel();
         HideProductionUI();
+        HideInfoPanel();
+        HideSquadPanel();
     }
 
     private void Update()
@@ -251,6 +266,9 @@ public class UIController : MonoBehaviour
         IReadOnlyList<ProductionData> queue,
         Action<int> onCancel)
     {
+        if (productionPanel != null)
+            productionPanel.SetActive(true);
+
         currentQueue = queue;
         isShowingProductionQueue = true;
 
@@ -261,6 +279,9 @@ public class UIController : MonoBehaviour
     // 생산 대기열 & 진행시간 UI를 숨기고 초기화한다 (생산 건물이 아닌 대상 선택 시 등)
     public void HideProductionUI()
     {
+        if (productionPanel != null)
+            productionPanel.SetActive(false);
+
         foreach (var slot in queueSlots)
             slot.Clear();
 
@@ -296,6 +317,104 @@ public class UIController : MonoBehaviour
 
         progressSlider.gameObject.SetActive(true);
         progressSlider.value = currentQueue[0].Progress;
+    }
+
+    // ===== Info Panel (단일 유닛/건물 선택 시) =====
+    // Squad_panel과는 항상 배타적이고, productionPanel과는 독립적으로 동시에 켜질 수 있다
+    // (생산 건물 선택 시 ShowInfoPanel + ShowProductionUI가 같이 호출됨).
+    // icon/설명 등 다른 정보는 아직 없고, 지금은 아이콘 이미지 + 체력 텍스트만 갱신한다.
+    public void ShowInfoPanel(Sprite icon, HealthManager health)
+    {
+        HideSquadPanel();
+
+        if (infoPanel != null)
+            infoPanel.SetActive(true);
+
+        if (infoIcon != null)
+        {
+            infoIcon.sprite = icon;
+            infoIcon.enabled = icon != null;
+        }
+
+        BindInfoHealth(health);
+    }
+
+    public void HideInfoPanel()
+    {
+        if (infoPanel != null)
+            infoPanel.SetActive(false);
+
+        BindInfoHealth(null);
+    }
+
+    // Info_panel이 구독 중인 HealthManager를 교체한다. 매 프레임 같은 대상으로 호출돼도
+    // 불필요하게 재구독하지 않도록 방어하고, 대상이 죽거나 선택 해제되면 이전 구독을 반드시 해제한다.
+    private void BindInfoHealth(HealthManager health)
+    {
+        if (infoBoundHealth == health)
+        {
+            return;
+        }
+
+        if (infoBoundHealth != null)
+            infoBoundHealth.OnHealthChanged -= UpdateInfoHpText;
+
+        infoBoundHealth = health;
+
+        if (infoBoundHealth != null)
+        {
+            infoBoundHealth.OnHealthChanged += UpdateInfoHpText;
+            UpdateInfoHpText(infoBoundHealth.GetHealth(), infoBoundHealth.GetMaxHealth());
+        }
+        else if (infoHpText != null)
+        {
+            infoHpText.text = string.Empty;
+        }
+    }
+
+    private void UpdateInfoHpText(int currentHp, int maxHealth)
+    {
+        if (infoHpText != null)
+            infoHpText.text = $"{currentHp}/{maxHealth}";
+    }
+
+    // ===== Squad Panel (유닛 다중 선택 시) =====
+    // selectedUnitList 순서대로 최대 squadSlots.Length(12)개까지 아이콘을 채우고,
+    // 슬롯을 클릭하면 onSelectUnit(그 유닛)이 호출되어 단일 선택으로 좁혀지도록 한다.
+    public void ShowSquadPanel(IReadOnlyList<UnitController> units, Action<UnitController> onSelectUnit)
+    {
+        HideInfoPanel();
+        HideProductionUI();
+
+        if (squadPanel != null)
+            squadPanel.SetActive(true);
+
+        int shownCount = Mathf.Min(units.Count, squadSlots.Length);
+
+        for (int i = 0; i < squadSlots.Length; i++)
+        {
+            if (squadSlots[i] == null)
+                continue;
+
+            if (i < shownCount)
+            {
+                UnitController unit = units[i];
+                squadSlots[i].SetData(new CommandButtonData(unit.GetIcon(), () => onSelectUnit(unit)));
+            }
+            else
+            {
+                squadSlots[i].Clear();
+            }
+        }
+    }
+
+    public void HideSquadPanel()
+    {
+        if (squadPanel != null)
+            squadPanel.SetActive(false);
+
+        for (int i = 0; i < squadSlots.Length; i++)
+            squadSlots[i]?.Clear();
     }
 
     // Worker

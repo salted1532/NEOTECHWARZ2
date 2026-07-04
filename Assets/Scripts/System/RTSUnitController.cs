@@ -502,9 +502,35 @@ public class RTSUnitController : MonoBehaviour
                 }
 
                 uIController.HideProductionUI();
+
+                // 유닛을 여러 마리 선택했으면 Squad_panel만, 한 마리면 Info_panel만 보여준다.
+                if (selectedUnitList.Count > 1)
+                {
+                    uIController.ShowSquadPanel(selectedUnitList, ClickSelectUnit);
+                }
+                else if (selectedUnitList.Count == 1)
+                {
+                    UnitController unit = selectedUnitList[0];
+                    uIController.ShowInfoPanel(unit.GetIcon(), unit.GetComponent<HealthManager>());
+                }
+                else
+                {
+                    uIController.HideInfoPanel();
+                }
                 break;
 
             case SelectState.BuildingSelect:
+
+                // 건물은 항상 단일 선택 취급 (Squad_panel은 유닛 다중 선택 전용) -> Info_panel 표시
+                if (selectedBuildingList.Count > 0)
+                {
+                    BuildingController building = selectedBuildingList[0];
+                    uIController.ShowInfoPanel(building.GetIcon(), building.GetComponent<HealthManager>());
+                }
+                else
+                {
+                    uIController.HideInfoPanel();
+                }
 
                 switch (BuildingSelectState)
                 {
@@ -569,11 +595,15 @@ public class RTSUnitController : MonoBehaviour
                     });
 
                 uIController.HideProductionUI();
+                uIController.HideInfoPanel();
+                uIController.HideSquadPanel();
                 break;
 
             default:
                 uIController.ClearPanel();
                 uIController.HideProductionUI();
+                uIController.HideInfoPanel();
+                uIController.HideSquadPanel();
                 break;
         }
     }

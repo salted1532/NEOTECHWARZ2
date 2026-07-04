@@ -285,6 +285,7 @@ GameObject:
   - component: {fileID: 875391073210738237}
   - component: {fileID: 3745819421430264317}
   - component: {fileID: 8055726903463392217}
+  - component: {fileID: 4967427582615997534}
   m_Layer: 9
   m_Name: SupplyDepot
   m_TagString: SupplyDepot
@@ -417,6 +418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingController
   buildingMarker: {fileID: 7296833267826986796}
+  icon: {fileID: 21300000, guid: 71da5815b92d5cd4c8762dd9ef7d5b8d, type: 3}
 --- !u!114 &8055726903463392217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -430,3 +432,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitSpawner
   database: {fileID: 11400000, guid: 9ddd87f106a53d84fa6f58363a4de5e8, type: 2}
+--- !u!114 &4967427582615997534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthManager
+  maxHealth: 100

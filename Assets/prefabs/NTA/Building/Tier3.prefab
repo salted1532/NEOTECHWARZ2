@@ -375,6 +375,7 @@ GameObject:
   - component: {fileID: 875391073210738237}
   - component: {fileID: 3745819421430264317}
   - component: {fileID: -4819241414651212883}
+  - component: {fileID: 9036445165335029168}
   m_Layer: 9
   m_Name: Tier3
   m_TagString: Tier3
@@ -508,6 +509,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingController
   buildingMarker: {fileID: 7296833267826986796}
+  icon: {fileID: 21300000, guid: dd15a21c5d9100640bb815f22be622a6, type: 3}
 --- !u!114 &-4819241414651212883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -521,3 +523,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitSpawner
   database: {fileID: 11400000, guid: 9ddd87f106a53d84fa6f58363a4de5e8, type: 2}
+--- !u!114 &9036445165335029168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthManager
+  maxHealth: 100

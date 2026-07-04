@@ -680,6 +680,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitController
   unitMarker: {fileID: 8287700491229270693}
+  icon: {fileID: 21300000, guid: f9088a500c2a2184c90293aea40e17bb, type: 3}
   moveSpeed: 10
   arriveDistance: 1.2
   stuckTimer: 0
@@ -692,6 +693,8 @@ MonoBehaviour:
   DepositGas: {fileID: 3080184815253860246}
   gatherInteractRange: 2
   gatherAgentRadius: 0.1
+  airSeparationRadius: 1.2
+  airSeparationSpeed: 4
 --- !u!114 &-8791996355998483226
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,6 +15,9 @@ public class UnitController : MonoBehaviour
     [SerializeField]
     private GameObject unitMarker;
 
+    [SerializeField]
+    private Sprite icon; // Squad_panel 등 선택 UI에 표시할 아이콘
+
     private NavMeshAgent navMeshAgent;
 
     [SerializeField]
@@ -744,6 +747,7 @@ public class UnitController : MonoBehaviour
 
         RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
         controller?.UnitList.Remove(this);
+        controller?.selectedUnitList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel/Squad_panel 등)가 유령 참조를 들고 있지 않도록
 
         Destroy(gameObject);
     }
@@ -754,4 +758,6 @@ public class UnitController : MonoBehaviour
     public bool IsIdle() => UnitcurrentState == UnitState.Idle;
     public bool IsMove() => UnitcurrentState == UnitState.Move;
     public bool IsAttack() => UnitcurrentState == UnitState.Attack;
+
+    public Sprite GetIcon() => icon;
 }

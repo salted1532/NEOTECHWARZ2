@@ -8,6 +8,9 @@ public class BuildingController : MonoBehaviour
     [SerializeField]
     private GameObject buildingMarker;
 
+    [SerializeField]
+    private Sprite icon; // Info_panel 등 선택 UI에 표시할 아이콘
+
     // 이 건물의 유닛 생산 큐를 실제로 관리하는 자식 컴포넌트
     private UnitSpawner UnitSpawner;
 
@@ -67,6 +70,8 @@ public class BuildingController : MonoBehaviour
         return RallyPosition;
     }
 
+    public Sprite GetIcon() => icon;
+
     // 현재 생산 대기열 목록을 반환 (UI 표시용, UnitSpawner에 위임)
     public IReadOnlyList<ProductionData> GetProductionQueue()
     {
@@ -91,6 +96,7 @@ public class BuildingController : MonoBehaviour
     {
         RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
         controller?.BuildingList.Remove(this);
+        controller?.selectedBuildingList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel 등)가 유령 참조를 들고 있지 않도록
 
         Destroy(gameObject);
     }
