@@ -8,26 +8,26 @@ using UnityEngine.UI;
 // RTSUnitController가 현재 선택 상태에 맞는 ShowXXXPanel 메서드를 호출해 패널 내용을 갱신한다.
 public class UIController : MonoBehaviour
 {
-    // ���� UI�� � ��������
+    // Which state the UI is currently in
     // 선택 종류: None(없음) / Worker(일꾼) / CombatUnit(전투유닛) / BuildMode(건설모드) /
     // Tier1~3Building(티어별 생산건물) / MainBase(커맨드센터, 본진)
     public enum UISelectionState
     {
         None,
 
-        Worker,            // �ϲ� ����
-        CombatUnit,        // ���� ���� ����
+        Worker,            // Worker selected
+        CombatUnit,        // Combat unit selected
 
-        BuildMode,         // �Ǽ� ���
+        BuildMode,         // Build mode
 
-        Tier1Building,     // �跰 ��
+        Tier1Building,     // Tier 1 building
         Tier2Building,
         Tier3Building,
 
-        MainBase           // Ŀ�ǵ弾��
+        MainBase           // Command center
     }
 
-    // ��ư ������
+    // Button data
     // 커맨드 패널의 버튼 하나에 필요한 데이터 (아이콘 / 클릭 콜백 / 활성화 여부)
     public struct CommandButtonData
     {
@@ -90,7 +90,7 @@ public class UIController : MonoBehaviour
 
     private RTSUnitController rtsUnitController;
 
-    //��⿭ ����
+    // Production queue
     [SerializeField] private ProductionSlot[] queueSlots;
     [SerializeField] private UnitDataSO database;
     [SerializeField] private Slider progressSlider;
@@ -139,7 +139,7 @@ public class UIController : MonoBehaviour
     }
 
     /// <summary>
-    /// �Ϲ� �г� ǥ��
+    /// Show generic panel
     /// </summary>
     // 범용 패널 표시: 지정한 상태로 전환하고 주어진 커맨드 버튼들을 그대로 슬롯에 채운다.
     public void ShowPanel(UISelectionState state, params CommandButtonData[] commands)
@@ -150,7 +150,7 @@ public class UIController : MonoBehaviour
     }
 
     /// <summary>
-    /// �Ǽ���� ǥ�� (��� ��ư �ڵ� �߰�)
+    /// Show build mode panel (auto-adds a cancel button)
     /// </summary>
     // 건설모드 패널 표시 (건물 목록 뒤에 취소 버튼을 자동으로 추가해서 표시)
     public void ShowBuildPanel(CommandButtonData[] buildingCommands, Action onCancel)
@@ -204,7 +204,7 @@ public class UIController : MonoBehaviour
         return result;
     }
 
-    //��⿭ ���
+    // Production queue
     // 생산 대기열 슬롯 UI 갱신: 큐에 있는 만큼 아이콘/취소 콜백을 채우고 나머지는 빈 슬롯으로 표시한다.
     public void UpdateQueue(
     IReadOnlyList<ProductionData> queue,
@@ -257,7 +257,7 @@ public class UIController : MonoBehaviour
         UpdateQueue(queue, onCancel);
     }
 
-    //���� ��⿭ & ����ð��� �����
+    // Hide production queue & progress time
     // 생산 대기열 & 진행시간 UI를 숨기고 초기화한다 (생산 건물이 아닌 대상 선택 시 등)
     public void HideProductionUI()
     {
@@ -282,7 +282,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //����ð� ǥ�� ����
+    // Progress time display
     // 생산시간 표시(프로그레스 바) 갱신: 대기열 맨 앞 항목의 진행률을 슬라이더에 반영한다.
     private void UpdateProductionProgress()
     {
@@ -298,7 +298,7 @@ public class UIController : MonoBehaviour
         progressSlider.value = currentQueue[0].Progress;
     }
 
-    //�ϲ�
+    // Worker
     // 일꾼 선택 패널 (이동/공격/정지/순찰/홀드/반환/건설 버튼)
     public void ShowWorkerPanel(
     Action onMove,
@@ -323,7 +323,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //��������
+    // Combat unit
     // 전투유닛 선택 패널 (이동/공격/정지/순찰/홀드 버튼)
     public void ShowAttackUnitPanel(
     Action onMove,
@@ -344,7 +344,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //�Ǽ����
+    // Build mode
     // 건설모드 패널 (건물 종류별 버튼 + 취소 버튼)
     public void ShowBuildPanel(
     Action onCommandCenter,
@@ -369,7 +369,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //���α���
+    // Main base
     // 본진(커맨드센터) 선택 패널 (일꾼 생산 버튼)
     public void ShowMainBasePanel(Action onTrainWorker)
     {
@@ -381,7 +381,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //����
+    // Barracks
     // 병영(Tier1 건물) 선택 패널 (마린/벌처 생산 버튼)
     public void ShowBarracksPanel(
     Action onMarine,
@@ -396,7 +396,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //���� 
+    // Factory
     // 공장(Tier2 건물) 선택 패널 (골리앗/탱크 생산 버튼)
     public void ShowFactoryPanel(
     Action onGoliath,
@@ -411,7 +411,7 @@ public class UIController : MonoBehaviour
         );
     }
 
-    //����
+    // Starport
     // 우주공항(Tier3 건물) 선택 패널 (레이스/가디언 생산 버튼)
     public void ShowAirportPanel(
     Action onWraith,

@@ -34,34 +34,34 @@ Assets/
 ├─ Material, Shader/    # 머티리얼 및 커스텀 셰이더
 └─ Settings/            # URP 렌더 파이프라인 설정
 
-doc/                     # 스크립트별 코드 문서 (역할/필드/메소드 정리)
-Docs/                    # 추가 설계 노트(한글)
+doc/                     # 그 외 설계 노트(README에 미연결)
+Docs/                    # 스크립트별 코드 문서 및 설계 노트 (역할/필드/메소드 정리)
 ```
 
 ### 핵심 스크립트
 
-각 스크립트의 상세 문서(필드, 메소드별 동작 방식)는 [`doc/`](doc) 폴더에 스크립트 이름과 동일한 파일명으로 정리되어 있습니다.
+각 스크립트의 상세 문서(필드, 메소드별 동작 방식)는 [`Docs/`](Docs) 폴더에 스크립트 이름과 동일한 파일명으로 정리되어 있습니다.
 
 | 스크립트 | 역할 | 문서 |
 |---|---|---|
-| `RTSUnitController` | 유닛/건물 선택 상태, 전체 목록, UI 갱신, 생산·건설 자원 검증을 총괄하는 중앙 허브 | [doc](doc/RTSUnitController.md) |
-| `UserControl` | 마우스/키보드 입력을 해석해 선택·명령을 `RTSUnitController`에 전달 | [doc](doc/UserControl.md) |
-| `UnitController` | 유닛의 이동/전투/순찰/자원 채취 상태머신 (지상+공중 유닛 공통) | [doc](doc/UnitController.md) |
-| `AttackRange` | 사거리 내 적 감지 및 자동 공격/추격 | [doc](doc/AttackRange.md) |
-| `BuildingController` | 건물 선택, 랠리 포인트, 생산 위임, 사망 처리 | [doc](doc/BuildingController.md) |
-| `UnitSpawner` | 건물의 유닛 생산 대기열(FIFO) 관리 및 스폰 | [doc](doc/UnitSpawner.md) |
-| `PlacementSystem` | 그리드 기반 건물 배치, 배치 가능 여부 판정 | [doc](doc/PlacementSystem.md) |
-| `GridData` | 그리드 셀 점유 정보 관리 (순수 데이터 클래스) | [doc](doc/GridData.md) |
-| `PreviewSystem` | 배치 프리뷰(고스트 오브젝트) 및 셀 커서 표시 | [doc](doc/PreviewSystem.md) |
-| `InputManager` | 건물 배치 전용 입력 처리 (클릭/ESC/마우스 좌표) | [doc](doc/InputManager.md) |
-| `ResourceManager` | 팀의 광물/가스/인구수 중앙 관리 | [doc](doc/ResourceManager.md) |
-| `ResourceNode` | 자원 채취 지점, 대기열(줄서기) 및 고갈 처리 | [doc](doc/ResourceNode.md) |
-| `HealthManager` | 체력/데미지/치유/사망 처리 공용 컴포넌트 | [doc](doc/HealthManager.md) |
-| `UnitDataSO` | 유닛 스탯(체력/공격력/비용 등) 데이터베이스 | [doc](doc/UnitDataSO.md) |
-| `BuildingDataSO` | 건물 스펙(비용/크기/생산시간 등) 데이터베이스 | [doc](doc/BuildingDataSO.md) |
-| `CameraControl` | RTS 시점 카메라 이동/줌 | [doc](doc/CameraControl.md) |
-| `UIController` | 커맨드 패널, 생산 대기열, 자원 표시 UI 총괄 | [doc](doc/UIController.md) |
-| `ProductionSlot` | 커맨드/생산 대기열의 버튼 슬롯 하나 | [doc](doc/ProductionSlot.md) |
+| `RTSUnitController` | 유닛/건물 선택 상태, 전체 목록, UI 갱신, 생산·건설 자원 검증을 총괄하는 중앙 허브 | [doc](Docs/RTSUnitController.md) |
+| `UserControl` | 마우스/키보드 입력을 해석해 선택·명령을 `RTSUnitController`에 전달 | [doc](Docs/UserControl.md) |
+| `UnitController` | 유닛의 이동/전투/순찰/자원 채취 상태머신 (지상+공중 유닛 공통) | [doc](Docs/UnitController.md) |
+| `AttackRange` | 사거리 내 적 감지 및 자동 공격/추격 | [doc](Docs/AttackRange.md) |
+| `BuildingController` | 건물 선택, 랠리 포인트, 생산 위임, 사망 처리 | [doc](Docs/BuildingController.md) |
+| `UnitSpawner` | 건물의 유닛 생산 대기열(FIFO) 관리 및 스폰 | [doc](Docs/UnitSpawner.md) |
+| `PlacementSystem` | 그리드 기반 건물 배치, 배치 가능 여부 판정 | [doc](Docs/PlacementSystem.md) |
+| `GridData` | 그리드 셀 점유 정보 관리 (순수 데이터 클래스) | [doc](Docs/GridData.md) |
+| `PreviewSystem` | 배치 프리뷰(고스트 오브젝트) 및 셀 커서 표시 | [doc](Docs/PreviewSystem.md) |
+| `InputManager` | 건물 배치 전용 입력 처리 (클릭/ESC/마우스 좌표) | [doc](Docs/InputManager.md) |
+| `ResourceManager` | 팀의 광물/가스/인구수 중앙 관리 | [doc](Docs/ResourceManager.md) |
+| `ResourceNode` | 자원 채취 지점, 대기열(줄서기) 및 고갈 처리 | [doc](Docs/ResourceNode.md) |
+| `HealthManager` | 체력/데미지/치유/사망 처리 공용 컴포넌트 | [doc](Docs/HealthManager.md) |
+| `UnitDataSO` | 유닛 스탯(체력/공격력/비용 등) 데이터베이스 | [doc](Docs/UnitDataSO.md) |
+| `BuildingDataSO` | 건물 스펙(비용/크기/생산시간 등) 데이터베이스 | [doc](Docs/BuildingDataSO.md) |
+| `CameraControl` | RTS 시점 카메라 이동/줌 | [doc](Docs/CameraControl.md) |
+| `UIController` | 커맨드 패널, 생산 대기열, 자원 표시 UI 총괄 | [doc](Docs/UIController.md) |
+| `ProductionSlot` | 커맨드/생산 대기열의 버튼 슬롯 하나 | [doc](Docs/ProductionSlot.md) |
 
 ## 주요 기능
 
@@ -70,7 +70,7 @@ Docs/                    # 추가 설계 노트(한글)
 - **자원 시스템**: 자원 노드 관리 (일부 기능 진행 중)
 - **UI**: 패널 기반 UI, 선택 상태에 따른 UI 전환, 유닛/건물 선택 UI
 
-> 스크립트별 상세 동작 방식은 위 표의 [`doc/`](doc) 링크를 참고하세요. 생산 대기열 UI에 대한 추가 설계 노트는 [Docs/ProductionQueue_UI_설계.md](Docs/ProductionQueue_UI_설계.md)에 별도로 남아 있습니다.
+> 스크립트별 상세 동작 방식은 위 표의 [`Docs/`](Docs) 링크를 참고하세요. 생산 대기열 UI에 대한 추가 설계 노트는 [Docs/ProductionQueue_UI_설계.md](Docs/ProductionQueue_UI_설계.md)에 별도로 남아 있습니다.
 
 ## 시작하기
 

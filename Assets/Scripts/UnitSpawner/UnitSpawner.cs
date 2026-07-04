@@ -48,7 +48,7 @@ public class UnitSpawner : MonoBehaviour
 
         if (database == null)
         {
-            Debug.LogError("UnitDataSO�� �Ҵ���� �ʾҽ��ϴ�.");
+            Debug.LogError("UnitDataSO is not assigned.");
             return;
         }
 
@@ -59,14 +59,14 @@ public class UnitSpawner : MonoBehaviour
 
         int index = database.unitData.FindIndex(d =>
         {
-            Debug.Log($"�� : {d.ID} == {unitID}");
+            Debug.Log($"Compare: {d.ID} == {unitID}");
             return d.ID == unitID;
         });
         //int index = database.unitData.FindIndex(d => d.ID == unitID);
 
         if (index == -1)
         {
-            Debug.LogError($"ID {unitID}�� UnitData�� ã�� �� �����ϴ�.");
+            Debug.LogError($"Could not find UnitData for ID {unitID}.");
             return;
         }
 
@@ -139,11 +139,11 @@ public class UnitSpawner : MonoBehaviour
     /// </summary>
     private void PrintQueue()
     {
-        string log = "���� ��⿭ : "; // Debug.Log 출력용 문자열 리터럴 (파일 인코딩 문제로 깨져 보이지만 동작 코드이므로 원문 유지)
+        string log = "생산 대기열 : ";
 
         if (productionQueue.Count == 0)
         {
-            log += "�������";
+            log += "비어있음";
         }
         else
         {

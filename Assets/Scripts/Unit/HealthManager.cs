@@ -39,7 +39,7 @@ public class HealthManager : MonoBehaviour
         currentHp = Mathf.Max(0, currentHp - damage);
         OnHealthChanged?.Invoke(currentHp, maxHealth);
 
-        Debug.Log($"{gameObject.name} ü��: {currentHp}/{maxHealth}");
+        Debug.Log($"{gameObject.name} HP: {currentHp}/{maxHealth}");
 
         if (currentHp <= 0)
         {
@@ -73,7 +73,7 @@ public class HealthManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"{name}: IDestructible�� ������ ��Ʈ�ѷ��� ���� �⺻ Destroy�� ó���մϴ�.");
+            Debug.LogWarning($"{name}: No IDestructible controller found. Falling back to default Destroy().");
             Destroy(gameObject);
         }
     }

@@ -15,9 +15,15 @@ public class ResourceNode : MonoBehaviour
     [SerializeField] private int waitWorkerCount = 2;
 
     private const float ShrinkStepPerQuarter = 0.2f;
+    private const float MinScale = 0.1f; // 스케일이 0 이하로 내려가 메시가 뒤집히는 것 방지
 
     private int initialAmount;
     private int consumedQuarters; // 지금까지 줄어든 구간 수 (0~4)
+
+    private CapsuleCollider nodeCollider;
+    private float colliderBaseRadius;
+    private float colliderBaseHeight;
+    private Vector3 colliderBaseCenter;
 
     // 대기열(큐): 맨 앞(index 0)의 일꾼만 실제로 채취하고, 나머지는 자기 차례를 기다린다. 인원 제한 없음
     private readonly List<UnitController> workerQueue = new List<UnitController>();
@@ -49,6 +55,14 @@ public class ResourceNode : MonoBehaviour
     private void Awake()
     {
         initialAmount = remainingAmount;
+
+        nodeCollider = GetComponent<CapsuleCollider>();
+        if (nodeCollider != null)
+        {
+            colliderBaseRadius = nodeCollider.radius;
+            colliderBaseHeight = nodeCollider.height;
+            colliderBaseCenter = nodeCollider.center;
+        }
     }
 
     private void Start()
@@ -83,7 +97,39 @@ public class ResourceNode : MonoBehaviour
         while (consumedQuarters < targetQuarters)
         {
             consumedQuarters++;
-            transform.localScale -= Vector3.one * ShrinkStepPerQuarter;
+
+            Vector3 scale = transform.localScale;
+            float newY = Mathf.Max(scale.y - ShrinkStepPerQuarter, MinScale);
+            float appliedYShrink = scale.y - newY; // 최소 스케일에 걸리면 실제로는 덜 줄어들 수 있음
+
+            transform.localScale = new Vector3(
+                Mathf.Max(scale.x - ShrinkStepPerQuarter, MinScale),
+                newY,
+                Mathf.Max(scale.z - ShrinkStepPerQuarter, MinScale));
+
+            // 크기(Y)가 줄어드는 만큼(0.2씩) 위치도 그대로 아래로 내림
+            transform.position -= new Vector3(0f, appliedYShrink, 0f);
         }
+
+        ApplyColliderSizeCompensation();
+    }
+
+    // transform.localScale이 작아져도 콜라이더의 실제(월드) 크기는 최초 그대로 유지되도록,
+    // Unity가 스케일을 곱해서 계산하는 만큼을 미리 나눠서 상쇄한다.
+    private void ApplyColliderSizeCompensation()
+    {
+        if (nodeCollider == null)
+            return;
+
+        Vector3 scale = transform.localScale;
+        float radialScale = Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z), 0.0001f);
+        float verticalScale = Mathf.Max(Mathf.Abs(scale.y), 0.0001f);
+
+        nodeCollider.radius = colliderBaseRadius / radialScale;
+        nodeCollider.height = colliderBaseHeight / verticalScale;
+        nodeCollider.center = new Vector3(
+            colliderBaseCenter.x / radialScale,
+            colliderBaseCenter.y / verticalScale,
+            colliderBaseCenter.z / radialScale);
     }
 }
