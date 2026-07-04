@@ -610,7 +610,6 @@ public class RTSUnitController : MonoBehaviour
     /// <summary>
     /// 테스트용
     /// </summary>
-
     //UI 버튼 연결 테스트용
     public void TestMethod()
     {

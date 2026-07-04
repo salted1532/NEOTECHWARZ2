@@ -81,6 +81,10 @@ public class UnitController : MonoBehaviour
     [SerializeField] private float gatherAgentRadius = 0.1f; // 채취 중 서로 부딪히는 것 방지용 축소 반경
     private float defaultAgentRadius;
 
+    // ===== 공중 유닛 겹침 분리 (이동 중엔 통과 허용, 정지/공격 중엔 분리) =====
+    [SerializeField] private float airSeparationRadius = 1.2f; // 두 콜라이더 반경 합 정도
+    [SerializeField] private float airSeparationSpeed = 4f;    // 밀려나는 속도(초당)
+
     private void Awake()
     {
         isWorker = CompareTag("Worker");
@@ -155,6 +159,44 @@ public class UnitController : MonoBehaviour
 
         GatherTick();
         PatrolTick();
+
+        if (isAirUnit)
+            SeparateFromOverlappingAirUnits();
+    }
+
+    // 이동 중이 아닌 공중 유닛끼리만 서로 겹친 만큼 수평으로 밀어낸다.
+    // isMovingAirUnit이 곧 "지금 서로 통과해도 되는가"의 기준이라 StopUnit/Attack/HoldUnit/도착 처리가
+    // 전부 이 값을 false로 내리는 것만으로 정지/공격 케이스가 자동으로 커버된다.
+    private void SeparateFromOverlappingAirUnits()
+    {
+        if (isMovingAirUnit)
+            return;
+
+        Vector3 push = Vector3.zero;
+
+        foreach (UnitController other in rtsController.UnitList)
+        {
+            if (other == this || other == null || !other.isAirUnit)
+                continue;
+            if (other.isMovingAirUnit)
+                continue; // 상대가 지나가는 중이면 통과시켜줌
+
+            Vector3 diff = transform.position - other.transform.position;
+            diff.y = 0f; // 고도는 건드리지 않고 수평으로만 분리
+            float dist = diff.magnitude;
+
+            if (dist > 0.001f && dist < airSeparationRadius)
+            {
+                float overlap = airSeparationRadius - dist;
+                push += diff.normalized * overlap;
+            }
+        }
+
+        if (push.sqrMagnitude > 0.0001f)
+        {
+            Vector3 step = push.normalized * Mathf.Min(push.magnitude, airSeparationSpeed * Time.deltaTime);
+            transform.position += step;
+        }
     }
 
     public void SelectUnit()
