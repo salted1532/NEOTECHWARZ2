@@ -158,8 +158,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e52a2baafe3771a46a413624bedb5f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRange
-  UnitRange: 5
-  AttackDamage: 1
+  UnitRange: 4
+  AttackDamage: 6
 --- !u!1 &7069137052622472766
 GameObject:
   m_ObjectHideFlags: 0
@@ -325,7 +325,7 @@ MonoBehaviour:
   isAirUnit: 0
   UnitcurrentState: 0
   alreadyAttacked: 0
-  timeBetweenAttacks: 5
+  timeBetweenAttacks: 0.4
   DepositOre: {fileID: 0}
   DepositGas: {fileID: 0}
   gatherInteractRange: 2
