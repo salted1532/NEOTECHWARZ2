@@ -27,22 +27,93 @@ public class UIController : MonoBehaviour
         MainBase           // Command center
     }
 
+    // Button action + tooltip data
+    // 버튼 하나의 동작과, 툴팁에 표시할 제목/설명/비용을 함께 묶은 데이터.
+    // RTSUnitController가 버튼에 Action을 연결할 때 이 정보도 함께 채워서 넘긴다.
+    public readonly struct ButtonAction
+    {
+        public Action Callback { get; }
+        public string Title { get; }
+        public string Description { get; }
+        public int Ore { get; }
+        public int Gas { get; }
+        public int Population { get; }
+        public bool HasCost { get; }
+
+        private ButtonAction(
+            Action callback,
+            string title,
+            string description,
+            int ore,
+            int gas,
+            int population,
+            bool hasCost)
+        {
+            Callback = callback;
+            Title = title;
+            Description = description;
+            Ore = ore;
+            Gas = gas;
+            Population = population;
+            HasCost = hasCost;
+        }
+
+        // 이동/공격/정지 등 비용이 없는 일반 명령 버튼용
+        public static ButtonAction Simple(Action callback, string title, string description)
+        {
+            return new ButtonAction(callback, title, description, 0, 0, 0, false);
+        }
+
+        // 유닛 생산/건물 건설처럼 광물/가스/인구 비용이 있는 버튼용
+        public static ButtonAction WithCost(
+            Action callback,
+            string title,
+            string description,
+            int ore,
+            int gas,
+            int population)
+        {
+            return new ButtonAction(callback, title, description, ore, gas, population, true);
+        }
+    }
+
     // Button data
-    // 커맨드 패널의 버튼 하나에 필요한 데이터 (아이콘 / 클릭 콜백 / 활성화 여부)
-    public struct CommandButtonData
+    // 커맨드 패널의 버튼 하나에 필요한 데이터 (아이콘 / 클릭 콜백 / 활성화 여부 / 툴팁 정보)
+    public readonly struct CommandButtonData
     {
         public Sprite Icon { get; }
         public Action Callback { get; }
         public bool Interactable { get; }
+        public string Title { get; }
+        public string Description { get; }
+        public int Ore { get; }
+        public int Gas { get; }
+        public int Population { get; }
+        public bool HasCost { get; }
 
+        public CommandButtonData(
+            Sprite icon,
+            ButtonAction action,
+            bool interactable = true)
+        {
+            Icon = icon;
+            Callback = action.Callback;
+            Interactable = interactable;
+            Title = action.Title;
+            Description = action.Description;
+            Ore = action.Ore;
+            Gas = action.Gas;
+            Population = action.Population;
+            HasCost = action.HasCost;
+        }
+
+        // 취소 버튼/빈 대기열 슬롯 등 툴팁이 필요 없는 버튼용
         public CommandButtonData(
             Sprite icon,
             Action callback,
             bool interactable = true)
+            : this(icon, ButtonAction.Simple(callback, string.Empty, string.Empty), interactable)
         {
-            Icon = icon;
-            Callback = callback;
-            Interactable = interactable;
         }
     }
 
@@ -103,6 +174,7 @@ public class UIController : MonoBehaviour
     [Header("Info Panel (SelectInfo)")]
     [SerializeField] private GameObject infoPanel;
     [SerializeField] private Image infoIcon;
+    [SerializeField] private TextMeshProUGUI infoNameText;
     [SerializeField] private TextMeshProUGUI infoHpText;
 
     private HealthManager infoBoundHealth; // 현재 Info_panel이 구독 중인 대상 (선택이 바뀌면 구독 해제 후 갈아끼움)
@@ -322,8 +394,7 @@ public class UIController : MonoBehaviour
     // ===== Info Panel (단일 유닛/건물 선택 시) =====
     // Squad_panel과는 항상 배타적이고, productionPanel과는 독립적으로 동시에 켜질 수 있다
     // (생산 건물 선택 시 ShowInfoPanel + ShowProductionUI가 같이 호출됨).
-    // icon/설명 등 다른 정보는 아직 없고, 지금은 아이콘 이미지 + 체력 텍스트만 갱신한다.
-    public void ShowInfoPanel(Sprite icon, HealthManager health)
+    public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health)
     {
         HideSquadPanel();
 
@@ -335,6 +406,9 @@ public class UIController : MonoBehaviour
             infoIcon.sprite = icon;
             infoIcon.enabled = icon != null;
         }
+
+        if (infoNameText != null)
+            infoNameText.text = unitName;
 
         BindInfoHealth(health);
     }
@@ -420,13 +494,13 @@ public class UIController : MonoBehaviour
     // Worker
     // 일꾼 선택 패널 (이동/공격/정지/순찰/홀드/반환/건설 버튼)
     public void ShowWorkerPanel(
-    Action onMove,
-    Action onAttack,
-    Action onStop,
-    Action onPatrol,
-    Action onHold,
-    Action onReturn,
-    Action onBuild)
+    ButtonAction onMove,
+    ButtonAction onAttack,
+    ButtonAction onStop,
+    ButtonAction onPatrol,
+    ButtonAction onHold,
+    ButtonAction onReturn,
+    ButtonAction onBuild)
     {
         CurrentState = UISelectionState.Worker;
 
@@ -445,11 +519,11 @@ public class UIController : MonoBehaviour
     // Combat unit
     // 전투유닛 선택 패널 (이동/공격/정지/순찰/홀드 버튼)
     public void ShowAttackUnitPanel(
-    Action onMove,
-    Action onAttack,
-    Action onStop,
-    Action onPatrol,
-    Action onHold)
+    ButtonAction onMove,
+    ButtonAction onAttack,
+    ButtonAction onStop,
+    ButtonAction onPatrol,
+    ButtonAction onHold)
     {
         CurrentState = UISelectionState.CombatUnit;
 
@@ -466,13 +540,13 @@ public class UIController : MonoBehaviour
     // Build mode
     // 건설모드 패널 (건물 종류별 버튼 + 취소 버튼)
     public void ShowBuildPanel(
-    Action onCommandCenter,
-    Action onSupplyDepot,
-    Action onBarracks,
-    Action onFactory,
-    Action onAirport,
-    Action onLab,
-    Action onCancel)
+    ButtonAction onCommandCenter,
+    ButtonAction onSupplyDepot,
+    ButtonAction onBarracks,
+    ButtonAction onFactory,
+    ButtonAction onAirport,
+    ButtonAction onLab,
+    ButtonAction onCancel)
     {
         CurrentState = UISelectionState.BuildMode;
 
@@ -490,7 +564,7 @@ public class UIController : MonoBehaviour
 
     // Main base
     // 본진(커맨드센터) 선택 패널 (일꾼 생산 버튼)
-    public void ShowMainBasePanel(Action onTrainWorker)
+    public void ShowMainBasePanel(ButtonAction onTrainWorker)
     {
         CurrentState = UISelectionState.MainBase;
 
@@ -503,8 +577,8 @@ public class UIController : MonoBehaviour
     // Barracks
     // 병영(Tier1 건물) 선택 패널 (마린/벌처 생산 버튼)
     public void ShowBarracksPanel(
-    Action onMarine,
-    Action onFirebat)
+    ButtonAction onMarine,
+    ButtonAction onFirebat)
     {
         CurrentState = UISelectionState.Tier1Building;
 
@@ -518,8 +592,8 @@ public class UIController : MonoBehaviour
     // Factory
     // 공장(Tier2 건물) 선택 패널 (골리앗/탱크 생산 버튼)
     public void ShowFactoryPanel(
-    Action onGoliath,
-    Action onTank)
+    ButtonAction onGoliath,
+    ButtonAction onTank)
     {
         CurrentState = UISelectionState.Tier2Building;
 
@@ -533,8 +607,8 @@ public class UIController : MonoBehaviour
     // Starport
     // 우주공항(Tier3 건물) 선택 패널 (레이스/가디언 생산 버튼)
     public void ShowAirportPanel(
-    Action onWraith,
-    Action onGuardian)
+    ButtonAction onWraith,
+    ButtonAction onGuardian)
     {
         CurrentState = UISelectionState.Tier3Building;
 

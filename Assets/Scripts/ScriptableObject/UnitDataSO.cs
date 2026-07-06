@@ -17,6 +17,10 @@ public class UnitData
     [field: SerializeField]
     public string unitName { get; private set; }
 
+    // 툴팁에 표시할 설명(역할 등). 비워두면 기본 문구가 대신 표시된다.
+    [field: SerializeField, TextArea(2, 5)]
+    public string description { get; private set; }
+
     // 코드에서 유닛을 식별하는 데 쓰이는 고유 ID (RTSUnitController.UnitID 상수와 매칭)
     [field: SerializeField]
     public int ID { get; private set; }

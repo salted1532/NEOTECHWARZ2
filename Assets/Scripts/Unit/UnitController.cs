@@ -18,6 +18,10 @@ public class UnitController : MonoBehaviour
     [SerializeField]
     private Sprite icon; // Squad_panel 등 선택 UI에 표시할 아이콘
 
+    // UnitDataSO.ID와 매칭되는 값 (Info_panel에 이름을 표시할 때 RTSUnitController.GetUnitName(unitID)로 조회)
+    [SerializeField]
+    private int unitID;
+
     private NavMeshAgent navMeshAgent;
 
     [SerializeField]
@@ -760,4 +764,5 @@ public class UnitController : MonoBehaviour
     public bool IsAttack() => UnitcurrentState == UnitState.Attack;
 
     public Sprite GetIcon() => icon;
+    public int GetUnitID() => unitID;
 }

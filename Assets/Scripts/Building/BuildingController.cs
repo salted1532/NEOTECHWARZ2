@@ -11,6 +11,10 @@ public class BuildingController : MonoBehaviour
     [SerializeField]
     private Sprite icon; // Info_panel 등 선택 UI에 표시할 아이콘
 
+    // BuildingDataSO.ID와 매칭되는 값 (Info_panel에 이름을 표시할 때 RTSUnitController.GetBuildingName(buildingID)로 조회)
+    [SerializeField]
+    private int buildingID;
+
     // 이 건물의 유닛 생산 큐를 실제로 관리하는 자식 컴포넌트
     private UnitSpawner UnitSpawner;
 
@@ -71,6 +75,7 @@ public class BuildingController : MonoBehaviour
     }
 
     public Sprite GetIcon() => icon;
+    public int GetBuildingID() => buildingID;
 
     // 현재 생산 대기열 목록을 반환 (UI 표시용, UnitSpawner에 위임)
     public IReadOnlyList<ProductionData> GetProductionQueue()

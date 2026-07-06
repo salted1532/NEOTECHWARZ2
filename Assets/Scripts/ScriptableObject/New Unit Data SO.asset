@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: New Unit Data SO
   m_EditorClassIdentifier: Assembly-CSharp::UnitDataSO
   unitData:
-  - <unitName>k__BackingField: Worker Drone
+  - <unitName>k__BackingField: 'Worker Drone '
+    <description>k__BackingField: 'train Worker Drone
+
+      shortcut key [<color=yellow>W</color>]'
     <ID>k__BackingField: 1
     <hp>k__BackingField: 40
     <attackDamge>k__BackingField: 5
@@ -24,7 +27,10 @@ MonoBehaviour:
     <productionTime>k__BackingField: 12
     <Icon>k__BackingField: {fileID: 21300000, guid: f9088a500c2a2184c90293aea40e17bb, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
-  - <unitName>k__BackingField: Assault Trooper
+  - <unitName>k__BackingField: 'Assault Trooper '
+    <description>k__BackingField: 'train Assault Trooper
+
+      shortcut key [<color=yellow>A</color>]'
     <ID>k__BackingField: 2
     <hp>k__BackingField: 40
     <attackDamge>k__BackingField: 5
@@ -35,7 +41,10 @@ MonoBehaviour:
     <productionTime>k__BackingField: 15
     <Icon>k__BackingField: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
-  - <unitName>k__BackingField: Scout Drone
+  - <unitName>k__BackingField: 'Scout Drone '
+    <description>k__BackingField: 'train Scout Drone
+
+      shortcut key [<color=yellow>S</color>]'
     <ID>k__BackingField: 3
     <hp>k__BackingField: 75
     <attackDamge>k__BackingField: 5
@@ -46,7 +55,10 @@ MonoBehaviour:
     <productionTime>k__BackingField: 19
     <Icon>k__BackingField: {fileID: 21300000, guid: 6919d5112ea74a64ebb34ca252c20ba2, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
-  - <unitName>k__BackingField: Ranger IFV
+  - <unitName>k__BackingField: 'Ranger IFV '
+    <description>k__BackingField: 'train Ranger IFV
+
+      shortcut key [<color=yellow>R</color>]'
     <ID>k__BackingField: 4
     <hp>k__BackingField: 100
     <attackDamge>k__BackingField: 10
@@ -57,7 +69,10 @@ MonoBehaviour:
     <productionTime>k__BackingField: 25
     <Icon>k__BackingField: {fileID: 21300000, guid: 04b3f4d7f72d40a48b0eff1ac5006315, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: d9657408020de9a44918eef6a3214c70, type: 3}
-  - <unitName>k__BackingField: Pulasr Tank
+  - <unitName>k__BackingField: 'Pulasr Tank '
+    <description>k__BackingField: 'train Pulasr Tank
+
+      shortcut key [<color=yellow>P</color>]'
     <ID>k__BackingField: 5
     <hp>k__BackingField: 150
     <attackDamge>k__BackingField: 20
@@ -68,7 +83,10 @@ MonoBehaviour:
     <productionTime>k__BackingField: 31
     <Icon>k__BackingField: {fileID: 21300000, guid: 2cf1e1b8455dc8346b3135d7ea2df0cd, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
-  - <unitName>k__BackingField: Firehawk
+  - <unitName>k__BackingField: 'Firehawk '
+    <description>k__BackingField: 'train Firehawk
+
+      shortcut key [<color=yellow>F</color>]'
     <ID>k__BackingField: 6
     <hp>k__BackingField: 150
     <attackDamge>k__BackingField: 15
@@ -79,7 +97,10 @@ MonoBehaviour:
     <productionTime>k__BackingField: 37
     <Icon>k__BackingField: {fileID: 21300000, guid: 06ad55446842ade4298efca8384bf7dc, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
-  - <unitName>k__BackingField: Guardian Drone
+  - <unitName>k__BackingField: 'Guardian Drone '
+    <description>k__BackingField: 'train Guardian Drone
+
+      shortcut key [<color=yellow>G</color>]'
     <ID>k__BackingField: 7
     <hp>k__BackingField: 400
     <attackDamge>k__BackingField: 30
