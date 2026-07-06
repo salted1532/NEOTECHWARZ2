@@ -421,6 +421,29 @@ public class UIController : MonoBehaviour
         BindInfoHealth(null);
     }
 
+    // 자원 노드(광물/가스) 선택 시 Info_panel 표시: 체력 대신 남은 채취량을 체력 텍스트 자리에 표시한다.
+    public void ShowResourceInfoPanel(Sprite icon, string resourceName, int remainingAmount)
+    {
+        HideSquadPanel();
+
+        if (infoPanel != null)
+            infoPanel.SetActive(true);
+
+        if (infoIcon != null)
+        {
+            infoIcon.sprite = icon;
+            infoIcon.enabled = icon != null;
+        }
+
+        if (infoNameText != null)
+            infoNameText.text = resourceName;
+
+        BindInfoHealth(null); // 자원은 HealthManager가 없으므로 체력 구독은 해제
+
+        if (infoHpText != null)
+            infoHpText.text = remainingAmount.ToString();
+    }
+
     // Info_panel이 구독 중인 HealthManager를 교체한다. 매 프레임 같은 대상으로 호출돼도
     // 불필요하게 재구독하지 않도록 방어하고, 대상이 죽거나 선택 해제되면 이전 구독을 반드시 해제한다.
     private void BindInfoHealth(HealthManager health)

@@ -1079,7 +1079,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 562.6, y: 432.8}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &252064950
@@ -1546,8 +1546,8 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  m_UseGeometry: 0
+    m_Bits: 1152
+  m_UseGeometry: 1
   m_DefaultArea: 0
   m_GenerateLinks: 0
   m_IgnoreNavMeshAgent: 1
@@ -1557,7 +1557,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: c452539cc8941ae4d832de1e41c46b77, type: 2}
   m_BuildHeightMesh: 0
 --- !u!64 &337738006
 MeshCollider:
@@ -1988,7 +1988,7 @@ RectTransform:
   m_GameObject: {fileID: 351090447}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 1.2, z: 1}
+  m_LocalScale: {x: 0.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1819648739}
@@ -2395,8 +2395,8 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  m_UseGeometry: 0
+    m_Bits: 1152
+  m_UseGeometry: 1
   m_DefaultArea: 0
   m_GenerateLinks: 0
   m_IgnoreNavMeshAgent: 1
@@ -2496,8 +2496,8 @@ Transform:
   m_GameObject: {fileID: 463115452}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.13052598, w: 0.9914449}
-  m_LocalPosition: {x: 29.588448, y: -1.1941931, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 29.56, y: -1.29, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 869095100}
@@ -2936,14 +2936,14 @@ RectTransform:
   m_GameObject: {fileID: 560202482}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 1.2, z: 1}
+  m_LocalScale: {x: 0.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1819648739}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 10, y: -5}
+  m_AnchoredPosition: {x: 10, y: -7.5}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &560202484
@@ -3294,14 +3294,14 @@ RectTransform:
   m_GameObject: {fileID: 575860188}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 1.2, z: 1}
+  m_LocalScale: {x: 0.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1819648739}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -35, y: -5}
+  m_AnchoredPosition: {x: -35, y: -7.5}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &575860190
@@ -4205,8 +4205,8 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  m_UseGeometry: 0
+    m_Bits: 1152
+  m_UseGeometry: 1
   m_DefaultArea: 0
   m_GenerateLinks: 0
   m_IgnoreNavMeshAgent: 1
@@ -4216,7 +4216,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 00db16ce62b168d4cb06115b3e74f590, type: 2}
+  m_NavMeshData: {fileID: 0}
   m_BuildHeightMesh: 0
 --- !u!64 &969362643
 MeshCollider:
@@ -5927,6 +5927,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RTSUnitController
   selectedUnitList: []
   selectedBuildingList: []
+  selectedEnemyList: []
+  selectedResourceNode: {fileID: 0}
   UnitList: []
   BuildingList: []
   ResourceNodeList: []
@@ -6383,6 +6385,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1305381693}
   m_CullTransparentMesh: 1
+--- !u!1 &1326651897 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5286784239653861491, guid: 8db263696937fb04a945b1599c048864, type: 3}
+  m_PrefabInstance: {fileID: 4667051649423260309}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1336635584
 GameObject:
   m_ObjectHideFlags: 0
@@ -6967,14 +6974,14 @@ RectTransform:
   m_GameObject: {fileID: 1464015376}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 1.2, z: 1}
+  m_LocalScale: {x: 0.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1819648739}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -20, y: -5}
+  m_AnchoredPosition: {x: -20, y: -7.5}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1464015378
@@ -8829,7 +8836,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 100
+  maxHealth: 1000
 --- !u!1 &1853204165
 GameObject:
   m_ObjectHideFlags: 0
@@ -9176,7 +9183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 100
+  maxHealth: 1000
 --- !u!1001 &1904368427
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9694,14 +9701,14 @@ RectTransform:
   m_GameObject: {fileID: 1952943784}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 1.2, z: 1}
+  m_LocalScale: {x: 0.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1819648739}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -5, y: -5}
+  m_AnchoredPosition: {x: -5, y: -7.5}
   m_SizeDelta: {x: 30, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1952943786
@@ -9952,7 +9959,7 @@ RectTransform:
   m_GameObject: {fileID: 1977063554}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 1.2, z: 1}
+  m_LocalScale: {x: 0.5, y: 1.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1096318072}
@@ -10129,7 +10136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 100
+  maxHealth: 1000
 --- !u!1001 &2026027039
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10432,6 +10439,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -1181422328391644967, guid: 8db263696937fb04a945b1599c048864, type: 3}
+      propertyPath: icon
+      value: 
+      objectReference: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
+    - target: {fileID: -1181422328391644967, guid: 8db263696937fb04a945b1599c048864, type: 3}
+      propertyPath: enemyName
+      value: Cyborg Soldier
+      objectReference: {fileID: 0}
+    - target: {fileID: -1181422328391644967, guid: 8db263696937fb04a945b1599c048864, type: 3}
+      propertyPath: enemyMarker
+      value: 
+      objectReference: {fileID: 1326651897}
     - target: {fileID: 2406533709525597571, guid: 8db263696937fb04a945b1599c048864, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3

@@ -11,6 +11,22 @@ public class AttackRange : MonoBehaviour
     // 트리거 범위 안에 들어와 있는 "Enemy" 태그 오브젝트 목록
     private readonly List<GameObject> enemiesInRange = new List<GameObject>();
 
+    // 지정 공격 명령(AttackOrderTick)이 "교전 중이라 정지된 것인지" 판단할 때 조회한다.
+    // Update() 실행 순서에 의존하지 않도록 매번 실시간으로(파괴된 항목 제외) 계산한다.
+    public bool HasEnemyInRange
+    {
+        get
+        {
+            foreach (GameObject enemy in enemiesInRange)
+            {
+                if (enemy != null)
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
     private void Awake()
     {
         // 이 콜라이더는 유닛의 자식이므로 부모에서 UnitController를 찾는다.
@@ -41,7 +57,7 @@ public class AttackRange : MonoBehaviour
     {
         enemiesInRange.RemoveAll(enemy => enemy == null); // 이미 죽어서 destroy된 대상 정리
 
-        GameObject target = GetClosestEnemy();
+        GameObject target = GetPreferredTarget();
         if (target == null)
             return;
 
@@ -58,6 +74,19 @@ public class AttackRange : MonoBehaviour
                 unitController.ChaseTarget(target.transform.position);
             }
         }
+    }
+
+    // 명시적으로 지정된 추격 대상(우클릭/A 모드)이 있으면 다른 적은 전부 무시하고 오직 그 대상만 선택한다
+    // (트리거 안에 아직 없으면 이번 프레임엔 대상 없음 - 다른 적으로 대체하지 않는다).
+    // 지정 대상이 아예 없을 때만(패시브 대기 상태) 가장 가까운 적을 선택한다.
+    private GameObject GetPreferredTarget()
+    {
+        EnemyController ordered = unitController.GetOrderedTarget();
+
+        if (ordered != null)
+            return enemiesInRange.Contains(ordered.gameObject) ? ordered.gameObject : null;
+
+        return GetClosestEnemy();
     }
 
     // 감지된 적들 중 자신과의 거리(제곱 거리)가 가장 짧은 적을 찾아 반환한다.

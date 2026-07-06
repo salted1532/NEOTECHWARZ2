@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections;
+using System.Net;
 using System.Resources;
 using TMPro;
 using UnityEngine;
@@ -10,7 +11,7 @@ using static UnityEngine.GraphicsBuffer;
 // 개별 유닛(일꾼/전투유닛/공중유닛 포함)의 이동, 전투, 순찰, 자원 채취(일꾼 전용) 상태머신을 담당하는 핵심 컴포넌트.
 // NavMeshAgent 기반 지상 이동과 직접 좌표 보간 기반 공중 이동을 모두 지원하며,
 // AttackRange가 사거리 내 적을 감지하면 이 컴포넌트의 Attack/ChaseTarget을 호출한다.
-public class UnitController : MonoBehaviour
+public class UnitController : MonoBehaviour, IDestructible
 {
     [SerializeField]
     private GameObject unitMarker;
@@ -92,9 +93,34 @@ public class UnitController : MonoBehaviour
     [SerializeField] private float airSeparationRadius = 1.2f; // 두 콜라이더 반경 합 정도
     [SerializeField] private float airSeparationSpeed = 4f;    // 밀려나는 속도(초당)
 
+    // ===== 공격 명령 (우클릭 적 지정 / A 모드) =====
+    [SerializeField] private float chaseLoseSightRange = 20f; // 지정 추격 대상과 이 거리 이상 벌어지면 "시야 이탈"로 간주
+
+    private EnemyController orderedTarget;   // 명시적으로 지정된 추격 대상 (없으면 null)
+    private Vector3? attackMoveDestination;  // 공격-이동 목적지 / 추격 중 마지막으로 확인된 위치 (교전 후 복귀할 지점)
+    private AttackRange attackRange;         // 사거리 내 교전 대상 존재 여부 조회용 (자식 컴포넌트)
+    // 지정 추격 대상과 한 번이라도 사거리 안에서 접촉했는지. 접촉 전(예: 맵 반대편의 먼 적을 지정한 직후)에는
+    // 아무리 멀어도 "시야 이탈"로 취급하지 않고 무조건 계속 쫓아간다 - 그래야 이동 도중 우연히 지나치는
+    // 다른 적에게 한눈팔지 않고 지정한 대상까지 끝까지 간다. 접촉 이후에만 chaseLoseSightRange가 적용된다.
+    private bool hasEngagedOrderedTarget;
+
+    // 아군 강제 공격 대상 (A 모드에서 아군 유닛/건물 좌클릭). MonoBehaviour로 두어 UnitController(유닛)와
+    // BuildingController(건물) 둘 다 받을 수 있게 한다 (둘 다 .transform/.gameObject로 충분).
+    // 적과 달리 시야 개념 없이 죽을 때까지 끝까지 추격/공격한다 (건물은 이동하지 않으므로 추격은 사실상 접근만 함).
+    private MonoBehaviour friendlyTarget;
+    // friendlyTarget이 죽어서(파괴되어) 이번 프레임에 Unity의 fake-null로 바뀌었는지 판별하기 위한 플래그.
+    // (파괴된 순간부터 friendlyTarget == null이 즉시 true가 되므로, 이 플래그 없이는 "막 끝났다"는
+    //  전이 시점을 알 수 없어 유닛이 정지된 채로 영원히 멈춰버린다.)
+    private bool hasFriendlyOrder;
+
+    private Coroutine markerFlashRoutine; // 공격 대상 지정 피드백 깜빡임 (Enemy/ResourceNode와 동일한 패턴)
+    [SerializeField] private float markerFlashInterval = 0.3f;
+    [SerializeField] private int markerFlashCount = 3;
+
     private void Awake()
     {
         isWorker = CompareTag("Worker");
+        attackRange = GetComponentInChildren<AttackRange>();
 
         if (!isAirUnit)
         {
@@ -147,7 +173,14 @@ public class UnitController : MonoBehaviour
             if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
             {
                 isMovingAirUnit = false;
-                UnitcurrentState = UnitState.Idle;
+
+                // 지정 추격 대상(적/아군)이 살아있는 동안은 잠깐 따라잡아도 Idle로 전환하지 않는다 (계속 추격/교전 유지)
+                if (orderedTarget == null && friendlyTarget == null)
+                {
+                    UnitcurrentState = UnitState.Idle;
+                    attackMoveDestination = null;
+                }
+
                 Debug.Log("공중유닛 도착 !");
             }
         }
@@ -155,17 +188,22 @@ public class UnitController : MonoBehaviour
         if (!isAirUnit)
         {
             if (!arrived &&
+                orderedTarget == null &&
+                friendlyTarget == null &&
                 !navMeshAgent.pathPending &&
                 navMeshAgent.remainingDistance <= arriveDistance)
             {
                 arrived = true;
                 navMeshAgent.ResetPath();
                 UnitcurrentState = UnitState.Idle;
+                attackMoveDestination = null;
             }
         }
 
         GatherTick();
         PatrolTick();
+        AttackOrderTick();
+        FriendlyAttackTick();
 
         if (isAirUnit)
             SeparateFromOverlappingAirUnits();
@@ -216,71 +254,221 @@ public class UnitController : MonoBehaviour
         unitMarker.SetActive(false);
     }
 
+    // 공격 명령(아군 강제 공격 등) 대상으로 지정됐을 때 "이 유닛이 대상"임을 피드백으로 마커를 짧게 깜빡인다.
+    // 좌클릭 선택 마커와 같은 오브젝트를 사용하므로, 끝나면 실제 선택 상태에 맞춰 복원한다.
+    public void FlashMarker()
+    {
+        if (unitMarker == null)
+            return;
+
+        if (markerFlashRoutine != null)
+            StopCoroutine(markerFlashRoutine);
+
+        markerFlashRoutine = StartCoroutine(FlashMarkerRoutine());
+    }
+
+    private IEnumerator FlashMarkerRoutine()
+    {
+        WaitForSeconds wait = new WaitForSeconds(markerFlashInterval);
+
+        for (int i = 0; i < markerFlashCount; i++)
+        {
+            unitMarker.SetActive(true);
+            yield return wait;
+            unitMarker.SetActive(false);
+            yield return wait;
+        }
+
+        // 깜빡이는 도중 선택된 상태였다면(드문 경우) 꺼진 채로 두지 않고 선택 마커 상태로 복원
+        bool isSelected = rtsController != null && rtsController.selectedUnitList.Contains(this);
+        unitMarker.SetActive(isSelected);
+
+        markerFlashRoutine = null;
+    }
+
     public void MoveTo(Vector3 end)
     {
         CancelGatheringForNewCommand();
+        CancelAttackOrder();
 
         arrived = false;
         patrolling = false;
         UnitcurrentState = UnitState.Move;
 
+        MoveAgentTo(end);
+    }
+
+    // 지상/공중 유닛 이동 로직을 한 곳으로 모은 헬퍼 (공격 명령 추적/재개 로직에서 반복 사용하기 위함)
+    private void MoveAgentTo(Vector3 destination)
+    {
         if (!isAirUnit)
         {
             navMeshAgent.isStopped = false;
-            navMeshAgent.SetDestination(end);
+            navMeshAgent.SetDestination(destination);
         }
         else
         {
-            targetPosition = end + Vector3.up * 5f;
+            targetPosition = destination + Vector3.up * 5f;
             isMovingAirUnit = true;
         }
     }
 
-    public void AttackToGround(Vector3 end)
+    // 명시 공격 명령(추격 대상/아군 강제공격 대상/공격-이동 목적지) 취소: 다른 종류의 명령이 새로 들어올 때 호출
+    private void CancelAttackOrder()
     {
-        CancelGatheringForNewCommand();
-
-        arrived = false;
-        //idle 모드로 변경(적 발견시 바로 공격)
-        UnitcurrentState = UnitState.Idle;
-        if (isAirUnit == false)
-        {
-            navMeshAgent.isStopped = false;
-            if (navMeshAgent != null)
-            {
-                navMeshAgent.SetDestination(end);
-            }
-        }
-        else
-        {
-            targetPosition = end + Vector3.up * 5f;
-            isMovingAirUnit = true;
-        }
+        orderedTarget = null;
+        hasEngagedOrderedTarget = false;
+        friendlyTarget = null;
+        hasFriendlyOrder = false;
+        attackMoveDestination = null;
     }
 
-    public void AttackToUnit(Vector3 end)
+    // ======================
+    // 공격 명령 (우클릭 적 지정 / A 모드)
+    // ======================
+
+    // 특정 적 유닛을 추격하여 공격한다 (우클릭 적 클릭 / A 모드에서 적 클릭).
+    // 대상이 살아있는 한 매 프레임 최신 위치를 쫓아가고(AttackOrderTick), 사거리 안에 들어오면
+    // AttackRange가 자동으로 공격을 실행한다.
+    public void AttackUnitTarget(EnemyController target)
     {
         CancelGatheringForNewCommand();
+
+        orderedTarget = target;
+        hasEngagedOrderedTarget = false;
+        friendlyTarget = null;
+        attackMoveDestination = target.transform.position;
 
         arrived = false;
         UnitcurrentState = UnitState.Attack;
-        if (isAirUnit == false)
+
+        MoveAgentTo(target.transform.position);
+    }
+
+    // 특정 지점으로 공격-이동한다 (A 모드에서 땅 클릭).
+    // 이동 중 사거리에 적이 들어오면 교전하고, 교전이 끝나면(AttackOrderTick) 다시 이 지점으로 이동을 재개한다.
+    public void AttackMoveTo(Vector3 destination)
+    {
+        CancelGatheringForNewCommand();
+
+        orderedTarget = null;
+        friendlyTarget = null;
+        attackMoveDestination = destination;
+
+        arrived = false;
+        UnitcurrentState = UnitState.Idle; // Idle 상태여야 AttackRange가 사거리 내 적을 자동으로 교전한다
+
+        MoveAgentTo(destination);
+    }
+
+    // 아군 유닛/건물을 강제로 공격한다 (A 모드에서 아군 좌클릭). target은 UnitController 또는 BuildingController.
+    // 적 추격과 달리 "시야 이탈" 개념이 없다: 대상이 죽어서 파괴되기 전까지는 거리에 상관없이 끝까지 쫓아간다
+    // (FriendlyAttackTick에서 매 프레임 갱신).
+    public void AttackFriendlyTarget(MonoBehaviour target)
+    {
+        CancelGatheringForNewCommand();
+
+        orderedTarget = null;
+        attackMoveDestination = null;
+        friendlyTarget = target;
+        hasFriendlyOrder = true;
+
+        arrived = false;
+        UnitcurrentState = UnitState.Attack;
+
+        MoveAgentTo(target.transform.position);
+    }
+
+    // 아군 강제 공격을 매 프레임 갱신한다: 사거리 안이면 공격하고, 아니면 거리 제한 없이 계속 추격한다.
+    // 대상이 죽어서 파괴되면 정지 상태를 풀고 Idle로 복귀한다.
+    // (AttackRange는 "Enemy" 태그만 감지하므로 아군 대상 전투는 여기서 직접 처리한다.)
+    private void FriendlyAttackTick()
+    {
+        if (!hasFriendlyOrder)
+            return;
+
+        if (friendlyTarget == null)
         {
-            navMeshAgent.isStopped = false;
-            if (navMeshAgent != null)
-            {
-                navMeshAgent.SetDestination(end);
-            }
+            // 대상이 죽어서 파괴됨: 정지된 채로 남지 않도록 여기서 직접 마무리 처리
+            hasFriendlyOrder = false;
+
+            arrived = true;
+            if (!isAirUnit)
+                navMeshAgent.ResetPath();
+
+            UnitcurrentState = UnitState.Idle;
+            return;
+        }
+
+        float distance = Vector3.Distance(transform.position, friendlyTarget.transform.position);
+
+        if (attackRange != null && distance <= attackRange.UnitRange)
+        {
+            Attack(friendlyTarget.transform.position, attackRange.AttackDamage, friendlyTarget.gameObject); // 내부에서 정지 처리까지 함께 해준다
         }
         else
         {
-            targetPosition = end + Vector3.up * 5f; ;
-            isMovingAirUnit = true;
+            MoveAgentTo(friendlyTarget.transform.position); // 사거리 밖: 거리 상관없이 끝까지 추격
+        }
+    }
+
+    // 명시적 공격 명령을 매 프레임 갱신한다.
+    // - 지정 대상과 한 번도 접촉(사거리 진입)한 적이 없다면, 아무리 멀어도 "시야 이탈"로 보지 않고
+    //   무조건 그 대상만 쫓아간다 (맵 반대편의 먼 적을 지정해도 도중의 다른 적에게 한눈팔지 않는다).
+    // - 한 번이라도 접촉한 뒤에는, 대상이 죽거나(파괴) chaseLoseSightRange 밖으로 벗어나면
+    //   마지막으로 확인한 위치로 공격-이동 전환한다 (그 뒤로는 도중에 만나는 다른 적과 교전해도 된다).
+    // - 공격-이동 중 근처에 교전 상대가 없는데 정지된 채로 남아있다면(전투 종료 직후 등)
+    //   원래 목적지로 이동을 재개한다.
+    private void AttackOrderTick()
+    {
+        if (orderedTarget != null)
+        {
+            float sqrDist = (transform.position - orderedTarget.transform.position).sqrMagnitude;
+
+            bool inAttackRange = attackRange != null && sqrDist <= (float)attackRange.UnitRange * attackRange.UnitRange;
+            if (inAttackRange)
+                hasEngagedOrderedTarget = true; // 한 번이라도 사거리 안에서 접촉했다면 이후 "시야 이탈" 판정을 적용
+
+            if (hasEngagedOrderedTarget && sqrDist > chaseLoseSightRange * chaseLoseSightRange)
+            {
+                // 시야 이탈: 마지막으로 확인된 위치로 "공격-이동" 전환 (추격 대상은 포기)
+                // Idle 상태로 바꿔야 그 길에 새로 마주치는 다른 적도 AttackRange가 자동으로 교전해준다.
+                attackMoveDestination = orderedTarget.transform.position;
+                orderedTarget = null;
+                hasEngagedOrderedTarget = false;
+                UnitcurrentState = UnitState.Idle;
+            }
+            else
+            {
+                attackMoveDestination = orderedTarget.transform.position;
+
+                // 다른 적이 근처에 있어도 그건 무시하고, 오직 "지정한 대상"과의 거리로만 교전 여부를 판단한다
+                // (attackRange.HasEnemyInRange를 쓰면 무관한 다른 적 때문에 추격이 멈춰버릴 수 있음).
+                if (!inAttackRange)
+                    MoveAgentTo(attackMoveDestination.Value); // 사거리 밖: 계속 추격 이동
+
+                return;
+            }
         }
 
+        if (attackMoveDestination == null)
+            return;
 
+        if (attackRange != null && attackRange.HasEnemyInRange)
+            return; // 아직 교전 중이면 그대로 둔다 (AttackRange가 정지시킨 상태 유지)
 
+        bool groundStopped = !isAirUnit && navMeshAgent.isStopped;
+        bool airStopped = isAirUnit && !isMovingAirUnit;
+
+        if (groundStopped || airStopped)
+        {
+            arrived = false;
+            MoveAgentTo(attackMoveDestination.Value); // 교전 종료 → 원래 목적지로 이동 재개
+        }
     }
+
+    public EnemyController GetOrderedTarget() => orderedTarget;
+
     // ======================
     // 추적 (공격 준비 이동)
     // ======================
@@ -359,6 +547,7 @@ public class UnitController : MonoBehaviour
     public void StopUnit()
     {
         CancelGatheringForNewCommand();
+        CancelAttackOrder();
 
         UnitcurrentState = UnitState.Idle;
 
@@ -377,6 +566,7 @@ public class UnitController : MonoBehaviour
     public void PatrolUnit(Vector3 end)
     {
         CancelGatheringForNewCommand();
+        CancelAttackOrder();
 
         UnitcurrentState = UnitState.Idle;
 
@@ -442,6 +632,7 @@ public class UnitController : MonoBehaviour
     public void HoldUnit()
     {
         CancelGatheringForNewCommand();
+        CancelAttackOrder();
 
         UnitcurrentState = UnitState.Attack;
 

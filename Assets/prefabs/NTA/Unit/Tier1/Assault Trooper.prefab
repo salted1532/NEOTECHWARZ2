@@ -158,7 +158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e52a2baafe3771a46a413624bedb5f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRange
-  UnitRange: 4
+  UnitRange: 8
   AttackDamage: 6
 --- !u!1 &7069137052622472766
 GameObject:
@@ -325,13 +325,16 @@ MonoBehaviour:
   isAirUnit: 0
   UnitcurrentState: 0
   alreadyAttacked: 0
-  timeBetweenAttacks: 0.4
+  timeBetweenAttacks: 0.6
   DepositOre: {fileID: 0}
   DepositGas: {fileID: 0}
   gatherInteractRange: 2
   gatherAgentRadius: 0.1
   airSeparationRadius: 1.2
   airSeparationSpeed: 4
+  chaseLoseSightRange: 20
+  markerFlashInterval: 0.3
+  markerFlashCount: 3
 --- !u!114 &5564514532825985460
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -344,7 +347,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 100
+  maxHealth: 40
 --- !u!54 &1803068245205877688
 Rigidbody:
   m_ObjectHideFlags: 0

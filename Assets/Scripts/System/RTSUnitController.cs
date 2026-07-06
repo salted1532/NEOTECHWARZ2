@@ -16,6 +16,8 @@ public class RTSUnitController : MonoBehaviour
     // 현재 선택된 유닛들
     public List<UnitController> selectedUnitList;
     public List<BuildingController> selectedBuildingList;
+    public List<EnemyController> selectedEnemyList;
+    public ResourceNode selectedResourceNode; // 광물/가스는 항상 단일 선택
 
     // 맵에 존재하는 모든 유닛/건물/자원 노드
     public List<UnitController> UnitList;
@@ -95,6 +97,7 @@ public class RTSUnitController : MonoBehaviour
     {
         selectedUnitList = new List<UnitController>();
         selectedBuildingList = new List<BuildingController>();
+        selectedEnemyList = new List<EnemyController>();
         UnitList = new List<UnitController>();
         BuildingList = new List<BuildingController>();
         ResourceNodeList = new List<ResourceNode>();
@@ -200,24 +203,50 @@ public class RTSUnitController : MonoBehaviour
     }
 
     /// <summary>
-    /// 선택된 유닛 공격
+    /// 선택된 유닛으로 특정 적 유닛을 추격 공격 (우클릭 적 클릭 / A 모드에서 적 클릭)
     /// </summary>
-    public void AttackSelectedUnits(Vector3 end)
+    public void AttackSelectedUnits(EnemyController target)
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
         {
-            selectedUnitList[i].AttackToUnit(end);
+            selectedUnitList[i].AttackUnitTarget(target);
         }
     }
 
     /// <summary>
-    /// 바닥 공격 명령
+    /// 바닥 공격-이동 명령 (A 모드에서 땅 클릭): 이동 중 교전 후 다시 이 지점으로 이동을 재개한다.
     /// </summary>
     public void AttackGroundSelectedUnits(Vector3 end)
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
         {
-            selectedUnitList[i].AttackToGround(end);
+            selectedUnitList[i].AttackMoveTo(end);
+        }
+    }
+
+    /// <summary>
+    /// 아군 강제 공격 (A 모드에서 아군 좌클릭): 대상이 죽을 때까지 거리 상관없이 끝까지 추격 공격한다.
+    /// (대상 자신이 선택되어 있어도 자기 자신을 공격하지는 않는다)
+    /// </summary>
+    public void AttackFriendlySelectedUnits(UnitController target)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            if (selectedUnitList[i] == target)
+                continue;
+
+            selectedUnitList[i].AttackFriendlyTarget(target);
+        }
+    }
+
+    /// <summary>
+    /// 아군 건물 강제 공격 (A 모드에서 아군 건물 좌클릭): 대상이 파괴될 때까지 끝까지 공격한다.
+    /// </summary>
+    public void AttackFriendlyBuildingSelectedUnits(BuildingController target)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].AttackFriendlyTarget(target);
         }
     }
     public void StopSelectedUnits()
@@ -364,6 +393,68 @@ public class RTSUnitController : MonoBehaviour
 
     #endregion
 
+    #region Enemy선택 관련
+
+    /// <summary>
+    /// 좌클릭 선택 처리 (적은 항상 단일 선택)
+    /// </summary>
+    public void ClickSelectEnemy(EnemyController enemy)
+    {
+        DeselectAll();
+        SelectEnemy(enemy);
+
+        Debug.Log("적 선택");
+    }
+
+    private void SelectEnemy(EnemyController enemy)
+    {
+        if (IsBuildMode())
+            return;
+
+        RTScurrentSate = SelectState.EnemySelect;
+
+        enemy.SelectEnemy();
+        selectedEnemyList.Add(enemy);
+    }
+
+    #endregion
+
+    #region Ore/Gas선택 관련
+
+    /// <summary>
+    /// 좌클릭 선택 처리 (자원 노드는 항상 단일 선택)
+    /// </summary>
+    public void ClickSelectResource(ResourceNode node)
+    {
+        DeselectAll();
+        SelectResource(node);
+
+        Debug.Log("자원 선택");
+    }
+
+    private void SelectResource(ResourceNode node)
+    {
+        if (IsBuildMode())
+            return;
+
+        RTScurrentSate = SelectState.OreSelect;
+
+        node.SelectResource();
+        selectedResourceNode = node;
+    }
+
+    // 채취 중 노드가 고갈되어 파괴될 때(ResourceNode.Extract) 선택 상태가 유령 참조로 남지 않도록 정리한다.
+    public void ClearSelectedResourceIfMatches(ResourceNode node)
+    {
+        if (selectedResourceNode != node)
+            return;
+
+        selectedResourceNode = null;
+        RTScurrentSate = SelectState.None;
+    }
+
+    #endregion
+
     /// <summary>
     /// 모든 선택 해제
     /// </summary>
@@ -382,9 +473,18 @@ public class RTSUnitController : MonoBehaviour
             building.DeselecBuilding();
         }
 
+        foreach (EnemyController enemy in selectedEnemyList)
+        {
+            enemy.DeselectEnemy();
+        }
+
+        selectedResourceNode?.DeselectResource();
+
         RTScurrentSate = SelectState.None;
         selectedUnitList.Clear();
         selectedBuildingList.Clear();
+        selectedEnemyList.Clear();
+        selectedResourceNode = null;
     }
 
     #region UserControl 상태 전환
@@ -636,6 +736,42 @@ public class RTSUnitController : MonoBehaviour
                         uIController.HideProductionUI();
                         break;
                 }
+                break;
+
+            case SelectState.EnemySelect:
+
+                if (selectedEnemyList.Count > 0)
+                {
+                    EnemyController enemy = selectedEnemyList[0];
+                    uIController.ShowInfoPanel(enemy.GetIcon(), enemy.GetEnemyName(), enemy.GetComponent<HealthManager>());
+                }
+                else
+                {
+                    uIController.HideInfoPanel();
+                }
+
+                uIController.ClearPanel();
+                uIController.HideProductionUI();
+                uIController.HideSquadPanel();
+                break;
+
+            case SelectState.OreSelect:
+
+                if (selectedResourceNode != null)
+                {
+                    uIController.ShowResourceInfoPanel(
+                        selectedResourceNode.GetIcon(),
+                        selectedResourceNode.Type == ResourceType.Ore ? "Ore" : "Gas",
+                        selectedResourceNode.RemainingAmount);
+                }
+                else
+                {
+                    uIController.HideInfoPanel();
+                }
+
+                uIController.ClearPanel();
+                uIController.HideProductionUI();
+                uIController.HideSquadPanel();
                 break;
 
             case SelectState.BuildMode:

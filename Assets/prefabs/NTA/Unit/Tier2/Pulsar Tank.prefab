@@ -322,7 +322,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 10
+  m_Radius: 15
   m_Height: 20
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -338,7 +338,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e52a2baafe3771a46a413624bedb5f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRange
-  UnitRange: 7
+  UnitRange: 14
   AttackDamage: 30
 --- !u!1 &7069137052622472766
 GameObject:

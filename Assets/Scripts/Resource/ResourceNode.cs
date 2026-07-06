@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,15 @@ public class ResourceNode : MonoBehaviour
 {
     [SerializeField] private ResourceType resourceType;
     [SerializeField] private int remainingAmount;
+
+    [SerializeField] private GameObject resourceMarker; // 선택 시 표시할 마커 (Unit/BuildingController와 동일한 패턴)
+    [SerializeField] private Sprite icon; // Info_panel에 표시할 아이콘
+
+    [SerializeField] private float flashInterval = 0.3f; // 채취 명령(우클릭) 피드백 깜빡임 간격
+    [SerializeField] private int flashCount = 3;          // 깜빡이는 횟수
+
+    private Coroutine flashRoutine;
+    private RTSUnitController rtsController;
 
     // 대기열이 이 인원 이상이면 "혼잡"으로 보고, 새로 오는 일꾼은 우선 다른 자원을 찾아보게 한다.
     // 하드 캡이 아니라 임계값일 뿐이므로, 대체 자원이 없으면 이 값을 넘겨서도 계속 줄을 설 수 있다.
@@ -30,6 +40,7 @@ public class ResourceNode : MonoBehaviour
 
     public ResourceType Type => resourceType;
     public bool IsDepleted => remainingAmount <= 0;
+    public int RemainingAmount => remainingAmount;
 
     // 대기열이 혼잡한지(= 새로 오는 일꾼이 다른 자원을 먼저 찾아봐야 하는지) 여부. 줄서기 자체를 막지는 않는다
     public bool IsCrowded => workerQueue.Count >= waitWorkerCount;
@@ -67,8 +78,58 @@ public class ResourceNode : MonoBehaviour
 
     private void Start()
     {
-        RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
-        controller?.ResourceNodeList.Add(this);
+        if (resourceMarker != null)
+            resourceMarker.SetActive(false);
+
+        rtsController = FindFirstObjectByType<RTSUnitController>();
+        rtsController?.ResourceNodeList.Add(this);
+    }
+
+    // 자원 노드 선택 시 마커(테두리 등 표시)를 활성화한다.
+    public void SelectResource()
+    {
+        if (resourceMarker != null)
+            resourceMarker.SetActive(true);
+    }
+
+    // 자원 노드 선택 해제 시 마커를 비활성화한다.
+    public void DeselectResource()
+    {
+        if (resourceMarker != null)
+            resourceMarker.SetActive(false);
+    }
+
+    public Sprite GetIcon() => icon;
+
+    // 채취 명령(우클릭)을 받았을 때 "어느 자원이 대상인지" 피드백으로 마커를 짧게 깜빡인다.
+    // 좌클릭 선택 마커와 같은 오브젝트를 사용하므로, 끝나면 실제 선택 상태에 맞춰 복원한다.
+    public void FlashMarker()
+    {
+        if (resourceMarker == null)
+            return;
+
+        if (flashRoutine != null)
+            StopCoroutine(flashRoutine);
+
+        flashRoutine = StartCoroutine(FlashMarkerRoutine());
+    }
+
+    private IEnumerator FlashMarkerRoutine()
+    {
+        WaitForSeconds wait = new WaitForSeconds(flashInterval);
+
+        for (int i = 0; i < flashCount; i++)
+        {
+            resourceMarker.SetActive(true);
+            yield return wait;
+            resourceMarker.SetActive(false);
+            yield return wait;
+        }
+
+        // 깜빡이는 도중 좌클릭으로 선택된 상태였다면(드문 경우) 꺼진 채로 두지 않고 선택 마커 상태로 복원
+        resourceMarker.SetActive(rtsController != null && rtsController.selectedResourceNode == this);
+
+        flashRoutine = null;
     }
 
     /// 채취 시도 시 실제로 얼마나 캐갈 수 있는지 (고갈 임박 시 amountPerTrip보다 적게 줄 수도 있음)
@@ -80,7 +141,12 @@ public class ResourceNode : MonoBehaviour
         ShrinkByRemainingRatio();
 
         if (remainingAmount <= 0)
+        {
+            // 채취 중이던(선택된) 채로 고갈된 경우 UI(Info_panel)가 유령 참조를 들고 있지 않도록 정리
+            rtsController?.ClearSelectedResourceIfMatches(this);
+
             Destroy(gameObject);
+        }
 
         return taken;
     }

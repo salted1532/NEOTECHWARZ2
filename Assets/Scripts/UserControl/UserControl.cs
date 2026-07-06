@@ -148,14 +148,27 @@ public class UserControl : MonoBehaviour
         bool clickedOre = Physics.Raycast(ray, out OreHit, Mathf.Infinity, layerOre);
         bool clickedGas = Physics.Raycast(ray, out GasHit, Mathf.Infinity, layerGas);
 
-        // 1. 유닛 클릭
+        // 1. 유닛 클릭 = 선택 또는 아군 강제 공격 (A 모드 중이면 해당 아군을 강제로 공격, 아니면 선택)
         if (clickedUnit)
         {
             UnitController unit = unitHit.transform.GetComponent<UnitController>();
-            
+
             if (unit != null)
             {
-                if (Input.GetKey(KeyCode.LeftShift))        
+                if (UsercurrentState == OrderState.Attack)
+                {
+                    rtsUnitController.AttackFriendlySelectedUnits(unit);
+                    unit.FlashMarker(); // 어느 아군이 공격 대상인지 마커 깜빡임으로 표시
+
+                    attackPointer.transform.position = unit.transform.position;
+                    attackPointer.SetActive(true);
+
+                    UsercurrentState = OrderState.None;
+
+                    return;
+                }
+
+                if (Input.GetKey(KeyCode.LeftShift))
                     rtsUnitController.ShiftClickSelectUnit(unit);
                 else
                     rtsUnitController.ClickSelectUnit(unit);
@@ -164,8 +177,67 @@ public class UserControl : MonoBehaviour
             }
         }
 
-        // 2. 땅 클릭 = 명령 처리
-        if (clickedGround)  
+        // 2. 적 클릭 = 선택 또는 공격 명령 (A 모드 중이면 해당 적을 추격 공격, 아니면 선택)
+        // 땅 클릭보다 먼저 처리해야 한다: 적은 지면 위에도 서 있어 clickedGround도 함께 true가 되기 때문에,
+        // 더 구체적인 대상(적)이 우선권을 가져야 "A 모드에서 적을 직접 지정"이 가능하다.
+        if (clickedEnemy)
+        {
+            EnemyController enemy = enemyHit.transform.GetComponent<EnemyController>();
+
+            if (enemy != null)
+            {
+                if (UsercurrentState == OrderState.Attack)
+                {
+                    rtsUnitController.AttackSelectedUnits(enemy);
+                    enemy.FlashMarker(); // 어느 적이 공격 대상인지 마커 깜빡임으로 표시
+
+                    attackPointer.transform.position = enemy.transform.position;
+                    attackPointer.SetActive(true);
+
+                    UsercurrentState = OrderState.None;
+
+                    return;
+                }
+
+                rtsUnitController.ClickSelectEnemy(enemy);
+
+                return; // 👉 중요: 여기서 종료 (명령 안 함)
+            }
+        }
+
+        // 3. 건물 클릭 = 선택 또는 아군 건물 강제 공격 (A 모드 중이면 해당 건물을 강제로 공격, 아니면 선택)
+        // 건물도 지면 위에 서 있어 clickedGround가 함께 true가 되므로, 땅 클릭보다 먼저 처리해야
+        // "A 모드에서 건물을 직접 지정"이 땅 공격-이동으로 새지 않는다 (적/아군 유닛과 동일한 이유).
+        if (clickedBuilding)
+        {
+            BuildingController building = BuildingHit.transform.GetComponent<BuildingController>();
+
+            if (building != null)
+            {
+                if (UsercurrentState == OrderState.Attack)
+                {
+                    rtsUnitController.AttackFriendlyBuildingSelectedUnits(building);
+                    building.FlashMarker(); // 어느 건물이 공격 대상인지 마커 깜빡임으로 표시
+
+                    attackPointer.transform.position = building.transform.position;
+                    attackPointer.SetActive(true);
+
+                    UsercurrentState = OrderState.None;
+
+                    return;
+                }
+
+                if (Input.GetKey(KeyCode.LeftShift))
+                    rtsUnitController.ShiftClickSelectBuilding(building);
+                else
+                    rtsUnitController.ClickSelectBuilding(building);
+
+                return; // 👉 중요: 여기서 종료 (명령 안 함)
+            }
+        }
+
+        // 4. 땅 클릭 = 명령 처리
+        if (clickedGround)
         {
             if (UsercurrentState == OrderState.Move)
             {
@@ -218,38 +290,30 @@ public class UserControl : MonoBehaviour
             }
         }
 
-        // 3. 적 클릭 = 명령 처리
-        if (clickedEnemy)
+        // 5. 광물 클릭 = 선택 처리
+        if (clickedOre)
         {
+            ResourceNode node = OreHit.transform.GetComponent<ResourceNode>();
 
-        }
-
-        // 4. 건물 클릭 = 명령 처리
-        if (clickedBuilding)
-        {
-            BuildingController building = BuildingHit.transform.GetComponent<BuildingController>();
-
-            if (building != null)
+            if (node != null)
             {
-                if (Input.GetKey(KeyCode.LeftShift))
-                    rtsUnitController.ShiftClickSelectBuilding(building);
-                else
-                    rtsUnitController.ClickSelectBuilding(building);
+                rtsUnitController.ClickSelectResource(node);
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
         }
 
-        // 5. 광물 클릭 = 명령 처리
-        if (clickedOre)
-        {
-
-        }
-
-        // 5. 가스 클릭 = 명령 처리
+        // 5. 가스 클릭 = 선택 처리
         if (clickedGas)
         {
+            ResourceNode node = GasHit.transform.GetComponent<ResourceNode>();
 
+            if (node != null)
+            {
+                rtsUnitController.ClickSelectResource(node);
+
+                return; // 👉 중요: 여기서 종료 (명령 안 함)
+            }
         }
 
         // 6. 아무것도 아닌 곳 클릭 = 선택 해제
@@ -279,6 +343,25 @@ public class UserControl : MonoBehaviour
         if (clickedUnit)
         {
 
+        }
+
+        // 1. 적 우클릭 = 공격 명령 (추격 후 공격)
+        // 적은 지면 위에도 서 있어 clickedGround도 함께 true가 되므로, 이동 명령이 끼어들지 않도록
+        // 땅 클릭보다 먼저 처리하고 여기서 return 한다.
+        if (clickedEnemy && rtsUnitController.IsUnitSelect())
+        {
+            EnemyController enemy = enemyHit.transform.GetComponent<EnemyController>();
+
+            if (enemy != null)
+            {
+                rtsUnitController.AttackSelectedUnits(enemy);
+                enemy.FlashMarker(); // 어느 적이 공격 대상인지 마커 깜빡임으로 표시
+
+                attackPointer.transform.position = enemy.transform.position;
+                attackPointer.SetActive(true);
+
+                return;
+            }
         }
 
         // 2. 땅 클릭 = 명령 처리
@@ -333,7 +416,10 @@ public class UserControl : MonoBehaviour
         {
             ResourceNode node = OreHit.transform.GetComponent<ResourceNode>();
             if (node != null)
+            {
                 rtsUnitController.GatherSelectedUnits(node);
+                node.FlashMarker(); // 어느 자원이 채취 대상인지 마커 깜빡임으로 표시
+            }
         }
 
         // 5. 가스 클릭 = 명령 처리
@@ -341,7 +427,10 @@ public class UserControl : MonoBehaviour
         {
             ResourceNode node = GasHit.transform.GetComponent<ResourceNode>();
             if (node != null)
+            {
                 rtsUnitController.GatherSelectedUnits(node);
+                node.FlashMarker(); // 어느 자원이 채취 대상인지 마커 깜빡임으로 표시
+            }
         }
     }
 

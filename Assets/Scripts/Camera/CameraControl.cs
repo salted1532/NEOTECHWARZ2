@@ -178,11 +178,13 @@ public class CameraControl : MonoBehaviour
     }
 
     // 미니맵 클릭 등 외부에서 특정 지면 좌표로 카메라를 이동시킬 때 사용.
-    // 높이(Y, 줌 상태)와 회전은 그대로 유지하고 X/Z만 바꾼다.
+    // 높이(Y, 줌 상태)와 회전은 그대로 유지하고 X/Z만 바꾸되, LateUpdate의 Lerp 보간 없이 즉시 순간이동한다.
     public void JumpToWorldXZ(Vector3 worldPoint)
     {
         targetPosition.x = Mathf.Clamp(worldPoint.x, minX, maxX);
         targetPosition.z = Mathf.Clamp(worldPoint.z, minZ, maxZ);
+
+        transform.position = new Vector3(targetPosition.x, transform.position.y, targetPosition.z);
     }
 
     // 화면 정중앙 레이가 지면(Y = 0 평면)과 만나는 지점을 구한다 (회전 축 pivot으로 사용).

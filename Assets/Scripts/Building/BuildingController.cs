@@ -1,9 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 // 건물 오브젝트에 부착되는 컨트롤러.
 // 선택 표시, 랠리 포인트(집결지) 관리, 자식의 UnitSpawner를 통한 유닛 생산 위임, 사망 처리를 담당한다.
-public class BuildingController : MonoBehaviour
+public class BuildingController : MonoBehaviour, IDestructible
 {
     [SerializeField]
     private GameObject buildingMarker;
@@ -15,11 +16,17 @@ public class BuildingController : MonoBehaviour
     [SerializeField]
     private int buildingID;
 
+    [SerializeField] private float markerFlashInterval = 0.3f; // 공격 대상 지정 피드백 깜빡임 간격
+    [SerializeField] private int markerFlashCount = 3;          // 깜빡이는 횟수
+
     // 이 건물의 유닛 생산 큐를 실제로 관리하는 자식 컴포넌트
     private UnitSpawner UnitSpawner;
 
     // 생산된 유닛이 스폰 후 이동할 집결 지점
     private Vector3 RallyPosition;
+
+    private RTSUnitController rtsController;
+    private Coroutine markerFlashRoutine;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -27,9 +34,9 @@ public class BuildingController : MonoBehaviour
         buildingMarker.SetActive(false);
 
         // 전역 RTSUnitController에 자신을 등록해 선택/관리 대상이 되게 한다.
-        RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
+        rtsController = FindFirstObjectByType<RTSUnitController>();
 
-        controller.BuildingList.Add(this);
+        rtsController.BuildingList.Add(this);
 
         UnitSpawner = GetComponentInChildren<UnitSpawner>();
 
@@ -55,6 +62,37 @@ public class BuildingController : MonoBehaviour
     {
         //Debug.Log(name + " ???? ????");
         buildingMarker.SetActive(false);
+    }
+
+    // 공격 대상(아군 강제 공격 등)으로 지정됐을 때 "이 건물이 대상"임을 피드백으로 마커를 짧게 깜빡인다.
+    // 좌클릭 선택 마커와 같은 오브젝트를 사용하므로, 끝나면 실제 선택 상태에 맞춰 복원한다.
+    public void FlashMarker()
+    {
+        if (buildingMarker == null)
+            return;
+
+        if (markerFlashRoutine != null)
+            StopCoroutine(markerFlashRoutine);
+
+        markerFlashRoutine = StartCoroutine(FlashMarkerRoutine());
+    }
+
+    private IEnumerator FlashMarkerRoutine()
+    {
+        WaitForSeconds wait = new WaitForSeconds(markerFlashInterval);
+
+        for (int i = 0; i < markerFlashCount; i++)
+        {
+            buildingMarker.SetActive(true);
+            yield return wait;
+            buildingMarker.SetActive(false);
+            yield return wait;
+        }
+
+        bool isSelected = rtsController != null && rtsController.selectedBuildingList.Contains(this);
+        buildingMarker.SetActive(isSelected);
+
+        markerFlashRoutine = null;
     }
 
     // 랠리 포인트(신규 생산 유닛의 집결지)를 지정 위치로 변경한다.
@@ -99,9 +137,8 @@ public class BuildingController : MonoBehaviour
     // (HealthManager의 IDestructible 구현체로 호출됨)
     public void Die()
     {
-        RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
-        controller?.BuildingList.Remove(this);
-        controller?.selectedBuildingList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel 등)가 유령 참조를 들고 있지 않도록
+        rtsController?.BuildingList.Remove(this);
+        rtsController?.selectedBuildingList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel 등)가 유령 참조를 들고 있지 않도록
 
         Destroy(gameObject);
     }
