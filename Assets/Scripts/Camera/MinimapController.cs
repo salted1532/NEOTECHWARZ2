@@ -28,6 +28,10 @@ public class MinimapController : MonoBehaviour, IPointerClickHandler, IDragHandl
         Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
 
         if (groundPlane.Raycast(ray, out float distance))
-            mainCameraControl.JumpToWorldXZ(ray.GetPoint(distance));
+        {
+            Vector3 groundPoint = ray.GetPoint(distance);
+            groundPoint.z -= 20f;
+            mainCameraControl.JumpToWorldXZ(groundPoint);
+        }
     }
 }
