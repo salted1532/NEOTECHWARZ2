@@ -790,6 +790,9 @@ MonoBehaviour:
   gatherAgentRadius: 0.1
   airSeparationRadius: 1.2
   airSeparationSpeed: 4
+  chaseLoseSightRange: 20
+  markerFlashInterval: 0.3
+  markerFlashCount: 3
 --- !u!114 &-6595556838437288612
 MonoBehaviour:
   m_ObjectHideFlags: 0

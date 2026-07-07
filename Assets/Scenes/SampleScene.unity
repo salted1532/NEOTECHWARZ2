@@ -306,6 +306,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ore (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -896,6 +900,10 @@ PrefabInstance:
     - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
       propertyPath: m_Name
       value: Ore (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1661,7 +1669,6 @@ GameObject:
   - component: {fileID: 337738008}
   - component: {fileID: 337738007}
   - component: {fileID: 337738006}
-  - component: {fileID: 337738005}
   m_Layer: 7
   m_Name: Ground
   m_TagString: Untagged
@@ -1669,38 +1676,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &337738005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 337738004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
-  m_SerializedVersion: 0
-  m_AgentTypeID: 0
-  m_CollectObjects: 0
-  m_Size: {x: 10, y: 10, z: 10}
-  m_Center: {x: 0, y: 2, z: 0}
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 1152
-  m_UseGeometry: 1
-  m_DefaultArea: 0
-  m_GenerateLinks: 0
-  m_IgnoreNavMeshAgent: 1
-  m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
-  m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
-  m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: c452539cc8941ae4d832de1e41c46b77, type: 2}
-  m_BuildHeightMesh: 0
 --- !u!64 &337738006
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2510,7 +2485,6 @@ GameObject:
   - component: {fileID: 463115456}
   - component: {fileID: 463115455}
   - component: {fileID: 463115454}
-  - component: {fileID: 463115453}
   m_Layer: 7
   m_Name: Ground
   m_TagString: Untagged
@@ -2518,38 +2492,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &463115453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 463115452}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
-  m_SerializedVersion: 0
-  m_AgentTypeID: 0
-  m_CollectObjects: 0
-  m_Size: {x: 10, y: 10, z: 10}
-  m_Center: {x: 0, y: 2, z: 0}
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 1152
-  m_UseGeometry: 1
-  m_DefaultArea: 0
-  m_GenerateLinks: 0
-  m_IgnoreNavMeshAgent: 1
-  m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
-  m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
-  m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 0}
-  m_BuildHeightMesh: 0
 --- !u!64 &463115454
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2637,9 +2579,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 463115452}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.13052598, w: 0.9914449}
-  m_LocalPosition: {x: 29.56, y: -1.29, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 0.5}
+  m_LocalRotation: {x: 0, y: 0, z: -0.13052624, w: 0.9914449}
+  m_LocalPosition: {x: 29.72, y: -1.27, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 869095100}
@@ -4134,6 +4076,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ore (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4148,6 +4094,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 869095100}
+  - component: {fileID: 869095102}
   m_Layer: 0
   m_Name: TestMap
   m_TagString: Untagged
@@ -4173,6 +4120,38 @@ Transform:
   - {fileID: 463115457}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &869095102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 869095099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: c3ca9920522c7b445a5efd63d650bb85, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &907379016
 GameObject:
   m_ObjectHideFlags: 0
@@ -4441,7 +4420,6 @@ GameObject:
   - component: {fileID: 969362645}
   - component: {fileID: 969362644}
   - component: {fileID: 969362643}
-  - component: {fileID: 969362642}
   m_Layer: 7
   m_Name: Ground
   m_TagString: Untagged
@@ -4449,38 +4427,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &969362642
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 969362641}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
-  m_SerializedVersion: 0
-  m_AgentTypeID: 0
-  m_CollectObjects: 0
-  m_Size: {x: 10, y: 10, z: 10}
-  m_Center: {x: 0, y: 2, z: 0}
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 1152
-  m_UseGeometry: 1
-  m_DefaultArea: 0
-  m_GenerateLinks: 0
-  m_IgnoreNavMeshAgent: 1
-  m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
-  m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
-  m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 0}
-  m_BuildHeightMesh: 0
 --- !u!64 &969362643
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -4974,6 +4920,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ore (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5014,7 +4964,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 11.111111, y: -30.204082}
-  m_SizeDelta: {x: 10, y: 35}
+  m_SizeDelta: {x: 10, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1032366034
 MonoBehaviour:
@@ -7920,6 +7870,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gas
       objectReference: {fileID: 0}
+    - target: {fileID: 8194234081944513413, guid: 25a71ab0ce05eb543b8a27cc58948977, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8042,6 +7996,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ore
       objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8098,6 +8056,10 @@ PrefabInstance:
     - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
       propertyPath: m_Name
       value: Ore (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8533,6 +8495,10 @@ PrefabInstance:
     - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
       propertyPath: m_Name
       value: Ore (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10282,6 +10248,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gas (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 8194234081944513413, guid: 25a71ab0ce05eb543b8a27cc58948977, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11025,7 +10995,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -30.204082}
-  m_SizeDelta: {x: 10, y: 35}
+  m_SizeDelta: {x: 10, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1953129766
 MonoBehaviour:
@@ -11493,6 +11463,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ore (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11596,6 +11570,10 @@ PrefabInstance:
     - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
       propertyPath: m_Name
       value: Ore (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11729,6 +11707,10 @@ PrefabInstance:
     - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
       propertyPath: m_Name
       value: Ore (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7353450964423807764, guid: 75ab96dc6b1b33746bfb878b055987c1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
