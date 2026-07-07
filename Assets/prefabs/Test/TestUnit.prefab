@@ -159,7 +159,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRange
   UnitRange: 5
-  AttackDamage: 1
 --- !u!1 &7069137052622472766
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,6 +314,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitController
   unitMarker: {fileID: 8287700491229270693}
+  attackDamage: 1
+  armor: 0
   moveSpeed: 10
   isMovingAirUnit: 0
   isAirUnit: 0

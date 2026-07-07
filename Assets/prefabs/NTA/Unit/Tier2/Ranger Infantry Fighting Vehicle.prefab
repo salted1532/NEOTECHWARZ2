@@ -609,7 +609,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRange
   UnitRange: 12
-  AttackDamage: 12
 --- !u!1 &7069137052622472766
 GameObject:
   m_ObjectHideFlags: 0
@@ -775,6 +774,8 @@ MonoBehaviour:
   unitMarker: {fileID: 8287700491229270693}
   icon: {fileID: 21300000, guid: 04b3f4d7f72d40a48b0eff1ac5006315, type: 3}
   unitID: 4
+  attackDamage: 12
+  armor: 0
   moveSpeed: 10
   arriveDistance: 1.2
   stuckTimer: 0

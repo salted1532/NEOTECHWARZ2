@@ -182,6 +182,10 @@ MonoBehaviour:
   enemyMarker: {fileID: 5286784239653861491}
   icon: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
   enemyName: Cyborg Soldier
+  attackDamage: 5
+  armor: 1
+  flashInterval: 0.3
+  flashCount: 3
 --- !u!1 &5286784239653861491
 GameObject:
   m_ObjectHideFlags: 0

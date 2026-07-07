@@ -5,7 +5,6 @@ using UnityEngine;
 public class AttackRange : MonoBehaviour
 {
     public int UnitRange;
-    public int AttackDamage;
 
     private UnitController unitController;
     // 트리거 범위 안에 들어와 있는 "Enemy" 태그 오브젝트 목록
@@ -67,7 +66,7 @@ public class AttackRange : MonoBehaviour
         {
             if (distance <= UnitRange)
             {
-                unitController.Attack(target.transform.position, AttackDamage, target);
+                unitController.Attack(target.transform.position, target);
             }
             else if (unitController.IsIdle())
             {

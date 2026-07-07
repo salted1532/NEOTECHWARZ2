@@ -668,7 +668,7 @@ public class RTSUnitController : MonoBehaviour
                 else if (selectedUnitList.Count == 1)
                 {
                     UnitController unit = selectedUnitList[0];
-                    uIController.ShowInfoPanel(unit.GetIcon(), GetUnitName(unit.GetUnitID()), unit.GetComponent<HealthManager>());
+                    uIController.ShowInfoPanel(unit.GetIcon(), GetUnitName(unit.GetUnitID()), unit.GetComponent<HealthManager>(), unit.GetAttackDamage(), unit.GetArmor());
                 }
                 else
                 {
@@ -743,7 +743,7 @@ public class RTSUnitController : MonoBehaviour
                 if (selectedEnemyList.Count > 0)
                 {
                     EnemyController enemy = selectedEnemyList[0];
-                    uIController.ShowInfoPanel(enemy.GetIcon(), enemy.GetEnemyName(), enemy.GetComponent<HealthManager>());
+                    uIController.ShowInfoPanel(enemy.GetIcon(), enemy.GetEnemyName(), enemy.GetComponent<HealthManager>(), enemy.GetAttackDamage(), enemy.GetArmor());
                 }
                 else
                 {

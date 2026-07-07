@@ -23,6 +23,12 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private int unitID;
 
+    // ===== 전투 스탯 (공격력/방어력) =====
+    // 공격력은 기존 AttackRange.AttackDamage였던 것을 이곳으로 옮겨 UnitController가 함께 관리한다.
+    // Info_panel에서 UnitDamage/UnitArmor 아이콘 호버 시 표시할 값이기도 하다.
+    [SerializeField] private int attackDamage;
+    [SerializeField] private int armor;
+
     private NavMeshAgent navMeshAgent;
 
     [SerializeField]
@@ -404,7 +410,7 @@ public class UnitController : MonoBehaviour, IDestructible
 
         if (attackRange != null && distance <= attackRange.UnitRange)
         {
-            Attack(friendlyTarget.transform.position, attackRange.AttackDamage, friendlyTarget.gameObject); // 내부에서 정지 처리까지 함께 해준다
+            Attack(friendlyTarget.transform.position, friendlyTarget.gameObject); // 내부에서 정지 처리까지 함께 해준다
         }
         else
         {
@@ -490,7 +496,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
     }
 
-    public void Attack(Vector3 end, int damage, GameObject enemy)
+    public void Attack(Vector3 end, GameObject enemy)
     {
         if (!isAirUnit)
         {
@@ -511,7 +517,7 @@ public class UnitController : MonoBehaviour, IDestructible
         Debug.Log("공격성공!");
         if (enemy.TryGetComponent<HealthManager>(out var targetHealth))
         {
-            targetHealth.GetDamage(damage);
+            targetHealth.GetDamage(attackDamage);
         }
 
         alreadyAttacked = true;
@@ -956,4 +962,6 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public Sprite GetIcon() => icon;
     public int GetUnitID() => unitID;
+    public int GetAttackDamage() => attackDamage;
+    public int GetArmor() => armor;
 }

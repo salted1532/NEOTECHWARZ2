@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 // 하단 커맨드 패널(선택된 유닛/건물에 따른 명령 버튼들), 자원 표시, 생산 대기열 UI를 총괄하는 컨트롤러.
@@ -176,12 +177,23 @@ public class UIController : MonoBehaviour
     [SerializeField] private Image infoIcon;
     [SerializeField] private TextMeshProUGUI infoNameText;
     [SerializeField] private TextMeshProUGUI infoHpText;
+    [SerializeField] private Image attackDamageImage; // 호버 시 "Attack Damge : N" 툴팁 표시
+    [SerializeField] private Image armorImage;         // 호버 시 "Armor : N" 툴팁 표시
 
     private HealthManager infoBoundHealth; // 현재 Info_panel이 구독 중인 대상 (선택이 바뀌면 구독 해제 후 갈아끼움)
+    private int infoAttackDamage;
+    private int infoArmor;
 
     [Header("Squad Panel (SelectInfo)")]
     [SerializeField] private GameObject squadPanel;
     [SerializeField] private ProductionSlot[] squadSlots; // 인스펙터에서 12개(slot0~11) 연결
+    [SerializeField] private Button[] squadPageButtons; // 인스펙터에서 5개(page1~5) 순서대로 연결, 한 페이지당 12마리 (최대 60마리)
+
+    private const int SquadUnitsPerPage = 12;
+
+    private readonly List<UnitController> squadUnitsSnapshot = new List<UnitController>();
+    private Action<UnitController> squadOnSelectUnit;
+    private int squadCurrentPage;
 
     private void Start()
     {
@@ -191,6 +203,8 @@ public class UIController : MonoBehaviour
         HideProductionUI();
         HideInfoPanel();
         HideSquadPanel();
+        SetupSquadPageButtons();
+        SetupInfoStatHoverTooltips();
     }
 
     private void Update()
@@ -394,7 +408,15 @@ public class UIController : MonoBehaviour
     // ===== Info Panel (단일 유닛/건물 선택 시) =====
     // Squad_panel과는 항상 배타적이고, productionPanel과는 독립적으로 동시에 켜질 수 있다
     // (생산 건물 선택 시 ShowInfoPanel + ShowProductionUI가 같이 호출됨).
+    // 건물/자원 등 공격력·방어력이 없는 대상용 (0으로 표시됨)
     public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health)
+    {
+        ShowInfoPanel(icon, unitName, health, 0, 0);
+    }
+
+    // 유닛 선택 시 공격력/방어력도 함께 받아 저장해둔다.
+    // AttackDamageImage/ArmorImage 호버 시(SetupInfoStatHoverTooltips) 이 값을 툴팁으로 보여준다.
+    public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health, int attackDamage, int armor)
     {
         HideSquadPanel();
 
@@ -410,7 +432,47 @@ public class UIController : MonoBehaviour
         if (infoNameText != null)
             infoNameText.text = unitName;
 
+        infoAttackDamage = attackDamage;
+        infoArmor = armor;
+
+        SetCombatStatsVisible(true);
         BindInfoHealth(health);
+    }
+
+    // 자원(Ore/Gas) 선택 시처럼 공격력/방어력 개념이 없는 대상에서는 두 아이콘 자체를 숨긴다.
+    private void SetCombatStatsVisible(bool visible)
+    {
+        if (attackDamageImage != null)
+            attackDamageImage.gameObject.SetActive(visible);
+
+        if (armorImage != null)
+            armorImage.gameObject.SetActive(visible);
+    }
+
+    // attackDamageImage/armorImage에 EventTrigger를 붙여, 호버 시 TooltipUI로 현재 선택 유닛의
+    // 공격력/방어력을 "Attack Damge : N" / "Armor : N" 형식으로 보여준다 (인스펙터에서 이미지만 연결하면 됨).
+    private void SetupInfoStatHoverTooltips()
+    {
+        AddStatHoverTooltip(attackDamageImage, () => $"Attack Damge : {infoAttackDamage}");
+        AddStatHoverTooltip(armorImage, () => $"Armor : {infoArmor}");
+    }
+
+    private void AddStatHoverTooltip(Image image, Func<string> textProvider)
+    {
+        if (image == null)
+            return;
+
+        EventTrigger trigger = image.gameObject.GetComponent<EventTrigger>();
+        if (trigger == null)
+            trigger = image.gameObject.AddComponent<EventTrigger>();
+
+        EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+        enterEntry.callback.AddListener(_ => TooltipUI.Instance?.Show(image.rectTransform, textProvider(), string.Empty));
+        trigger.triggers.Add(enterEntry);
+
+        EventTrigger.Entry exitEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+        exitEntry.callback.AddListener(_ => TooltipUI.Instance?.Hide());
+        trigger.triggers.Add(exitEntry);
     }
 
     public void HideInfoPanel()
@@ -438,6 +500,7 @@ public class UIController : MonoBehaviour
         if (infoNameText != null)
             infoNameText.text = resourceName;
 
+        SetCombatStatsVisible(false);
         BindInfoHealth(null); // 자원은 HealthManager가 없으므로 체력 구독은 해제
 
         if (infoHpText != null)
@@ -476,7 +539,8 @@ public class UIController : MonoBehaviour
     }
 
     // ===== Squad Panel (유닛 다중 선택 시) =====
-    // selectedUnitList 순서대로 최대 squadSlots.Length(12)개까지 아이콘을 채우고,
+    // selectedUnitList를 12마리씩 페이지로 나누고, 현재 페이지의 12마리만 squadSlots에 채운다.
+    // 매 프레임 호출되므로(UpdateUI) 선택 내용이 실제로 바뀐 경우에만 페이지를 0으로 리셋한다.
     // 슬롯을 클릭하면 onSelectUnit(그 유닛)이 호출되어 단일 선택으로 좁혀지도록 한다.
     public void ShowSquadPanel(IReadOnlyList<UnitController> units, Action<UnitController> onSelectUnit)
     {
@@ -486,23 +550,102 @@ public class UIController : MonoBehaviour
         if (squadPanel != null)
             squadPanel.SetActive(true);
 
-        int shownCount = Mathf.Min(units.Count, squadSlots.Length);
+        squadOnSelectUnit = onSelectUnit;
+
+        if (!SquadUnitsEqual(squadUnitsSnapshot, units))
+        {
+            squadUnitsSnapshot.Clear();
+            squadUnitsSnapshot.AddRange(units);
+            squadCurrentPage = 0;
+        }
+
+        int pageCount = Mathf.Max(1, Mathf.CeilToInt((float)squadUnitsSnapshot.Count / SquadUnitsPerPage));
+        squadCurrentPage = Mathf.Clamp(squadCurrentPage, 0, pageCount - 1);
+
+        UpdateSquadPageButtons(pageCount);
+        RefreshSquadSlots();
+    }
+
+    // 페이지 버튼(page1~5) 클릭 시 호출: 해당 페이지의 12마리로 슬롯을 다시 채운다.
+    public void SelectSquadPage(int page)
+    {
+        if (squadPageButtons == null || page < 0 || page >= squadPageButtons.Length)
+            return;
+
+        if (!squadPageButtons[page].gameObject.activeSelf)
+            return;
+
+        squadCurrentPage = page;
+        RefreshSquadSlots();
+    }
+
+    // 현재 squadCurrentPage 기준으로 squadSlots(12칸)를 채운다.
+    private void RefreshSquadSlots()
+    {
+        int startIndex = squadCurrentPage * SquadUnitsPerPage;
 
         for (int i = 0; i < squadSlots.Length; i++)
         {
             if (squadSlots[i] == null)
                 continue;
 
-            if (i < shownCount)
+            int unitIndex = startIndex + i;
+
+            if (unitIndex < squadUnitsSnapshot.Count)
             {
-                UnitController unit = units[i];
-                squadSlots[i].SetData(new CommandButtonData(unit.GetIcon(), () => onSelectUnit(unit)));
+                UnitController unit = squadUnitsSnapshot[unitIndex];
+                squadSlots[i].SetData(new CommandButtonData(unit.GetIcon(), () => squadOnSelectUnit(unit)));
             }
             else
             {
                 squadSlots[i].Clear();
             }
         }
+    }
+
+    // 선택된 유닛 수로 채워지는 페이지 버튼만 보이도록 켠다 (예: 36마리면 1~3페이지만 SetActive(true), 나머지는 숨김).
+    private void UpdateSquadPageButtons(int pageCount)
+    {
+        if (squadPageButtons == null)
+            return;
+
+        for (int i = 0; i < squadPageButtons.Length; i++)
+        {
+            if (squadPageButtons[i] == null)
+                continue;
+
+            squadPageButtons[i].gameObject.SetActive(i < pageCount);
+        }
+    }
+
+    // page1~5 버튼의 onClick을 코드에서 연결 (인스펙터에서는 squadPageButtons 배열에 버튼만 드래그하면 됨)
+    private void SetupSquadPageButtons()
+    {
+        if (squadPageButtons == null)
+            return;
+
+        for (int i = 0; i < squadPageButtons.Length; i++)
+        {
+            if (squadPageButtons[i] == null)
+                continue;
+
+            int page = i;
+            squadPageButtons[i].onClick.AddListener(() => SelectSquadPage(page));
+        }
+    }
+
+    private static bool SquadUnitsEqual(List<UnitController> current, IReadOnlyList<UnitController> incoming)
+    {
+        if (current.Count != incoming.Count)
+            return false;
+
+        for (int i = 0; i < current.Count; i++)
+        {
+            if (current[i] != incoming[i])
+                return false;
+        }
+
+        return true;
     }
 
     public void HideSquadPanel()
@@ -512,6 +655,9 @@ public class UIController : MonoBehaviour
 
         for (int i = 0; i < squadSlots.Length; i++)
             squadSlots[i]?.Clear();
+
+        squadUnitsSnapshot.Clear();
+        squadCurrentPage = 0;
     }
 
     // Worker
