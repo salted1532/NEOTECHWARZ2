@@ -24,7 +24,7 @@
 | `attackDamge` | `int` | 공격력 |
 | `attackRange` | `int` | 공격 사거리 |
 | `mineral` / `gas` | `int` | 생산 비용 |
-| `population` | `int` | 이 유닛을 생산하는 데 필요한 인구수(보급) 비용 |
+| `population` | `int` | 이 유닛을 생산하는 데 필요한 인구수(보급) 비용 — 생산 시 소모되고, 대기열 취소/생산건물 파괴 시 환불됨 |
 | `productionTime` | `int` | 생산 소요 시간 |
 | `Icon` | `Sprite` | UI 아이콘 |
 | `Prefab` | `GameObject` | 스폰될 프리팹 |
@@ -32,5 +32,5 @@
 ## 연관 컴포넌트
 
 - **UnitSpawner**: `Enqueue`/`Spawn`에서 ID로 `UnitData`를 조회해 생산시간/프리팹 사용
-- **RTSUnitController**: `TryProduceUnit(unitID)`에서 비용 조회 후 `ResourceManager.TrySpend` 호출
+- **RTSUnitController**: `TryProduceUnit(unitID)`에서 비용 조회 후 `ResourceManager.TrySpend` 호출, 대기열 취소/생산건물 파괴 시 `RefundUnit`/`RefundProductionQueue`가 같은 비용만큼 환불(`AddOre`/`AddGas`/`ReleasePopulation`)
 - **UIController**: `UpdateQueue`에서 대기열 항목의 아이콘을 표시할 때 조회
