@@ -26,6 +26,8 @@ public class UnitSpawner : MonoBehaviour
 {
     [SerializeField] private UnitDataSO database;
 
+    private const int MaxQueueSize = 5;
+
     private List<ProductionData> productionQueue = new();
 
     private BuildingController buildingController;
@@ -54,7 +56,7 @@ public class UnitSpawner : MonoBehaviour
 
         Debug.Log($"unitData : {database.unitData}");
 
-        if (productionQueue.Count >= 5)
+        if (productionQueue.Count >= MaxQueueSize)
             return;
 
         int index = database.unitData.FindIndex(d =>
@@ -78,6 +80,9 @@ public class UnitSpawner : MonoBehaviour
 
         PrintQueue();
     }
+
+    // 대기열이 가득 찼는지(자원 소모 전에 미리 확인하기 위함, RTSUnitController.TryProduceUnit에서 사용)
+    public bool IsQueueFull() => productionQueue.Count >= MaxQueueSize;
 
     // 생산이 완료된 유닛을 실제로 Instantiate하고, 스포너 위치에서 랠리 포인트로 이동을 명령한다.
     private void Spawn(int unitID)
@@ -123,14 +128,25 @@ public class UnitSpawner : MonoBehaviour
         Spawn(unitID);
     }
 
-    // 대기열의 특정 인덱스 항목을 취소(제거)한다. (UI의 대기열 슬롯 클릭 시 호출)
-    public void Cancel(int index)
+    // 대기열의 특정 인덱스 항목을 취소(제거)하고, 환불에 쓸 수 있도록 그 유닛ID를 반환한다 (유효하지 않으면 -1).
+    // (UI의 대기열 슬롯 클릭 시 호출)
+    public int Cancel(int index)
     {
         if (index < 0 || index >= productionQueue.Count)
-            return;
+            return -1;
 
+        int unitID = productionQueue[index].UnitID;
         productionQueue.RemoveAt(index);
         PrintQueue();
+        return unitID;
+    }
+
+    // 건물이 파괴될 때 호출: 대기열에 남아있던 항목 전체를 반환(제거)한다 - 환불 자체는 호출측(RTSUnitController)이 처리.
+    public List<ProductionData> ClearQueue()
+    {
+        List<ProductionData> remaining = new List<ProductionData>(productionQueue);
+        productionQueue.Clear();
+        return remaining;
     }
    
 

@@ -123,6 +123,22 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField] private float markerFlashInterval = 0.3f;
     [SerializeField] private int markerFlashCount = 3;
 
+    // ===== 아군 유닛 우클릭 = 계속 따라다니기 (공격 명령 아님, Idle 상태 유지) =====
+    // Attack 상태가 아니라 Idle로 유지해야 AttackRange가 사거리 내 적을 자동으로 교전한다 (AttackMoveTo와 동일한 이유).
+    private UnitController followTarget;
+    private bool hasFollowOrder;
+
+    // ===== 건설 이동 (건설모드에서 위치 클릭 시 일꾼이 그 자리로 이동 후 완공) =====
+    [SerializeField] private float buildInteractRange = 2f; // 건설 위치 도착 판정 거리 (gatherInteractRange와 동일한 이유)
+    private Vector3 buildDestination;
+    private System.Action onBuildArrived;
+    private System.Action onBuildCancelled;
+    private bool hasBuildOrder;
+
+    // ===== 건설 진행 (BaseStructure에 붙어서 건설 중일 때는 다른 명령을 받을 수 없다) =====
+    private BaseStructure attachedStructure;
+    private bool isConstructing;
+
     private void Awake()
     {
         isWorker = CompareTag("Worker");
@@ -181,7 +197,7 @@ public class UnitController : MonoBehaviour, IDestructible
                 isMovingAirUnit = false;
 
                 // 지정 추격 대상(적/아군)이 살아있는 동안은 잠깐 따라잡아도 Idle로 전환하지 않는다 (계속 추격/교전 유지)
-                if (orderedTarget == null && friendlyTarget == null)
+                if (orderedTarget == null && friendlyTarget == null && followTarget == null)
                 {
                     UnitcurrentState = UnitState.Idle;
                     attackMoveDestination = null;
@@ -196,6 +212,7 @@ public class UnitController : MonoBehaviour, IDestructible
             if (!arrived &&
                 orderedTarget == null &&
                 friendlyTarget == null &&
+                followTarget == null &&
                 !navMeshAgent.pathPending &&
                 navMeshAgent.remainingDistance <= arriveDistance)
             {
@@ -210,6 +227,8 @@ public class UnitController : MonoBehaviour, IDestructible
         PatrolTick();
         AttackOrderTick();
         FriendlyAttackTick();
+        FollowTick();
+        BuildTick();
 
         if (isAirUnit)
             SeparateFromOverlappingAirUnits();
@@ -294,6 +313,8 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public void MoveTo(Vector3 end)
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         CancelGatheringForNewCommand();
         CancelAttackOrder();
 
@@ -327,6 +348,10 @@ public class UnitController : MonoBehaviour, IDestructible
         friendlyTarget = null;
         hasFriendlyOrder = false;
         attackMoveDestination = null;
+        followTarget = null;
+        hasFollowOrder = false;
+
+        CancelBuildOrder();
     }
 
     // ======================
@@ -338,12 +363,17 @@ public class UnitController : MonoBehaviour, IDestructible
     // AttackRange가 자동으로 공격을 실행한다.
     public void AttackUnitTarget(EnemyController target)
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         CancelGatheringForNewCommand();
 
         orderedTarget = target;
         hasEngagedOrderedTarget = false;
         friendlyTarget = null;
         attackMoveDestination = target.transform.position;
+        followTarget = null;
+        hasFollowOrder = false;
+        CancelBuildOrder();
 
         arrived = false;
         UnitcurrentState = UnitState.Attack;
@@ -355,11 +385,16 @@ public class UnitController : MonoBehaviour, IDestructible
     // 이동 중 사거리에 적이 들어오면 교전하고, 교전이 끝나면(AttackOrderTick) 다시 이 지점으로 이동을 재개한다.
     public void AttackMoveTo(Vector3 destination)
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         CancelGatheringForNewCommand();
 
         orderedTarget = null;
         friendlyTarget = null;
         attackMoveDestination = destination;
+        followTarget = null;
+        hasFollowOrder = false;
+        CancelBuildOrder();
 
         arrived = false;
         UnitcurrentState = UnitState.Idle; // Idle 상태여야 AttackRange가 사거리 내 적을 자동으로 교전한다
@@ -372,12 +407,17 @@ public class UnitController : MonoBehaviour, IDestructible
     // (FriendlyAttackTick에서 매 프레임 갱신).
     public void AttackFriendlyTarget(MonoBehaviour target)
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         CancelGatheringForNewCommand();
 
         orderedTarget = null;
         attackMoveDestination = null;
         friendlyTarget = target;
         hasFriendlyOrder = true;
+        followTarget = null;
+        hasFollowOrder = false;
+        CancelBuildOrder();
 
         arrived = false;
         UnitcurrentState = UnitState.Attack;
@@ -417,6 +457,126 @@ public class UnitController : MonoBehaviour, IDestructible
             MoveAgentTo(friendlyTarget.transform.position); // 사거리 밖: 거리 상관없이 끝까지 추격
         }
     }
+
+    public void FollowUnit(UnitController target)
+    {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
+        CancelGatheringForNewCommand();
+        CancelAttackOrder();
+
+        followTarget = target;
+        hasFollowOrder = true;
+
+        arrived = false;
+        UnitcurrentState = UnitState.Idle; // Idle 유지 - AttackRange가 사거리 내 적을 자동으로 교전하게 함
+
+        MoveAgentTo(target.transform.position);
+    }
+
+    // 따라다니기 명령을 매 프레임 갱신한다: 대상이 죽으면 그 자리에 멈추고, 교전 중(AttackRange가 정지시킨 상태)이면
+    // 이동 명령을 덮어쓰지 않으며, 그 외에는 대상의 최신 위치로 계속 이동한다 (거리 제한 없음 - FriendlyAttackTick과 동일 패턴).
+    private void FollowTick()
+    {
+        if (!hasFollowOrder)
+            return;
+
+        if (followTarget == null)
+        {
+            hasFollowOrder = false;
+
+            arrived = true;
+            if (!isAirUnit)
+                navMeshAgent.ResetPath();
+            else
+                isMovingAirUnit = false;
+            return;
+        }
+
+        if (attackRange != null && attackRange.HasEnemyInRange)
+            return; // 교전 중이면 그대로 둔다 (AttackRange가 정지시킨 상태 유지)
+
+        MoveAgentTo(followTarget.transform.position);
+    }
+
+    // 건설모드에서 건물 위치를 클릭했을 때 PlacementSystem이 호출한다.
+    // destination에 도착하면 onArrived(실제 건물 스폰)를, 도착 전에 다른 명령으로 취소되면 onCancelled(그리드 예약 해제)를 실행한다.
+    public void GoBuild(Vector3 destination, System.Action onArrived, System.Action onCancelled)
+    {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
+        CancelGatheringForNewCommand();
+        CancelAttackOrder(); // 이전 건설 이동이 있었다면 여기서 먼저 취소 콜백이 실행됨
+
+        buildDestination = destination;
+        onBuildArrived = onArrived;
+        onBuildCancelled = onCancelled;
+        hasBuildOrder = true;
+
+        arrived = false;
+        UnitcurrentState = UnitState.Move;
+        MoveAgentTo(destination);
+    }
+
+    // 진행 중이던 건설 이동을 취소하고(다른 명령으로 대체됨) 취소 콜백을 실행한다.
+    private void CancelBuildOrder()
+    {
+        if (!hasBuildOrder)
+            return;
+
+        hasBuildOrder = false;
+        System.Action cancelled = onBuildCancelled;
+        onBuildArrived = null;
+        onBuildCancelled = null;
+
+        cancelled?.Invoke();
+    }
+
+    // 건설 이동을 매 프레임 갱신한다: 목적지 근접 반경 안에 들어오면 도착 콜백을 실행하고 Idle로 전환한다.
+    private void BuildTick()
+    {
+        if (!hasBuildOrder)
+            return;
+
+        if (Vector3.Distance(transform.position, buildDestination) > buildInteractRange)
+            return;
+
+        hasBuildOrder = false;
+
+        if (!isAirUnit)
+            navMeshAgent.ResetPath();
+
+        arrived = true;
+        UnitcurrentState = UnitState.Idle;
+
+        System.Action arrivedCallback = onBuildArrived;
+        onBuildArrived = null;
+        onBuildCancelled = null;
+
+        arrivedCallback?.Invoke();
+    }
+
+    // BaseStructure에 도착해서 건설을 시작(또는 재개)할 때 호출된다(GoBuild의 onArrived에서 호출).
+    // structure가 이미 파괴된 경우(도착 전에 다른 일꾼이 먼저 완공한 경우 등)는 그냥 아무 것도 하지 않고 자유 상태로 남는다.
+    public void BeginConstruction(BaseStructure structure)
+    {
+        if (structure == null)
+            return;
+
+        attachedStructure = structure;
+        isConstructing = true;
+
+        structure.AttachBuilder(this);
+    }
+
+    // 건설이 끝나거나(완공) 다른 일꾼으로 교체되어 담당에서 풀렸을 때 BaseStructure가 호출한다.
+    public void FinishConstruction()
+    {
+        isConstructing = false;
+        attachedStructure = null;
+    }
+
+    public bool IsConstructing() => isConstructing;
 
     // 명시적 공격 명령을 매 프레임 갱신한다.
     // - 지정 대상과 한 번도 접촉(사거리 진입)한 적이 없다면, 아무리 멀어도 "시야 이탈"로 보지 않고
@@ -552,6 +712,8 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public void StopUnit()
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         CancelGatheringForNewCommand();
         CancelAttackOrder();
 
@@ -566,11 +728,13 @@ public class UnitController : MonoBehaviour, IDestructible
             targetPosition = transform.position + Vector3.up * 5f;
             isMovingAirUnit = false;
         }
- 
+
 
     }
     public void PatrolUnit(Vector3 end)
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         CancelGatheringForNewCommand();
         CancelAttackOrder();
 
@@ -637,6 +801,8 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public void HoldUnit()
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         CancelGatheringForNewCommand();
         CancelAttackOrder();
 
@@ -656,6 +822,8 @@ public class UnitController : MonoBehaviour, IDestructible
     // ===== 외부에서 호출하는 유일한 진입점 =====
     public void Gather(ResourceNode node)
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         if (!isWorker)
         {
             MoveTo(node.transform.position); // 전투 유닛은 그냥 이동 명령으로 처리
@@ -731,6 +899,8 @@ public class UnitController : MonoBehaviour, IDestructible
     // ===== Return Cargo 진입점 (UI "반환" 버튼) =====
     public void ReturnCargo()
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         if (!isWorker || !IsCarryingResource())
             return; // 일꾼이 아니거나 들고 있는 자원이 없으면 아무 것도 안 함
 
@@ -752,6 +922,8 @@ public class UnitController : MonoBehaviour, IDestructible
     // 그 외(자원 없는 일꾼, 전투 유닛 등)에는 그냥 건물 위치로 이동만 한다.
     public void MoveToBuilding(BuildingController building)
     {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
         if (isWorker && IsCarryingResource())
         {
             ReturnCargo();

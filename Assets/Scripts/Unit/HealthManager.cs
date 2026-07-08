@@ -57,6 +57,25 @@ public class HealthManager : MonoBehaviour
         OnHealthChanged?.Invoke(currentHp, maxHealth);
     }
 
+    // 최대 체력을 동적으로 재설정한다 (예: BaseStructure가 어떤 건물을 지을지에 따라 최대체력을 다시 지정할 때).
+    // 현재 체력이 새 최대치를 넘지 않도록 클램프한다.
+    public void SetMaxHealth(int newMax)
+    {
+        maxHealth = Mathf.Max(0, newMax);
+        currentHp = Mathf.Min(currentHp, maxHealth);
+        OnHealthChanged?.Invoke(currentHp, maxHealth);
+    }
+
+    // 현재 체력을 절대값으로 지정한다 (데미지/회복처럼 상대적 증감이 아니라 특정 값으로 강제 설정).
+    public void SetHealth(int newCurrent)
+    {
+        if (isDead)
+            return;
+
+        currentHp = Mathf.Clamp(newCurrent, 0, maxHealth);
+        OnHealthChanged?.Invoke(currentHp, maxHealth);
+    }
+
     // 사망 처리: 중복 실행을 막고, OnDeath 이벤트를 발생시킨 뒤 실제 파괴는 IDestructible에 위임한다.
     private void Die()
     {

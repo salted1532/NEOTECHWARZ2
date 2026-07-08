@@ -18,6 +18,7 @@ public class RTSUnitController : MonoBehaviour
     public List<BuildingController> selectedBuildingList;
     public List<EnemyController> selectedEnemyList;
     public ResourceNode selectedResourceNode; // 광물/가스는 항상 단일 선택
+    public BaseStructure selectedBaseStructure; // 건설 중인 건물 기반도 항상 단일 선택
 
     // 맵에 존재하는 모든 유닛/건물/자원 노드
     public List<UnitController> UnitList;
@@ -45,6 +46,7 @@ public class RTSUnitController : MonoBehaviour
         BuildingSelect,
         EnemySelect,
         OreSelect,
+        BaseStructureSelect,
         BuildMode
     }
 
@@ -194,6 +196,36 @@ public class RTSUnitController : MonoBehaviour
         return selectedUnitList;
     }
 
+    // 건설모드 진입 시점에 선택돼 있던 일꾼을 건설 담당자로 그대로 사용한다.
+    // (SelectUnit()이 IsBuildMode() 중엔 새 선택을 막으므로, 건설모드에 있는 한 selectedUnitList는 그대로 유지된다)
+    public UnitController GetSelectedWorker()
+    {
+        if (selectedUnitList.Count == 0)
+            return null;
+
+        UnitController unit = selectedUnitList[0];
+        return unit != null && unit.CompareTag("Worker") && !unit.IsConstructing() ? unit : null;
+    }
+
+    // BaseStructure(건설 중단된 건물 기반) 우클릭: 선택된 일꾼을 보내 붙여서 건설을 재개시킨다.
+    public void AssignBuilderToStructure(BaseStructure structure)
+    {
+        UnitController worker = GetSelectedWorker();
+        if (worker == null)
+            return;
+
+        // NavMeshObstacle 때문에 중심점 자체엔 도달할 수 없으므로, 콜라이더 표면에서 일꾼과 가장 가까운
+        // 지점을 목적지로 삼는다(자원/건물 접근 시 DistanceToTarget이 쓰는 것과 동일한 방식).
+        Vector3 destination = structure.transform.position;
+        if (structure.TryGetComponent<Collider>(out var collider))
+            destination = collider.ClosestPoint(worker.transform.position);
+
+        worker.GoBuild(
+            destination,
+            onArrived: () => worker.BeginConstruction(structure),
+            onCancelled: null);
+    }
+
     public void MoveSelectedUnits(Vector3 end)
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
@@ -236,6 +268,21 @@ public class RTSUnitController : MonoBehaviour
                 continue;
 
             selectedUnitList[i].AttackFriendlyTarget(target);
+        }
+    }
+
+    /// <summary>
+    /// 아군 유닛 우클릭 = 계속 따라다니기: Idle 상태를 유지해 도중에 만나는 적은 AttackRange가 알아서 자동 교전한다.
+    /// (대상 자신이 선택되어 있어도 자기 자신을 따라다니지는 않는다)
+    /// </summary>
+    public void FollowSelectedUnits(UnitController target)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            if (selectedUnitList[i] == target)
+                continue;
+
+            selectedUnitList[i].FollowUnit(target);
         }
     }
 
@@ -455,6 +502,40 @@ public class RTSUnitController : MonoBehaviour
 
     #endregion
 
+    #region BaseStructure선택 관련
+
+    /// <summary>
+    /// 좌클릭 선택 처리 (BaseStructure는 항상 단일 선택)
+    /// </summary>
+    public void ClickSelectStructure(BaseStructure structure)
+    {
+        DeselectAll();
+        SelectStructure(structure);
+    }
+
+    private void SelectStructure(BaseStructure structure)
+    {
+        if (IsBuildMode())
+            return;
+
+        RTScurrentSate = SelectState.BaseStructureSelect;
+
+        structure.SelectStructure();
+        selectedBaseStructure = structure;
+    }
+
+    // 건설이 완료되어 BaseStructure가 파괴될 때 선택 상태가 유령 참조로 남지 않도록 정리한다.
+    public void ClearSelectedStructureIfMatches(BaseStructure structure)
+    {
+        if (selectedBaseStructure != structure)
+            return;
+
+        selectedBaseStructure = null;
+        RTScurrentSate = SelectState.None;
+    }
+
+    #endregion
+
     /// <summary>
     /// 모든 선택 해제
     /// </summary>
@@ -479,12 +560,14 @@ public class RTSUnitController : MonoBehaviour
         }
 
         selectedResourceNode?.DeselectResource();
+        selectedBaseStructure?.DeselectStructure();
 
         RTScurrentSate = SelectState.None;
         selectedUnitList.Clear();
         selectedBuildingList.Clear();
         selectedEnemyList.Clear();
         selectedResourceNode = null;
+        selectedBaseStructure = null;
     }
 
     #region UserControl 상태 전환
@@ -547,24 +630,94 @@ public class RTSUnitController : MonoBehaviour
         return selectedBuildingList[0].GetProductionProgress();
     }
 
-    //대기열 취소
+    //대기열 취소 (취소된 유닛 가격만큼 환불)
     public void CancelProduction(int index)
     {
         if (selectedBuildingList.Count == 0)
             return;
 
-        selectedBuildingList[0].CancelProduction(index);
+        int canceledUnitID = selectedBuildingList[0].CancelProduction(index);
+        RefundUnit(canceledUnitID);
     }
 
-    /// 유닛 생산 요청 (선택된 건물들에게 큐잉하기 전에 자원부터 확인)
+    // 생산 건물이 파괴됐을 때 대기열에 남아있던 유닛들을 전부 환불한다.
+    public void RefundProductionQueue(IReadOnlyList<ProductionData> queue)
+    {
+        if (queue == null)
+            return;
+
+        foreach (ProductionData item in queue)
+            RefundUnit(item.UnitID);
+    }
+
+    // 유닛 하나의 가격(광물/가스/인구수)만큼 환불한다. 생산 시 TryProduceUnit이 이미 소모해둔 것을 그대로 되돌리는 것.
+    private void RefundUnit(int unitID)
+    {
+        if (unitID < 0)
+            return;
+
+        UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
+        if (data == null)
+            return;
+
+        resourceManager.AddOre(data.mineral);
+        resourceManager.AddGas(data.gas);
+        resourceManager.ReleasePopulation(data.population);
+    }
+
+    // BaseStructure 건설을 취소했을 때 건물 가격(광물/가스) 전액을 환불한다. (건설 중엔 인구수를 소모하지 않으므로 인구수 환불은 없음)
+    public void RefundBuilding(int buildingID)
+    {
+        BuildingData data = buildingDatabase.buildingData.Find(d => d.ID == buildingID);
+        if (data == null)
+            return;
+
+        resourceManager.AddOre(data.mineral);
+        resourceManager.AddGas(data.gas);
+    }
+
+    // Info_panel의 "취소" 버튼/단축키(T)에서 호출.
+    public void CancelSelectedBaseStructure()
+    {
+        selectedBaseStructure?.CancelConstruction();
+    }
+
+    public void AddMaxPopulation(int amount) => resourceManager.AddMaxPopulation(amount);
+
+    // 건물이 파괴됐을 때 그 건물 종류가 제공하던 인구수 한도를 되돌린다 (buildingID로 DB에서 조회).
+    public void RemoveMaxPopulationForBuilding(int buildingID)
+    {
+        BuildingData data = buildingDatabase.buildingData.Find(d => d.ID == buildingID);
+        if (data != null)
+            resourceManager.RemoveMaxPopulation(data.maxpopulationamount);
+    }
+
+    /// 유닛 생산 요청 (선택된 건물들에게 큐잉하기 전에 대기열/자원부터 확인)
     public bool TryProduceUnit(int unitID)
     {
         UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
         if (data == null)
             return false;
 
+        if (selectedBuildingList.Count == 0)
+            return false;
+
+        // 대기열이 가득 찼으면 자원을 소모하기 전에 여기서 먼저 걸러낸다 (자원만 쓰고 큐잉은 안 되는 사고 방지)
+        if (selectedBuildingList[0].IsProductionQueueFull())
+        {
+            Debug.Log("대기열 가득참!");
+            return false;
+        }
+
         if (!resourceManager.TrySpend(data.mineral, data.gas, data.population))
-            return false; // 자원 부족 → 여기서 그냥 반환, 아무 것도 소모 안 됨
+        {
+            if (resourceManager.GetOre() < data.mineral || resourceManager.GetGas() < data.gas)
+                Debug.Log("자원부족!");
+            else
+                Debug.Log("인구수부족!");
+
+            return false; // 자원/인구 부족 → 여기서 그냥 반환, 아무 것도 소모 안 됨
+        }
 
         SpawnUnit(unitID); // 기존 메소드: selectedBuildingList에 실제 큐잉
         return true;
@@ -585,7 +738,7 @@ public class RTSUnitController : MonoBehaviour
     #region 버튼 툴팁 데이터 구성
 
     // 유닛 생산 버튼용 ButtonAction 생성 (제목=유닛명, 비용=광물/가스/인구수)
-    private ButtonAction UnitButtonAction(Action callback, int unitID)
+    private ButtonAction UnitButtonAction(Action callback, int unitID, KeyCode shortcut = KeyCode.None)
     {
         UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
         if (data == null)
@@ -595,11 +748,11 @@ public class RTSUnitController : MonoBehaviour
             ? $"Train {data.unitName}."
             : data.description;
 
-        return ButtonAction.WithCost(callback, data.unitName, description, data.mineral, data.gas, data.population);
+        return ButtonAction.WithCost(callback, data.unitName, description, data.mineral, data.gas, data.population, shortcut);
     }
 
     // 건물 건설 버튼용 ButtonAction 생성 (제목=건물명, 비용=광물/가스/인구수)
-    private ButtonAction BuildingButtonAction(Action callback, int buildingID)
+    private ButtonAction BuildingButtonAction(Action callback, int buildingID, KeyCode shortcut = KeyCode.None)
     {
         BuildingData data = buildingDatabase.buildingData.Find(d => d.ID == buildingID);
         if (data == null)
@@ -609,7 +762,7 @@ public class RTSUnitController : MonoBehaviour
             ? $"Construct {data.Name}."
             : data.description;
 
-        return ButtonAction.WithCost(callback, data.Name, description, data.mineral, data.gas, data.population);
+        return ButtonAction.WithCost(callback, data.Name, description, data.mineral, data.gas, data.population, shortcut);
     }
 
     // Info_panel에 표시할 유닛/건물 이름 조회 (UnitController.unitID / BuildingController.buildingID 기준)
@@ -639,22 +792,22 @@ public class RTSUnitController : MonoBehaviour
                 {
                     case UnitState.Worker:
                         uIController.ShowWorkerPanel(
-                            ButtonAction.Simple(EnterMoveMode, "Move", "Move to a location. \nshortcut key [<color=yellow>M</color>]"),
-                            ButtonAction.Simple(EnterAttackMode, "Attack", "Attack a target or location. \nshortcut key [<color=yellow>A</color>]"),
-                            ButtonAction.Simple(StopSelectedUnits, "Stop", "Stop the current action. \nshortcut key [<color=yellow>S</color>]"),
-                            ButtonAction.Simple(EnterPatrolMode, "Patrol", "Patrol along a path. \nshortcut key [<color=yellow>P</color>]"),
-                            ButtonAction.Simple(HoldSelectedUnits, "Hold", "Hold the current position. \nshortcut key [<color=yellow>H</color>]"),
-                            ButtonAction.Simple(EnterReturnMode, "Return Cargo", "Return gathered resources to base. \nshortcut key [<color=yellow>R</color>]"),
-                            ButtonAction.Simple(BuildModeOn, "Build", "Enter build mode. \nshortcut key [<color=yellow>B</color>]"));
+                            ButtonAction.Simple(EnterMoveMode, "Move", "Move to a location. \nshortcut key [<color=yellow>M</color>]", KeyCode.M),
+                            ButtonAction.Simple(EnterAttackMode, "Attack", "Attack a target or location. \nshortcut key [<color=yellow>A</color>]", KeyCode.A),
+                            ButtonAction.Simple(StopSelectedUnits, "Stop", "Stop the current action. \nshortcut key [<color=yellow>S</color>]", KeyCode.S),
+                            ButtonAction.Simple(EnterPatrolMode, "Patrol", "Patrol along a path. \nshortcut key [<color=yellow>P</color>]", KeyCode.P),
+                            ButtonAction.Simple(HoldSelectedUnits, "Hold", "Hold the current position. \nshortcut key [<color=yellow>H</color>]", KeyCode.H),
+                            ButtonAction.Simple(EnterReturnMode, "Return Cargo", "Return gathered resources to base. \nshortcut key [<color=yellow>R</color>]", KeyCode.R),
+                            ButtonAction.Simple(BuildModeOn, "Build", "Enter build mode. \nshortcut key [<color=yellow>B</color>]", KeyCode.B));
                         break;
 
                     case UnitState.AttackUnit:
                         uIController.ShowAttackUnitPanel(
-                            ButtonAction.Simple(EnterMoveMode, "Move", "Move to a location. \nshortcut key [<color=yellow>M</color>]"),
-                            ButtonAction.Simple(EnterAttackMode, "Attack", "Attack a target or location. \nshortcut key [<color=yellow>A</color>]"),
-                            ButtonAction.Simple(StopSelectedUnits, "Stop", "Stop the current action. \nshortcut key [<color=yellow>S</color>]"),
-                            ButtonAction.Simple(EnterPatrolMode, "Patrol", "Patrol along a path. \nshortcut key [<color=yellow>P</color>]"),
-                            ButtonAction.Simple(HoldSelectedUnits, "Hold", "Hold the current position. \nshortcut key [<color=yellow>H</color>]"));
+                            ButtonAction.Simple(EnterMoveMode, "Move", "Move to a location. \nshortcut key [<color=yellow>M</color>]", KeyCode.M),
+                            ButtonAction.Simple(EnterAttackMode, "Attack", "Attack a target or location. \nshortcut key [<color=yellow>A</color>]", KeyCode.A),
+                            ButtonAction.Simple(StopSelectedUnits, "Stop", "Stop the current action. \nshortcut key [<color=yellow>S</color>]", KeyCode.S),
+                            ButtonAction.Simple(EnterPatrolMode, "Patrol", "Patrol along a path. \nshortcut key [<color=yellow>P</color>]", KeyCode.P),
+                            ButtonAction.Simple(HoldSelectedUnits, "Hold", "Hold the current position. \nshortcut key [<color=yellow>H</color>]", KeyCode.H));
                         break;
                 }
 
@@ -693,7 +846,7 @@ public class RTSUnitController : MonoBehaviour
                 {
                     case BuildingState.MainBaseSelect:
                         uIController.ShowMainBasePanel(
-                            UnitButtonAction(() => SpawnUnit(UnitID.Worker), UnitID.Worker));
+                            UnitButtonAction(() => TryProduceUnit(UnitID.Worker), UnitID.Worker, KeyCode.W));
                         uIController.ShowProductionUI(
                             GetProductionQueue(),
                             CancelProduction);
@@ -701,8 +854,8 @@ public class RTSUnitController : MonoBehaviour
 
                     case BuildingState.Tier1Select:
                         uIController.ShowBarracksPanel(
-                            UnitButtonAction(() => SpawnUnit(UnitID.Marine), UnitID.Marine),
-                            UnitButtonAction(() => SpawnUnit(UnitID.Vulture), UnitID.Vulture));
+                            UnitButtonAction(() => TryProduceUnit(UnitID.Marine), UnitID.Marine, KeyCode.A),
+                            UnitButtonAction(() => TryProduceUnit(UnitID.Vulture), UnitID.Vulture, KeyCode.S));
 
                         uIController.ShowProductionUI(
                             GetProductionQueue(),
@@ -711,8 +864,8 @@ public class RTSUnitController : MonoBehaviour
 
                     case BuildingState.Tier2Select:
                         uIController.ShowFactoryPanel(
-                            UnitButtonAction(() => SpawnUnit(UnitID.Goliath), UnitID.Goliath),
-                            UnitButtonAction(() => SpawnUnit(UnitID.Tank), UnitID.Tank));
+                            UnitButtonAction(() => TryProduceUnit(UnitID.Goliath), UnitID.Goliath, KeyCode.I),
+                            UnitButtonAction(() => TryProduceUnit(UnitID.Tank), UnitID.Tank, KeyCode.P));
 
                         uIController.ShowProductionUI(
                             GetProductionQueue(),
@@ -721,8 +874,8 @@ public class RTSUnitController : MonoBehaviour
 
                     case BuildingState.Tier3Select:
                         uIController.ShowAirportPanel(
-                            UnitButtonAction(() => SpawnUnit(UnitID.Wraith), UnitID.Wraith),
-                            UnitButtonAction(() => SpawnUnit(UnitID.Guardian), UnitID.Guardian));
+                            UnitButtonAction(() => TryProduceUnit(UnitID.Wraith), UnitID.Wraith, KeyCode.F),
+                            UnitButtonAction(() => TryProduceUnit(UnitID.Guardian), UnitID.Guardian, KeyCode.D));
 
                         uIController.ShowProductionUI(
                             GetProductionQueue(),
@@ -774,14 +927,40 @@ public class RTSUnitController : MonoBehaviour
                 uIController.HideSquadPanel();
                 break;
 
+            case SelectState.BaseStructureSelect:
+
+                if (selectedBaseStructure != null)
+                {
+                    uIController.ShowBaseStructureInfoPanel(
+                        selectedBaseStructure.GetIcon(),
+                        GetBuildingName(selectedBaseStructure.GetBuildingID()),
+                        selectedBaseStructure.GetComponent<HealthManager>());
+
+                    uIController.ShowBaseStructureCommandPanel(
+                        ButtonAction.Simple(
+                            CancelSelectedBaseStructure,
+                            "Cancel",
+                            "Cancel construction and refund resources. \nshortcut key [<color=yellow>T</color>]",
+                            KeyCode.T));
+                }
+                else
+                {
+                    uIController.HideInfoPanel();
+                    uIController.ClearPanel();
+                }
+
+                uIController.HideProductionUI();
+                uIController.HideSquadPanel();
+                break;
+
             case SelectState.BuildMode:
                 uIController.ShowBuildPanel(
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.CommandCenter), BuildingID.CommandCenter),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.SupplyDepot), BuildingID.SupplyDepot),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Barracks), BuildingID.Barracks),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Factory), BuildingID.Factory),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Airport), BuildingID.Airport),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Lab), BuildingID.Lab),
+                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.CommandCenter), BuildingID.CommandCenter, KeyCode.C),
+                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.SupplyDepot), BuildingID.SupplyDepot, KeyCode.S),
+                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Barracks), BuildingID.Barracks, KeyCode.B),
+                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Factory), BuildingID.Factory, KeyCode.F),
+                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Airport), BuildingID.Airport, KeyCode.P),
+                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Lab), BuildingID.Lab, KeyCode.L),
                     ButtonAction.Simple(
                         () =>
                         {
@@ -789,7 +968,8 @@ public class RTSUnitController : MonoBehaviour
                             ReturnState();
                         },
                         "Cancel",
-                        "Exit build mode. \nshortcut key [<color=yellow>C</color>]"));
+                        "Exit build mode. \nshortcut key [<color=yellow>T</color>]",
+                        KeyCode.T));
 
                 uIController.HideProductionUI();
                 uIController.HideInfoPanel();

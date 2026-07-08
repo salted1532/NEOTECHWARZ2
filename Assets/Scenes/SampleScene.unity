@@ -370,6 +370,7 @@ MonoBehaviour:
   gridVisualization: {fileID: 1831891280}
   preview: {fileID: 2056467141}
   yOffset: 1
+  baseStructurePrefab: {fileID: 7639526730160681910, guid: d175452430e9a09418fee93a0913fc12, type: 3}
 --- !u!1 &106451811
 GameObject:
   m_ObjectHideFlags: 0
@@ -521,7 +522,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 768760043591592085, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.26
+      value: 0.321
       objectReference: {fileID: 0}
     - target: {fileID: 768760043591592085, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
       propertyPath: m_LocalPosition.z
@@ -558,6 +559,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
       propertyPath: m_Name
       value: Pulsar Tank
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -962,6 +967,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Worker Drone
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1110,6 +1119,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
       propertyPath: m_Name
       value: Firehawk (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2714,6 +2727,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Assault Trooper (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3670,6 +3687,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
       propertyPath: m_Name
       value: Firehawk
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4698,6 +4719,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Assault Trooper
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4862,6 +4887,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: d9657408020de9a44918eef6a3214c70, type: 3}
       propertyPath: m_Name
       value: Ranger Infantry Fighting Vehicle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: d9657408020de9a44918eef6a3214c70, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6529,6 +6558,7 @@ MonoBehaviour:
   selectedBuildingList: []
   selectedEnemyList: []
   selectedResourceNode: {fileID: 0}
+  selectedBaseStructure: {fileID: 0}
   UnitList: []
   BuildingList: []
   ResourceNodeList: []
@@ -7678,6 +7708,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Guardian Drone
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 7c8f9a4aa9f4bf74c8f9f9d9977dcc9f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8707,8 +8741,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bad1b75ec2169c47ad0f6e47b7ebd47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceManager
-  startOre: 50
-  startGas: 0
+  startOre: 10000
+  startGas: 10000
   startMaxPopulation: 10
 --- !u!4 &1727864002
 Transform:
@@ -10051,6 +10085,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
       propertyPath: m_Name
       value: Scout Drone
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

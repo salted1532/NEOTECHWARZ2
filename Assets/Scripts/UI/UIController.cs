@@ -25,7 +25,9 @@ public class UIController : MonoBehaviour
         Tier2Building,
         Tier3Building,
 
-        MainBase           // Command center
+        MainBase,          // Command center
+
+        BaseStructureSelect // 건설 중인 건물 기반(BaseStructure) 선택
     }
 
     // Button action + tooltip data
@@ -40,6 +42,7 @@ public class UIController : MonoBehaviour
         public int Gas { get; }
         public int Population { get; }
         public bool HasCost { get; }
+        public KeyCode Shortcut { get; } // 이 버튼을 대신 "누르는" 키보드 단축키 (없으면 KeyCode.None)
 
         private ButtonAction(
             Action callback,
@@ -48,7 +51,8 @@ public class UIController : MonoBehaviour
             int ore,
             int gas,
             int population,
-            bool hasCost)
+            bool hasCost,
+            KeyCode shortcut)
         {
             Callback = callback;
             Title = title;
@@ -57,12 +61,13 @@ public class UIController : MonoBehaviour
             Gas = gas;
             Population = population;
             HasCost = hasCost;
+            Shortcut = shortcut;
         }
 
         // 이동/공격/정지 등 비용이 없는 일반 명령 버튼용
-        public static ButtonAction Simple(Action callback, string title, string description)
+        public static ButtonAction Simple(Action callback, string title, string description, KeyCode shortcut = KeyCode.None)
         {
-            return new ButtonAction(callback, title, description, 0, 0, 0, false);
+            return new ButtonAction(callback, title, description, 0, 0, 0, false, shortcut);
         }
 
         // 유닛 생산/건물 건설처럼 광물/가스/인구 비용이 있는 버튼용
@@ -72,9 +77,10 @@ public class UIController : MonoBehaviour
             string description,
             int ore,
             int gas,
-            int population)
+            int population,
+            KeyCode shortcut = KeyCode.None)
         {
-            return new ButtonAction(callback, title, description, ore, gas, population, true);
+            return new ButtonAction(callback, title, description, ore, gas, population, true, shortcut);
         }
     }
 
@@ -91,6 +97,7 @@ public class UIController : MonoBehaviour
         public int Gas { get; }
         public int Population { get; }
         public bool HasCost { get; }
+        public KeyCode Shortcut { get; }
 
         public CommandButtonData(
             Sprite icon,
@@ -106,6 +113,7 @@ public class UIController : MonoBehaviour
             Gas = action.Gas;
             Population = action.Population;
             HasCost = action.HasCost;
+            Shortcut = action.Shortcut;
         }
 
         // 취소 버튼/빈 대기열 슬롯 등 툴팁이 필요 없는 버튼용
@@ -505,6 +513,36 @@ public class UIController : MonoBehaviour
 
         if (infoHpText != null)
             infoHpText.text = remainingAmount.ToString();
+    }
+
+    // BaseStructure(건설 중인 건물 기반) 선택 시 Info_panel 표시: 공격력/방어력은 숨기고,
+    // 체력은 실제 HealthManager를 그대로 구독해서(BindInfoHealth) 건설 진행에 따라 자동으로 갱신되게 한다.
+    public void ShowBaseStructureInfoPanel(Sprite icon, string buildingName, HealthManager health)
+    {
+        HideSquadPanel();
+
+        if (infoPanel != null)
+            infoPanel.SetActive(true);
+
+        if (infoIcon != null)
+        {
+            infoIcon.sprite = icon;
+            infoIcon.enabled = icon != null;
+        }
+
+        if (infoNameText != null)
+            infoNameText.text = buildingName;
+
+        SetCombatStatsVisible(false);
+        BindInfoHealth(health);
+    }
+
+    // BaseStructure(건설 중) 선택 시 커맨드 패널: 취소(환불) 버튼 하나만 표시. 기존 취소 아이콘(cancelIcon)을 재사용.
+    public void ShowBaseStructureCommandPanel(ButtonAction onCancelConstruction)
+    {
+        CurrentState = UISelectionState.BaseStructureSelect;
+
+        SetCommands(new CommandButtonData(cancelIcon, onCancelConstruction));
     }
 
     // Info_panel이 구독 중인 HealthManager를 교체한다. 매 프레임 같은 대상으로 호출돼도

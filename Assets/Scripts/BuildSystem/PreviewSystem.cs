@@ -51,11 +51,18 @@ public class PreviewSystem : MonoBehaviour
         }
     }
 
-    // 생성된 프리뷰 오브젝트를 "허상"처럼 만든다: 모든 머티리얼을 반투명 프리뷰 머티리얼로 교체하고,
+    // 생성된 프리뷰 오브젝트를 "허상"처럼 만든다: 지정한 머티리얼로 전부 교체하고,
     // 콜라이더/리지드바디/NavMeshObstacle 등 실제 게임플레이에 영향을 주는 컴포넌트를 전부 비활성화한다.
     private void PreparePreview(GameObject previewObject)
     {
-        Renderer[] renderers = previewObject.GetComponentsInChildren<Renderer>();
+        ApplyGhostMaterial(previewObject, previewMaterialInstance);
+        DisableGameplayComponents(previewObject);
+    }
+
+    // 오브젝트의 모든 렌더러 머티리얼을 지정한 머티리얼 인스턴스로 교체한다.
+    private void ApplyGhostMaterial(GameObject obj, Material material)
+    {
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
 
         foreach (Renderer renderer in renderers)
         {
@@ -63,35 +70,54 @@ public class PreviewSystem : MonoBehaviour
 
             for (int i = 0; i < materials.Length; i++)
             {
-                materials[i] = previewMaterialInstance;
+                materials[i] = material;
             }
 
             renderer.materials = materials;
         }
+    }
 
-        // Collider OFF
-        Collider[] colliders = previewObject.GetComponentsInChildren<Collider>();
+    // 콜라이더/리지드바디/NavMeshObstacle 등 실제 게임플레이에 영향을 주는 컴포넌트를 전부 비활성화한다.
+    private void DisableGameplayComponents(GameObject obj)
+    {
+        Collider[] colliders = obj.GetComponentsInChildren<Collider>();
         foreach (Collider col in colliders)
         {
             col.enabled = false;
         }
 
-        // Rigidbody OFF
-        Rigidbody[] rigidbodies = previewObject.GetComponentsInChildren<Rigidbody>();
+        Rigidbody[] rigidbodies = obj.GetComponentsInChildren<Rigidbody>();
         foreach (Rigidbody rb in rigidbodies)
         {
             rb.isKinematic = true;
             rb.useGravity = false;
         }
 
-        // ⭐ NavMeshObstacle OFF (핵심 추가)
         UnityEngine.AI.NavMeshObstacle[] obstacles =
-            previewObject.GetComponentsInChildren<UnityEngine.AI.NavMeshObstacle>();
+            obj.GetComponentsInChildren<UnityEngine.AI.NavMeshObstacle>();
 
         foreach (var obs in obstacles)
         {
             obs.enabled = false;
         }
+    }
+
+    // 배치가 확정된 위치에 "일꾼이 도착할 때까지 남아있는" 정적 건설 고스트를 생성한다.
+    // 마우스를 따라다니는 previewObject와는 완전히 별개의 오브젝트/머티리얼 인스턴스를 사용하므로
+    // 이후 다른 건물을 미리보기해도 서로 색이 간섭하지 않는다. 항상 고정된 흰색(배치 가능 색)으로 표시.
+    public GameObject SpawnConstructionGhost(GameObject prefab, Vector3 position)
+    {
+        GameObject ghost = Instantiate(prefab, position, Quaternion.identity);
+
+        Material ghostMaterial = new Material(previewMaterialPrefab);
+        Color c = Color.white;
+        c.a = 0.5f;
+        ghostMaterial.color = c;
+
+        ApplyGhostMaterial(ghost, ghostMaterial);
+        DisableGameplayComponents(ghost);
+
+        return ghost;
     }
 
     // 프리뷰 표시 종료: 셀 커서를 숨기고 프리뷰 오브젝트를 파괴한다.

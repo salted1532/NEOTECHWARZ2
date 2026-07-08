@@ -234,6 +234,15 @@ public class UserControl : MonoBehaviour
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
+
+            // 건설 중인 BaseStructure 좌클릭 = 선택 (항상 단일 선택, A 모드 강제공격 등은 없음)
+            BaseStructure baseStructure = BuildingHit.transform.GetComponent<BaseStructure>();
+            if (baseStructure != null)
+            {
+                rtsUnitController.ClickSelectStructure(baseStructure);
+
+                return; // 👉 중요: 여기서 종료 (명령 안 함)
+            }
         }
 
         // 4. 땅 클릭 = 명령 처리
@@ -340,9 +349,22 @@ public class UserControl : MonoBehaviour
         bool clickedOre = Physics.Raycast(ray, out OreHit, Mathf.Infinity, layerOre);
         bool clickedGas = Physics.Raycast(ray, out GasHit, Mathf.Infinity, layerGas);
 
-        if (clickedUnit)
+        // 0. 아군 유닛 우클릭 = 계속 따라다니기 (Idle 상태 유지 - 적 만나면 AttackRange가 자동 교전)
+        // 아군도 지면 위에 서 있어 clickedGround가 함께 true가 되므로, 땅 클릭보다 먼저 처리하고 여기서 return 한다.
+        if (clickedUnit && rtsUnitController.IsUnitSelect())
         {
+            UnitController unit = unitHit.transform.GetComponent<UnitController>();
 
+            if (unit != null)
+            {
+                rtsUnitController.FollowSelectedUnits(unit);
+                unit.FlashMarker(); // 어느 아군을 따라갈지 마커 깜빡임으로 표시
+
+                movePointer.transform.position = unit.transform.position;
+                movePointer.SetActive(true);
+
+                return;
+            }
         }
 
         // 1. 적 우클릭 = 공격 명령 (추격 후 공격)
@@ -409,6 +431,17 @@ public class UserControl : MonoBehaviour
 
                 UsercurrentState = OrderState.None;
             }
+
+            // 건설이 중단된 BaseStructure 우클릭 = 선택된 일꾼을 보내 건설 재개
+            BaseStructure baseStructure = BuildingHit.transform.GetComponent<BaseStructure>();
+            if (baseStructure != null && rtsUnitController.IsUnitSelect())
+            {
+                rtsUnitController.AssignBuilderToStructure(baseStructure);
+                baseStructure.FlashMarker();
+
+                movePointer.transform.position = baseStructure.transform.position;
+                movePointer.SetActive(true);
+            }
         }
 
         // 5. 광물 클릭 = 명령 처리
@@ -436,39 +469,11 @@ public class UserControl : MonoBehaviour
 
     private void HandlekeyBoard()
     {
-
-        if(rtsUnitController.IsUnitSelect())
+        // 유닛 명령(Attack/Move/Stop/Patrol/Hold/Return/Build)과 건물 건설/유닛 생산 단축키는
+        // 이제 각 버튼(ProductionSlot)이 자기 단축키를 직접 감지해서 스스로 클릭되므로 여기서 따로 처리하지 않는다.
+        // (Rally는 대응하는 버튼이 없는 순수 키보드 전용 모드 전환이라 그대로 남겨둠)
+        if (rtsUnitController.IsUnitSelect())
         {
-            // 공격모드 변화
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                UsercurrentState = OrderState.Attack;
-            }
-            // 유닛 정지 명령
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                rtsUnitController.StopSelectedUnits();
-            }
-            // 유닛 홀드 명령
-            if (Input.GetKeyDown(KeyCode.H))
-            {
-                rtsUnitController.HoldSelectedUnits();
-            }
-            // 순찰모드 변화
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                UsercurrentState = OrderState.Patrol;
-            }
-            // 이동모드 변화
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                UsercurrentState = OrderState.Move;
-            }
-            //건설모드 전환
-            if (Input.GetKeyDown(KeyCode.V))
-            {
-                //건설 모드 전환
-            }
             //건물 랠리 설정
             if (Input.GetKeyDown(KeyCode.Y))
             {
@@ -476,9 +481,8 @@ public class UserControl : MonoBehaviour
             }
         }
 
-        if(rtsUnitController.IsBuildMode())
+        if (rtsUnitController.IsBuildMode())
         {
-            //건물 랠리 설정
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 rtsUnitController.ReturnState();

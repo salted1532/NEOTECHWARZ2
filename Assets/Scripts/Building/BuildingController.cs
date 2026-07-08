@@ -127,18 +127,32 @@ public class BuildingController : MonoBehaviour, IDestructible
         return UnitSpawner.GetProductionProgress();
     }
 
-    // 대기열의 특정 항목 생산을 취소한다 (UnitSpawner에 위임)
-    public void CancelProduction(int index)
+    // 생산 대기열이 가득 찼는지 (UnitSpawner에 위임) - 자원을 소모하기 전에 먼저 확인하기 위함
+    public bool IsProductionQueueFull()
     {
-        UnitSpawner.Cancel(index);
+        return UnitSpawner != null && UnitSpawner.IsQueueFull();
     }
 
-    // 건물 파괴 처리: RTSUnitController의 관리 목록에서 제거하고 게임오브젝트를 파괴한다.
+    // 대기열의 특정 항목 생산을 취소한다 (UnitSpawner에 위임) - 환불을 위해 취소된 유닛ID를 반환한다.
+    public int CancelProduction(int index)
+    {
+        return UnitSpawner.Cancel(index);
+    }
+
+    // 파괴 시 대기열에 남아있던 항목들을 반환(제거)한다 - UnitSpawner가 없는 건물(생산 불가 건물)은 null.
+    public IReadOnlyList<ProductionData> ClearProductionQueue()
+    {
+        return UnitSpawner != null ? UnitSpawner.ClearQueue() : null;
+    }
+
+    // 건물 파괴 처리: 대기열 환불, RTSUnitController의 관리 목록에서 제거, 인구수 반환 후 게임오브젝트를 파괴한다.
     // (HealthManager의 IDestructible 구현체로 호출됨)
     public void Die()
     {
+        rtsController?.RefundProductionQueue(ClearProductionQueue()); // 대기열에 남아있던 유닛들 환불
         rtsController?.BuildingList.Remove(this);
         rtsController?.selectedBuildingList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel 등)가 유령 참조를 들고 있지 않도록
+        rtsController?.RemoveMaxPopulationForBuilding(buildingID); // 이 건물이 제공하던 인구수 한도를 반환
 
         Destroy(gameObject);
     }

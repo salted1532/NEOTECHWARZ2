@@ -7,6 +7,7 @@ public class ResourceManager : MonoBehaviour
     [SerializeField] private int startOre = 50;
     [SerializeField] private int startGas = 0;
     [SerializeField] private int startMaxPopulation = 10;
+    [SerializeField] private int maxPopulationCap = 200; // 인구수 한도가 아무리 늘어도 이 값을 넘지 않음
 
     private int currentOre;
     private int currentGas;
@@ -48,7 +49,7 @@ public class ResourceManager : MonoBehaviour
     public void AddMaxPopulation(int amount)
     {
         if (amount <= 0) return;
-        maxPopulation += amount;
+        maxPopulation = Mathf.Min(maxPopulationCap, maxPopulation + amount);
         OnResourceChanged?.Invoke();
     }
 

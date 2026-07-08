@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -14,6 +15,7 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private Action callback;
     private UIController.CommandButtonData data;
     private bool hasData;
+    private KeyCode shortcut = KeyCode.None; // 이 슬롯을 대신 "누르는" 키보드 단축키 (없으면 KeyCode.None)
 
     private void Awake()
     {
@@ -39,6 +41,7 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         this.data = data;
         hasData = true;
         callback = data.Callback;
+        shortcut = data.Shortcut;
 
         if (iconImage != null)
         {
@@ -61,6 +64,7 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         callback = null;
         hasData = false;
+        shortcut = KeyCode.None;
 
         if (iconImage != null)
         {
@@ -77,6 +81,29 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private void OnClick()
     {
         callback?.Invoke();
+    }
+
+    // 이 슬롯이 활성화(SetData)돼 있는 동안에만 실행됨 - Clear()되면 gameObject 자체가 비활성화라
+    // Update()가 아예 호출되지 않으므로, "지금 이 버튼이 안 보이면 단축키도 죽어있다"가 자동으로 성립한다.
+    private void Update()
+    {
+        if (!hasData || shortcut == KeyCode.None || button == null || !button.interactable)
+            return;
+
+        if (Input.GetKeyDown(shortcut))
+            StartCoroutine(SimulateClickRoutine());
+    }
+
+    // 실제 마우스 클릭과 동일한 PointerDown → (짧은 대기) → PointerUp/PointerClick 이벤트를 그대로 재현한다.
+    // 버튼에 이미 설정된 눌림 색상/스프라이트 Transition이 그대로 재생되고, PointerClick이 onClick을 호출한다.
+    private IEnumerator SimulateClickRoutine()
+    {
+        PointerEventData eventData = new PointerEventData(EventSystem.current);
+
+        ExecuteEvents.Execute(gameObject, eventData, ExecuteEvents.pointerDownHandler);
+        yield return new WaitForSeconds(0.08f);
+        ExecuteEvents.Execute(gameObject, eventData, ExecuteEvents.pointerUpHandler);
+        ExecuteEvents.Execute(gameObject, eventData, ExecuteEvents.pointerClickHandler);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
