@@ -326,7 +326,10 @@ public class UserControl : MonoBehaviour
         }
 
         // 6. 아무것도 아닌 곳 클릭 = 선택 해제
-        rtsUnitController.DeselectAll();
+        // (Shift를 누른 채 빈 바닥에서 드래그를 시작한 경우엔, 곧이어 시작될 드래그 선택이
+        //  기존 선택에 "추가"되어야 하므로 여기서 기존 선택을 지우지 않는다)
+        if (!Input.GetKey(KeyCode.LeftShift))
+            rtsUnitController.DeselectAll();
     }
 
     /// <summary>

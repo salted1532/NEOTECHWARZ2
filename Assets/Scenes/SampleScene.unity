@@ -8742,8 +8742,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceManager
   startOre: 10000
-  startGas: 10000
+  startGas: 0
   startMaxPopulation: 10
+  maxPopulationCap: 200
 --- !u!4 &1727864002
 Transform:
   m_ObjectHideFlags: 0
