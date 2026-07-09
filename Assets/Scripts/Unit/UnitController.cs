@@ -1102,6 +1102,7 @@ public class UnitController : MonoBehaviour, IDestructible
         foreach (BuildingController building in rtsController.BuildingList)
         {
             if (building == null) continue;
+            if (!building.CompareTag("MainBase")) continue; // 메인기지에만 반납
 
             float sqrDist = (building.transform.position - transform.position).sqrMagnitude;
             if (sqrDist < nearestSqrDist)
