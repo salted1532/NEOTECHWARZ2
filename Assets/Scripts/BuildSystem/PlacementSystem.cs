@@ -17,8 +17,14 @@ public class PlacementSystem : MonoBehaviour
     [SerializeField] private PreviewSystem preview;
 
     // ⭐ 건물 높이 오프셋 (프리뷰 + 실제 공통 적용)
-    [SerializeField] 
+    [SerializeField]
     private float yOffset = 1f;
+
+    [Header("메인기지(커맨드센터) 전용 - 자원 이격 거리")]
+    // ⭐ 메인기지(커맨드센터)만 적용받는, 자원(광물/가스) 노드로부터의 최소 이격 거리 (그리드 칸 단위, 원형/유클리드 거리)
+    [Tooltip("메인기지(커맨드센터)를 지을 때 광물/가스로부터 최소 이만큼(칸, 원형 거리) 떨어져야 함. 다른 건물에는 적용되지 않음.")]
+    [SerializeField]
+    private float minDistanceFromResource = 7f;
 
     private int selectedObjectIndex = -1;
 
@@ -86,6 +92,10 @@ public class PlacementSystem : MonoBehaviour
 
         // ⭐ 유닛 체크 추가
         if (IsBlocked(mousePos, data.Size))
+            return;
+
+        // ⭐ 자원(광물/가스)과 너무 가까우면 배치 불가
+        if (IsTooCloseToResource(data.ID, gridPos, data.Size))
             return;
 
         UnitController worker = rtsController != null ? rtsController.GetSelectedWorker() : null;
@@ -216,6 +226,40 @@ public class PlacementSystem : MonoBehaviour
         return hits.Length > 0;
     }
 
+    // 건물이 차지할 모든 셀 중 하나라도 자원(광물/가스) 노드와 minDistanceFromResource(칸, 원형 거리)보다
+    // 가까우면 true를 반환한다. 자원 노드는 단일 대표 셀(자신의 위치가 속한 그리드 셀)로 취급한다.
+    private bool IsTooCloseToResource(int buildingID, Vector3Int gridPosition, Vector2Int size)
+    {
+        // ⭐ 메인기지(커맨드센터)만 이 규칙을 적용받는다. 다른 건물은 자원 옆에 지어도 무방.
+        if (buildingID != RTSUnitController.BuildingID.CommandCenter)
+            return false;
+
+        if (rtsController == null || rtsController.ResourceNodeList == null)
+            return false;
+
+        List<Vector3Int> occupiedCells = StructureData.CalculatePositionsPublic(gridPosition, size);
+
+        foreach (ResourceNode node in rtsController.ResourceNodeList)
+        {
+            if (node == null)
+                continue;
+
+            Vector3Int resourceCell = grid.WorldToCell(node.transform.position);
+
+            foreach (Vector3Int cell in occupiedCells)
+            {
+                float dx = cell.x - resourceCell.x;
+                float dz = cell.z - resourceCell.z;
+                float distance = Mathf.Sqrt(dx * dx + dz * dz);
+
+                if (distance < minDistanceFromResource)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
     // 배치 모드를 종료하고 프리뷰/이벤트 구독을 정리한다. (취소 또는 배치 완료 후 재진입 대비)
     public void StopPlacement()
     {
@@ -242,7 +286,9 @@ public class PlacementSystem : MonoBehaviour
         {
             var data = database.buildingData[selectedObjectIndex];
 
-            bool valid = StructureData.CanPlaceObejctAt(gridPos, data.Size) && !IsBlocked(mousePos, data.Size);
+            bool valid = StructureData.CanPlaceObejctAt(gridPos, data.Size)
+                && !IsBlocked(mousePos, data.Size)
+                && !IsTooCloseToResource(data.ID, gridPos, data.Size);
 
             Vector3 previewPos = GetGroundPosition(gridPos, data.Size) + Vector3.up * GetGroundOffsetY(data.Prefab);
 

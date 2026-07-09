@@ -165,6 +165,11 @@ public class BaseStructure : MonoBehaviour, IDestructible
 
             GameObject obj = Instantiate(data.Prefab, spawnPos, transform.rotation);
 
+            // ⭐ 건설 중 입은 피해가 완공된 건물에도 그대로 이어지도록, BaseStructure의 최종 체력을 넘겨준다.
+            // (BaseStructure의 HealthManager는 Initialize()에서 이미 완공될 건물과 같은 최대체력 척도로 맞춰져 있음)
+            if (healthManager != null && obj.TryGetComponent<HealthManager>(out var finishedHealthManager))
+                finishedHealthManager.SetHealth(healthManager.GetHealth());
+
             NavMeshObstacle obstacle = obj.GetComponent<NavMeshObstacle>();
             if (obstacle != null)
                 obstacle.enabled = true;

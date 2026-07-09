@@ -235,10 +235,23 @@ public class UserControl : MonoBehaviour
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
 
-            // 건설 중인 BaseStructure 좌클릭 = 선택 (항상 단일 선택, A 모드 강제공격 등은 없음)
+            // 건설 중인 BaseStructure 좌클릭 = 선택 또는 아군 강제 공격 (A 모드 중이면 강제로 공격, 아니면 선택)
             BaseStructure baseStructure = BuildingHit.transform.GetComponent<BaseStructure>();
             if (baseStructure != null)
             {
+                if (UsercurrentState == OrderState.Attack)
+                {
+                    rtsUnitController.AttackFriendlyStructureSelectedUnits(baseStructure);
+                    baseStructure.FlashMarker(); // 어느 구조체가 공격 대상인지 마커 깜빡임으로 표시
+
+                    attackPointer.transform.position = baseStructure.transform.position;
+                    attackPointer.SetActive(true);
+
+                    UsercurrentState = OrderState.None;
+
+                    return;
+                }
+
                 rtsUnitController.ClickSelectStructure(baseStructure);
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)

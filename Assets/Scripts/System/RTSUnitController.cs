@@ -296,6 +296,17 @@ public class RTSUnitController : MonoBehaviour
             selectedUnitList[i].AttackFriendlyTarget(target);
         }
     }
+
+    /// <summary>
+    /// 아군 구조체(건설 중인 BaseStructure) 강제 공격 (A 모드에서 아군 구조체 좌클릭): 대상이 파괴(건설 취소)될 때까지 끝까지 공격한다.
+    /// </summary>
+    public void AttackFriendlyStructureSelectedUnits(BaseStructure target)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].AttackFriendlyTarget(target);
+        }
+    }
     public void StopSelectedUnits()
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
