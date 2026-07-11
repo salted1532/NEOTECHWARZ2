@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 // 유닛/건물마다 다른 사망 처리(Destroy 방식, 이펙트 등)를 구현하기 위한 인터페이스.
 public interface IDestructible
@@ -14,6 +15,8 @@ public class HealthManager : MonoBehaviour
     [SerializeField]
     private int maxHealth = 100;
 
+    [SerializeField] private Slider healthSlider; // 체력바 UI (프리팹에서 직접 연결) - 체력 변화에 맞춰 값만 자동 갱신됨
+
     private int currentHp;
     private bool isDead;
 
@@ -24,6 +27,26 @@ public class HealthManager : MonoBehaviour
     private void Awake()
     {
         currentHp = maxHealth;
+
+        OnHealthChanged += UpdateHealthSlider;
+        UpdateHealthSlider(currentHp, maxHealth);
+    }
+
+    // 체력이 바뀔 때마다(OnHealthChanged) 체력바 슬라이더 값을 함께 갱신한다. 슬라이더가 연결 안 돼 있으면 아무 것도 안 함.
+    private void UpdateHealthSlider(int current, int max)
+    {
+        if (healthSlider == null)
+            return;
+
+        healthSlider.maxValue = max;
+        healthSlider.value = current;
+    }
+
+    // 체력바 UI 자체를 켜고 끈다 (건설 프리뷰/고스트처럼 체력 표시가 필요 없는 경우 PreviewSystem이 호출).
+    public void SetHealthBarVisible(bool visible)
+    {
+        if (healthSlider != null)
+            healthSlider.gameObject.SetActive(visible);
     }
 
     public int GetHealth() => currentHp;

@@ -51,11 +51,19 @@ public class UserControl : MonoBehaviour
         Attack,
         Move,
         Patrol,
-        Rally
+        Rally,
+        BuildingMove // 공중에 뜬 건물의 "이동" 버튼(M) 전용 - Move와 분리해야 HandleLeftClick에서 유닛용 MoveSelectedUnits와 섞이지 않는다
     }
 
     [SerializeField]
     private OrderState UsercurrentState = OrderState.None;
+
+    // 부대 지정(컨트롤 그룹) 단축키 - 인덱스가 그대로 그룹 번호(0~9)가 되도록 키보드 위쪽 숫자(1~9,0) 순서로 배치.
+    private static readonly KeyCode[] controlGroupKeys =
+    {
+        KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5,
+        KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9, KeyCode.Alpha0
+    };
 
     private void Awake()
     {
@@ -310,6 +318,18 @@ public class UserControl : MonoBehaviour
 
                 return;
             }
+
+            if (UsercurrentState == OrderState.BuildingMove)
+            {
+                rtsUnitController.MoveSelectedLiftedBuilding(groundHit.point);
+
+                movePointer.transform.position = groundHit.point;
+                movePointer.SetActive(true);
+
+                UsercurrentState = OrderState.None;
+
+                return;
+            }
         }
 
         // 5. 광물 클릭 = 선택 처리
@@ -419,7 +439,11 @@ public class UserControl : MonoBehaviour
 
             if (rtsUnitController.IsBuildingSelect())
             {
-                rtsUnitController.SetRallySelectBuilding(groundHit.point);
+                // 선택된 건물이 공중에 떠 있으면 공중유닛처럼 그 지점으로 이동시키고, 지상 건물이면 기존처럼 랠리 포인트를 지정한다.
+                if (rtsUnitController.IsSelectedBuildingLifted())
+                    rtsUnitController.MoveSelectedLiftedBuilding(groundHit.point);
+                else
+                    rtsUnitController.SetRallySelectBuilding(groundHit.point);
 
                 UsercurrentState = OrderState.Rally;
                 UpdatePointer();
@@ -504,6 +528,43 @@ public class UserControl : MonoBehaviour
                 rtsUnitController.ReturnState();
             }
         }
+
+        HandleControlGroupInput();
+    }
+
+    // 부대 지정(컨트롤 그룹): Ctrl+숫자(1~9,0)는 덮어쓰기 저장, Shift+숫자는 겹치지 않는 대상만 추가(병합),
+    // 숫자만 누르면 저장된 부대를 선택한다.
+    private void HandleControlGroupInput()
+    {
+        bool ctrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+        bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+        for (int i = 0; i < controlGroupKeys.Length; i++)
+        {
+            if (!Input.GetKeyDown(controlGroupKeys[i]))
+                continue;
+
+            if (ctrlHeld)
+                rtsUnitController.AssignControlGroup(i);
+            else if (shiftHeld)
+                rtsUnitController.AddSelectedToControlGroup(i);
+            else
+            {
+                rtsUnitController.SelectControlGroup(i);
+
+                // A/M/P로 들어간 "공격 위치/순찰/이동 위치 지정" 대기 모드에서만 빠져나온다 (Rally/BuildingMove는 그대로 유지)
+                if (UsercurrentState == OrderState.Attack || UsercurrentState == OrderState.Move || UsercurrentState == OrderState.Patrol)
+                {
+                    UsercurrentState = OrderState.None;
+
+                    // 명령을 취소했으니 마우스를 따라다니던 대기 중 마커(공격/이동 포인터)도 그 자리에 남지 않도록 끈다
+                    attackPointer.SetActive(false);
+                    movePointer.SetActive(false);
+                }
+            }
+
+            break; // 한 프레임에 숫자 키 하나만 처리하면 충분
+        }
     }
 
 
@@ -579,7 +640,7 @@ public class UserControl : MonoBehaviour
 
             attackPointer.transform.position = hit.point;
         }
-        else if (UsercurrentState == OrderState.Move || UsercurrentState == OrderState.Patrol || UsercurrentState == OrderState.Rally)
+        else if (UsercurrentState == OrderState.Move || UsercurrentState == OrderState.Patrol || UsercurrentState == OrderState.Rally || UsercurrentState == OrderState.BuildingMove)
         {
             movePointer.SetActive(true);
             attackPointer.SetActive(false);

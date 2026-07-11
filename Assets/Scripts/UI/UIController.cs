@@ -130,6 +130,13 @@ public class UIController : MonoBehaviour
     [SerializeField] private GameObject panelRoot;
     [SerializeField] private ProductionSlot[] slots;
 
+    // 건물 리프트/이동 버튼 전용 고정 슬롯 인덱스. 건물 선택 컨텍스트 안에서는 이 두 슬롯을 절대 Clear()(SetActive(false))로
+    // 건드리지 않는다 - 매 프레임 SetActive(false)→true를 반복하면 실행 중이던 클릭 코루틴(단축키 시뮬레이션, ProductionSlot.
+    // SimulateClickRoutine)이 그 순간 강제 종료되어 버튼이 눌린 채로 멈추고 단축키도 동작하지 않는 버그가 생긴다.
+    private const int BuildingMoveSlotIndex = 0;
+    private const int BuildingLiftSlotIndex = 8;
+    private static readonly HashSet<int> LiftSlotOnlyProtected = new HashSet<int> { BuildingLiftSlotIndex };
+
     [Header("Command Icons (ShowWorkerPanel / ShowAttackUnitPanel)")]
     [SerializeField] private Sprite moveIcon;
     [SerializeField] private Sprite attackIcon;
@@ -158,6 +165,8 @@ public class UIController : MonoBehaviour
 
     [Header("Common")]
     [SerializeField] private Sprite cancelIcon;
+    [SerializeField] private Sprite liftOffIcon; // 리프트 버튼(지상 상태일 때)
+    [SerializeField] private Sprite landIcon;    // 착륙 버튼(공중 상태일 때)
 
     [Header("Queue Empty Icons")]
     [SerializeField] private Sprite[] emptyQueueIcons; // 0=1, 1=2, 2=3, 3=4, 4=5
@@ -272,6 +281,14 @@ public class UIController : MonoBehaviour
     // 커맨드 패널의 각 슬롯에 데이터를 채우거나(모자란 슬롯은) 비운다.
     private void SetCommands(params CommandButtonData[] commands)
     {
+        SetCommands(commands, null);
+    }
+
+    // protectedSlotIndices에 포함된 슬롯은 commands 배열에 포함되지 않아도 Clear()하지 않고 그대로 둔다.
+    // (건물 리프트/이동 버튼처럼 별도 경로에서 매 프레임 독립적으로 갱신되는 슬롯이 이 호출 때문에 매 프레임
+    // 껐다 켜졌다 하면서 실행 중이던 클릭 코루틴/단축키가 끊기는 것을 막기 위함 - 위 BuildingLiftSlotIndex 주석 참고)
+    private void SetCommands(CommandButtonData[] commands, HashSet<int> protectedSlotIndices)
+    {
         if (panelRoot != null)
             panelRoot.SetActive(true);
 
@@ -284,7 +301,7 @@ public class UIController : MonoBehaviour
             {
                 slots[i].SetData(commands[i]);
             }
-            else
+            else if (protectedSlotIndices == null || !protectedSlotIndices.Contains(i))
             {
                 slots[i].Clear();
             }
@@ -775,10 +792,13 @@ public class UIController : MonoBehaviour
     {
         CurrentState = UISelectionState.MainBase;
 
+        // 리프트 슬롯(8)은 여기 포함되지 않아도 건드리지 않는다 - RTSUnitController가 바로 뒤이어 독립적으로 채운다.
         SetCommands(
-
-            new CommandButtonData(workerIcon, onTrainWorker)
-        );
+            new CommandButtonData[]
+            {
+                new CommandButtonData(workerIcon, onTrainWorker)
+            },
+            LiftSlotOnlyProtected);
     }
 
     // Barracks
@@ -790,10 +810,12 @@ public class UIController : MonoBehaviour
         CurrentState = UISelectionState.Tier1Building;
 
         SetCommands(
-
-            new CommandButtonData(marineIcon, onMarine),
-            new CommandButtonData(vultureIcon, onFirebat)
-        );
+            new CommandButtonData[]
+            {
+                new CommandButtonData(marineIcon, onMarine),
+                new CommandButtonData(vultureIcon, onFirebat)
+            },
+            LiftSlotOnlyProtected);
     }
 
     // Factory
@@ -805,10 +827,12 @@ public class UIController : MonoBehaviour
         CurrentState = UISelectionState.Tier2Building;
 
         SetCommands(
-
-            new CommandButtonData(goliathIcon, onGoliath),
-            new CommandButtonData(tankIcon, onTank)
-        );
+            new CommandButtonData[]
+            {
+                new CommandButtonData(goliathIcon, onGoliath),
+                new CommandButtonData(tankIcon, onTank)
+            },
+            LiftSlotOnlyProtected);
     }
 
     // Starport
@@ -820,9 +844,69 @@ public class UIController : MonoBehaviour
         CurrentState = UISelectionState.Tier3Building;
 
         SetCommands(
+            new CommandButtonData[]
+            {
+                new CommandButtonData(wraithIcon, onWraith),
+                new CommandButtonData(guardianIcon, onGuardian)
+            },
+            LiftSlotOnlyProtected);
+    }
 
-            new CommandButtonData(wraithIcon, onWraith),
-            new CommandButtonData(guardianIcon, onGuardian)
-        );
+    // 건물 커맨드 패널의 고정 슬롯(BuildingLiftSlotIndex)에 리프트/착륙 버튼을 추가로 표시한다.
+    // ShowMainBasePanel/ShowBarracksPanel/ShowFactoryPanel/ShowAirportPanel 호출 "이후"에, 혹은
+    // 전용 패널이 없는 건물(SupplyDepot/Lab 등) 선택 시 단독으로 호출된다.
+    public void ShowBuildingLiftCommand(bool isLifted, ButtonAction onLiftOrLand)
+    {
+        if (BuildingLiftSlotIndex >= slots.Length || slots[BuildingLiftSlotIndex] == null)
+            return;
+
+        if (panelRoot != null)
+            panelRoot.SetActive(true);
+
+        Sprite icon = isLifted ? landIcon : liftOffIcon;
+        slots[BuildingLiftSlotIndex].SetData(new CommandButtonData(icon, onLiftOrLand));
+    }
+
+    // 공중에 뜬 건물 전용 "이동" 버튼 (고정 슬롯 BuildingMoveSlotIndex). ShowBuildingLiftCommand(Land 버튼)와 함께 사용.
+    public void ShowBuildingMoveCommand(ButtonAction onMove)
+    {
+        if (BuildingMoveSlotIndex >= slots.Length || slots[BuildingMoveSlotIndex] == null)
+            return;
+
+        if (panelRoot != null)
+            panelRoot.SetActive(true);
+
+        slots[BuildingMoveSlotIndex].SetData(new CommandButtonData(moveIcon, onMove));
+    }
+
+    // 건물 선택 컨텍스트에서 생산 패널이 없을 때(SupplyDepot/Lab/None, 또는 공중 상태) 사용.
+    // 리프트 슬롯(8)은 항상 보호하고, protectMoveSlot이 true면(공중 상태) 이동 슬롯(0)도 함께 보호한다.
+    // 나머지 슬롯만 비워서, 착륙 직후처럼 이동 슬롯을 더 이상 보호하지 않아도 되는 시점엔 자연스럽게 정리된다.
+    public void ClearBuildingPanelExceptLiftSlots(bool protectMoveSlot)
+    {
+        if (panelRoot != null)
+            panelRoot.SetActive(true);
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            if (slots[i] == null)
+                continue;
+
+            if (i == BuildingLiftSlotIndex || (protectMoveSlot && i == BuildingMoveSlotIndex))
+                continue;
+
+            slots[i].Clear();
+        }
+    }
+
+    // 리프트 불가능한 건물을 선택했을 때(CanLift() == false) 이전에 선택했던 다른 건물의 리프트/이동 버튼이
+    // 잔상으로 남지 않도록 두 슬롯을 정리한다.
+    public void ClearBuildingLiftSlots()
+    {
+        if (BuildingMoveSlotIndex < slots.Length)
+            slots[BuildingMoveSlotIndex]?.Clear();
+
+        if (BuildingLiftSlotIndex < slots.Length)
+            slots[BuildingLiftSlotIndex]?.Clear();
     }
 }

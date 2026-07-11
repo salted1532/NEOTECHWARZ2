@@ -20,6 +20,11 @@ public class RTSUnitController : MonoBehaviour
     public ResourceNode selectedResourceNode; // 광물/가스는 항상 단일 선택
     public BaseStructure selectedBaseStructure; // 건설 중인 건물 기반도 항상 단일 선택
 
+    // ===== 부대 지정(컨트롤 그룹) - Ctrl+숫자(1~9,0)로 저장, 숫자만 누르면 해당 부대를 선택 =====
+    // 인덱스는 눌린 숫자와 그대로 대응(1→[0], 2→[1], ..., 9→[8], 0→[9]) - UserControl에서 이미 이렇게 매핑해 넘겨준다.
+    private readonly List<UnitController>[] controlGroupUnits = new List<UnitController>[10];
+    private readonly List<BuildingController>[] controlGroupBuildings = new List<BuildingController>[10];
+
     // 맵에 존재하는 모든 유닛/건물/자원 노드
     public List<UnitController> UnitList;
     public List<BuildingController> BuildingList;
@@ -103,6 +108,12 @@ public class RTSUnitController : MonoBehaviour
         UnitList = new List<UnitController>();
         BuildingList = new List<BuildingController>();
         ResourceNodeList = new List<ResourceNode>();
+
+        for (int i = 0; i < controlGroupUnits.Length; i++)
+        {
+            controlGroupUnits[i] = new List<UnitController>();
+            controlGroupBuildings[i] = new List<BuildingController>();
+        }
     }
 
     private void Update()
@@ -449,6 +460,33 @@ public class RTSUnitController : MonoBehaviour
         }
     }
 
+    // "리프트" 버튼: 선택된 건물(단일 취급)을 공중으로 띄운다.
+    public void LiftSelectedBuilding()
+    {
+        if (selectedBuildingList.Count == 0) return;
+        selectedBuildingList[0].LiftOff();
+    }
+
+    // "착륙" 버튼: 선택된 건물(단일 취급)의 착륙 위치 선택 모드로 진입한다.
+    public void BeginLandingSelectedBuilding()
+    {
+        if (selectedBuildingList.Count == 0) return;
+        selectedBuildingList[0].BeginLanding();
+    }
+
+    // 선택된 건물(단일 취급)이 현재 공중에 떠 있는지 (UserControl 우클릭 분기용)
+    public bool IsSelectedBuildingLifted()
+    {
+        return selectedBuildingList.Count > 0 && selectedBuildingList[0].IsLifted();
+    }
+
+    // 공중에 뜬 건물을 공중유닛처럼 우클릭/Move버튼 지점으로 수평 이동시킨다 (착륙하지 않고 계속 공중에 떠 있음).
+    public void MoveSelectedLiftedBuilding(Vector3 destination)
+    {
+        if (selectedBuildingList.Count == 0) return;
+        selectedBuildingList[0].MoveWhileLifted(destination);
+    }
+
     #endregion
 
     #region Enemy선택 관련
@@ -581,6 +619,72 @@ public class RTSUnitController : MonoBehaviour
         selectedBaseStructure = null;
     }
 
+    #region 부대 지정(컨트롤 그룹)
+
+    // Ctrl+숫자: 현재 선택된 유닛/건물을 지정한 그룹 번호(0~9)에 저장한다(기존 저장 내용은 덮어씀).
+    // 아무 것도 선택돼 있지 않으면 아무 것도 하지 않는다(실수로 빈 선택을 눌러 기존 그룹을 날리는 것 방지).
+    public void AssignControlGroup(int groupIndex)
+    {
+        if (groupIndex < 0 || groupIndex >= controlGroupUnits.Length)
+            return;
+
+        if (selectedUnitList.Count == 0 && selectedBuildingList.Count == 0)
+            return;
+
+        controlGroupUnits[groupIndex].Clear();
+        controlGroupUnits[groupIndex].AddRange(selectedUnitList);
+
+        controlGroupBuildings[groupIndex].Clear();
+        controlGroupBuildings[groupIndex].AddRange(selectedBuildingList);
+    }
+
+    // Shift+숫자: 현재 선택된 유닛/건물 중 그 그룹에 아직 없는 대상만 추가한다(기존 멤버는 그대로 유지).
+    // Ctrl(AssignControlGroup)과 달리 완전 교체가 아니라 병합이라, 유닛 하나가 여러 그룹에 동시에 속할 수 있다.
+    public void AddSelectedToControlGroup(int groupIndex)
+    {
+        if (groupIndex < 0 || groupIndex >= controlGroupUnits.Length)
+            return;
+
+        if (selectedUnitList.Count == 0 && selectedBuildingList.Count == 0)
+            return;
+
+        foreach (UnitController unit in selectedUnitList)
+        {
+            if (unit != null && !controlGroupUnits[groupIndex].Contains(unit))
+                controlGroupUnits[groupIndex].Add(unit);
+        }
+
+        foreach (BuildingController building in selectedBuildingList)
+        {
+            if (building != null && !controlGroupBuildings[groupIndex].Contains(building))
+                controlGroupBuildings[groupIndex].Add(building);
+        }
+    }
+
+    // 숫자만 누르면: 저장된 그룹의 유닛/건물을 선택 상태로 되돌린다. 그 사이 죽거나 파괴된 대상은 자동으로 걸러진다.
+    // 그룹이 비어있으면(저장한 적 없거나 전부 사라짐) 기존 선택을 그대로 둔다.
+    public void SelectControlGroup(int groupIndex)
+    {
+        if (groupIndex < 0 || groupIndex >= controlGroupUnits.Length)
+            return;
+
+        controlGroupUnits[groupIndex].RemoveAll(unit => unit == null);
+        controlGroupBuildings[groupIndex].RemoveAll(building => building == null);
+
+        if (controlGroupUnits[groupIndex].Count == 0 && controlGroupBuildings[groupIndex].Count == 0)
+            return;
+
+        DeselectAll();
+
+        foreach (UnitController unit in controlGroupUnits[groupIndex])
+            DragSelectUnit(unit);
+
+        foreach (BuildingController building in controlGroupBuildings[groupIndex])
+            SelectBuilding(building);
+    }
+
+    #endregion
+
     #region UserControl 상태 전환
 
     public void EnterMoveMode()
@@ -601,6 +705,12 @@ public class RTSUnitController : MonoBehaviour
     public void EnterRallyMode()
     {
         userControl.SetOrderState("Rally");
+    }
+
+    // 공중에 뜬 건물의 "이동" 버튼(M)용
+    public void EnterBuildingMoveMode()
+    {
+        userControl.SetOrderState("BuildingMove");
     }
 
     #endregion
@@ -853,52 +963,90 @@ public class RTSUnitController : MonoBehaviour
                     uIController.HideInfoPanel();
                 }
 
-                switch (BuildingSelectState)
+                // 공중에 뜬 건물은 생산/연구 등 모든 커맨드를 막고 아래에서 Land/Move 버튼만 노출한다.
+                bool selectedBuildingLifted = selectedBuildingList.Count > 0 && selectedBuildingList[0].IsLifted();
+
+                if (selectedBuildingLifted)
                 {
-                    case BuildingState.MainBaseSelect:
-                        uIController.ShowMainBasePanel(
-                            UnitButtonAction(() => TryProduceUnit(UnitID.Worker), UnitID.Worker, KeyCode.W));
-                        uIController.ShowProductionUI(
-                            GetProductionQueue(),
-                            CancelProduction);
-                        break;
+                    // ClearPanel()이 아니라 리프트/이동 슬롯을 보호하는 전용 메서드를 쓴다 - 매 프레임 호출되므로
+                    // ClearPanel()로 그 두 슬롯까지 매번 껐다 켰다 하면 실행 중이던 클릭 코루틴/단축키가 끊긴다.
+                    uIController.ClearBuildingPanelExceptLiftSlots(protectMoveSlot: true);
+                    uIController.HideProductionUI();
+                }
+                else
+                {
+                    switch (BuildingSelectState)
+                    {
+                        case BuildingState.MainBaseSelect:
+                            uIController.ShowMainBasePanel(
+                                UnitButtonAction(() => TryProduceUnit(UnitID.Worker), UnitID.Worker, KeyCode.W));
+                            uIController.ShowProductionUI(
+                                GetProductionQueue(),
+                                CancelProduction);
+                            break;
 
-                    case BuildingState.Tier1Select:
-                        uIController.ShowBarracksPanel(
-                            UnitButtonAction(() => TryProduceUnit(UnitID.Marine), UnitID.Marine, KeyCode.A),
-                            UnitButtonAction(() => TryProduceUnit(UnitID.Vulture), UnitID.Vulture, KeyCode.S));
+                        case BuildingState.Tier1Select:
+                            uIController.ShowBarracksPanel(
+                                UnitButtonAction(() => TryProduceUnit(UnitID.Marine), UnitID.Marine, KeyCode.A),
+                                UnitButtonAction(() => TryProduceUnit(UnitID.Vulture), UnitID.Vulture, KeyCode.S));
 
-                        uIController.ShowProductionUI(
-                            GetProductionQueue(),
-                            CancelProduction);
-                        break;
+                            uIController.ShowProductionUI(
+                                GetProductionQueue(),
+                                CancelProduction);
+                            break;
 
-                    case BuildingState.Tier2Select:
-                        uIController.ShowFactoryPanel(
-                            UnitButtonAction(() => TryProduceUnit(UnitID.Goliath), UnitID.Goliath, KeyCode.I),
-                            UnitButtonAction(() => TryProduceUnit(UnitID.Tank), UnitID.Tank, KeyCode.P));
+                        case BuildingState.Tier2Select:
+                            uIController.ShowFactoryPanel(
+                                UnitButtonAction(() => TryProduceUnit(UnitID.Goliath), UnitID.Goliath, KeyCode.I),
+                                UnitButtonAction(() => TryProduceUnit(UnitID.Tank), UnitID.Tank, KeyCode.P));
 
-                        uIController.ShowProductionUI(
-                            GetProductionQueue(),
-                            CancelProduction);
-                        break;
+                            uIController.ShowProductionUI(
+                                GetProductionQueue(),
+                                CancelProduction);
+                            break;
 
-                    case BuildingState.Tier3Select:
-                        uIController.ShowAirportPanel(
-                            UnitButtonAction(() => TryProduceUnit(UnitID.Wraith), UnitID.Wraith, KeyCode.F),
-                            UnitButtonAction(() => TryProduceUnit(UnitID.Guardian), UnitID.Guardian, KeyCode.D));
+                        case BuildingState.Tier3Select:
+                            uIController.ShowAirportPanel(
+                                UnitButtonAction(() => TryProduceUnit(UnitID.Wraith), UnitID.Wraith, KeyCode.F),
+                                UnitButtonAction(() => TryProduceUnit(UnitID.Guardian), UnitID.Guardian, KeyCode.D));
 
-                        uIController.ShowProductionUI(
-                            GetProductionQueue(),
-                            CancelProduction);
-                        break;
+                            uIController.ShowProductionUI(
+                                GetProductionQueue(),
+                                CancelProduction);
+                            break;
 
-                    case BuildingState.SupplyDepot:
-                    case BuildingState.Lab:
-                    case BuildingState.None:
-                        uIController.ClearPanel();
-                        uIController.HideProductionUI();
-                        break;
+                        case BuildingState.SupplyDepot:
+                        case BuildingState.Lab:
+                        case BuildingState.None:
+                            uIController.ClearBuildingPanelExceptLiftSlots(protectMoveSlot: false);
+                            uIController.HideProductionUI();
+                            break;
+                    }
+                }
+
+                // 리프트 가능한 건물이면(전용 패널이 없는 SupplyDepot/Lab 포함) 고정 슬롯에 리프트/착륙 버튼을 덧붙인다.
+                if (selectedBuildingList.Count > 0 && selectedBuildingList[0].CanLift())
+                {
+                    BuildingController building = selectedBuildingList[0];
+
+                    uIController.ShowBuildingLiftCommand(
+                        building.IsLifted(),
+                        building.IsLifted()
+                            ? ButtonAction.Simple(BeginLandingSelectedBuilding, "Land", "Choose a landing site. \nshortcut key [<color=yellow>L</color>]", KeyCode.L)
+                            : ButtonAction.Simple(LiftSelectedBuilding, "Lift Off", "Lift the building into the air. \nshortcut key [<color=yellow>L</color>]", KeyCode.L));
+
+                    // 공중에 뜬 상태에서만 고정 슬롯(0번)에 "이동" 버튼을 추가로 노출한다.
+                    if (building.IsLifted())
+                    {
+                        uIController.ShowBuildingMoveCommand(
+                            ButtonAction.Simple(EnterBuildingMoveMode, "Move", "Move to a location while airborne. \nshortcut key [<color=yellow>M</color>]", KeyCode.M));
+                    }
+                }
+                else if (selectedBuildingList.Count > 0)
+                {
+                    // 리프트 불가능한 건물(CanLift() == false)이면, 이전에 선택했던 다른 건물의 리프트/이동 버튼이
+                    // 잔상으로 남지 않도록 정리한다.
+                    uIController.ClearBuildingLiftSlots();
                 }
                 break;
 

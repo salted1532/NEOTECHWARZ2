@@ -18,6 +18,7 @@ public class BaseStructure : MonoBehaviour, IDestructible
     private int buildingID;
     private float remainingBuildTime;
     private Vector3 groundPosition; // 완공 시 실제 건물을 다시 배치할 지면 좌표(오프셋 없는 순수 지면 위치)
+    private Vector3Int gridPosition; // 완공될 건물에 그대로 넘겨줄 그리드 좌표 (리프트 이동 시 자기 자리 해제용)
 
     private float healthPerSecond; // 건설 중 초당 채워지는 체력량 (완공될 건물의 최대체력 ÷ 건설시간)
     private float healAccumulator; // HealthManager.Heal()은 int만 받으므로 소수점 나머지를 누적해뒀다가 1 이상 모이면 반영
@@ -43,11 +44,12 @@ public class BaseStructure : MonoBehaviour, IDestructible
 
     // PlacementSystem이 스폰 직후 호출해 지어질 건물 종류와 건설시간을 설정한다.
     // 완공될 건물의 최대체력/아이콘을 프리팹에서 미리 읽어와 HealthManager와 Info_panel 표시에 반영한다.
-    public void Initialize(int buildingID, float buildTime, Vector3 groundPosition, System.Action onCancelledByPlayer)
+    public void Initialize(int buildingID, float buildTime, Vector3 groundPosition, Vector3Int gridPosition, System.Action onCancelledByPlayer)
     {
         this.buildingID = buildingID;
         remainingBuildTime = buildTime;
         this.groundPosition = groundPosition;
+        this.gridPosition = gridPosition;
         this.onCancelledByPlayer = onCancelledByPlayer;
 
         int finalMaxHealth = 0;
@@ -173,6 +175,9 @@ public class BaseStructure : MonoBehaviour, IDestructible
             NavMeshObstacle obstacle = obj.GetComponent<NavMeshObstacle>();
             if (obstacle != null)
                 obstacle.enabled = true;
+
+            if (obj.TryGetComponent<BuildingController>(out var builtController))
+                builtController.SetGridInfo(gridPosition); // 이후 리프트 이동 시 자기 자리를 해제할 수 있도록 전달
 
             rtsController?.AddMaxPopulation(data.maxpopulationamount); // 건설 완료 시점에만 인구수 한도 반영 (건설 중엔 미반영)
         }

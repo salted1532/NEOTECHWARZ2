@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 // 건물 배치 시스템의 핵심 컨트롤러.
 // 배치 모드 시작/취소, 그리드 위치 계산, 배치 가능 여부(겹침 + 유닛/장애물 충돌) 판정, 실제 건물 생성을 담당한다.
@@ -37,11 +38,62 @@ public class PlacementSystem : MonoBehaviour
 
     [SerializeField] private GameObject baseStructurePrefab; // 건설 중 표시할 공용 건물 기반(BaseStructure) 프리팹
 
+    [Header("시작 위치")]
+    [Tooltip("게임 시작 시 메인기지(커맨드센터)를 그리드에 맞춰 즉시 생성할 위치. 빈 오브젝트를 씬에 배치해서 연결.")]
+    [SerializeField] private GameObject startPoint;
+
+    // ===== 건물 리프트 이동(착륙 위치 선택) =====
+    private BuildingController relocatingBuilding; // 현재 착륙 위치를 고르는 중인 건물(없으면 null)
+
     void Start()
     {
         StopPlacement();
         StructureData = new();
         rtsController = FindFirstObjectByType<RTSUnitController>();
+
+        SpawnStartingMainBase();
+    }
+
+    // 게임 시작 시 startPoint 위치에 메인기지(커맨드센터)를 건설 과정 없이 완성된 상태로 즉시 생성하고,
+    // 다른 배치와 동일하게 그리드에 등록한다(리프트 이동을 위한 gridPosition도 함께 설정됨).
+    private void SpawnStartingMainBase()
+    {
+        if (startPoint == null)
+            return;
+
+        int index = database.buildingData.FindIndex(d => d.ID == RTSUnitController.BuildingID.CommandCenter);
+        if (index < 0)
+        {
+            Debug.LogWarning("BuildingDataSO에 메인기지(CommandCenter) 데이터가 없습니다.");
+            return;
+        }
+
+        BuildingData data = database.buildingData[index];
+        Vector3Int gridPos = grid.WorldToCell(startPoint.transform.position);
+
+        if (!StructureData.CanPlaceObejctAt(gridPos, data.Size))
+        {
+            Debug.LogWarning("시작 위치(startPoint)에 메인기지를 배치할 수 없습니다 (그리드 겹침).");
+            return;
+        }
+
+        Vector3 groundPos = GetGroundPosition(gridPos, data.Size);
+        Vector3 spawnPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab);
+
+        GameObject obj = Instantiate(data.Prefab, spawnPos, Quaternion.identity);
+
+        NavMeshObstacle obstacle = obj.GetComponent<NavMeshObstacle>();
+        if (obstacle != null)
+            obstacle.enabled = true;
+
+        if (obj.TryGetComponent<BuildingController>(out var controller))
+            controller.SetGridInfo(gridPos); // 이후 리프트 이동 시 자기 자리를 해제할 수 있도록
+
+        placedGameObject.Add(obj);
+        int placedIndex = placedGameObject.Count - 1;
+        StructureData.AddObjectAt(gridPos, data.Size, data.ID, placedIndex);
+
+        rtsController?.AddMaxPopulation(data.maxpopulationamount); // 완공 건물과 동일하게 인구수 한도 반영
     }
 
     // ID에 해당하는 건물 데이터베이스 항목을 찾아 배치 모드를 시작한다 (프리뷰 표시 + 클릭/ESC 이벤트 구독).
@@ -140,7 +192,7 @@ public class PlacementSystem : MonoBehaviour
 
         BaseStructure structure = obj.GetComponent<BaseStructure>();
         // 플레이어가 직접 건설을 취소할 때(CancelConstruction) 그리드 예약을 풀어줄 콜백도 함께 넘긴다.
-        structure.Initialize(data.ID, data.productionTime, groundPos, () => CancelReservedConstruction(gridPos, null));
+        structure.Initialize(data.ID, data.productionTime, groundPos, gridPos, () => CancelReservedConstruction(gridPos, null));
 
         placedGameObject[placedIndex] = obj;
 
@@ -154,6 +206,77 @@ public class PlacementSystem : MonoBehaviour
             Destroy(ghost);
 
         StructureData.RemoveObjectAt(gridPos);
+    }
+
+    // ===== 건물 리프트 이동 =====
+
+    // 리프트 이륙한 건물이 자기 자리를 비울 때 호출 (BuildingController.LiftOff). 자원/일꾼과 무관.
+    public void ReleaseBuildingGrid(Vector3Int gridPosition)
+    {
+        StructureData.RemoveObjectAt(gridPosition);
+    }
+
+    // "착륙" 버튼(BuildingController.BeginLanding)에서 호출: 착륙 위치를 고르는 프리뷰 모드로 진입한다.
+    // 일반 건설모드(StartPlacement)와 달리 자원 소모/일꾼이 필요 없다.
+    public void StartBuildingRelocation(BuildingController building)
+    {
+        StopPlacement();
+
+        selectedObjectIndex = database.buildingData.FindIndex(d => d.ID == building.GetBuildingID());
+        if (selectedObjectIndex < 0)
+            return;
+
+        relocatingBuilding = building;
+
+        gridVisualization.SetActive(true);
+
+        preview.StartShowingPlacementPreview(
+            database.buildingData[selectedObjectIndex].Prefab,
+            database.buildingData[selectedObjectIndex].Size);
+
+        inputManager.OnClicked += PlaceRelocatedBuilding;
+        inputManager.OnExit += StopPlacement; // ESC = 착륙 위치 선택만 취소(건물은 계속 공중에 남음)
+    }
+
+    // OnClicked 핸들러: 클릭한 자리가 유효하면 그리드를 즉시 예약하고, 클릭 자리에 고정 고스트를 남긴 채
+    // 건물을 그 위치로 비행시킨다(도착 후 실제로 착륙 처리는 BuildingController가 담당).
+    private void PlaceRelocatedBuilding()
+    {
+        if (relocatingBuilding == null) { StopPlacement(); return; }
+        if (inputManager.IsPointerOverUI()) return;
+
+        Vector3 mousePos = inputManager.GetSelectedMapPosition();
+        Vector3Int gridPos = grid.WorldToCell(mousePos);
+
+        var data = database.buildingData[selectedObjectIndex];
+
+        if (!StructureData.CanPlaceObejctAt(gridPos, data.Size)) return;
+        if (IsBlocked(mousePos, data.Size)) return;
+        if (IsTooCloseToResource(data.ID, gridPos, data.Size)) return;
+
+        Vector3 groundPos = GetGroundPosition(gridPos, data.Size);
+        Vector3 landingPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab); // 착륙 완료 시 최종 정착 위치
+
+        // 다른 곳에 겹쳐 짓지 못하도록 클릭 즉시 그리드를 예약 (건설 시스템과 동일한 패턴)
+        placedGameObject.Add(null);
+        int placedIndex = placedGameObject.Count - 1;
+        StructureData.AddObjectAt(gridPos, data.Size, data.ID, placedIndex);
+
+        // 클릭한 자리에 건물이 도착할 때까지 남아있을 고정 고스트
+        GameObject ghost = preview.SpawnConstructionGhost(data.Prefab, landingPos);
+
+        BuildingController building = relocatingBuilding;
+        building.BeginRelocationFlight(
+            gridPos,
+            landingPos,
+            onLanded: () => { if (ghost != null) Destroy(ghost); },
+            onCancelled: () =>
+            {
+                StructureData.RemoveObjectAt(gridPos);
+                if (ghost != null) Destroy(ghost);
+            });
+
+        StopPlacement();
     }
 
     /// <summary>
@@ -264,11 +387,13 @@ public class PlacementSystem : MonoBehaviour
     public void StopPlacement()
     {
         selectedObjectIndex = -1;
+        relocatingBuilding = null;
 
         gridVisualization.SetActive(false);
         preview.StopShowingPreview();
 
         inputManager.OnClicked -= PlaceStructure;
+        inputManager.OnClicked -= PlaceRelocatedBuilding;
         inputManager.OnExit -= StopPlacement;
 
         lastDectectedPosition = Vector3Int.zero;

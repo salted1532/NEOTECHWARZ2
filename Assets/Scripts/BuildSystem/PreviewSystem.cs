@@ -100,6 +100,13 @@ public class PreviewSystem : MonoBehaviour
         {
             obs.enabled = false;
         }
+
+        // 프리뷰/고스트는 실제 체력이 없으므로(항상 풀피로 초기화됨) 체력바를 표시하면 오해를 일으킨다 - 숨긴다.
+        HealthManager[] healthManagers = obj.GetComponentsInChildren<HealthManager>();
+        foreach (HealthManager hm in healthManagers)
+        {
+            hm.SetHealthBarVisible(false);
+        }
     }
 
     // 배치가 확정된 위치에 "일꾼이 도착할 때까지 남아있는" 정적 건설 고스트를 생성한다.
