@@ -172,7 +172,13 @@ public class PlacementSystem : MonoBehaviour
         worker.GoBuild(
             spawnPos,
             onArrived: () => StartConstruction(data, groundPos, gridPos, placedIndex, ghost, worker),
-            onCancelled: () => CancelReservedConstruction(gridPos, ghost));
+            onCancelled: () =>
+            {
+                // 일꾼이 건설 위치에 도착하기 전(BaseStructure 생성 전)에 이동/공격 등 다른 명령으로
+                // 건설 이동이 취소된 경우: 클릭 시 이미 차감된 건물 가격(광물/가스)을 전액 환불한다.
+                CancelReservedConstruction(gridPos, ghost);
+                rtsController?.RefundBuilding(data.ID);
+            });
 
         // 클릭 한 번으로 배치를 확정했으므로 건설모드는 여기서 종료한다 (기존 "취소" 버튼과 동일한 종료 방식)
         StopPlacement();

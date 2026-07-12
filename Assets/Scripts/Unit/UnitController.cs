@@ -1233,6 +1233,8 @@ public class UnitController : MonoBehaviour, IDestructible
     public void Die()
     {
         gatherTargetNode?.LeaveQueue(this); // 대기열/채취 중에 사망해도 자리를 비워줌
+        CancelBuildOrder(); // 건설 위치로 이동 중(hasBuildOrder)에 사망해도, 다른 명령으로 취소될 때와 동일하게
+                             // 그리드 예약 해제 + 건물 가격 환불(onCancelled 콜백, 0089)이 실행되도록 함
 
         RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
         controller?.UnitList.Remove(this);
