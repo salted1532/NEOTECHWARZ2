@@ -387,6 +387,9 @@ MonoBehaviour:
   moveSpeed: 10
   isMovingAirUnit: 0
   isAirUnit: 1
+  airGroundLayer:
+    serializedVersion: 2
+    m_Bits: 128
   UnitcurrentState: 0
   alreadyAttacked: 0
   timeBetweenAttacks: 5

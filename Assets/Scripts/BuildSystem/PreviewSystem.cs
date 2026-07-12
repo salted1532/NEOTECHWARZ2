@@ -147,6 +147,7 @@ public class PreviewSystem : MonoBehaviour
 
         ApplyGhostMaterial(ghost, ghostMaterial);
         DisableGameplayComponents(ghost);
+        SetLayerRecursively(ghost, indicatorsLayer);
 
         return ghost;
     }

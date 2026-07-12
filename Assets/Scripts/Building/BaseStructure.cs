@@ -44,13 +44,20 @@ public class BaseStructure : MonoBehaviour, IDestructible
 
     // PlacementSystem이 스폰 직후 호출해 지어질 건물 종류와 건설시간을 설정한다.
     // 완공될 건물의 최대체력/아이콘을 프리팹에서 미리 읽어와 HealthManager와 Info_panel 표시에 반영한다.
-    public void Initialize(int buildingID, float buildTime, Vector3 groundPosition, Vector3Int gridPosition, System.Action onCancelledByPlayer)
+    // buildingSize/cellSize: 프리팹 자체는 3x3(6x6 유닛) 기준으로 만들어져 있어서, 2x2처럼 더 작은/다른 크기의
+    // 건물을 지을 땐 그 크기(그리드 칸 수 × 셀 크기)에 맞춰 가로/세로(X/Z) 스케일을 다시 계산해 덮어쓴다.
+    // 세로(Y, 두께)는 프리팹에 원래 세팅된 값을 그대로 유지한다.
+    public void Initialize(int buildingID, float buildTime, Vector3 groundPosition, Vector3Int gridPosition,
+        Vector2Int buildingSize, Vector3 cellSize, System.Action onCancelledByPlayer)
     {
         this.buildingID = buildingID;
         remainingBuildTime = buildTime;
         this.groundPosition = groundPosition;
         this.gridPosition = gridPosition;
         this.onCancelledByPlayer = onCancelledByPlayer;
+
+        Vector3 currentScale = transform.localScale;
+        transform.localScale = new Vector3(buildingSize.x * cellSize.x, currentScale.y, buildingSize.y * cellSize.z);
 
         int finalMaxHealth = 0;
 

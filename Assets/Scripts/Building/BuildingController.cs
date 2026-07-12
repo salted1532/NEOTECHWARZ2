@@ -34,6 +34,9 @@ public class BuildingController : MonoBehaviour, IDestructible
     [SerializeField] private bool canLift = true; // 이 건물이 리프트 이륙 가능한지 (건물별로 인스펙터에서 끌 수 있음)
     [SerializeField] private float liftHeight = 5f;   // 이륙 시 상승할 높이
     [SerializeField] private float liftMoveSpeed = 5f; // 상승/수평이동/하강 공통 속도
+    // 이동 중 실시간으로 자기 발밑 지면 높이를 알아내기 위한 레이어(지형/땅). 비워두면(Nothing) 지면 높이 추적
+    // 없이 목적지 고도로 곧장 직선 이동한다(이 경우 언덕을 완전히 넘기 전에 미리 하강할 수 있음).
+    [SerializeField] private LayerMask groundLayer;
 
     private NavMeshObstacle navMeshObstacle;
     private PlacementSystem placementSystem;
@@ -44,7 +47,11 @@ public class BuildingController : MonoBehaviour, IDestructible
     private bool isDescending;         // 착륙 위치 위에서 하강 중
 
     private Vector3 verticalTarget;    // 상승 목표(현재 위치 기준 + liftHeight)
-    private Vector3 flightDestination; // 수평 비행 목표(목적지 좌표 + liftHeight 고도) - 자유이동/착륙 비행 공통
+    // 수평 비행 목표(목적지 좌표 + liftHeight 고도) - 자유이동/착륙 비행 공통.
+    // 목적지의 지면 높이(Y)를 기준으로 매번 다시 계산한다 - 언덕/저지대처럼 지형 높이가 다른 곳으로 이동해도
+    // 항상 "그 지점 + liftHeight"가 되도록. 건물 이동 목적지는 항상 지면 레이캐스트로만 들어오므로(다른 유닛/건물의
+    // 이미 공중에 뜬 좌표를 목적지로 받는 경우가 없음) 매번 다시 더해도 고도가 중첩될 일은 없다.
+    private Vector3 flightDestination;
     private Vector3 landingGroundDestination; // 착륙 최종 지면 좌표 (pendingLanding일 때만 유효, 하강 단계 전용)
 
     private Vector3Int gridPosition;   // 현재 자신이 점유 중인 그리드 셀 좌표
@@ -56,6 +63,13 @@ public class BuildingController : MonoBehaviour, IDestructible
 
     private bool pendingLanding; // true면 현재 수평이동이 "공식 착륙 비행"(도착 시 하강→착륙까지 이어짐), false면 우클릭/Move버튼 자유이동(도착 시 그 자리에서 계속 공중 대기)
 
+    // 이 건물의 메쉬 피벗이 바닥(지면)에서 얼마나 떨어져 있는지(PlacementSystem.GetGroundOffsetY와 동일한 계산).
+    // 건물이 지면에 서 있을 때의 transform.position.y = (그 지점 지면 높이) + groundOffset이다.
+    // SampleGroundHeight()는 순수 지면 높이(레이캐스트로 잰 지형 표면)만 돌려주므로, 비행 중 고도를 계산할 때
+    // 이 오프셋을 더해줘야 이륙 시(자기 transform.position 기준으로 상승) 도달한 고도와 이동 중 고도가 일치한다.
+    // 안 더하면 건물 메쉬 크기만큼(피벗-지면 거리) 이동 중 고도가 이륙 때보다 낮게 계산된다.
+    private float groundOffset;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -64,6 +78,8 @@ public class BuildingController : MonoBehaviour, IDestructible
         // 전역 RTSUnitController에 자신을 등록해 선택/관리 대상이 되게 한다.
         rtsController = FindFirstObjectByType<RTSUnitController>();
         placementSystem = FindFirstObjectByType<PlacementSystem>();
+
+        groundOffset = PlacementSystem.GetGroundOffsetY(gameObject);
 
         rtsController.BuildingList.Add(this);
 
@@ -98,11 +114,37 @@ public class BuildingController : MonoBehaviour, IDestructible
 
         if (isFlyingToDestination)
         {
-            // flightDestination은 항상 "목적지 좌표 + liftHeight"로 미리 계산돼 있으므로, 그대로 목표로 삼으면
-            // 이륙 도중(고도가 덜 오른 상태)에 새 이동 명령이 들어와도 비행하면서 자연스럽게 목표 고도까지 수렴한다.
-            transform.position = Vector3.MoveTowards(transform.position, flightDestination, liftMoveSpeed * Time.deltaTime);
+            // 수평(X/Z)과 수직(Y)을 각각 독립적으로 목표에 수렴시킨다. 예전엔 Vector3.MoveTowards로 목적지(수평+수직)를
+            // 한 번에 보간했는데, 그러면 수평 이동거리가 liftHeight보다 훨씬 크면(흔한 경우) 방향 벡터의 수직 성분이
+            // 희석돼서 "목적지에 거의 다 왔을 때가 돼서야 살짝 상승"하는 것처럼 보였다 - 이륙 직후(아직 목표 고도에
+            // 도달 못한 상태)에 바로 이동 명령을 내리면 특히 두드러짐(수평 이동은 정상인데 고도는 안 오르는 것처럼 보임).
+            // 이제는 X/Z는 목적지를 향해 수렴하고, Y는 목적지 고도로 곧장 보간하는 대신 매 프레임 "지금 발밑 지면 +
+            // liftHeight"를 다시 재서 그쪽으로 수렴한다 - 그래야 언덕 위를 지나는 동안은 그만큼 떠 있다가, 언덕을
+            // 실제로 벗어나 발밑 지형이 낮아지는 순간에 맞춰 고도도 자연스럽게 낮아진다(공중 유닛과 동일한 방식,
+            // [[0084-air-unit-terrain-hugging-altitude]] 참고).
+            Vector3 pos = transform.position;
 
-            if (Vector3.Distance(transform.position, flightDestination) < 0.05f)
+            Vector3 horizontalTarget = new Vector3(flightDestination.x, pos.y, flightDestination.z);
+            pos = Vector3.MoveTowards(pos, horizontalTarget, liftMoveSpeed * Time.deltaTime);
+
+            // 도착 판정도 미리 계산해둔 flightDestination.y가 아니라 "지금 이 프레임에 실제로 향하고 있는" 고도
+            // (desiredY)와 비교해야 한다. flightDestination.y는 그리드 기준 지면 좌표로 미리 계산된 값이라 실제
+            // 지형(레이캐스트로 잰 값)과 완전히 일치한다는 보장이 없는데, 예전처럼 flightDestination.y와 비교하면
+            // 그 미세한 차이 때문에 도착 판정이 영원히 안 나서(수직 오차가 0.05를 못 좁힘) 착륙까지 못 이어지는
+            // 문제가 있었다.
+            // groundOffset(메쉬 피벗-지면 거리)을 반드시 더해야 한다 - SampleGroundHeight는 순수 지면 표면 높이만
+            // 돌려주는데, 이륙 시 도달한 고도(transform.position + liftHeight)에는 이 피벗 오프셋이 이미 포함돼
+            // 있어서, 여기서 안 더하면 이동 중엔 이륙 때보다 딱 그 오프셋만큼 낮게 계산돼버린다.
+            float groundBelow = SampleGroundHeight(pos, flightDestination.y - liftHeight - groundOffset);
+            float desiredY = groundBelow + groundOffset + liftHeight;
+            pos.y = Mathf.MoveTowards(pos.y, desiredY, liftMoveSpeed * Time.deltaTime);
+
+            transform.position = pos;
+
+            bool arrivedHorizontally = Mathf.Abs(pos.x - flightDestination.x) < 0.05f && Mathf.Abs(pos.z - flightDestination.z) < 0.05f;
+            bool arrivedVertically = Mathf.Abs(pos.y - desiredY) < 0.05f;
+
+            if (arrivedHorizontally && arrivedVertically)
             {
                 isFlyingToDestination = false;
 
@@ -124,6 +166,20 @@ public class BuildingController : MonoBehaviour, IDestructible
                 Land();
             }
         }
+    }
+
+    // xzPosition의 X/Z 바로 아래에 있는 지면(groundLayer) 높이를 레이캐스트로 알아낸다. 못 찾으면 fallback을 쓴다.
+    // UnitController.SampleGroundHeight와 동일한 패턴.
+    private float SampleGroundHeight(Vector3 xzPosition, float fallback)
+    {
+        if (groundLayer == 0)
+            return fallback;
+
+        Vector3 rayOrigin = new Vector3(xzPosition.x, 1000f, xzPosition.z);
+        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 2000f, groundLayer))
+            return hit.point.y;
+
+        return fallback;
     }
 
     public bool CanLift() => canLift;
@@ -185,7 +241,10 @@ public class BuildingController : MonoBehaviour, IDestructible
         isDescending = false;
         pendingLanding = true;
         landingGroundDestination = destination; // 최종 착륙 지면 좌표 (하강 단계에서 사용)
-        flightDestination = destination + Vector3.up * liftHeight; // 수평 비행 중엔 착륙지점 상공(liftHeight 고도)까지만 이동
+        // 수평 비행 중엔 착륙지점 상공까지만 이동. destination(PlacementSystem이 계산)은 이미
+        // GetGroundOffsetY(피벗 오프셋)가 반영된 좌표라 여기서 groundOffset을 또 더하지 않는다
+        // (MoveWhileLifted의 groundDestination과 달리 이쪽은 이미 포함돼 있음).
+        flightDestination = new Vector3(destination.x, destination.y + liftHeight, destination.z);
         isFlyingToDestination = true;
     }
 
@@ -201,7 +260,11 @@ public class BuildingController : MonoBehaviour, IDestructible
         isAscending = false;
         isDescending = false;
         pendingLanding = false;
-        flightDestination = groundDestination + Vector3.up * liftHeight; // 공중유닛과 동일한 패턴: 목적지 + 이륙 높이
+        // 목적지의 지면 높이(Y) 기준으로 (피벗 오프셋 + liftHeight)만큼 띄운 고도까지 이동 - 언덕 위/아래로
+        // 이동해도 항상 "그 지점 + groundOffset + liftHeight"가 되도록 목적지 Y를 그대로 반영한다.
+        // groundDestination.y는 우클릭/Move 지점의 순수 지면 raycast 값(피벗 보정 없음)이라 groundOffset을
+        // 직접 더해줘야 한다(BeginRelocationFlight의 destination과 달리 여기엔 애초에 피벗 보정이 안 들어있음).
+        flightDestination = new Vector3(groundDestination.x, groundDestination.y + groundOffset + liftHeight, groundDestination.z);
         isFlyingToDestination = true;
     }
 

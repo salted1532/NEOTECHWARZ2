@@ -191,7 +191,7 @@ GameObject:
   - component: {fileID: 547785135463238089}
   - component: {fileID: 8453985708527338003}
   - component: {fileID: 2499581810181161271}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: AirUnitMarker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -669,6 +669,10 @@ MonoBehaviour:
   stuckTimer: 0
   isMovingAirUnit: 0
   isAirUnit: 1
+  airCruiseAltitude: 5
+  airGroundLayer:
+    serializedVersion: 2
+    m_Bits: 128
   UnitcurrentState: 0
   alreadyAttacked: 0
   timeBetweenAttacks: 1.2
@@ -681,6 +685,8 @@ MonoBehaviour:
   chaseLoseSightRange: 20
   markerFlashInterval: 0.3
   markerFlashCount: 3
+  followStopMargin: 1
+  airFollowStopMargin: 1
   buildInteractRange: 2
 --- !u!114 &1984441222666374635
 MonoBehaviour:
@@ -952,7 +958,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8287700491229270693}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0

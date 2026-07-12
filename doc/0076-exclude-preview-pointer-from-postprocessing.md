@@ -70,9 +70,22 @@ Overlay 카메라**로 만들어서 재사용하는 방식.
 - **`Assets/Scripts/BuildSystem/PreviewSystem.cs`**: 건물마다 다른 프리팹을 그대로 `Instantiate`하는 이동 중
   프리뷰 고스트(`previewObject`)는 프리팹 자체를 건드릴 수 없으므로, `PreparePreview()`에서
   `SetLayerRecursively(previewObject, indicatorsLayer)`로 런타임에 자식까지 전부 `Indicators` 레이어로 이동시키는
-  방식으로 처리. (`SpawnConstructionGhost()`로 만드는, 배치 확정 후 건설 중 표시되는 고스트는 이번 범위에서 제외 —
-  이건 "프리뷰/포인터"가 아니라 실제로 짓고 있는 건물의 반투명 표현이라 일반 조명/포스트프로세싱을 받는 게 자연스럽다고
-  판단.)
+  방식으로 처리.
+
+### 후속 수정 (2026-07-12): 클릭 확정 후 생성되는 고정 고스트도 누락돼 있었음
+
+`SpawnConstructionGhost()`(건설 위치 클릭 확정 직후 / 건물 리프트 "착륙" 위치 확정 직후, 일꾼·건물이 도착할 때까지
+그 자리에 남아있는 고정 반투명 고스트 — `PlacementSystem.cs`의 `PlaceStructure()`/`PlaceRelocatedBuilding()`에서 호출)는
+처음 작업 때 "실제 짓고 있는 건물의 표현이니 일반 포스트프로세싱을 받아도 된다"고 판단해 일부러 제외했었음.
+그런데 이 고스트는 `Instantiate(prefab, ...)`로 만들어져서 레이어가 원본 건물 프리팹 레이어(`Building`)를 그대로
+물려받고, `previewObject`와 마찬가지로 반투명 고스트 머티리얼(`ApplyGhostMaterial`)을 쓰는 "확정 전 임시 표시"라는
+점에서 이동 중 프리뷰와 본질적으로 같은 것이었음 — 사용자 확인 결과 이것도 Indicators 레이어로 옮겨야 함.
+
+이 고스트는 항상 `StartConstruction()`/`onLanded`/`onCancelled` 콜백에서 `Destroy()`되고 그 자리에 별개의
+진짜 오브젝트(`BaseStructure` 또는 착륙한 건물 자신)가 대신 들어서므로, 고스트 자체가 "진짜 건물"로 전환되는 경우는
+없음 — 그래서 계속 Building 레이어로 둘 이유가 없었음.
+
+- `SpawnConstructionGhost()`에도 `SetLayerRecursively(ghost, indicatorsLayer)` 한 줄 추가로 해결.
 - **`Assets/Scenes/SampleScene.unity`의 Main Camera**:
   - `m_CullingMask`: `4294967295`(Everything) → `4294963199` (Layer 12 `Indicators`만 제외한 나머지 전부).
   - `UniversalAdditionalCameraData.m_Cameras`에 새 Overlay 카메라를 추가해서 Camera Stack 구성.

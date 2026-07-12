@@ -43,6 +43,17 @@ public class UnitController : MonoBehaviour, IDestructible
     private bool isMovingAirUnit = false;
     [SerializeField]
     private bool isAirUnit;
+    // 공중 유닛이 지면으로부터 띄워서 날아다니는 높이. 목적지 자체가 이미 공중에 뜬 대상(다른 공중유닛/이륙한
+    // 건물)의 좌표일 땐 여기에 또 더하지 않는다(AirTargetPosition의 destinationIsAirborne 참고) - 안 그러면
+    // 고도가 중첩(예: 5+5=10)돼서 그 대상 머리 위로 솟구쳐버린다.
+    [SerializeField]
+    private float airCruiseAltitude = 5f;
+
+    // 공중 유닛이 이동 중 실시간으로 자기 발밑 지면 높이를 알아내기 위한 레이어(지형/땅). 비워두면(Nothing)
+    // 지면 높이 추적 없이 목적지 고도로 곧장 직선 이동한다(이 경우 언덕을 완전히 넘기 전에 미리 하강해서
+    // 언덕에 파묻히듯 스칠 수 있음 - 아래 SampleGroundHeight 주석 참고).
+    [SerializeField]
+    private LayerMask airGroundLayer;
 
     // ===== 상태 하나로 통합 =====
     private enum UnitState
@@ -130,6 +141,18 @@ public class UnitController : MonoBehaviour, IDestructible
     // Attack 상태가 아니라 Idle로 유지해야 AttackRange가 사거리 내 적을 자동으로 교전한다 (AttackMoveTo와 동일한 이유).
     private UnitController followTarget;
     private bool hasFollowOrder;
+    // 지상 유닛이 정지할 때 실제 몸체 반경(this.navMeshAgent.radius + 대상의 반경, 대상이 지상유닛일 때만)에
+    // 더해줄 여유 거리. 고정된 정지거리를 쓰면 유닛 크기에 따라 두 NavMeshAgent 반경 합보다 짧아질 수 있는데,
+    // 그러면 NavMeshAgent가 서로의 반경 안쪽 자리를 계속 점유하려고 들어서 밀어붙이는 문제가 생긴다 -
+    // 그래서 고정 거리가 아니라 "두 유닛 반경 합 + 여유값"으로 대상 크기에 맞춰 정지 거리가 늘어나게 한다.
+    [SerializeField] private float followStopMargin = 1f;
+    // 공중 유닛이 정지할 때 실제 몸체 반경(this.airUnitRadius + 대상의 airUnitRadius, 대상이 공중유닛일 때만)에
+    // 더해줄 여유 거리. 고정값(예전엔 airFollowStopDistance 4로 고정)으로 두면 작은 유닛끼리는 여유롭게 멈추지만
+    // 큰 유닛(예: airUnitRadius가 큰 유닛)은 그 문턱보다 실제 반경 합이 더 커서 여전히 서로 밀고 들어가는 문제가
+    // 있었다 - 그래서 고정 거리가 아니라 "두 유닛 반경 합 + 여유값"으로 대상 크기에 맞춰 정지 거리가 늘어나게 한다.
+    // 목표 도착 판정이 MoveTowards 기반이라 문턱 부근에서 위치가 살짝만 흔들려도(대상이 다른 유닛에 밀려 미세하게
+    // 움직이는 등) 정지→재이동을 반복하며 튕겨 들어가는 현상을 줄이기 위한 여유값이기도 하다.
+    [SerializeField] private float airFollowStopMargin = 1f;
 
     // ===== 건설 이동 (건설모드에서 위치 클릭 시 일꾼이 그 자리로 이동 후 완공) =====
     [SerializeField] private float buildInteractRange = 2f; // 건설 위치 도착 판정 거리 (gatherInteractRange와 동일한 이유)
@@ -154,7 +177,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = transform.position + Vector3.up * 5f;
+            targetPosition = AirTargetPosition(transform.position);
             isMovingAirUnit = true;
         }
 
@@ -180,11 +203,23 @@ public class UnitController : MonoBehaviour, IDestructible
         //공중 유닛 일 경우
         if (isAirUnit && isMovingAirUnit)
         {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                targetPosition,
-                moveSpeed * Time.deltaTime
-            );
+            // 수평(X/Z)은 목적지를 향해, 수직(Y)은 "지금 발밑 지면 + airCruiseAltitude"를 매 프레임 다시 재서
+            // 각각 독립적으로 수렴시킨다 - 그래야 언덕 위를 지나는 동안은 그만큼 떠 있다가, 언덕을 실제로 벗어나
+            // 발밑 지형이 낮아지는 순간에 맞춰 고도도 자연스럽게 낮아진다.
+            Vector3 pos = transform.position;
+
+            Vector3 horizontalTarget = new Vector3(targetPosition.x, pos.y, targetPosition.z);
+            pos = Vector3.MoveTowards(pos, horizontalTarget, moveSpeed * Time.deltaTime);
+
+            // 도착 판정은 미리 계산해둔 targetPosition.y가 아니라 "지금 이 프레임에 실제로 향하고 있는" 고도
+            // (desiredY)와 비교해야 한다. targetPosition.y는 명령을 내린 시점에 한 번 계산된 값이라 실제 지형
+            // (레이캐스트로 잰 값)과 완전히 일치한다는 보장이 없는데, 예전처럼 targetPosition.y와 비교하면 그
+            // 미세한 차이 때문에 도착 판정이 영원히 안 나서 계속 제자리에서 맴도는 문제가 있었다.
+            float groundBelow = SampleGroundHeight(pos, targetPosition.y - airCruiseAltitude);
+            float desiredY = groundBelow + airCruiseAltitude;
+            pos.y = Mathf.MoveTowards(pos.y, desiredY, moveSpeed * Time.deltaTime);
+
+            transform.position = pos;
 
             Vector3 dir = targetPosition - transform.position;
             dir.y = 0;
@@ -195,7 +230,10 @@ public class UnitController : MonoBehaviour, IDestructible
                 transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
             }
 
-            if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+            bool arrivedHorizontally = Mathf.Abs(pos.x - targetPosition.x) < 0.1f && Mathf.Abs(pos.z - targetPosition.z) < 0.1f;
+            bool arrivedVertically = Mathf.Abs(pos.y - desiredY) < 0.1f;
+
+            if (arrivedHorizontally && arrivedVertically)
             {
                 isMovingAirUnit = false;
 
@@ -331,8 +369,51 @@ public class UnitController : MonoBehaviour, IDestructible
         MoveAgentTo(end);
     }
 
-    // 지상/공중 유닛 이동 로직을 한 곳으로 모은 헬퍼 (공격 명령 추적/재개 로직에서 반복 사용하기 위함)
-    private void MoveAgentTo(Vector3 destination)
+    // 공중 유닛의 비행 목표 좌표를 계산한다.
+    // destinationIsAirborne이 false(기본값)면 destination을 "지면 좌표"로 보고 그 지점의 지면 높이(Y) 기준으로
+    // airCruiseAltitude만큼 띄운다 - 그래야 언덕/저지대처럼 지형 높이가 다른 곳도 정확히 "그 지점 + 5"로 날아간다.
+    // destinationIsAirborne이 true면 destination이 이미 공중에 뜬 대상(다른 공중유닛/이륙한 건물/자기 자신의 현재
+    // 위치)의 좌표라는 뜻이므로 다시 더하지 않고 그대로 쓴다 - 안 그러면 이미 반영된 고도에 또 더해져서(예: 5+5=10)
+    // 그 대상 머리 위로 솟구쳐버린다.
+    private Vector3 AirTargetPosition(Vector3 destination, bool destinationIsAirborne = false)
+    {
+        if (destinationIsAirborne)
+            return destination;
+
+        return new Vector3(destination.x, destination.y + airCruiseAltitude, destination.z);
+    }
+
+    // friendlyTarget(아군 강제공격 대상)은 UnitController 또는 BuildingController 둘 다 될 수 있어서,
+    // 실제로 지금 공중에 떠 있는 상태인지 타입별로 확인해야 AirTargetPosition에 정확히 알려줄 수 있다.
+    private static bool IsAirborne(MonoBehaviour target)
+    {
+        if (target is UnitController unit)
+            return unit.isAirUnit;
+        if (target is BuildingController building)
+            return building.IsLifted();
+        return false;
+    }
+
+    // xzPosition의 X/Z 바로 아래에 있는 지면(airGroundLayer) 높이를 레이캐스트로 알아낸다. 못 찾으면 fallback을 쓴다.
+    // 공중 유닛이 "지금 자기 발밑" 지형을 매 프레임 다시 확인하는 데 쓴다 - 목적지 고도를 미리 계산해서 그쪽으로만
+    // 직선 이동하면, 언덕 위에서 출발해 저지대로 이동할 때 언덕을 채 벗어나기도 전에 미리 하강을 시작해서 언덕
+    // 지형에 파묻히듯 스치는 문제가 생긴다. 매 프레임 발밑 지형을 다시 재는 방식이라야 "언덕을 실제로 벗어나는
+    // 순간"에 맞춰 고도가 자연스럽게 바뀐다.
+    private float SampleGroundHeight(Vector3 xzPosition, float fallback)
+    {
+        if (airGroundLayer == 0)
+            return fallback;
+
+        Vector3 rayOrigin = new Vector3(xzPosition.x, 1000f, xzPosition.z);
+        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 2000f, airGroundLayer))
+            return hit.point.y;
+
+        return fallback;
+    }
+
+    // 지상/공중 유닛 이동 로직을 한 곳으로 모은 헬퍼 (공격 명령 추적/재개 로직에서 반복 사용하기 위함).
+    // destinationIsAirborne: destination이 이미 공중에 뜬 대상의 좌표인지 (공중 유닛에만 의미 있음).
+    private void MoveAgentTo(Vector3 destination, bool destinationIsAirborne = false)
     {
         if (!isAirUnit)
         {
@@ -341,7 +422,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = destination + Vector3.up * 5f;
+            targetPosition = AirTargetPosition(destination, destinationIsAirborne);
             isMovingAirUnit = true;
         }
     }
@@ -428,7 +509,7 @@ public class UnitController : MonoBehaviour, IDestructible
         arrived = false;
         UnitcurrentState = UnitState.Attack;
 
-        MoveAgentTo(target.transform.position);
+        MoveAgentTo(target.transform.position, IsAirborne(target));
     }
 
     // 아군 강제 공격을 매 프레임 갱신한다: 사거리 안이면 공격하고, 아니면 거리 제한 없이 계속 추격한다.
@@ -460,7 +541,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            MoveAgentTo(friendlyTarget.transform.position); // 사거리 밖: 거리 상관없이 끝까지 추격
+            MoveAgentTo(friendlyTarget.transform.position, IsAirborne(friendlyTarget)); // 사거리 밖: 거리 상관없이 끝까지 추격
         }
     }
 
@@ -477,11 +558,13 @@ public class UnitController : MonoBehaviour, IDestructible
         arrived = false;
         UnitcurrentState = UnitState.Idle; // Idle 유지 - AttackRange가 사거리 내 적을 자동으로 교전하게 함
 
-        MoveAgentTo(target.transform.position);
+        MoveAgentTo(target.transform.position, target.isAirUnit);
     }
 
     // 따라다니기 명령을 매 프레임 갱신한다: 대상이 죽으면 그 자리에 멈추고, 교전 중(AttackRange가 정지시킨 상태)이면
-    // 이동 명령을 덮어쓰지 않으며, 그 외에는 대상의 최신 위치로 계속 이동한다 (거리 제한 없음 - FriendlyAttackTick과 동일 패턴).
+    // 이동 명령을 덮어쓰지 않으며, 두 유닛의 반경 합(+여유값) 이내로 가까워지면 정지한다(그래야 지상 유닛이 대상을
+    // 계속 밀어붙이거나, 공중 유닛이 계속 "이동 중" 상태로 남아 겹침 분리가 안 되는 문제가 없다). 그 외에는 대상의
+    // 최신 위치로 계속 이동한다. 대상이 다시 멀어지면 다음 프레임에 거리 재확인으로 자동으로 다시 쫓아간다.
     private void FollowTick()
     {
         if (!hasFollowOrder)
@@ -502,7 +585,29 @@ public class UnitController : MonoBehaviour, IDestructible
         if (attackRange != null && attackRange.HasEnemyInRange)
             return; // 교전 중이면 그대로 둔다 (AttackRange가 정지시킨 상태 유지)
 
-        MoveAgentTo(followTarget.transform.position);
+        float stopDistance;
+        if (isAirUnit)
+        {
+            float combinedRadius = airUnitRadius + (followTarget.isAirUnit ? followTarget.airUnitRadius : 0f);
+            stopDistance = combinedRadius + airFollowStopMargin;
+        }
+        else
+        {
+            float combinedRadius = navMeshAgent.radius + (followTarget.isAirUnit ? 0f : followTarget.navMeshAgent.radius);
+            stopDistance = combinedRadius + followStopMargin;
+        }
+
+        float sqrDist = (followTarget.transform.position - transform.position).sqrMagnitude;
+        if (sqrDist <= stopDistance * stopDistance)
+        {
+            if (!isAirUnit)
+                navMeshAgent.isStopped = true;
+            else
+                isMovingAirUnit = false;
+            return;
+        }
+
+        MoveAgentTo(followTarget.transform.position, followTarget.isAirUnit);
     }
 
     // 건설모드에서 건물 위치를 클릭했을 때 PlacementSystem이 호출한다.
@@ -657,7 +762,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = pos + Vector3.up * 5f;
+            targetPosition = AirTargetPosition(pos);
             isMovingAirUnit = true;
         }
     }
@@ -670,7 +775,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = transform.position + Vector3.up * 5f;
+            targetPosition = AirTargetPosition(transform.position, true); // 제자리 정지 - 현재 고도를 그대로 유지
             isMovingAirUnit = false;
         }
 
@@ -731,7 +836,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = transform.position + Vector3.up * 5f;
+            targetPosition = AirTargetPosition(transform.position, true); // 제자리 정지 - 현재 고도를 그대로 유지
             isMovingAirUnit = false;
         }
 
@@ -761,7 +866,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = endPoint + Vector3.up * 5f;
+            targetPosition = AirTargetPosition(endPoint);
             isMovingAirUnit = true;
         }
     }
@@ -776,9 +881,13 @@ public class UnitController : MonoBehaviour, IDestructible
             !navMeshAgent.pathPending &&
             navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance;
 
+        // 수평(X/Z) 거리만 본다 - 고도는 Update()에서 매 프레임 발밑 지형을 따라 계속 조정되는 값이라
+        // targetPosition.y와 정확히 일치한다는 보장이 없어서, 3D 거리로 비교하면 도착 판정이 영원히 안 날 수 있다.
+        Vector3 horizontalDiff = targetPosition - transform.position;
+        horizontalDiff.y = 0;
         bool arrivedAir =
             isAirUnit &&
-            (targetPosition - transform.position).sqrMagnitude < 0.5f;
+            horizontalDiff.sqrMagnitude < 0.5f;
 
         if (!arrivedGround && !arrivedAir)
             return;
@@ -792,7 +901,7 @@ public class UnitController : MonoBehaviour, IDestructible
             if (!isAirUnit)
                 navMeshAgent.SetDestination(startPoint);
             else
-                targetPosition = startPoint;
+                targetPosition = AirTargetPosition(startPoint, true); // startPoint는 순찰 시작 시 현재(이미 공중) 위치를 그대로 캡처한 값
         }
         else
         {
@@ -801,7 +910,7 @@ public class UnitController : MonoBehaviour, IDestructible
             if (!isAirUnit)
                 navMeshAgent.SetDestination(endPoint);
             else
-                targetPosition = endPoint + Vector3.up * 5f;
+                targetPosition = AirTargetPosition(endPoint);
         }
     }
 
@@ -820,7 +929,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = transform.position + Vector3.up * 5f;
+            targetPosition = AirTargetPosition(transform.position, true); // 제자리 정지 - 현재 고도를 그대로 유지
             isMovingAirUnit = false;
         }
     }
@@ -1128,6 +1237,7 @@ public class UnitController : MonoBehaviour, IDestructible
         RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
         controller?.UnitList.Remove(this);
         controller?.selectedUnitList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel/Squad_panel 등)가 유령 참조를 들고 있지 않도록
+        controller?.ReleaseUnitPopulation(unitID); // 죽은 유닛이 차지하던 인구수를 현재 인구수에서 반환
 
         Destroy(gameObject);
     }

@@ -192,7 +192,8 @@ public class PlacementSystem : MonoBehaviour
 
         BaseStructure structure = obj.GetComponent<BaseStructure>();
         // 플레이어가 직접 건설을 취소할 때(CancelConstruction) 그리드 예약을 풀어줄 콜백도 함께 넘긴다.
-        structure.Initialize(data.ID, data.productionTime, groundPos, gridPos, () => CancelReservedConstruction(gridPos, null));
+        // data.Size/grid.cellSize를 넘겨서, 3x3 기준으로 만들어진 BaseStructure 프리팹을 실제 건물 칸 수에 맞게 스케일한다.
+        structure.Initialize(data.ID, data.productionTime, groundPos, gridPos, data.Size, grid.cellSize, () => CancelReservedConstruction(gridPos, null));
 
         placedGameObject[placedIndex] = obj;
 

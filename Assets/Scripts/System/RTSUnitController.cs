@@ -813,6 +813,15 @@ public class RTSUnitController : MonoBehaviour
             resourceManager.RemoveMaxPopulation(data.maxpopulationamount);
     }
 
+    // 유닛이 죽었을 때 그 유닛이 차지하던 인구수만큼 현재 인구수에서 반환한다 (unitID로 DB에서 조회).
+    // RefundUnit()과 달리 광물/가스는 돌려주지 않는다 - 이미 살아서 존재했던 유닛이 죽은 것이지, 생산 취소가 아니기 때문.
+    public void ReleaseUnitPopulation(int unitID)
+    {
+        UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
+        if (data != null)
+            resourceManager.ReleasePopulation(data.population);
+    }
+
     /// 유닛 생산 요청 (선택된 건물들에게 큐잉하기 전에 대기열/자원부터 확인)
     public bool TryProduceUnit(int unitID)
     {
