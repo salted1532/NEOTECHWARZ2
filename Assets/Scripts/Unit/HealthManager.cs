@@ -33,6 +33,7 @@ public class HealthManager : MonoBehaviour
     }
 
     // 체력이 바뀔 때마다(OnHealthChanged) 체력바 슬라이더 값을 함께 갱신한다. 슬라이더가 연결 안 돼 있으면 아무 것도 안 함.
+    // 만피 상태에서는 체력바를 숨기고, 조금이라도 깎이면 다시 보여준다(회복해서 만피로 돌아가면 다시 숨김).
     private void UpdateHealthSlider(int current, int max)
     {
         if (healthSlider == null)
@@ -40,6 +41,7 @@ public class HealthManager : MonoBehaviour
 
         healthSlider.maxValue = max;
         healthSlider.value = current;
+        healthSlider.gameObject.SetActive(current < max);
     }
 
     // 체력바 UI 자체를 켜고 끈다 (건설 프리뷰/고스트처럼 체력 표시가 필요 없는 경우 PreviewSystem이 호출).
