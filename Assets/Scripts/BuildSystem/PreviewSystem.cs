@@ -8,8 +8,14 @@ public class PreviewSystem : MonoBehaviour
     private float previewYOffset = 0.06f;
 
     [SerializeField]
+    private float cellIndicatorYOffset = 0.02f;
+
+    [SerializeField]
     private GameObject cellIndicator;
     private GameObject previewObject;
+
+    [SerializeField]
+    private Grid grid;
 
     [SerializeField]
     private Material previewMaterialPrefab;
@@ -17,11 +23,27 @@ public class PreviewSystem : MonoBehaviour
 
     private Renderer cellIndicatorRenderer;
 
+    // 포스트프로세싱(Bloom/Tonemapping/Color Adjustments)과 SSAO의 영향을 받지 않도록,
+    // Main Camera는 그리지 않고 별도 Overlay 카메라만 그리는 전용 레이어(Indicators)에 프리뷰 고스트를 배치한다.
+    private int indicatorsLayer;
+
     private void Start()
     {
         previewMaterialInstance = new Material(previewMaterialPrefab);
         cellIndicator.SetActive(false);
         cellIndicatorRenderer = cellIndicator.GetComponentInChildren<Renderer>();
+        indicatorsLayer = LayerMask.NameToLayer("Indicators");
+    }
+
+    // 오브젝트와 그 자식 전체의 레이어를 재귀적으로 바꾼다 (previewObject는 매번 다른 건물 프리팹을
+    // 그대로 Instantiate하므로, 프리팹 자체의 레이어를 건드리지 않고 런타임에만 전용 레이어로 옮긴다).
+    private static void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
     }
 
     // 배치할 프리팹의 고스트(프리뷰) 오브젝트를 생성하고 셀 커서 크기를 맞춰 표시한다.
@@ -46,7 +68,8 @@ public class PreviewSystem : MonoBehaviour
     {
         if (size.x > 0 || size.y > 0)
         {
-            cellIndicator.transform.localScale = new Vector3(size.x, 1, size.y);
+            Vector3 cellSize = grid.cellSize;
+            cellIndicator.transform.localScale = new Vector3(size.x * cellSize.x, 1, size.y * cellSize.z);
             cellIndicatorRenderer.material.mainTextureScale = size;
         }
     }
@@ -57,6 +80,7 @@ public class PreviewSystem : MonoBehaviour
     {
         ApplyGhostMaterial(previewObject, previewMaterialInstance);
         DisableGameplayComponents(previewObject);
+        SetLayerRecursively(previewObject, indicatorsLayer);
     }
 
     // 오브젝트의 모든 렌더러 머티리얼을 지정한 머티리얼 인스턴스로 교체한다.
@@ -136,16 +160,18 @@ public class PreviewSystem : MonoBehaviour
     }
 
     // 매 프레임 마우스 위치를 받아 프리뷰/커서 위치와 배치 가능 여부에 따른 색상 피드백을 갱신한다.
-    public void UpdatePosition(Vector3 position, bool validity)
+    // previewPosition: 건물 프리뷰(고스트)용 위치 (건물 메쉬 바닥이 지면에 닿도록 이미 높이 보정됨)
+    // groundPosition: 셀 커서(cellIndicator)용 위치 (건물 높이와 무관하게 항상 지면 기준)
+    public void UpdatePosition(Vector3 previewPosition, Vector3 groundPosition, bool validity)
     {
         if (previewObject != null)
         {
-            MovePreview(position);
+            MovePreview(previewPosition);
             ApplyFeedbackToPreview(validity);
 
         }
 
-        MoveCursor(position);
+        MoveCursor(groundPosition);
         ApplyFeedbackToCursor(validity);
     }
 
@@ -167,11 +193,12 @@ public class PreviewSystem : MonoBehaviour
         cellIndicatorRenderer.material.color = c;
     }
 
-    // 셀 커서를 지면 살짝 아래(y -0.9)로 내려서 배치하여 바닥에 밀착된 것처럼 보이게 한다.
+    // 셀 커서를 지면 기준 위치 + 살짝 띄운 오프셋(cellIndicatorYOffset)으로 배치해 바닥에 밀착된 것처럼 보이게 한다.
+    // 건물 높이와 무관하게 항상 같은 높이(지면)에 그려져야 하므로, 건물 프리뷰 위치가 아닌 별도의 지면 위치를 받는다.
     private void MoveCursor(Vector3 position)
     {
         Vector3 cellPosition = position;
-        cellPosition.y -= 0.9f;
+        cellPosition.y += cellIndicatorYOffset;
 
         cellIndicator.transform.position = cellPosition;
     }

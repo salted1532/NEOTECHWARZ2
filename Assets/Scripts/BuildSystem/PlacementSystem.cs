@@ -415,9 +415,10 @@ public class PlacementSystem : MonoBehaviour
                 && !IsBlocked(mousePos, data.Size)
                 && !IsTooCloseToResource(data.ID, gridPos, data.Size);
 
-            Vector3 previewPos = GetGroundPosition(gridPos, data.Size) + Vector3.up * GetGroundOffsetY(data.Prefab);
+            Vector3 groundPos = GetGroundPosition(gridPos, data.Size);
+            Vector3 previewPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab);
 
-            preview.UpdatePosition(previewPos, valid);
+            preview.UpdatePosition(previewPos, groundPos, valid);
 
             mouseIndicator.transform.position = mousePos;
 

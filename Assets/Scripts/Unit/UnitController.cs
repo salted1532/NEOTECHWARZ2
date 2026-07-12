@@ -96,8 +96,11 @@ public class UnitController : MonoBehaviour, IDestructible
     private float defaultAgentRadius;
 
     // ===== 공중 유닛 겹침 분리 (이동 중엔 통과 허용, 정지/공격 중엔 분리) =====
-    [SerializeField] private float airSeparationRadius = 1.2f; // 두 콜라이더 반경 합 정도
-    [SerializeField] private float airSeparationSpeed = 4f;    // 밀려나는 속도(초당)
+    // 이 유닛 자신이 차지하는 "절반의 분리 반경". 두 유닛 사이에 필요한 분리 거리는 항상
+    // (this.airUnitRadius + other.airUnitRadius)로 계산되므로, 큰 유닛일수록 이 값을 키우면
+    // 그 유닛이 낀 모든 페어가 자동으로 더 멀리 떨어져서 풀린다 (유닛 크기에 비례한 분리).
+    [SerializeField] private float airUnitRadius = 0.6f;    // 기본값 0.6 = 기존 고정 분리거리(1.2)와 동일한 결과
+    [SerializeField] private float airSeparationSpeed = 4f; // 밀려나는 속도(초당)
 
     // ===== 공격 명령 (우클릭 적 지정 / A 모드) =====
     [SerializeField] private float chaseLoseSightRange = 20f; // 지정 추격 대상과 이 거리 이상 벌어지면 "시야 이탈"로 간주
@@ -255,9 +258,12 @@ public class UnitController : MonoBehaviour, IDestructible
             diff.y = 0f; // 고도는 건드리지 않고 수평으로만 분리
             float dist = diff.magnitude;
 
-            if (dist > 0.001f && dist < airSeparationRadius)
+            // 필요한 분리 거리 = 두 유닛 각자의 반경 합 (큰 유닛이 낀 페어일수록 더 멀리 떨어짐)
+            float requiredDist = airUnitRadius + other.airUnitRadius;
+
+            if (dist > 0.001f && dist < requiredDist)
             {
-                float overlap = airSeparationRadius - dist;
+                float overlap = requiredDist - dist;
                 push += diff.normalized * overlap;
             }
         }
