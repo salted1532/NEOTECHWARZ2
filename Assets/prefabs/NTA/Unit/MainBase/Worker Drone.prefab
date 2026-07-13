@@ -690,6 +690,10 @@ MonoBehaviour:
   stuckTimer: 0
   isMovingAirUnit: 0
   isAirUnit: 0
+  airCruiseAltitude: 5
+  airGroundLayer:
+    serializedVersion: 2
+    m_Bits: 0
   UnitcurrentState: 0
   alreadyAttacked: 0
   timeBetweenAttacks: 0.6
@@ -702,6 +706,8 @@ MonoBehaviour:
   chaseLoseSightRange: 20
   markerFlashInterval: 0.3
   markerFlashCount: 3
+  followStopMargin: 1
+  airFollowStopMargin: 1
   buildInteractRange: 2
 --- !u!114 &-8791996355998483226
 MonoBehaviour:

@@ -784,6 +784,9 @@ MonoBehaviour:
   isMovingAirUnit: 0
   isAirUnit: 0
   airCruiseAltitude: 5
+  airGroundLayer:
+    serializedVersion: 2
+    m_Bits: 0
   UnitcurrentState: 0
   alreadyAttacked: 0
   timeBetweenAttacks: 1
@@ -796,6 +799,8 @@ MonoBehaviour:
   chaseLoseSightRange: 20
   markerFlashInterval: 0.3
   markerFlashCount: 3
+  followStopMargin: 1
+  airFollowStopMargin: 1
   buildInteractRange: 2
 --- !u!114 &-6595556838437288612
 MonoBehaviour:
@@ -1254,7 +1259,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 4652853755716937891, guid: 14c22f8bcb5d67d42a69fa2f1da0e9a5, type: 3}
+    - {fileID: 8641298216092165884, guid: 14c22f8bcb5d67d42a69fa2f1da0e9a5, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 14c22f8bcb5d67d42a69fa2f1da0e9a5, type: 3}
