@@ -396,6 +396,11 @@ public class UserControl : MonoBehaviour
     /// </summary>
     private void HandleRightClick()
     {
+        // 건설모드(배치 프리뷰 포함) 중 우클릭 = 배치 취소 + 그 자리에서 원래 우클릭 명령(이동/추적/공격 등) 수행.
+        // ReturnState()로 UnitSelect로 되돌리면 아래 기존 분기들이 selectedUnitList(건설 맡던 일꾼)에 대해 그대로 동작한다.
+        if (rtsUnitController.IsBuildMode())
+            rtsUnitController.CancelBuildMode();
+
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit unitHit;
         RaycastHit groundHit;

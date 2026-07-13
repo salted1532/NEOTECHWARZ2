@@ -12,7 +12,7 @@ public class ResourceManager : MonoBehaviour
     private int currentOre;
     private int currentGas;
     private int currentPopulation;   // 현재 사용 중인 인구수
-    private int maxPopulation;       // 인구수 한도 (보급고 등 건물로 증가)
+    private int rawMaxPopulation;    // 인구수 한도 누적치 (200 캡 적용 전 실제 합계)
 
     // 자원/인구가 변경될 때마다 발생하는 이벤트 (UI 갱신용)
     public event System.Action OnResourceChanged;
@@ -21,14 +21,15 @@ public class ResourceManager : MonoBehaviour
     {
         currentOre = startOre;
         currentGas = startGas;
-        maxPopulation = startMaxPopulation;
+        rawMaxPopulation = startMaxPopulation;
     }
 
     // ===== Get =====
     public int GetOre() => currentOre;
     public int GetGas() => currentGas;
     public int GetPopulation() => currentPopulation;
-    public int GetMaxPopulation() => maxPopulation;
+    // 표시/판정용 한도는 항상 여기서 캡을 씌운다. 누적치(rawMaxPopulation) 자체는 캡을 넘어도 그대로 보존.
+    public int GetMaxPopulation() => Mathf.Min(maxPopulationCap, rawMaxPopulation);
 
     // ===== 채취(일꾼)로 인한 자원 획득 =====
     public void AddOre(int amount)
@@ -46,17 +47,19 @@ public class ResourceManager : MonoBehaviour
     }
 
     // ===== 인구수 한도 변경 (보급고 건설/파괴 시) =====
+    // 누적치(rawMaxPopulation)에는 캡을 씌우지 않는다 — 캡을 넘겨 지은 뒤 일부가 파괴돼도
+    // 남은 누적치가 여전히 캡을 넘으면 표시 한도(GetMaxPopulation)는 캡값 그대로 유지되어야 하기 때문.
     public void AddMaxPopulation(int amount)
     {
         if (amount <= 0) return;
-        maxPopulation = Mathf.Min(maxPopulationCap, maxPopulation + amount);
+        rawMaxPopulation += amount;
         OnResourceChanged?.Invoke();
     }
 
     public void RemoveMaxPopulation(int amount)
     {
         if (amount <= 0) return;
-        maxPopulation = Mathf.Max(0, maxPopulation - amount);
+        rawMaxPopulation = Mathf.Max(0, rawMaxPopulation - amount);
         OnResourceChanged?.Invoke();
     }
 
@@ -65,7 +68,7 @@ public class ResourceManager : MonoBehaviour
     {
         if (currentOre < oreCost) return false;
         if (currentGas < gasCost) return false;
-        if (currentPopulation + populationCost > maxPopulation) return false;
+        if (currentPopulation + populationCost > GetMaxPopulation()) return false;
 
         return true;
     }

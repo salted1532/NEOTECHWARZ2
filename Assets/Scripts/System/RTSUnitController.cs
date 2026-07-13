@@ -1130,11 +1130,7 @@ public class RTSUnitController : MonoBehaviour
                     BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Airport), BuildingID.Airport, KeyCode.P),
                     BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Lab), BuildingID.Lab, KeyCode.L),
                     ButtonAction.Simple(
-                        () =>
-                        {
-                            PlacementSystem.StopPlacement();
-                            ReturnState();
-                        },
+                        CancelBuildMode,
                         "Cancel",
                         "Exit build mode. \nshortcut key [<color=yellow>T</color>]",
                         KeyCode.T));
@@ -1166,6 +1162,12 @@ public class RTSUnitController : MonoBehaviour
     public void ReturnState()
     {
         RTScurrentSate = SelectState.UnitSelect;
+    }
+    // 건설모드(배치 프리뷰 포함) 취소 - Cancel 버튼과 우클릭 명령 가로채기가 공유해서 쓴다.
+    public void CancelBuildMode()
+    {
+        PlacementSystem.StopPlacement();
+        ReturnState();
     }
 
     #endregion

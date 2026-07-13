@@ -135,4 +135,81 @@
 
 - 건물 목록 패널만 열려 있고(배치 프리뷰 시작 전) 우클릭해도 동일하게 취소 + 이동이 적용된다 (`PlacementSystem.StopPlacement()`는 `selectedObjectIndex < 0`이어도 안전하게 아무 것도 안 함).
 - 왼쪽 클릭(배치 확정)이나 ESC(취소만) 동작은 이번 변경과 무관하게 그대로 유지.
-- 아직 프로젝트 파일에는 반영하지 않음 — 승인 시 위 변경 그대로 적용 예정.
+## 적용 결과 (2026-07-13)
+
+사용자가 doc 92번 내용이 실제 프로젝트에 적용됐는지 확인 요청 → 미적용 상태였음을 확인 → 적용 승인 받아 위 계획대로 그대로 반영함.
+
+### `Assets/Scripts/System/RTSUnitController.cs`
+
+Before (1132-1140):
+```csharp
+                    ButtonAction.Simple(
+                        () =>
+                        {
+                            PlacementSystem.StopPlacement();
+                            ReturnState();
+                        },
+                        "Cancel",
+                        "Exit build mode. \nshortcut key [<color=yellow>T</color>]",
+                        KeyCode.T));
+```
+
+After:
+```csharp
+                    ButtonAction.Simple(
+                        CancelBuildMode,
+                        "Cancel",
+                        "Exit build mode. \nshortcut key [<color=yellow>T</color>]",
+                        KeyCode.T));
+```
+
+Before (1165-1169, `#region RTSController 상태 전환`):
+```csharp
+    //상태 초기화
+    public void ReturnState()
+    {
+        RTScurrentSate = SelectState.UnitSelect;
+    }
+
+    #endregion
+```
+
+After:
+```csharp
+    //상태 초기화
+    public void ReturnState()
+    {
+        RTScurrentSate = SelectState.UnitSelect;
+    }
+    // 건설모드(배치 프리뷰 포함) 취소 - Cancel 버튼과 우클릭 명령 가로채기가 공유해서 쓴다.
+    public void CancelBuildMode()
+    {
+        PlacementSystem.StopPlacement();
+        ReturnState();
+    }
+
+    #endregion
+```
+
+### `Assets/Scripts/UserControl/UserControl.cs`
+
+Before (397-399):
+```csharp
+    private void HandleRightClick()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+```
+
+After:
+```csharp
+    private void HandleRightClick()
+    {
+        // 건설모드(배치 프리뷰 포함) 중 우클릭 = 배치 취소 + 그 자리에서 원래 우클릭 명령(이동/추적/공격 등) 수행.
+        // ReturnState()로 UnitSelect로 되돌리면 아래 기존 분기들이 selectedUnitList(건설 맡던 일꾼)에 대해 그대로 동작한다.
+        if (rtsUnitController.IsBuildMode())
+            rtsUnitController.CancelBuildMode();
+
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+```
+
+계획했던 것과 100% 동일하게 반영됨. `IsBuildMode()`는 이미 `RTSUnitController.cs:1206`에 존재하고 `UserControl.cs:550`에서도 이미 사용 중이던 메서드라 별도 추가 불필요했음.
