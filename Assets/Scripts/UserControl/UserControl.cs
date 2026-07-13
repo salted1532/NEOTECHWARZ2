@@ -38,6 +38,29 @@ public class UserControl : MonoBehaviour
     [SerializeField]
     private GameObject attackPointerPrefab;
 
+    [Header("Mouse Cursor")]
+    [SerializeField]
+    private Texture2D cursorDefaultTexture; // 비워두면 OS 기본 화살표 사용
+    [SerializeField]
+    private Texture2D cursorSelectEnemyTexture;
+    [SerializeField]
+    private Texture2D cursorSelectAllyTexture;
+    [SerializeField]
+    private Texture2D cursorSelectNeutralTexture;
+    [SerializeField]
+    private Texture2D cursorCommandEnemyTexture;
+    [SerializeField]
+    private Texture2D cursorCommandAllyTexture;
+    [SerializeField]
+    private Texture2D cursorCommandNeutralTexture;
+    [SerializeField]
+    private Vector2 cursorHotspot = Vector2.zero;
+
+    // 마우스 아래에 있는 대상의 진영 (선택/명령 커서의 색을 고른다)
+    private enum CursorTarget { None, Enemy, Ally, Neutral }
+
+    private Texture2D currentCursorTexture; // 직전 프레임에 적용한 텍스처 (같으면 SetCursor 재호출 생략)
+
     private RTSUnitController rtsUnitController;
 
     private Vector2 start;
@@ -91,6 +114,9 @@ public class UserControl : MonoBehaviour
 
         // 입력 상황에 따라 포인터 생성
         UpdatePointer();
+
+        // 입력 상황에 따라 마우스 커서 아이콘 갱신
+        UpdateCursor();
     }
 
     // 좌클릭(드래그 시작/중/종료)과 우클릭 입력을 처리한다.
@@ -651,6 +677,76 @@ public class UserControl : MonoBehaviour
         {
 
         }
+    }
+
+    // 상황(UI 위/명령 대기 중 호버 대상/선택 가능 대상 호버)에 맞춰 실제 마우스 커서 아이콘을 바꾼다.
+    // 모양(기본/선택/명령)은 OrderState가, 색(적/아군/중립)은 마우스 아래 대상의 진영이 결정한다.
+    private void UpdateCursor()
+    {
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            SetCursorTexture(cursorDefaultTexture);
+            return;
+        }
+
+        bool commandPending =
+            UsercurrentState == OrderState.Attack || UsercurrentState == OrderState.Move ||
+            UsercurrentState == OrderState.Patrol || UsercurrentState == OrderState.Rally ||
+            UsercurrentState == OrderState.BuildingMove;
+
+        CursorTarget target = GetHoveredTarget();
+        Texture2D texture;
+
+        if (commandPending)
+        {
+            texture = target switch
+            {
+                CursorTarget.Enemy => cursorCommandEnemyTexture,
+                CursorTarget.Ally => cursorCommandAllyTexture,
+                _ => cursorCommandNeutralTexture, // 땅/자원/빈 곳은 전부 중립 취급 (이동/공격-이동 지점 지정)
+            };
+        }
+        else if (target != CursorTarget.None)
+        {
+            texture = target switch
+            {
+                CursorTarget.Enemy => cursorSelectEnemyTexture,
+                CursorTarget.Ally => cursorSelectAllyTexture,
+                _ => cursorSelectNeutralTexture,
+            };
+        }
+        else
+        {
+            texture = cursorDefaultTexture;
+        }
+
+        SetCursorTexture(texture);
+    }
+
+    // 마우스 아래에 있는 대상의 진영(적/아군/중립자원)을 판별한다. 아무 것도 없으면 None(땅 등).
+    private CursorTarget GetHoveredTarget()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, Mathf.Infinity, layerEnemy))
+            return CursorTarget.Enemy;
+
+        if (Physics.Raycast(ray, Mathf.Infinity, layerUnit | layerBuilding))
+            return CursorTarget.Ally;
+
+        if (Physics.Raycast(ray, Mathf.Infinity, layerOre | layerGas))
+            return CursorTarget.Neutral;
+
+        return CursorTarget.None;
+    }
+
+    private void SetCursorTexture(Texture2D texture)
+    {
+        if (texture == currentCursorTexture)
+            return;
+
+        currentCursorTexture = texture;
+        Cursor.SetCursor(texture, cursorHotspot, CursorMode.Auto);
     }
 
     // 외부(RTSUnitController)에서 문자열로 명령 대기 상태를 전환할 때 사용 (예: "Move", "Attack", "Patrol", "Rally")

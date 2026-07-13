@@ -7064,6 +7064,14 @@ MonoBehaviour:
   dragRectangle: {fileID: 252064949}
   pointerPrefab: {fileID: 2934299905608118493, guid: a3f94f4e57500574f952d24d72edafc8, type: 3}
   attackPointerPrefab: {fileID: 2934299905608118493, guid: d4922d0ba0a09d4458472df4c5ce092d, type: 3}
+  cursorDefaultTexture: {fileID: 2800000, guid: 9c2d77e276d94de40bbf9f244dce00b8, type: 3}
+  cursorSelectEnemyTexture: {fileID: 2800000, guid: 540cfccb9eadc874cb68d66782cd29df, type: 3}
+  cursorSelectAllyTexture: {fileID: 2800000, guid: a4bfefaaa0a9380408d8bd5ddda6c7c1, type: 3}
+  cursorSelectNeutralTexture: {fileID: 2800000, guid: 781ccb3dee0fe3f4688374f6e3aa6914, type: 3}
+  cursorCommandEnemyTexture: {fileID: 2800000, guid: 81704f8585be207458d70be695e73b19, type: 3}
+  cursorCommandAllyTexture: {fileID: 2800000, guid: b234e2a6d7dfd9842ba395cd27b31a46, type: 3}
+  cursorCommandNeutralTexture: {fileID: 2800000, guid: e835a1ea21ea81e41b8505c9d4bf16b2, type: 3}
+  cursorHotspot: {x: 0, y: 0}
   UsercurrentState: 0
 --- !u!114 &1214007160
 MonoBehaviour:
