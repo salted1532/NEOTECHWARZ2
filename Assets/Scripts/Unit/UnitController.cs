@@ -8,6 +8,10 @@ using UnityEngine.Audio;
 using static UnityEditor.PlayerSettings;
 using static UnityEngine.GraphicsBuffer;
 
+// 공격 수단의 종류. 피격 이펙트를 공격자에 따라 다르게 재생하기 위해 HealthManager.GetDamage에 실어 보낸다
+// (UnitEffects가 이 값으로 총기/폭발형/레이저/화염 중 어떤 피격 이펙트를 재생할지 고른다).
+public enum AttackEffectType { Bullet, Explosive, Laser, Flame }
+
 // 개별 유닛(일꾼/전투유닛/공중유닛 포함)의 이동, 전투, 순찰, 자원 채취(일꾼 전용) 상태머신을 담당하는 핵심 컴포넌트.
 // NavMeshAgent 기반 지상 이동과 직접 좌표 보간 기반 공중 이동을 모두 지원하며,
 // AttackRange가 사거리 내 적을 감지하면 이 컴포넌트의 Attack/ChaseTarget을 호출한다.
@@ -28,6 +32,8 @@ public class UnitController : MonoBehaviour, IDestructible
     // Info_panel에서 UnitDamage/UnitArmor 아이콘 호버 시 표시할 값이기도 하다.
     [SerializeField] private int attackDamage;
     [SerializeField] private int armor;
+    // 이 유닛의 공격 수단 (총기 든 유닛은 Bullet, 탱크류는 Explosive 등) - 피격 이펙트 선택에 사용됨
+    [SerializeField] private AttackEffectType attackType = AttackEffectType.Bullet;
 
     private NavMeshAgent navMeshAgent;
 
@@ -438,6 +444,8 @@ public class UnitController : MonoBehaviour, IDestructible
         followTarget = null;
         hasFollowOrder = false;
 
+        GetComponent<UnitEffects>()?.StopAttackEffects(); // 이동/정지 등 다른 명령으로 공격이 취소되면 재생 중인 공격 이펙트도 즉시 정지
+
         CancelBuildOrder();
     }
 
@@ -788,7 +796,7 @@ public class UnitController : MonoBehaviour, IDestructible
         Debug.Log("공격성공!");
         if (enemy.TryGetComponent<HealthManager>(out var targetHealth))
         {
-            targetHealth.GetDamage(attackDamage, transform.position); // 공격자 위치를 같이 넘겨 피격 이펙트 방향 계산에 사용
+            targetHealth.GetDamage(attackDamage, transform.position, attackType); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
             GetComponent<UnitEffects>()?.PlayAttack();
         }
 
@@ -1265,4 +1273,5 @@ public class UnitController : MonoBehaviour, IDestructible
     public int GetUnitID() => unitID;
     public int GetAttackDamage() => attackDamage;
     public int GetArmor() => armor;
+    public AttackEffectType GetAttackType() => attackType;
 }

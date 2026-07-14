@@ -560,6 +560,16 @@ public class UserControl : MonoBehaviour
             }
         }
 
+        // ESC: 공격(A)/이동(M)/순찰(P)/랠리(Y)/건물이동(M) 등 위치·대상 지정을 기다리는 대기 상태를 취소한다.
+        // HandleControlGroupInput의 그룹 선택 취소 로직과 동일한 패턴(상태를 None으로 되돌리고 포인터를 끔).
+        if (Input.GetKeyDown(KeyCode.Escape) && UsercurrentState != OrderState.None)
+        {
+            UsercurrentState = OrderState.None;
+
+            attackPointer.SetActive(false);
+            movePointer.SetActive(false);
+        }
+
         HandleControlGroupInput();
     }
 

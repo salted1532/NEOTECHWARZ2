@@ -751,6 +751,7 @@ MonoBehaviour:
   unitID: 1
   attackDamage: 5
   armor: 0
+  attackType: 0
   moveSpeed: 10
   arriveDistance: 1.2
   stuckTimer: 0
@@ -801,14 +802,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
-  muzzlePrefab: {fileID: 0}
+  muzzlePrefab: {fileID: 1000011396044746, guid: 33014d721b457eb4493158dfa60e7378, type: 3}
   firePoints:
   - {fileID: 7953001845211387754}
-  moveTrailPrefab: {fileID: 0}
+  moveTrailPrefab: {fileID: 100000, guid: facfb523f81e2dc4fa90851bdfb1884e, type: 3}
   moveTrailPoints:
   - {fileID: 1605882452460748531}
-  hitPrefab: {fileID: 0}
-  deathPrefab: {fileID: 0}
+  hitEffects:
+    bulletHitPrefab: {fileID: 0}
+    explosiveHitPrefab: {fileID: 0}
+    laserHitPrefab: {fileID: 0}
+    flameHitPrefab: {fileID: 0}
+  deathPrefab: {fileID: 100006, guid: 094238bbd484f184f958b7a8971e7c75, type: 3}
   deathPoints:
   - {fileID: 5967060366301379098}
 --- !u!54 &1803068245205877688

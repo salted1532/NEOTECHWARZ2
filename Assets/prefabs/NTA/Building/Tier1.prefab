@@ -475,6 +475,11 @@ MonoBehaviour:
   takeoffPoints: []
   landingPrefab: {fileID: 0}
   landingPoints: []
+  hitEffects:
+    bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
+    laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    flameHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
 --- !u!1 &7800518109464376171
 GameObject:
   m_ObjectHideFlags: 0
