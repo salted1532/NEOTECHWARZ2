@@ -788,7 +788,8 @@ public class UnitController : MonoBehaviour, IDestructible
         Debug.Log("공격성공!");
         if (enemy.TryGetComponent<HealthManager>(out var targetHealth))
         {
-            targetHealth.GetDamage(attackDamage);
+            targetHealth.GetDamage(attackDamage, transform.position); // 공격자 위치를 같이 넘겨 피격 이펙트 방향 계산에 사용
+            GetComponent<UnitEffects>()?.PlayAttack();
         }
 
         alreadyAttacked = true;
@@ -1250,6 +1251,15 @@ public class UnitController : MonoBehaviour, IDestructible
     public bool IsIdle() => UnitcurrentState == UnitState.Idle;
     public bool IsMove() => UnitcurrentState == UnitState.Move;
     public bool IsAttack() => UnitcurrentState == UnitState.Attack;
+
+    // 이동 이펙트(UnitEffects)가 상태머신을 직접 건드리지 않고 매 프레임 폴링으로 이동 여부를 판단할 수 있도록 노출.
+    public bool IsCurrentlyMoving()
+    {
+        if (isAirUnit)
+            return isMovingAirUnit;
+
+        return navMeshAgent != null && !navMeshAgent.isStopped && navMeshAgent.velocity.sqrMagnitude > 0.01f;
+    }
 
     public Sprite GetIcon() => icon;
     public int GetUnitID() => unitID;

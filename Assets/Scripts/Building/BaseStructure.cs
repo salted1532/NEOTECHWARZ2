@@ -81,6 +81,8 @@ public class BaseStructure : MonoBehaviour, IDestructible
             healthManager.SetMaxHealth(finalMaxHealth);
             healthManager.SetHealth(0); // 건설 시작 시점엔 0에서부터 진행률만큼 차오르게 함
         }
+
+        GetComponent<ConstructionEffects>()?.StartLoop();
     }
 
     private void Update()
@@ -164,6 +166,8 @@ public class BaseStructure : MonoBehaviour, IDestructible
 
     private void CompleteConstruction()
     {
+        GetComponent<ConstructionEffects>()?.StopLoopAndPlayComplete();
+
         BuildingData data = buildingDatabase != null
             ? buildingDatabase.buildingData.Find(d => d.ID == buildingID)
             : null;

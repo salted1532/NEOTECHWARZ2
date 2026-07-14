@@ -104,6 +104,7 @@ GameObject:
   - component: {fileID: 4801222303072369676}
   - component: {fileID: 4801222303072369677}
   - component: {fileID: -7501322225062848808}
+  - component: {fileID: 147287910951696269}
   - component: {fileID: 6768062149875187418}
   m_Layer: 9
   m_Name: BaseStructure
@@ -238,6 +239,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
   maxHealth: 100
   healthSlider: {fileID: 1798028007937400207}
+--- !u!114 &147287910951696269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7639526730160681910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d46e2d0e3d45d247aa03fbf70418989, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ConstructionEffects
+  constructionLoopPrefab: {fileID: 0}
+  constructionPoints: []
+  completePrefab: {fileID: 0}
+  completePoints: []
 --- !u!208 &6768062149875187418
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -284,7 +301,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5816233316875016010, guid: f13d287e34ee13f479ffde804eccfa99, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5816233316875016010, guid: f13d287e34ee13f479ffde804eccfa99, type: 3}
       propertyPath: m_LocalPosition.z

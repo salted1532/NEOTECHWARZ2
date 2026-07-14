@@ -174,6 +174,7 @@ GameObject:
   - component: {fileID: 6940323903812237968}
   - component: {fileID: 710970143293451408}
   - component: {fileID: 5564514532825985460}
+  - component: {fileID: 5990702166823489546}
   - component: {fileID: 1803068245205877688}
   m_Layer: 6
   m_Name: Assault Trooper
@@ -326,6 +327,10 @@ MonoBehaviour:
   stuckTimer: 0
   isMovingAirUnit: 0
   isAirUnit: 0
+  airCruiseAltitude: 5
+  airGroundLayer:
+    serializedVersion: 2
+    m_Bits: 0
   UnitcurrentState: 0
   alreadyAttacked: 0
   timeBetweenAttacks: 0.6
@@ -338,6 +343,8 @@ MonoBehaviour:
   chaseLoseSightRange: 20
   markerFlashInterval: 0.3
   markerFlashCount: 3
+  followStopMargin: 1
+  airFollowStopMargin: 1
   buildInteractRange: 2
 --- !u!114 &5564514532825985460
 MonoBehaviour:
@@ -353,6 +360,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
   maxHealth: 40
   healthSlider: {fileID: 7635752030612211742}
+--- !u!114 &5990702166823489546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
+  muzzlePrefab: {fileID: 0}
+  firePoints: []
+  moveTrailPrefab: {fileID: 0}
+  moveTrailPoints: []
+  hitPrefab: {fileID: 0}
+  deathPrefab: {fileID: 0}
+  deathPoints: []
 --- !u!54 &1803068245205877688
 Rigidbody:
   m_ObjectHideFlags: 0

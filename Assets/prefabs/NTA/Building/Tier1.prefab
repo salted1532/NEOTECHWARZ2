@@ -286,6 +286,7 @@ GameObject:
   - component: {fileID: 3745819421430264317}
   - component: {fileID: -4229113039568389225}
   - component: {fileID: -1964745908143649194}
+  - component: {fileID: -3834908958368173375}
   m_Layer: 9
   m_Name: Tier1
   m_TagString: Tier1
@@ -458,6 +459,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
   maxHealth: 1000
   healthSlider: {fileID: 2456449002600290041}
+--- !u!114 &-3834908958368173375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65bcd7dfebc817048ab66083f552348f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingEffects
+  takeoffPrefab: {fileID: 0}
+  takeoffPoints: []
+  landingPrefab: {fileID: 0}
+  landingPoints: []
 --- !u!1 &7800518109464376171
 GameObject:
   m_ObjectHideFlags: 0
