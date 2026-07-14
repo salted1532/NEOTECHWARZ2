@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -68,6 +69,10 @@ public class UserControl : MonoBehaviour
     private Rect dragRect;
     private Vector3 mousePos;
 
+    // (Shift 없이) 클릭으로 확정하려던 단일 선택 동작. 실제 선택은 즉시 하지 않고 마우스를 놓을 때 실행한다.
+    // 마우스 업 시 드래그 범위 안에 유닛이 하나라도 걸리면 이 값은 버려지고 드래그 유닛 선택이 우선한다.
+    private Action pendingLeftClickSelect;
+
     private enum OrderState
     {
         None,
@@ -128,6 +133,7 @@ public class UserControl : MonoBehaviour
         {
             start = Input.mousePosition;
             dragRect = new Rect();
+            pendingLeftClickSelect = null;
 
             if (EventSystem.current.IsPointerOverGameObject())
                 return;
@@ -205,7 +211,7 @@ public class UserControl : MonoBehaviour
                 if (Input.GetKey(KeyCode.LeftShift))
                     rtsUnitController.ShiftClickSelectUnit(unit);
                 else
-                    rtsUnitController.ClickSelectUnit(unit);
+                    pendingLeftClickSelect = () => { if (unit != null) rtsUnitController.ClickSelectUnit(unit); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
@@ -233,7 +239,7 @@ public class UserControl : MonoBehaviour
                     return;
                 }
 
-                rtsUnitController.ClickSelectEnemy(enemy);
+                pendingLeftClickSelect = () => { if (enemy != null) rtsUnitController.ClickSelectEnemy(enemy); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
@@ -264,7 +270,7 @@ public class UserControl : MonoBehaviour
                 if (Input.GetKey(KeyCode.LeftShift))
                     rtsUnitController.ShiftClickSelectBuilding(building);
                 else
-                    rtsUnitController.ClickSelectBuilding(building);
+                    pendingLeftClickSelect = () => { if (building != null) rtsUnitController.ClickSelectBuilding(building); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
@@ -286,7 +292,7 @@ public class UserControl : MonoBehaviour
                     return;
                 }
 
-                rtsUnitController.ClickSelectStructure(baseStructure);
+                pendingLeftClickSelect = () => { if (baseStructure != null) rtsUnitController.ClickSelectStructure(baseStructure); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
@@ -365,7 +371,7 @@ public class UserControl : MonoBehaviour
 
             if (node != null)
             {
-                rtsUnitController.ClickSelectResource(node);
+                pendingLeftClickSelect = () => { if (node != null) rtsUnitController.ClickSelectResource(node); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
@@ -378,7 +384,7 @@ public class UserControl : MonoBehaviour
 
             if (node != null)
             {
-                rtsUnitController.ClickSelectResource(node);
+                pendingLeftClickSelect = () => { if (node != null) rtsUnitController.ClickSelectResource(node); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
@@ -387,7 +393,8 @@ public class UserControl : MonoBehaviour
         // 6. 아무것도 아닌 곳 클릭 = 선택 해제
         // (Shift를 누른 채 빈 바닥에서 드래그를 시작한 경우엔, 곧이어 시작될 드래그 선택이
         //  기존 선택에 "추가"되어야 하므로 여기서 기존 선택을 지우지 않는다)
-        if (!Input.GetKey(KeyCode.LeftShift))
+        // (땅 클릭은 선택 해제하지 않는다 - 평상시 좌클릭으로 빈 땅을 눌러도 기존 선택을 유지)
+        if (!Input.GetKey(KeyCode.LeftShift) && !clickedGround)
             rtsUnitController.DeselectAll();
     }
 
@@ -649,11 +656,14 @@ public class UserControl : MonoBehaviour
     }
 
     /// <summary>
-    /// 드래그 범위 내 모든것 선택
+    /// 마우스를 놓는 시점에 선택을 확정한다.
+    /// 드래그 범위 안에 유닛이 있으면 유닛(드래그) 선택을 우선하고, 없으면 대기해둔 단일 클릭 선택을 실행한다.
     /// </summary>
     private void SelectObject()
     {
-        //유닛 선택
+        //드래그 범위 안에 들어오는 유닛부터 먼저 계산
+        List<UnitController> unitsInDrag = new List<UnitController>();
+
         foreach (UnitController unit in rtsUnitController.UnitList)
         {
             Vector3 screenPos =
@@ -661,9 +671,30 @@ public class UserControl : MonoBehaviour
 
             if (dragRect.Contains(screenPos))
             {
-                rtsUnitController.DragSelectUnit(unit);
+                unitsInDrag.Add(unit);
             }
         }
+
+        if (unitsInDrag.Count > 0)
+        {
+            // 드래그 범위 안에 유닛이 있으면 드래그 유닛 선택이 우선 - 대기 중이던 단일 클릭 선택은 취소한다.
+            pendingLeftClickSelect = null;
+
+            // Shift가 아니면 기존 선택을 지우고 드래그로 잡힌 유닛들만 새로 선택한다 (Shift면 기존 선택에 추가).
+            if (!Input.GetKey(KeyCode.LeftShift))
+                rtsUnitController.DeselectAll();
+
+            foreach (UnitController unit in unitsInDrag)
+            {
+                rtsUnitController.DragSelectUnit(unit);
+            }
+
+            return;
+        }
+
+        // 드래그로 걸린 유닛이 없으면(제자리 클릭이거나 빈 범위로 드래그) 마우스를 놓는 시점에 단일 클릭 선택을 확정한다.
+        pendingLeftClickSelect?.Invoke();
+        pendingLeftClickSelect = null;
     }
 
     // 현재 명령 대기 상태(공격/이동/순찰/랠리)에 맞는 포인터 아이콘을 마우스가 가리키는 지면 위치에 표시한다.

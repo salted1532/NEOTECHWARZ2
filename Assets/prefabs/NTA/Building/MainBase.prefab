@@ -286,7 +286,6 @@ GameObject:
   - component: {fileID: 5523754168051553664}
   - component: {fileID: 8908353327074705168}
   - component: {fileID: 530226741687852247}
-  - component: {fileID: 4740935235335426818}
   - component: {fileID: 875391073210738237}
   - component: {fileID: 3745819421430264317}
   - component: {fileID: 6312048194751110915}
@@ -397,31 +396,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.97, y: 0.6, z: 0.79}
-  m_Center: {x: 0, y: -0.17, z: 0}
---- !u!136 &4740935235335426818
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7636683964052424660}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.42
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: -0.2}
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!208 &875391073210738237
 NavMeshObstacle:
   m_ObjectHideFlags: 0
