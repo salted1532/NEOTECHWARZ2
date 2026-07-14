@@ -782,7 +782,7 @@ MonoBehaviour:
   unitID: 3
   attackDamage: 20
   armor: 0
-  attackType: 0
+  attackType: 3
   moveSpeed: 10
   arriveDistance: 1.2
   stuckTimer: 0
@@ -839,11 +839,15 @@ MonoBehaviour:
   moveTrailPrefab: {fileID: 100000, guid: facfb523f81e2dc4fa90851bdfb1884e, type: 3}
   moveTrailPoints:
   - {fileID: 9034103457495926246}
+  moveTrailRotationFollowSpeed: 6
+  moveTrailFastRotationThreshold: 90
+  moveTrailShrinkScale: 0.4
+  moveTrailShrinkLerpSpeed: 8
   hitEffects:
     bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
     explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
     laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
-    flameHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    flameHitPrefab: {fileID: 100014, guid: 04876b7e195a7624ab34f532e53c64cb, type: 3}
   deathPrefab: {fileID: 100006, guid: 094238bbd484f184f958b7a8971e7c75, type: 3}
   deathPoints:
   - {fileID: 6469705914775531242}
@@ -1019,13 +1023,36 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5934031178726573792, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4163288795476949780}
   m_SourcePrefab: {fileID: 100100000, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
 --- !u!4 &1282244074593265877 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6418255393187126362, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
   m_PrefabInstance: {fileID: 5249309816792052879}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1909705040148001391 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5934031178726573792, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
+  m_PrefabInstance: {fileID: 5249309816792052879}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4163288795476949780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909705040148001391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acd7820bbe8872a4fb8e421443669336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleShake
+  shakeStrength: 0.03
+  vibrato: 15
+  shakeCycleDuration: 0.2
 --- !u!1001 &8447900163450509886
 PrefabInstance:
   m_ObjectHideFlags: 0

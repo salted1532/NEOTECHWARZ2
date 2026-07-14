@@ -99,7 +99,13 @@ public static class EffectPlayer
     // 스폰해 그 지점에 붙여두고(parent = 그 지점 자신, 계속 따라다니게), 나중에 꺼야 할 때 정리할 수
     // 있도록 인스턴스 목록을 반환한다. 지속형이라 Spawn()과 달리 자동 파괴를 걸지 않는다 - 호출자가
     // 명시적으로 Destroy한다.
-    public static List<GameObject> SpawnPersistentAtPoints(GameObject effectPrefab, IReadOnlyList<Transform> points, Transform fallback)
+    // rotationFollowSpeed가 0(기본)이면 기존처럼 지점에 즉시 부모로 붙는다(건물 등 회전하지 않는 대상에
+    // 적합 - ConstructionEffects가 이 기본값을 그대로 쓴다). 0보다 크면 부모 부착 대신
+    // TrailRotationFollower를 붙여서, 위치는 매 프레임 그대로 따라가되 회전은 Slerp로 서서히 뒤쫓고
+    // (doc/0118), fastRotationThreshold(도/초)를 넘는 급회전 중에는 shrinkScale까지 축소했다가 복구한다.
+    public static List<GameObject> SpawnPersistentAtPoints(
+        GameObject effectPrefab, IReadOnlyList<Transform> points, Transform fallback,
+        float rotationFollowSpeed = 0f, float fastRotationThreshold = 90f, float shrinkScale = 1f, float shrinkLerpSpeed = 8f)
     {
         List<GameObject> instances = new List<GameObject>();
         if (effectPrefab == null)
@@ -107,7 +113,7 @@ public static class EffectPlayer
 
         if (points == null || points.Count == 0)
         {
-            instances.Add(ForceLooping(Object.Instantiate(effectPrefab, fallback.position, fallback.rotation, fallback)));
+            instances.Add(SpawnPersistentAt(effectPrefab, fallback, rotationFollowSpeed, fastRotationThreshold, shrinkScale, shrinkLerpSpeed));
             return instances;
         }
 
@@ -116,10 +122,22 @@ public static class EffectPlayer
             if (point == null)
                 continue;
 
-            instances.Add(ForceLooping(Object.Instantiate(effectPrefab, point.position, point.rotation, point)));
+            instances.Add(SpawnPersistentAt(effectPrefab, point, rotationFollowSpeed, fastRotationThreshold, shrinkScale, shrinkLerpSpeed));
         }
 
         return instances;
+    }
+
+    private static GameObject SpawnPersistentAt(
+        GameObject effectPrefab, Transform point,
+        float rotationFollowSpeed, float fastRotationThreshold, float shrinkScale, float shrinkLerpSpeed)
+    {
+        GameObject instance = ForceLooping(Object.Instantiate(effectPrefab, point.position, point.rotation, rotationFollowSpeed > 0f ? null : point));
+
+        if (rotationFollowSpeed > 0f)
+            instance.AddComponent<TrailRotationFollower>().Init(point, rotationFollowSpeed, fastRotationThreshold, shrinkScale, shrinkLerpSpeed);
+
+        return instance;
     }
 
     // 지속형 이펙트는 "명시적으로 정리될 때까지 계속 반복 재생"이 기본 전제인데, 프리팹 자체가 한 번만 터지고

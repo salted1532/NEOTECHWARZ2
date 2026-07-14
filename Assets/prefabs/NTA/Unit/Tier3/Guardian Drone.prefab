@@ -115,7 +115,7 @@ Transform:
   m_GameObject: {fileID: 2299615425326694499}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
-  m_LocalPosition: {x: -0.338, y: -0.306, z: -2.158}
+  m_LocalPosition: {x: -0.338, y: -0.055999994, z: -2.158}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -146,7 +146,7 @@ Transform:
   m_GameObject: {fileID: 2736294483151768547}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
-  m_LocalPosition: {x: 0.326, y: -0.306, z: -2.158}
+  m_LocalPosition: {x: 0.326, y: -0.055999994, z: -2.158}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -952,7 +952,6 @@ Transform:
   - {fileID: 8969036317305992285}
   - {fileID: 2090812934896102312}
   - {fileID: 2796212138661668246}
-  - {fileID: 8460784833593513303}
   - {fileID: 8168545361100734034}
   - {fileID: 8366107528187157805}
   - {fileID: 9082468093922027248}
@@ -1127,12 +1126,15 @@ MonoBehaviour:
   moveTrailPoints:
   - {fileID: 2090812934896102312}
   - {fileID: 2796212138661668246}
-  - {fileID: 8460784833593513303}
+  moveTrailRotationFollowSpeed: 6
+  moveTrailFastRotationThreshold: 90
+  moveTrailShrinkScale: 0.4
+  moveTrailShrinkLerpSpeed: 8
   hitEffects:
     bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
     explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
     laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
-    flameHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    flameHitPrefab: {fileID: 100014, guid: 04876b7e195a7624ab34f532e53c64cb, type: 3}
   deathPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
   deathPoints:
   - {fileID: 8168545361100734034}
@@ -1253,37 +1255,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &8358911248098631704
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8460784833593513303}
-  m_Layer: 0
-  m_Name: MoveTrailPos (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8460784833593513303
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8358911248098631704}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
-  m_LocalPosition: {x: 0.007, y: -0.003, z: -2.158}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 768760043591592085}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1001 &436742868626926127
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1549,13 +1520,36 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3420214958373469289, guid: 746b62adb229e26418b5af4cc91d0dcf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 542174931167690052}
   m_SourcePrefab: {fileID: 100100000, guid: 746b62adb229e26418b5af4cc91d0dcf, type: 3}
 --- !u!4 &53017397529584636 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2611203564661614291, guid: 746b62adb229e26418b5af4cc91d0dcf, type: 3}
   m_PrefabInstance: {fileID: 2630243763318490415}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &862311400089516358 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3420214958373469289, guid: 746b62adb229e26418b5af4cc91d0dcf, type: 3}
+  m_PrefabInstance: {fileID: 2630243763318490415}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &542174931167690052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 862311400089516358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94c8bba61d935104f8b65876c5307ccb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HoverBob
+  bobHeight: 0.125
+  bobDuration: 2
+  bobEase: 4
 --- !u!1001 &2642780764335344231
 PrefabInstance:
   m_ObjectHideFlags: 0

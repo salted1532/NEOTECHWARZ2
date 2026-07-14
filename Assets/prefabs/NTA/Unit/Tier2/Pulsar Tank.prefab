@@ -653,18 +653,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
-  muzzlePrefab: {fileID: 100002, guid: 4410f8f51fa02aa479c6d727f542154c, type: 3}
+  muzzlePrefab: {fileID: 100006, guid: 9686463478d1fdb4d9cf5c735af3dd94, type: 3}
   firePoints:
   - {fileID: 8025584364347258525}
   moveTrailPrefab: {fileID: 100000, guid: facfb523f81e2dc4fa90851bdfb1884e, type: 3}
   moveTrailPoints:
   - {fileID: 1569698052591894581}
   - {fileID: 7803021794332356419}
+  moveTrailRotationFollowSpeed: 6
+  moveTrailFastRotationThreshold: 90
+  moveTrailShrinkScale: 0.4
+  moveTrailShrinkLerpSpeed: 8
   hitEffects:
     bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
     explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
     laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
-    flameHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    flameHitPrefab: {fileID: 100014, guid: 04876b7e195a7624ab34f532e53c64cb, type: 3}
   deathPrefab: {fileID: 1000013462590818, guid: 900b6a17c4205f844af8859f493b8caa, type: 3}
   deathPoints:
   - {fileID: 2421650684887519001}
@@ -973,8 +977,31 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 306438625495933438, guid: 7b994b6521e87d1488c26b5a5189d737, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5510203965001688189}
   m_SourcePrefab: {fileID: 100100000, guid: 7b994b6521e87d1488c26b5a5189d737, type: 3}
+--- !u!1 &7288853161425062351 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 306438625495933438, guid: 7b994b6521e87d1488c26b5a5189d737, type: 3}
+  m_PrefabInstance: {fileID: 7018724897314416689}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5510203965001688189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7288853161425062351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acd7820bbe8872a4fb8e421443669336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleShake
+  shakeStrength: 0.03
+  vibrato: 15
+  shakeCycleDuration: 0.2
 --- !u!4 &7956987501548737397 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1084066663127890756, guid: 7b994b6521e87d1488c26b5a5189d737, type: 3}

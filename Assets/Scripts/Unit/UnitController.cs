@@ -1259,6 +1259,7 @@ public class UnitController : MonoBehaviour, IDestructible
     public bool IsIdle() => UnitcurrentState == UnitState.Idle;
     public bool IsMove() => UnitcurrentState == UnitState.Move;
     public bool IsAttack() => UnitcurrentState == UnitState.Attack;
+    public bool IsAirUnit() => isAirUnit; // HoverBob 등 외부 이펙트 컴포넌트가 폴링용으로 사용(doc/0119)
 
     // 이동 이펙트(UnitEffects)가 상태머신을 직접 건드리지 않고 매 프레임 폴링으로 이동 여부를 판단할 수 있도록 노출.
     public bool IsCurrentlyMoving()

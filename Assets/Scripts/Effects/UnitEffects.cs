@@ -17,6 +17,10 @@ public class UnitEffects : MonoBehaviour
     [Header("이동 (비워두면 유닛 자신의 위치에서 재생)")]
     [SerializeField] private GameObject moveTrailPrefab;
     [SerializeField] private List<Transform> moveTrailPoints = new(); // 발/바퀴/추진구 등 - 여러 개면 각 지점에 트레일이 붙어 따라다님
+    [SerializeField] private float moveTrailRotationFollowSpeed = 6f; // 회전 추적 속도 - 낮을수록 더 느리게 따라감(관성감 커짐), 0이면 유닛에 즉시 부착(doc/0118)
+    [SerializeField] private float moveTrailFastRotationThreshold = 90f; // 이 각속도(도/초)를 넘는 급회전 중엔 트레일 축소
+    [SerializeField] private float moveTrailShrinkScale = 0.4f; // 급회전 중 목표 크기/방출량 배율 - 1이면 축소 없음
+    [SerializeField] private float moveTrailShrinkLerpSpeed = 8f;
     private List<GameObject> activeTrails = new();
 
     [Header("피격 (공격 타입별로 다른 이펙트, 위치는 동적 계산 - 콜라이더 기준)")]
@@ -66,7 +70,9 @@ public class UnitEffects : MonoBehaviour
     {
         if (moving && activeTrails.Count == 0 && moveTrailPrefab != null)
         {
-            activeTrails = EffectPlayer.SpawnPersistentAtPoints(moveTrailPrefab, moveTrailPoints, transform);
+            activeTrails = EffectPlayer.SpawnPersistentAtPoints(
+                moveTrailPrefab, moveTrailPoints, transform,
+                moveTrailRotationFollowSpeed, moveTrailFastRotationThreshold, moveTrailShrinkScale, moveTrailShrinkLerpSpeed);
         }
         else if (!moving && activeTrails.Count > 0)
         {
