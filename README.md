@@ -12,15 +12,18 @@ Unity로 제작 중인 스타크래프트 스타일의 RTS(실시간 전략) 게
 | 길찾기 | AI Navigation (NavMesh) 2.0.12 |
 | UI | UGUI, TextMesh Pro |
 | 그래픽 | URP Volume 포스트프로세싱(Bloom/Color Adjustments, Tonemapping은 현재 None), Screen Space Ambient Occlusion(SSAO), 오버레이 카메라 기반 레이어 분리(프리뷰/포인터 제외) |
+| 애니메이션/트윈 | DOTween (Demigiant, `Assets/Plugins/Demigiant`) — 이펙트/모션 트위닝(호버링, 셰이크 등) |
 
 ## 프로젝트 구조
 
 ```
 Assets/
 ├─ Scripts/
+│  ├─ Animation/        # 공중유닛/리프트 건물 호버링(HoverBob), 지상 차량 이동 셰이크(VehicleShake) - DOTween 기반
 │  ├─ Building/        # 건물 컨트롤러, 건설 중 건물 기반(BaseStructure)
 │  ├─ BuildSystem/      # 건물 배치 시스템 (그리드, 미리보기, 입력)
 │  ├─ Camera/           # RTS 카메라/미니맵 이동·조작
+│  ├─ Effects/          # 공격/이동/피격/사망/건물 이착륙/건설 이펙트 재생 시스템(EffectPlayer 등)
 │  ├─ Enemy/            # 적 유닛 컨트롤러 (마커/스탯 데이터만, AI 로직은 미구현)
 │  ├─ Resource/         # 자원 노드 및 자원 관리 (`ResourceController.cs`는 미사용 빈 스텁)
 │  ├─ ScriptableObject/ # 유닛/건물 데이터 정의(SO)
@@ -28,7 +31,7 @@ Assets/
 │  ├─ UI/               # 생산 슬롯, 인게임 UI 컨트롤러, 툴팁
 │  ├─ Unit/             # 유닛 컨트롤러, 공격 범위, 체력 관리
 │  ├─ UnitSpawner/      # 유닛 생산/스폰
-│  └─ UserControl/      # 유닛 선택 및 명령 입력 처리
+│  └─ UserControl/      # 유닛 선택 및 명령 입력 처리, 마우스 커서 상태 전환
 ├─ Scenes/              # 게임 씬 (SampleScene 등)
 ├─ prefabs/             # 유닛/건물 프리팹 (`NTA/`, 현재는 기본 프리미티브 메시 사용)
 ├─ AssetFolder/         # 3rd-party 모델링/스카이박스 에셋 (Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox) — 임포트 + URP 머티리얼 변환 완료, 게임플레이 프리팹(`prefabs/NTA/`)에는 아직 미적용
@@ -48,7 +51,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | 스크립트 | 역할 | 문서 |
 |---|---|---|
 | `RTSUnitController` | 유닛/건물 선택 상태, 전체 목록, UI 갱신, 생산·건설 자원 검증을 총괄하는 중앙 허브 | [doc](Docs/RTSUnitController.md) |
-| `UserControl` | 마우스/키보드 입력을 해석해 선택·명령을 `RTSUnitController`에 전달 | [doc](Docs/UserControl.md) |
+| `UserControl` | 마우스/키보드 입력을 해석해 선택·명령을 `RTSUnitController`에 전달, 상태별(기본/선택/이동/공격) 마우스 커서 아이콘 전환, ESC로 대기 명령 취소 | [doc](Docs/UserControl.md) |
 | `UnitController` | 유닛의 이동/전투/순찰/자원 채취 상태머신 (지상+공중 유닛 공통) | [doc](Docs/UnitController.md) |
 | `AttackRange` | 사거리 내 적 감지 및 자동 공격/추격 | [doc](Docs/AttackRange.md) |
 | `BuildingController` | 건물 선택, 랠리 포인트, 생산 위임, 파괴 시 대기열 환불/인구수 반환 | [doc](Docs/BuildingController.md) |
@@ -70,6 +73,16 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `ProductionSlot` | 커맨드/생산 대기열의 버튼 슬롯 하나, 자기 단축키 자동 감지 + 눌림 효과 재현 | [doc](Docs/ProductionSlot.md) |
 | `TooltipUI` | 버튼/스탯 호버 시 툴팁 표시 | [doc](Docs/TooltipUI.md) |
 | `HealthBarBillboard` | 체력바 UI가 카메라의 X(피치) 각도만 따라 회전(Y/Z 고정)하도록 하는 빌보드 컴포넌트 | [doc](Docs/HealthBarBillboard.md) |
+| `EffectPlayer` | 이펙트 프리팹(파티클/사운드) 스폰·자동 파괴 공용 정적 헬퍼 — 단발/다중지점/지속형 재생 지원 | [doc](doc/0105-effect-system-integration-design.md) |
+| `HitEffectSet` | 공격 타입(총기/폭발/레이저/화염)별 피격 이펙트 프리팹 묶음(직렬화 클래스) | [doc](doc/0108-hit-effect-attack-type-variants.md) |
+| `UnitEffects` | 유닛의 공격(총구)/이동(트레일)/피격/사망 이펙트 재생 전담 컴포넌트 | [doc](doc/0105-effect-system-integration-design.md) |
+| `BuildingEffects` | 건물의 이착륙/피격/파괴 이펙트 재생 전담 컴포넌트 | [doc](doc/0116-building-destroy-effect.md) |
+| `ConstructionEffects` | `BaseStructure`의 건설 중 지속/완공/피격/파괴 이펙트 재생 전담 컴포넌트 | [doc](doc/0117-construction-destroy-effect.md) |
+| `TrailRotationFollower` | 지속형 이펙트가 부착 지점을 부모-자식으로 즉시 따라가지 않고, 위치는 매 프레임 추적하되 회전만 Slerp로 서서히 따라가게 하는 컴포넌트(급회전 중 축소 포함) | [doc](doc/0118-move-trail-smooth-rotation-follow-design.md) |
+| `HoverBob` | 공중 유닛/리프트 중인 건물의 비주얼 자식 오브젝트를 DOTween으로 둥실거리게 하는 컴포넌트 | [doc](doc/0119-dotween-hover-bob-design.md) |
+| `VehicleShake` | 지상 차량 유닛이 이동 중일 때 DOTween으로 흔들림을 재현하는 컴포넌트 | [doc](doc/0120-vehicle-shake-and-animation-folder.md) |
+
+> 위 8개(`EffectPlayer`~`VehicleShake`)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
 
 ## 주요 기능
 
@@ -83,6 +96,10 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - **전투**: 사거리 기반 자동 교전, 공격력/방어력 스탯, 적 강제 지정, 아군 강제 공격(오인사격, 완공 건물 + 건설 중인 `BaseStructure` 포함)
 - **체력바 UI**: 유닛/건물 공용 `HealthManager`에 `Slider` 연결 시 체력 변화에 맞춰 자동 갱신, 만피 상태에선 자동으로 숨겨지고 피해를 입는 즉시 표시(회복해서 만피로 돌아가면 다시 숨김), `HealthBarBillboard`로 카메라의 X(피치) 각도만 따라 회전(Y/Z 고정)해 유닛이 돌아도 체력바 자체는 방향을 유지
 - **키보드 단축키**: 선택 상태(유닛/일꾼/건설모드/생산 패널/공중 건물)별 버튼에 단축키 배정 — 버튼이 자기 단축키를 직접 감지해 클릭과 동일하게 동작 + 눌림 시각 효과, 현재 패널에 없는 버튼의 단축키는 자동으로 비활성
+- **명령 취소**: 공격/이동/순찰/랠리/건물이동 등 대기 중인 명령 모드를 ESC로 즉시 취소(포인터 마커도 함께 사라짐)
+- **마우스 커서**: 기본 화살표 외에 선택 가능 대상(유닛/적/건물/광물/가스) 호버 시 선택 커서, 공격/이동 대기 상태(A/M/P/랠리/건물이동)에서 각각 공격/이동 커서로 전환(`UserControl`), UI 위에서는 항상 OS 기본 커서로 복귀
+- **이펙트 시스템**: `EffectPlayer` 공용 헬퍼로 공격(총구)/이동(트레일)/피격(공격 타입별 4종: 총기·폭발·레이저·화염)/사망/건물 이착륙/건설 진행·완공·파괴 이펙트를 재생 — 유닛/건물 프리팹에 붙는 `UnitEffects`/`BuildingEffects`/`ConstructionEffects`가 각각 전담, 스폰 위치는 `List<Transform>`으로 다중 지점 지정 가능(비워두면 오브젝트 자신 위치 하나로 폴백), 피격 이펙트는 콜라이더 표면의 공격자 쪽 지점에서 방향까지 계산해 재생
+- **모션 연출**: 이동 트레일은 `TrailRotationFollower`로 위치는 매 프레임 추적하되 회전만 Slerp로 서서히 따라가 급회전 시 부자연스럽게 홱 도는 문제 방지(급회전 중엔 크기/방출량도 축소), 공중 유닛/리프트 중인 건물은 `HoverBob`으로 DOTween 기반 부유(호버링) 애니메이션, 지상 차량 유닛은 이동 중 `VehicleShake`로 DOTween 기반 흔들림 연출 — 둘 다 루트가 아닌 비주얼 자식 오브젝트에 부착해 이동 로직(루트 트랜스폼 직접 갱신)과 충돌하지 않음
 - **UI**: 패널 기반 커맨드 UI, Info Panel(공격력/방어력 호버 툴팁), Squad Panel(최대 60마리 페이지네이션), 생산 대기열 UI, 미니맵
 - **그래픽/비주얼**: URP Volume 포스트프로세싱(Bloom, Color Adjustments) + SSAO 적용, 빌드 프리뷰/셀 커서/이동·공격 명령 포인터는 전용 레이어 + 오버레이 카메라로 포스트프로세싱 미적용 처리, 3rd-party 유닛/건물 모델링 에셋(Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox) 임포트 및 Built-in → URP 머티리얼 변환 완료(게임플레이 프리팹에 실제 모델 적용은 아직 로드맵)
 
@@ -140,6 +157,18 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 건물 배치 시 자원 소모 연결 — `PlacementSystem.PlaceStructure()`가 `TryConstructBuilding`으로 자원 확인 후 차감
 - [x] 인구수 한도 200 상한(`ResourceManager.maxPopulationCap`)
 - [x] 유닛 사망 시 인구수 반환(`RTSUnitController.ReleaseUnitPopulation`) — 생산 취소(광물/가스+인구수 전액 환불)와 별개로, 이미 생산된 유닛이 죽을 때는 인구수만 반환
+- [x] 인구수 한도 초과분 누적치 보존(`ResourceManager.rawMaxPopulation`) — 캡(200)보다 많이 지어도 내부 누적치는 그대로 유지, 일부가 파괴돼도 남은 누적치가 캡을 넘으면 표시 한도는 캡 값 그대로 유지
+
+### 이펙트 / 모션 연출
+- [x] 공격(총구) / 이동(트레일) / 피격(공격 타입별 4종: 총기·폭발·레이저·화염) / 사망 이펙트 — `UnitEffects`, 공용 헬퍼 `EffectPlayer`
+- [x] 건물 이착륙 이펙트 — `BuildingEffects`
+- [x] 건설 진행 중 지속 이펙트, 완공 순간 이펙트 — `ConstructionEffects`
+- [x] 건물/건설중 파운데이션(`BaseStructure`) 피격·파괴(전투로 파괴 시에만, 취소 버튼과는 구분) 이펙트 — `BuildingEffects`/`ConstructionEffects`
+- [x] 이동 트레일의 부자연스러운 급회전 보정 — `TrailRotationFollower`(위치는 매 프레임 추적, 회전은 Slerp로 서서히 추적 + 급회전 중 크기/방출량 축소)
+- [x] 공중 유닛/리프트 중인 건물 호버링(둥실거림) 애니메이션 — `HoverBob`(DOTween)
+- [x] 지상 차량 유닛 이동 중 흔들림 애니메이션 — `VehicleShake`(DOTween)
+- [x] 마우스 커서 상태 전환(기본/선택/이동/공격) — `UserControl`
+- [x] ESC로 대기 중인 명령(공격/이동/순찰/랠리/건물이동) 취소 — `UserControl`
 
 ### 그래픽 / 비주얼
 - [x] URP Volume 포스트프로세싱 — Bloom(붉은끼 tint), Color Adjustments(대비/노출 보정), Tonemapping은 현재 None
@@ -163,7 +192,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 ## 로드맵 (미구현)
 
 - [ ] 유닛/건물 모델링 실제 적용 — 3rd-party 에셋(Canopus-III, Yoge) 임포트 및 URP 머티리얼 변환은 완료됐지만, 게임플레이 유닛/건물 프리팹(`prefabs/NTA/`)은 아직 기본 프리미티브 메시(캡슐/큐브/구)를 그대로 사용 중 — 실제 모델 교체는 남은 작업
-- [ ] 공격 이펙트(VFX) 추가, 이동/건설/이륙/착륙/사망 이펙트
+- [ ] 사망 시 래그돌/사망 애니메이션 — 현재는 사망 즉시 `Destroy(gameObject)` + 파티클 스폰만 지원(옵션 A), 오브젝트를 유지한 채 애니메이션 재생 후 지연 파괴하는 구조(옵션 B, doc/0105 3.5절)는 미구현
 - [ ] 전장의 안개(Fog of War) 구현 — 설계 + 제안 코드는 [`doc/0069`](doc/0069-fog-of-war-design.md)에 정리돼 있으나 실제 `Assets/Scripts` 반영은 아직 승인 대기 상태
 - [ ] 맵(스테이지) 제작
 - [ ] Enemy AI 구현 — `EnemyController`는 현재 마커/아이콘/공격력·방어력 데이터만 갖고 있고, 실제로 공격하거나 이동하는 AI 로직은 없음(플레이어 유닛이 일방적으로 공격하는 대상)
@@ -267,6 +296,9 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - **지형 추적 비행 도입 후 착륙이 안 됨**: 도착 판정이 매 프레임 갱신되는 실측 지형 목표가 아니라 미리 계산해둔 옛 목표값과 비교하고 있었던 버그 — 실시간 목표값과 비교하도록 통일해 해결.
 - **`groundLayer`/`airGroundLayer`가 일부 프리팹에서 동작하지 않음**: LayerMask를 스칼라 정수로 잘못 직렬화해 Unity가 빈 값으로 인식하던 문제 — 올바른 구조체 포맷으로 재작성.
 - **Lab 체력바가 실제 체력과 무관하게 움직임**: `HealthManager.healthSlider` 연결 누락 + 체력바 슬라이더가 마우스로 드래그 가능한 상태였던 두 문제가 겹친 것 — 연결 추가 + 슬라이더 `Interactable` 비활성화로 해결.
+- **인구수 한도(200) 초과분이 보급고 파괴 시 통째로 사라짐**: 캡이 이미 적용된 값을 필드에 그대로 저장해 "캡을 넘겨 지었다"는 정보 자체가 소실되던 문제 — 캡 미적용 누적치(`rawMaxPopulation`)를 별도로 유지하고, 노출/판정 시점에만 캡을 씌우도록 수정.
+- **지속형 파티클(이동 트레일 등)이 반복 재생 도중 여러 번 겹쳐 재생됨**: looping이 꺼진 파티클을 지속형(부모 부착)으로 스폰하면 자기 duration만큼만 방출하고 멈춰버리던 문제 — 지속형 스폰 시 loop 강제 on, 발사 후 잊기 스폰 시 loop 강제 off로 용도별 분리.
+- **이동 트레일이 급회전 시 부자연스럽게 홱 돌거나, 이동 중간에 멈춤**: 부모-자식으로 직접 붙이면 회전이 매 프레임 즉시 동기화되던 문제 — `TrailRotationFollower`로 위치는 추적, 회전만 Slerp로 분리해 해결(관련 세부 버그는 doc/0112~0113 참고).
 
 전체 세션별 변경 이력(코드 변경 전/후 diff 포함)은 [`doc/`](doc) 폴더에 번호순으로 정리돼 있습니다.
 
