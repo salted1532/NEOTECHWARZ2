@@ -574,13 +574,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6887665104281071328}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0.000000104308114}
   m_LocalPosition: {x: 0, y: -0.485, z: -1.116}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 768760043591592085}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!1 &7069137052622472766
 GameObject:
   m_ObjectHideFlags: 0
@@ -809,10 +809,10 @@ MonoBehaviour:
   moveTrailPoints:
   - {fileID: 1605882452460748531}
   hitEffects:
-    bulletHitPrefab: {fileID: 0}
-    explosiveHitPrefab: {fileID: 0}
-    laserHitPrefab: {fileID: 0}
-    flameHitPrefab: {fileID: 0}
+    bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
+    laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    flameHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
   deathPrefab: {fileID: 100006, guid: 094238bbd484f184f958b7a8971e7c75, type: 3}
   deathPoints:
   - {fileID: 5967060366301379098}

@@ -660,10 +660,11 @@ MonoBehaviour:
   moveTrailPoints:
   - {fileID: 1569698052591894581}
   - {fileID: 7803021794332356419}
-  bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
-  explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
-  laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
-  flameHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+  hitEffects:
+    bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
+    laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    flameHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
   deathPrefab: {fileID: 1000013462590818, guid: 900b6a17c4205f844af8859f493b8caa, type: 3}
   deathPoints:
   - {fileID: 2421650684887519001}

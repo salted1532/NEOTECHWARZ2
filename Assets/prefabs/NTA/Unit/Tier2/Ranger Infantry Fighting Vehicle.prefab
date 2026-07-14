@@ -927,17 +927,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
-  muzzlePrefab: {fileID: 100002, guid: 4410f8f51fa02aa479c6d727f542154c, type: 3}
+  muzzlePrefab: {fileID: 100006, guid: 9686463478d1fdb4d9cf5c735af3dd94, type: 3}
   firePoints:
   - {fileID: 7349305232445298622}
   moveTrailPrefab: {fileID: 100000, guid: facfb523f81e2dc4fa90851bdfb1884e, type: 3}
   moveTrailPoints:
   - {fileID: 9005083361712585757}
   - {fileID: 2517890265666568985}
-  bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
-  explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
-  laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
-  flameHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+  hitEffects:
+    bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
+    laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    flameHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
   deathPrefab: {fileID: 1000013462590818, guid: 900b6a17c4205f844af8859f493b8caa, type: 3}
   deathPoints:
   - {fileID: 8521852288427204864}
