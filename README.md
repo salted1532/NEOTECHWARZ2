@@ -19,10 +19,11 @@ Unity로 제작 중인 스타크래프트 스타일의 RTS(실시간 전략) 게
 ```
 Assets/
 ├─ Scripts/
-│  ├─ Animation/        # 공중유닛/리프트 건물 호버링(HoverBob), 지상 차량 이동 셰이크(VehicleShake) - DOTween 기반
+│  ├─ Animation/        # 공중유닛/리프트 건물 호버링(HoverBob), 지상 차량 이동 셰이크(VehicleShake), 지속 회전(AutoRotate) - DOTween 기반
 │  ├─ Building/        # 건물 컨트롤러, 건설 중 건물 기반(BaseStructure)
 │  ├─ BuildSystem/      # 건물 배치 시스템 (그리드, 미리보기, 입력)
-│  ├─ Camera/           # RTS 카메라/미니맵 이동·조작
+│  ├─ Camera/           # RTS 카메라/미니맵 이동·조작, 지형 티어별 줌 범위 보정, 미니맵 시야 사각형 표시
+│  ├─ CaptureSystem/    # 거점 점령(밀당식 Ally↔Neutral↔Enemy 순환) + 다각형 영토 판정(TerritoryZone/TerritoryManager)
 │  ├─ Effects/          # 공격/이동/피격/사망/건물 이착륙/건설 이펙트 재생 시스템(EffectPlayer 등)
 │  ├─ Enemy/            # 적 유닛 컨트롤러 (마커/스탯 데이터만, AI 로직은 미구현)
 │  ├─ Resource/         # 자원 노드 및 자원 관리 (`ResourceController.cs`는 미사용 빈 스텁)
@@ -32,9 +33,9 @@ Assets/
 │  ├─ Unit/             # 유닛 컨트롤러, 공격 범위, 체력 관리
 │  ├─ UnitSpawner/      # 유닛 생산/스폰
 │  └─ UserControl/      # 유닛 선택 및 명령 입력 처리, 마우스 커서 상태 전환
-├─ Scenes/              # 게임 씬 (SampleScene 등)
-├─ prefabs/             # 유닛/건물 프리팹 (`NTA/`, 현재는 기본 프리미티브 메시 사용)
-├─ AssetFolder/         # 3rd-party 모델링/스카이박스 에셋 (Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox) — 임포트 + URP 머티리얼 변환 완료, 게임플레이 프리팹(`prefabs/NTA/`)에는 아직 미적용
+├─ Scenes/              # 게임 씬 (SampleScene, TestScene — TestScene이 1스테이지 맵(Mission1) 복원용 씬)
+├─ prefabs/             # 유닛/건물 프리팹 (`NTA/`, 현재는 기본 프리미티브 메시 사용), 맵 프리팹(`Maps/Mission1~5`, YuME 타일맵 기반 — 실제 사용 중인 건 Mission1뿐)
+├─ AssetFolder/         # 3rd-party 모델링/스카이박스 에셋 (Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox, TZ_Futuristic Panel Textures, LowPolyWater_Pack) — 임포트 + URP 머티리얼 변환 완료, 게임플레이 프리팹(`prefabs/NTA/`)에는 아직 미적용
 ├─ Material, Shader/    # 머티리얼 및 커스텀 셰이더
 └─ Settings/            # URP 렌더 파이프라인 설정 + 포스트프로세싱 Volume Profile(Bloom/Color Adjustments/SSAO)
 
@@ -66,9 +67,13 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `HealthManager` | 체력/데미지/치유/사망 처리 공용 컴포넌트, 절대값 지정(SetHealth/SetMaxHealth) | [doc](Docs/HealthManager.md) |
 | `UnitDataSO` | 유닛 스탯(체력/공격력/비용 등) 데이터베이스 | [doc](Docs/UnitDataSO.md) |
 | `BuildingDataSO` | 건물 스펙(비용/크기/생산시간/인구수 제공량 등) 데이터베이스 | [doc](Docs/BuildingDataSO.md) |
-| `CameraControl` | RTS 시점 카메라 이동/줌 | [doc](Docs/CameraControl.md) |
+| `CameraControl` | RTS 시점 카메라 이동/줌 — 지형 티어(`Layer1`/`Layer2` 태그) 감지로 언덕마다 줌 범위·현재 높이 자동 보정 | [doc](Docs/CameraControl.md) |
 | `MinimapController` | 미니맵 표시 및 클릭 시 카메라 이동 | [doc](Docs/MinimapController.md) |
+| `MinimapViewIndicator` | 메인 카메라 시야를 미니맵 위에 반투명 사각형으로 표시, 줌/회전에 따라 매 프레임 크기·위치 자동 갱신(미니맵 밖으로 안 나가게 클리핑) | [doc](Docs/MinimapViewIndicator.md) |
 | `EnemyController` | 적 유닛 선택/마커/스탯 데이터 (AI 로직은 미구현) | [doc](Docs/EnemyController.md) |
+| `CaptureSystem` | 거점 점령 — 트리거 범위 내 아군/적 유닛 수에 따라 부호 있는 점령치를 밀당, 양쪽 다 있으면 교착, Ally↔Neutral↔Enemy 3단계 순환 전환(항상 Neutral 경유), 진행 중일 때만 점령바 노출 | [doc](doc/0146-tug-of-war-capture-cycle-implementation.md) |
+| `TerritoryZone` | 인스펙터에서 핀(꼭짓점) 개수만 늘리면 자동 생성되는 다각형 영토 범위(오목 다각형도 판정 가능), 소유자에 따라 외곽선 색이 흰색/초록/빨강으로 자동 전환 | [doc](doc/0133-territoryzone-implementation.md) |
+| `TerritoryManager` | 씬의 모든 `TerritoryZone`을 등록해 특정 좌표가 아군 영토 안인지 한 번에 질의(여러 영토가 겹치면 합집합) | [doc](doc/0141-territory-restriction-implementation-design.md) |
 | `UIController` | 커맨드 패널, 생산 대기열, 자원 표시 UI 총괄, 버튼별 키보드 단축키 데이터 보유 | [doc](Docs/UIController.md) |
 | `ProductionSlot` | 커맨드/생산 대기열의 버튼 슬롯 하나, 자기 단축키 자동 감지 + 눌림 효과 재현 | [doc](Docs/ProductionSlot.md) |
 | `TooltipUI` | 버튼/스탯 호버 시 툴팁 표시 | [doc](Docs/TooltipUI.md) |
@@ -81,8 +86,9 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `TrailRotationFollower` | 지속형 이펙트가 부착 지점을 부모-자식으로 즉시 따라가지 않고, 위치는 매 프레임 추적하되 회전만 Slerp로 서서히 따라가게 하는 컴포넌트(급회전 중 축소 포함) | [doc](doc/0118-move-trail-smooth-rotation-follow-design.md) |
 | `HoverBob` | 공중 유닛/리프트 중인 건물의 비주얼 자식 오브젝트를 DOTween으로 둥실거리게 하는 컴포넌트 | [doc](doc/0119-dotween-hover-bob-design.md) |
 | `VehicleShake` | 지상 차량 유닛이 이동 중일 때 DOTween으로 흔들림을 재현하는 컴포넌트 | [doc](doc/0120-vehicle-shake-and-animation-folder.md) |
+| `AutoRotate` | 레이더 접시/터렛 헤드 등을 DOTween으로 조건 없이 지속 회전시키는 컴포넌트 | [doc](doc/0147-autorotate-dotween-script.md) |
 
-> 위 8개(`EffectPlayer`~`VehicleShake`)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
+> 위 12개(`EffectPlayer`~`AutoRotate`, `MinimapViewIndicator` 제외)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
 
 ## 주요 기능
 
@@ -94,6 +100,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - **건물 이동(리프트)**: 건물을 공중으로 띄워(그리드 점유 해제) 공중유닛처럼 우클릭으로 자유 이동시키거나, 착륙 위치를 지정해 그 자리로 날아가 착륙(그리드 재등록) — 이동 중에도 공중 유닛과 동일하게 발밑 지형을 따라가는 지형 추적 비행 적용, 이륙/이동/착륙 전 구간에서 메쉬 피벗 오프셋까지 반영해 고도 기준이 일관됨. 공중에 뜬 동안은 생산/커맨드가 전부 잠기고 Land/Move 버튼만 노출, 생산 대기열이 남아있으면 이륙 자체가 차단됨. 메인기지 건설 시 자원(광물/가스)과 최소 거리(기본 7칸, 인스펙터 조정 가능) 이격 규칙 적용(다른 건물엔 미적용)
 - **자원 시스템**: `ResourceManager` 기반 광물/가스/인구수 관리(한도 200), 건물 건설·유닛 생산 시 실제 자원/인구수 소모, 대기열 취소·생산 건물 파괴·건설 취소/파괴·건설 이동 중 취소·건설 이동 중 일꾼 사망 시 가격만큼 환불, 유닛 사망 시 인구수 반환, 자원 노드 대기열(줄서기)
 - **전투**: 사거리 기반 자동 교전, 공격력/방어력 스탯, 적 강제 지정, 아군 강제 공격(오인사격, 완공 건물 + 건설 중인 `BaseStructure` 포함)
+- **점령/영토 시스템**: 거점(`CaptureSystem`)은 트리거 범위 내 아군/적 유닛 수에 따라 점령치를 밀당하며 Ally↔Neutral↔Enemy 3단계로 순환 전환(항상 Neutral을 거침), 양쪽이 동시에 있으면 교착. `TerritoryZone`은 인스펙터에서 핀 개수만 조절하면 자동 생성/정리되는 다각형 영토(오목 다각형 포함)로 소유자별 외곽선 색이 자동 전환되고, `TerritoryManager`가 전체 영토를 등록해 좌표 질의를 제공. 건물 배치(칸 전부가 아군 영토 안이어야 함), 자원 채취(영토 밖 노드 채취 불가, 채취 중 영토 상실 시 즉시 중단), 유닛 생산(영토 밖이면 대기열 유지한 채 타이머 정지), 건설 진행(영토 밖이면 담당 일꾼 유무와 별개로 일시정지)이 전부 영토 여부에 실제로 게이팅됨
 - **체력바 UI**: 유닛/건물 공용 `HealthManager`에 `Slider` 연결 시 체력 변화에 맞춰 자동 갱신, 만피 상태에선 자동으로 숨겨지고 피해를 입는 즉시 표시(회복해서 만피로 돌아가면 다시 숨김), `HealthBarBillboard`로 카메라의 X(피치) 각도만 따라 회전(Y/Z 고정)해 유닛이 돌아도 체력바 자체는 방향을 유지
 - **키보드 단축키**: 선택 상태(유닛/일꾼/건설모드/생산 패널/공중 건물)별 버튼에 단축키 배정 — 버튼이 자기 단축키를 직접 감지해 클릭과 동일하게 동작 + 눌림 시각 효과, 현재 패널에 없는 버튼의 단축키는 자동으로 비활성
 - **명령 취소**: 공격/이동/순찰/랠리/건물이동 등 대기 중인 명령 모드를 ESC로 즉시 취소(포인터 마커도 함께 사라짐)
@@ -167,14 +174,21 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 이동 트레일의 부자연스러운 급회전 보정 — `TrailRotationFollower`(위치는 매 프레임 추적, 회전은 Slerp로 서서히 추적 + 급회전 중 크기/방출량 축소)
 - [x] 공중 유닛/리프트 중인 건물 호버링(둥실거림) 애니메이션 — `HoverBob`(DOTween)
 - [x] 지상 차량 유닛 이동 중 흔들림 애니메이션 — `VehicleShake`(DOTween)
+- [x] 레이더 접시/터렛 등 지속 회전 연출 — `AutoRotate`(DOTween)
 - [x] 마우스 커서 상태 전환(기본/선택/이동/공격) — `UserControl`
 - [x] ESC로 대기 중인 명령(공격/이동/순찰/랠리/건물이동) 취소 — `UserControl`
+
+### 점령 / 영토
+- [x] 거점 점령 시스템(`CaptureSystem`) — 트리거 범위 내 아군/적 유닛 수에 따라 점령치 밀당, 양쪽 다 있으면 교착, Ally↔Neutral↔Enemy 3단계 순환(항상 Neutral 경유), 진행 중일 때만 점령바 노출, 인스펙터 `debugOwner`로 테스트 가능
+- [x] 다각형 영토(`TerritoryZone`) — 인스펙터 핀 개수 조절만으로 자동 생성/정리, 오목 다각형 판정 가능, 소유자별 외곽선 색 자동 전환(흰/초록/빨강), 여러 영토 등록/질의(`TerritoryManager`, 겹치면 합집합)
+- [x] 영토 기반 게임플레이 제한 — 건물 배치는 그리드 칸 전부가 아군 영토 안일 때만 가능(프리뷰 자동 빨간색), 자원 채취는 영토 밖 노드 신규 채취 불가 + 채취 중 영토 상실 시 즉시 중단, 유닛 생산은 영토 밖이면 대기열 유지한 채 타이머만 정지, 건설 진행(`BaseStructure`)도 영토 밖이면 일시정지
 
 ### 그래픽 / 비주얼
 - [x] URP Volume 포스트프로세싱 — Bloom(붉은끼 tint), Color Adjustments(대비/노출 보정), Tonemapping은 현재 None
 - [x] Screen Space Ambient Occlusion(SSAO) — URP Renderer Feature로 적용
 - [x] 빌드 프리뷰 고스트/셀 커서/유닛 이동·공격 명령 포인터는 전용 레이어(`Indicators`) + 오버레이 카메라(`Indicator Camera`, Depth Only + PostProcessing 끔)로 분리해 포스트프로세싱(Bloom/Color Adjustments)이 적용되지 않도록 처리
-- [x] 3rd-party 유닛/건물/자연 모델링 에셋 임포트 — Canopus-III Low-Poly Sci-Fi Desert Units Set, Yoge Stylized Nature, Animated Sun Skybox, 전부 Built-in RP 셰이더로 제작돼 있던 것을 URP Lit로 변환해 마젠타/핑크 깨짐 해결(게임플레이 유닛/건물 프리팹에 실제 모델을 적용하는 작업은 아직 로드맵)
+- [x] 3rd-party 유닛/건물/자연 모델링 에셋 임포트 — Canopus-III Low-Poly Sci-Fi Desert Units Set, Yoge Stylized Nature, Animated Sun Skybox, TZ_Futuristic Panel Textures Lite, LowPolyWater_Pack, 전부 Built-in RP 셰이더로 제작돼 있던 것을 URP(Lit/Unlit)로 변환해 마젠타/핑크 깨짐 해결(게임플레이 유닛/건물 프리팹에 실제 모델을 적용하는 작업은 아직 로드맵)
+- [x] 1스테이지 맵 복원 — `TestScene` 씬 + `Mission1` 프리팹(YuME 타일맵 기반, `Layer1`/`Layer2` 태그로 언덕 단 구분), 게임 분위기/색감 확인용 프로토타입(`Mission2~5` 프리팹은 아직 미사용, 캠페인 맵은 추후 별도 제작 예정)
 
 ### UI
 - [x] 커맨드 패널(선택 상태별 버튼 자동 전환)
@@ -183,7 +197,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] Squad Panel 페이지네이션 — 12마리 × 5페이지, 최대 60마리, 필요한 페이지 버튼만 노출
 - [x] 커맨드/생산 버튼 호버 툴팁(`TooltipUI`), 제목만 있을 때 배경 크기 자동 축소(컴팩트 모드)
 - [x] 미니맵 + 미니맵 클릭 시 카메라 이동
-- [x] 카메라 이동/확대
+- [x] 미니맵 시야 사각형 표시(`MinimapViewIndicator`) — 메인 카메라가 보고 있는 지면 영역을 반투명 사각형으로 표시, 줌/회전에 따라 매 프레임 자동 갱신 + 미니맵 밖으로 안 나가게 클리핑
+- [x] 카메라 이동/확대 — 지형 티어(태그 기반) 감지로 언덕마다 줌 범위·현재 높이 자동 보정
 - [x] 상단 자원 UI(광물/가스/인구수 실시간 표시)
 - [x] 커맨드 패널 버튼별 키보드 단축키 + 눌림 시각 효과(아래 "키보드 단축키" 참고)
 - [x] 유닛/건물별 체력바 UI — `HealthManager`의 `Slider` 필드가 체력 변화에 맞춰 자동 갱신, `HealthBarBillboard`로 카메라의 X(피치)만 따라 회전(Y/Z 고정)
@@ -194,7 +209,6 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [ ] 유닛/건물 모델링 실제 적용 — 3rd-party 에셋(Canopus-III, Yoge) 임포트 및 URP 머티리얼 변환은 완료됐지만, 게임플레이 유닛/건물 프리팹(`prefabs/NTA/`)은 아직 기본 프리미티브 메시(캡슐/큐브/구)를 그대로 사용 중 — 실제 모델 교체는 남은 작업
 - [ ] 사망 시 래그돌/사망 애니메이션 — 현재는 사망 즉시 `Destroy(gameObject)` + 파티클 스폰만 지원(옵션 A), 오브젝트를 유지한 채 애니메이션 재생 후 지연 파괴하는 구조(옵션 B, doc/0105 3.5절)는 미구현
 - [ ] 전장의 안개(Fog of War) 구현 — 설계 + 제안 코드는 [`doc/0069`](doc/0069-fog-of-war-design.md)에 정리돼 있으나 실제 `Assets/Scripts` 반영은 아직 승인 대기 상태
-- [ ] 맵(스테이지) 제작
 - [ ] Enemy AI 구현 — `EnemyController`는 현재 마커/아이콘/공격력·방어력 데이터만 갖고 있고, 실제로 공격하거나 이동하는 AI 로직은 없음(플레이어 유닛이 일방적으로 공격하는 대상)
 - [ ] 유닛/건물 사운드, 사운드 매니저
 - [ ] 메인 화면, 설정창 UI
@@ -299,6 +313,13 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - **인구수 한도(200) 초과분이 보급고 파괴 시 통째로 사라짐**: 캡이 이미 적용된 값을 필드에 그대로 저장해 "캡을 넘겨 지었다"는 정보 자체가 소실되던 문제 — 캡 미적용 누적치(`rawMaxPopulation`)를 별도로 유지하고, 노출/판정 시점에만 캡을 씌우도록 수정.
 - **지속형 파티클(이동 트레일 등)이 반복 재생 도중 여러 번 겹쳐 재생됨**: looping이 꺼진 파티클을 지속형(부모 부착)으로 스폰하면 자기 duration만큼만 방출하고 멈춰버리던 문제 — 지속형 스폰 시 loop 강제 on, 발사 후 잊기 스폰 시 loop 강제 off로 용도별 분리.
 - **이동 트레일이 급회전 시 부자연스럽게 홱 돌거나, 이동 중간에 멈춤**: 부모-자식으로 직접 붙이면 회전이 매 프레임 즉시 동기화되던 문제 — `TrailRotationFollower`로 위치는 추적, 회전만 Slerp로 분리해 해결(관련 세부 버그는 doc/0112~0113 참고).
+- **건물 배치 프리뷰 Y좌표가 실제 지형이 아니라 그리드 셀 크기로 스냅됨**: `GetGroundPosition`이 Y값을 `grid.CellToWorld`/`WorldToCell` 왕복으로 재계산한 게 원인 — 레이캐스트로 측정한 실제 지면 Y를 5개 호출부 전체에 파라미터로 그대로 전달하도록 수정.
+- **`TerritoryZone` 외곽선이 플레이 모드에서 안 보임**: `LineRenderer`에 머티리얼이 비어있던 게 원인 — URP Unlit 셰이더를 런타임에 복제해 자동 생성.
+- **`TerritoryZone` 핀이 플레이 모드 진입/종료 시 중복되거나 초기화됨**: 도메인 리로드 도중 Transform 참조가 복구되기 전에 `OnValidate`가 실행된 게 원인 — `EditorApplication.isPlayingOrWillChangePlaymode` 가드 추가.
+- **`CaptureSystem`이 같은 오브젝트가 아닌 자식 오브젝트의 `TerritoryZone`을 못 찾음**: `GetComponent` → `GetComponentInChildren(true)`로 수정.
+- **아군 강제공격(A모드) 중 근처 다른 적에게 타겟이 가로채짐**: `AttackRange.GetPreferredTarget()`이 `orderedTarget`이 null이면 `friendlyTarget` 여부를 안 보고 곧장 최근접 적으로 폴백하던 게 원인 — `friendlyTarget` 우선 확인 후 폴백하도록 수정.
+- **건물 클릭 후 드래그하면 건물+유닛이 동시에 선택됨**: 좌클릭 선택이 클릭 즉시 실행돼 드래그 시작을 구분 못한 게 원인 — 모든 좌클릭 선택(유닛/적/건물/`BaseStructure`/자원)을 마우스 뗄 때로 통일 지연, Shift 없이 드래그박스 선택 시 기존 선택을 정상적으로 교체.
+- **`TZ_Futuristic Panel Textures Lite`(15개 머티리얼), `LowPolyWater_Pack`(`IslandMat` + 커스텀 `WaterShaded` 수면 셰이더)도 마젠타로 깨짐**: 기존 Canopus/Yoge와 동일하게 Built-in RP 전용 셰이더였던 게 원인 — URP로 변환(`WaterShaded`는 죽은 코드였던 GrabPass도 함께 제거).
 
 전체 세션별 변경 이력(코드 변경 전/후 diff 포함)은 [`doc/`](doc) 폴더에 번호순으로 정리돼 있습니다.
 
