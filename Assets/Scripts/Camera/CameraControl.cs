@@ -17,8 +17,9 @@ public class CameraControl : MonoBehaviour
 
     [Header("Zoom")]
     [SerializeField] private float zoomSpeed = 25f;
-    [SerializeField] private float minZoom = 8f;  // 카메라 높이(Y) 하한 - 너무 가깝게 못 들어가게
-    [SerializeField] private float maxZoom = 35f; // 카메라 높이(Y) 상한 - 너무 멀리 못 나가게
+    [SerializeField] private float minZoom = 8f;  // 카메라 높이(Y) 하한 - 너무 가깝게 못 들어가게 (기준 지형고도 0 기준)
+    [SerializeField] private float maxZoom = 35f; // 카메라 높이(Y) 상한 - 너무 멀리 못 나가게 (기준 지형고도 0 기준)
+    [SerializeField] private LayerMask groundLayer; // 화면 중앙 지형 높이 샘플링용 레이어 (지형/Ground)
 
     [Header("Rotate")]
     [SerializeField] private float rotateSpeed = 120f;     // Q/E 회전 속도 (초당 각도)
@@ -129,11 +130,28 @@ public class CameraControl : MonoBehaviour
         Vector3 zoomStep = transform.forward * scroll * zoomSpeed;
         float nextY = targetPosition.y + zoomStep.y;
 
-        // 높이(Y) 기준으로 줌 범위를 제한 (지면에 처박히거나 너무 멀리 빠지는 것 방지)
-        if (nextY < minZoom || nextY > maxZoom)
+        // 화면 중앙이 보고 있는 지형의 높이만큼 줌 범위 자체를 같이 올려서, 언덕 위/아래 어디를 보든
+        // "지형으로부터의 거리감"이 평지에서와 동일하게 느껴지도록 한다.
+        float groundHeight = GetGroundHeightAtScreenCenter();
+
+        if (nextY < minZoom + groundHeight || nextY > maxZoom + groundHeight)
             return;
 
         targetPosition += zoomStep;
+    }
+
+    // 화면 정중앙이 바라보는 지점의 실제 지형(groundLayer) 높이를 레이캐스트로 알아낸다.
+    // 레이어 미설정이거나 아무것도 맞지 않으면(허공 등) 0(기준 평지)을 반환.
+    private float GetGroundHeightAtScreenCenter()
+    {
+        if (groundLayer == 0)
+            return 0f;
+
+        Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        if (Physics.Raycast(ray, out RaycastHit hit, 2000f, groundLayer))
+            return hit.point.y;
+
+        return 0f;
     }
 
     // Q/E 입력으로 화면 중앙이 바라보는 지점을 기준으로 카메라를 좌우로 궤도 회전시킨다.

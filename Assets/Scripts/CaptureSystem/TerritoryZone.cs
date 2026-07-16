@@ -21,7 +21,8 @@ public class TerritoryZone : MonoBehaviour
 
     [Header("외곽선 표시")]
     [SerializeField] private Material outlineMaterial; // 원본 참고용 — 실제로 색이 바뀌는 건 런타임 복제본
-    [SerializeField] private float outlineWidth = 0.3f;
+    [SerializeField] private float outlineWidth = 0.6f; // 카메라가 멀리서(탑다운 줌아웃) 봐도 보이도록 폭 상향
+    [SerializeField] private float outlineHeightOffset = 0.15f; // 지면과 겹쳐 z-fighting 나는 것 방지용 살짝 띄우는 높이
 
     [Header("소유권별 색상 (자동 전환)")]
     [SerializeField] private Color neutralColor = Color.white;
@@ -116,7 +117,11 @@ public class TerritoryZone : MonoBehaviour
 
         outlineRenderer.positionCount = pinPoints.Count;
         for (int i = 0; i < pinPoints.Count; i++)
-            outlineRenderer.SetPosition(i, pinPoints[i].position);
+        {
+            Vector3 p = pinPoints[i].position;
+            p.y += outlineHeightOffset;
+            outlineRenderer.SetPosition(i, p);
+        }
     }
 
 #if UNITY_EDITOR
