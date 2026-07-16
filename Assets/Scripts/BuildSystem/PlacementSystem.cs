@@ -150,6 +150,10 @@ public class PlacementSystem : MonoBehaviour
         if (IsTooCloseToResource(data.ID, gridPos, data.Size))
             return;
 
+        // ⭐ 아군 영토 밖이면 배치 불가
+        if (!IsInsideAlliedTerritory(gridPos, data.Size))
+            return;
+
         UnitController worker = rtsController != null ? rtsController.GetSelectedWorker() : null;
         if (worker == null)
             return; // 건설을 맡을 일꾼이 없으면 배치하지 않음
@@ -260,6 +264,7 @@ public class PlacementSystem : MonoBehaviour
         if (!StructureData.CanPlaceObejctAt(gridPos, data.Size)) return;
         if (IsBlocked(mousePos, data.Size)) return;
         if (IsTooCloseToResource(data.ID, gridPos, data.Size)) return;
+        if (!IsInsideAlliedTerritory(gridPos, data.Size)) return;
 
         Vector3 groundPos = GetGroundPosition(gridPos, data.Size);
         Vector3 landingPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab); // 착륙 완료 시 최종 정착 위치
@@ -390,6 +395,19 @@ public class PlacementSystem : MonoBehaviour
         return false;
     }
 
+    // 건물이 차지할 모든 셀이 전부 아군 영토 안에 있는지 검사한다 (하나라도 밖이면 false).
+    private bool IsInsideAlliedTerritory(Vector3Int gridPosition, Vector2Int size)
+    {
+        List<Vector3Int> occupiedCells = StructureData.CalculatePositionsPublic(gridPosition, size);
+
+        foreach (Vector3Int cell in occupiedCells)
+        {
+            if (!TerritoryManager.IsInsideAlliedTerritory(grid.CellToWorld(cell)))
+                return false;
+        }
+        return true;
+    }
+
     // 배치 모드를 종료하고 프리뷰/이벤트 구독을 정리한다. (취소 또는 배치 완료 후 재진입 대비)
     public void StopPlacement()
     {
@@ -420,7 +438,8 @@ public class PlacementSystem : MonoBehaviour
 
             bool valid = StructureData.CanPlaceObejctAt(gridPos, data.Size)
                 && !IsBlocked(mousePos, data.Size)
-                && !IsTooCloseToResource(data.ID, gridPos, data.Size);
+                && !IsTooCloseToResource(data.ID, gridPos, data.Size)
+                && IsInsideAlliedTerritory(gridPos, data.Size);
 
             Vector3 groundPos = GetGroundPosition(gridPos, data.Size);
             Vector3 previewPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab);

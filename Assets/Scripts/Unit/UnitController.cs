@@ -957,6 +957,9 @@ public class UnitController : MonoBehaviour, IDestructible
             return;
         }
 
+        if (!TerritoryManager.IsInsideAlliedTerritory(node.transform.position))
+            return; // 영토 밖 자원은 채취 명령 자체를 무시
+
         // 새 채취 명령이므로, 기존에 대기열에 들어가 있던 노드가 있다면 자리부터 비워준다
         // (gatherTargetNode를 새 목표로 덮어쓰기 전에 반드시 먼저 호출해야 함)
         CancelGatheringForNewCommand();
@@ -1007,7 +1010,8 @@ public class UnitController : MonoBehaviour, IDestructible
 
         foreach (ResourceNode node in rtsController.ResourceNodeList)
         {
-            if (node == null || node == exclude || node.IsDepleted || node.IsCrowded)
+            if (node == null || node == exclude || node.IsDepleted || node.IsCrowded
+                || !TerritoryManager.IsInsideAlliedTerritory(node.transform.position))
                 continue;
 
             float sqrDist = (node.transform.position - transform.position).sqrMagnitude;
@@ -1094,6 +1098,15 @@ public class UnitController : MonoBehaviour, IDestructible
         // 채취 중엔 서로 부딪히지 않도록 반경 축소 (다른 명령이 들어오면 CancelGatheringForNewCommand에서 원상복구)
         if (!isAirUnit)
             navMeshAgent.radius = gatherAgentRadius;
+
+        // 채취 중이던(이동/대기/채취 중) 노드가 영토를 잃으면(적에게 거점을 뺏기는 등) 왕복을 끝까지 두지 않고
+        // 그 자리에서 즉시 정지시킨다.
+        if ((gatherState == GatherState.MovingToResource || gatherState == GatherState.WaitingInQueue || gatherState == GatherState.Gathering)
+            && gatherTargetNode != null && !TerritoryManager.IsInsideAlliedTerritory(gatherTargetNode.transform.position))
+        {
+            StopUnit();
+            return;
+        }
 
         // 채취 도중(혹은 대기 중) 노드가 고갈되어 파괴된 경우(다른 유닛이 마저 캐간 경우 등) 방어
         // 그냥 멈추지 않고, 자신 기준 10 거리 이내에 대체 자원이 있으면 그쪽으로 재이동한다

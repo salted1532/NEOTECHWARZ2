@@ -650,7 +650,30 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2077589293580246448, guid: 74906eae36698e545b9a007d28105b21, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7679725548719001776}
+    - targetCorrespondingSourceObject: {fileID: 3046031697518998877, guid: 74906eae36698e545b9a007d28105b21, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4559533908964927531}
   m_SourcePrefab: {fileID: 100100000, guid: 74906eae36698e545b9a007d28105b21, type: 3}
+--- !u!1 &6647050948144867112 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3046031697518998877, guid: 74906eae36698e545b9a007d28105b21, type: 3}
+  m_PrefabInstance: {fileID: 8537342949676683893}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4559533908964927531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6647050948144867112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbe770cc993d4e4e9d334b461c5a196, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AutoRotate
+  rotationAxis: {x: 0, y: 1, z: 0}
+  secondsPerRotation: 2
+  clockwise: 1
 --- !u!4 &7053895918396577151 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1702014145004635914, guid: 74906eae36698e545b9a007d28105b21, type: 3}

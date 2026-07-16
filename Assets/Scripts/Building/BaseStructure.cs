@@ -90,6 +90,9 @@ public class BaseStructure : MonoBehaviour, IDestructible
         if (builder == null)
             return; // 담당 일꾼이 없음(교체 대기 중이거나 방금 사망) - 건설 일시정지
 
+        if (!TerritoryManager.IsInsideAlliedTerritory(transform.position))
+            return; // 영토를 잃으면 건설 진행(및 그에 딸린 체력 회복)도 함께 일시정지
+
         remainingBuildTime -= Time.deltaTime;
 
         if (healthManager != null)

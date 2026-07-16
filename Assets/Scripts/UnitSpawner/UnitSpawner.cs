@@ -112,6 +112,9 @@ public class UnitSpawner : MonoBehaviour
         if (productionQueue.Count == 0)
             return;
 
+        if (buildingController != null && !TerritoryManager.IsInsideAlliedTerritory(transform.position))
+            return; // 영토 밖이면 타이머가 그 자리에서 멈춘다 (대기열은 유지, 리셋하지 않음)
+
         ProductionData current = productionQueue[0];
 
         current.RemainTime -= Time.deltaTime;

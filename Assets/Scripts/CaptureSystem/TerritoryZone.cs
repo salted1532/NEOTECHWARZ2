@@ -33,6 +33,9 @@ public class TerritoryZone : MonoBehaviour
 
     public CaptureOwner Owner { get => owner; set => owner = value; }
 
+    private void OnEnable() => TerritoryManager.Register(this);
+    private void OnDisable() => TerritoryManager.Unregister(this);
+
     private void Awake()
     {
         outlineRenderer = GetComponent<LineRenderer>();
