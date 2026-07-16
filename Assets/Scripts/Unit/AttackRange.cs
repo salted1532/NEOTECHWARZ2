@@ -80,6 +80,9 @@ public class AttackRange : MonoBehaviour
     // 지정 대상이 아예 없을 때만(패시브 대기 상태) 가장 가까운 적을 선택한다.
     private GameObject GetPreferredTarget()
     {
+        if (unitController.HasFriendlyOrder)
+            return null; // 아군 강제 공격 중엔 다른 적을 무시한다 (FriendlyAttackTick이 전담 처리)
+
         EnemyController ordered = unitController.GetOrderedTarget();
 
         if (ordered != null)

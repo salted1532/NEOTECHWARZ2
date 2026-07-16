@@ -754,6 +754,9 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public EnemyController GetOrderedTarget() => orderedTarget;
 
+    // 아군 강제공격 중인지 (AttackRange가 다른 적으로 대상을 가로채지 않도록 확인하는 데 쓴다).
+    public bool HasFriendlyOrder => hasFriendlyOrder;
+
     // ======================
     // 추적 (공격 준비 이동)
     // ======================
