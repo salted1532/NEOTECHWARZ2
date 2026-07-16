@@ -19,7 +19,8 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float zoomSpeed = 25f;
     [SerializeField] private float minZoom = 8f;  // 카메라 높이(Y) 하한 - 너무 가깝게 못 들어가게 (기준 지형고도 0 기준)
     [SerializeField] private float maxZoom = 35f; // 카메라 높이(Y) 상한 - 너무 멀리 못 나가게 (기준 지형고도 0 기준)
-    [SerializeField] private LayerMask groundLayer; // 화면 중앙 지형 높이 샘플링용 레이어 (지형/Ground)
+    [SerializeField] private LayerMask groundLayer; // 화면 중앙 지형 판정용 레이어 (지형/Ground)
+    [SerializeField] private float tierZoomStep = 5f; // 지형 단(Layer1/Layer2 태그) 하나당 줌 범위 + 현재 줌이 같이 움직이는 양
 
     [Header("Rotate")]
     [SerializeField] private float rotateSpeed = 120f;     // Q/E 회전 속도 (초당 각도)
@@ -32,6 +33,8 @@ public class CameraControl : MonoBehaviour
     private Vector3 mainBasePosition;
 
     private float currentRotationAngle = 0f; // 기준(정면) 각도로부터 현재까지 회전한 누적 각도
+
+    private int currentTerrainTier = 0; // 화면 중앙이 보고 있는 지형의 높이 단. 0=지상, 1=언덕(Layer1), 2=언덕 위 언덕(Layer2)
 
     private void Start()
     {
@@ -47,6 +50,7 @@ public class CameraControl : MonoBehaviour
     private void Update()
     {
         HandleMovement();
+        HandleTerrainTier();
         HandleZoom();
         HandleRotate();
     }
@@ -106,6 +110,13 @@ public class CameraControl : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             targetPosition = mainBasePosition;
+
+            // mainBasePosition은 Start()에서 지형 단 보정이 아직 한 번도 적용되기 전(0단 기준) 높이로 저장된 값이다.
+            // currentTerrainTier를 그대로 두면(예: 언덕 위에 있다가 Space를 누른 경우 1단으로 남아있음),
+            // 복귀하는 도중 화면 중앙이 지형 단을 다시 지나가면서 HandleTerrainTier()가 "1→0으로 내려갔다"고
+            // 착각해 이미 0단 기준으로 세팅된 targetPosition.y에서 또 한 번 tierZoomStep을 빼버려 높이가
+            // 틀어진다(예: 15로 돌아와야 하는데 10으로 돌아옴). 본진 복귀는 항상 0단 기준이므로 같이 리셋한다.
+            currentTerrainTier = 0;
             return;
         }
 
@@ -130,28 +141,50 @@ public class CameraControl : MonoBehaviour
         Vector3 zoomStep = transform.forward * scroll * zoomSpeed;
         float nextY = targetPosition.y + zoomStep.y;
 
-        // 화면 중앙이 보고 있는 지형의 높이만큼 줌 범위 자체를 같이 올려서, 언덕 위/아래 어디를 보든
+        // 화면 중앙이 보고 있는 지형의 단(tier)만큼 줌 범위 자체를 같이 올려서, 언덕 위/아래 어디를 보든
         // "지형으로부터의 거리감"이 평지에서와 동일하게 느껴지도록 한다.
-        float groundHeight = GetGroundHeightAtScreenCenter();
+        float tierOffset = currentTerrainTier * tierZoomStep;
 
-        if (nextY < minZoom + groundHeight || nextY > maxZoom + groundHeight)
+        if (nextY < minZoom + tierOffset || nextY > maxZoom + tierOffset)
             return;
 
         targetPosition += zoomStep;
     }
 
-    // 화면 정중앙이 바라보는 지점의 실제 지형(groundLayer) 높이를 레이캐스트로 알아낸다.
-    // 레이어 미설정이거나 아무것도 맞지 않으면(허공 등) 0(기준 평지)을 반환.
-    private float GetGroundHeightAtScreenCenter()
+    // 화면 중앙이 보고 있는 지형의 단(tier)이 바뀌면, 줌 범위뿐 아니라 지금 카메라 높이 자체도
+    // 그 차이만큼 같이 밀어 올리거나 내려서 "지형으로부터의 거리감"이 항상 동일하게 유지되도록 한다.
+    private void HandleTerrainTier()
+    {
+        int newTier = SampleTerrainTier();
+
+        if (newTier == currentTerrainTier)
+            return;
+
+        targetPosition.y += (newTier - currentTerrainTier) * tierZoomStep;
+        currentTerrainTier = newTier;
+    }
+
+    // 화면 정중앙 레이가 맞은 지형의 높이 단을 태그로 판정한다. 실제 지형 메시/콜라이더는
+    // Layer1/Layer2 태그가 붙은 오브젝트의 자식(타일 프리팹)에 있을 수 있어, 맞은 콜라이더에서부터
+    // 부모 방향으로 올라가며 태그를 찾는다. Layer2(언덕 위 언덕) > Layer1(언덕) > 태그 없음(지상) 순.
+    private int SampleTerrainTier()
     {
         if (groundLayer == 0)
-            return 0f;
+            return 0;
 
         Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-        if (Physics.Raycast(ray, out RaycastHit hit, 2000f, groundLayer))
-            return hit.point.y;
+        if (!Physics.Raycast(ray, out RaycastHit hit, 2000f, groundLayer))
+            return 0;
 
-        return 0f;
+        for (Transform t = hit.transform; t != null; t = t.parent)
+        {
+            if (t.CompareTag("Layer2"))
+                return 2;
+            if (t.CompareTag("Layer1"))
+                return 1;
+        }
+
+        return 0;
     }
 
     // Q/E 입력으로 화면 중앙이 바라보는 지점을 기준으로 카메라를 좌우로 궤도 회전시킨다.
