@@ -217,6 +217,9 @@ Transform:
   m_Children:
   - {fileID: 4119497394471839877}
   - {fileID: 1241571010822148290}
+  - {fileID: 4892838969434194252}
+  - {fileID: 6321715142657795101}
+  - {fileID: 3291681615387591797}
   - {fileID: 6410182459658755509}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -258,7 +261,7 @@ MonoBehaviour:
   allyEffect: {fileID: 5747561678752484674}
   enemyEffect: {fileID: 6601878576318097427}
   captureBar: {fileID: 1654163789838782687}
-  territoryZone: {fileID: 0}
+  territoryZone: {fileID: 7848459884988780718}
   debugOwner: 0
 --- !u!1 &5255209892118076139
 GameObject:
@@ -454,10 +457,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4892838969434194252}
-  - {fileID: 6321715142657795101}
-  - {fileID: 3291681615387591797}
+  m_Children: []
   m_Father: {fileID: 9207662580619536009}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &7863367502308364975
@@ -677,7 +677,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 6410182459658755509}
+    m_TransformParent: {fileID: 9207662580619536009}
     m_Modifications:
     - target: {fileID: 6044037666520248651, guid: 5e01d3681c8d44b4897aeb36e54b78f2, type: 3}
       propertyPath: m_Name
@@ -752,7 +752,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 6410182459658755509}
+    m_TransformParent: {fileID: 9207662580619536009}
     m_Modifications:
     - target: {fileID: 6044037666520248651, guid: 8b0fa71f7907159499b1a6969ecee7b7, type: 3}
       propertyPath: m_Name
@@ -968,7 +968,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 6410182459658755509}
+    m_TransformParent: {fileID: 9207662580619536009}
     m_Modifications:
     - target: {fileID: 6044037666520248651, guid: 6e82786fd0846bc42a3d580d0f43e516, type: 3}
       propertyPath: m_Name

@@ -77,7 +77,7 @@ public class PlacementSystem : MonoBehaviour
             return;
         }
 
-        Vector3 groundPos = GetGroundPosition(gridPos, data.Size);
+        Vector3 groundPos = GetGroundPosition(gridPos, data.Size, startPoint.transform.position.y);
         Vector3 spawnPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab);
 
         GameObject obj = Instantiate(data.Prefab, spawnPos, Quaternion.identity);
@@ -161,7 +161,7 @@ public class PlacementSystem : MonoBehaviour
         if (rtsController == null || !rtsController.TryConstructBuilding(data.ID))
             return; // 자원/인구가 부족하면 배치하지 않음 (여기서 자원이 실제로 차감됨)
 
-        Vector3 groundPos = GetGroundPosition(gridPos, data.Size);
+        Vector3 groundPos = GetGroundPosition(gridPos, data.Size, mousePos.y);
         Vector3 spawnPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab); // 완공될 건물 기준 높이 (고스트/일꾼 목적지용)
 
         // 그리드는 클릭 즉시 예약(다른 곳에 겹쳐 짓지 못하게) - 실제 오브젝트는 일꾼 도착 후 생성
@@ -266,7 +266,7 @@ public class PlacementSystem : MonoBehaviour
         if (IsTooCloseToResource(data.ID, gridPos, data.Size)) return;
         if (!IsInsideAlliedTerritory(gridPos, data.Size)) return;
 
-        Vector3 groundPos = GetGroundPosition(gridPos, data.Size);
+        Vector3 groundPos = GetGroundPosition(gridPos, data.Size, mousePos.y);
         Vector3 landingPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab); // 착륙 완료 시 최종 정착 위치
 
         // 다른 곳에 겹쳐 짓지 못하도록 클릭 즉시 그리드를 예약 (건설 시스템과 동일한 패턴)
@@ -292,9 +292,11 @@ public class PlacementSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Grid → World 변환 + XZ 중앙정렬 (Y는 그리드 기준 지면 그대로, 오프셋 없음)
+    /// Grid → World 변환 + XZ 중앙정렬. Y는 그리드 셀 크기로 양자화하지 않고, 호출부가 이미 알고 있는
+    /// 실제 지면 좌표(groundY, 마우스 레이캐스트나 startPoint.transform.position.y 등)를 그대로 쓴다.
+    /// (그리드 셀 크기를 거쳐 Y를 되돌리면 cellSize.y 배수로 양자화돼 실제 지형 높이와 어긋난다 - doc/0150)
     /// </summary>
-    private Vector3 GetGroundPosition(Vector3Int gridPos, Vector2Int size)
+    private Vector3 GetGroundPosition(Vector3Int gridPos, Vector2Int size, float groundY)
     {
         Vector3 basePos = grid.CellToWorld(gridPos);
         Vector3 cellSize = grid.cellSize;
@@ -305,13 +307,15 @@ public class PlacementSystem : MonoBehaviour
             (size.y - 1) * cellSize.y * 0.5f
         );
 
-        return basePos + centerOffset;
+        Vector3 pos = basePos + centerOffset;
+        pos.y = groundY;
+        return pos;
     }
 
     // 기존 IsBlocked()용 - 프리팹에 상관없이 대략적인 충돌 검사 박스 중심 높이만 필요하므로 고정 오프셋을 그대로 사용.
-    private Vector3 GetPlacementWorldPosition(Vector3Int gridPos, Vector2Int size)
+    private Vector3 GetPlacementWorldPosition(Vector3Int gridPos, Vector2Int size, float groundY)
     {
-        return GetGroundPosition(gridPos, size) + Vector3.up * yOffset;
+        return GetGroundPosition(gridPos, size, groundY) + Vector3.up * yOffset;
     }
 
     // 프리팹의 메쉬 바운드(로컬)와 스케일을 바탕으로, 피벗이 정확히 지면(바닥)에 닿도록 필요한 y 오프셋을 계산한다.
@@ -334,7 +338,7 @@ public class PlacementSystem : MonoBehaviour
     {
         Vector3 cellSize = grid.cellSize;
 
-        Vector3 center = GetPlacementWorldPosition(grid.WorldToCell(worldPos), size);
+        Vector3 center = GetPlacementWorldPosition(grid.WorldToCell(worldPos), size, worldPos.y);
 
         const float margin = 0.02f;
 
@@ -441,7 +445,7 @@ public class PlacementSystem : MonoBehaviour
                 && !IsTooCloseToResource(data.ID, gridPos, data.Size)
                 && IsInsideAlliedTerritory(gridPos, data.Size);
 
-            Vector3 groundPos = GetGroundPosition(gridPos, data.Size);
+            Vector3 groundPos = GetGroundPosition(gridPos, data.Size, mousePos.y);
             Vector3 previewPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab);
 
             preview.UpdatePosition(previewPos, groundPos, valid);

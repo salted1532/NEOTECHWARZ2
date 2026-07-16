@@ -122,10 +122,18 @@ public class TerritoryZone : MonoBehaviour
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if (Application.isPlaying) return; // Play 모드 중/전환 시점엔 씬 편집용 동기화를 돌리지 않는다
+        // isPlaying만 검사하면 Play 모드를 "빠져나오는 도중"(이미 isPlaying=false로 바뀌었지만 씬 복원이
+        // 끝나기 전)에 걸린 OnValidate를 못 막는다 - isPlayingOrWillChangePlaymode는 그 전환 구간 전체를
+        // true로 유지해줘서 이 틈을 막는다.
+        if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
-        // OnValidate 안에서 바로 씬을 건드리면 경고/에러가 날 수 있어 다음 에디터 틱으로 미룬다.
-        EditorApplication.delayCall += SyncPinPoints;
+        // OnValidate 안에서 바로 씬을 건드리면 경고/에러가 날 수 있어 다음 에디터 틱으로 미루고,
+        // 그 시점에도 다시 한번 전환 여부를 확인한다(그 사이에 Play가 눌렸을 수 있음).
+        EditorApplication.delayCall += () =>
+        {
+            if (this == null || EditorApplication.isPlayingOrWillChangePlaymode) return;
+            SyncPinPoints();
+        };
     }
 
     private void SyncPinPoints()
