@@ -576,6 +576,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainBase
       objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: ed05f7d2714c7614486d64c65e4b1d79, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1745,6 +1749,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: 7c8f9a4aa9f4bf74c8f9f9d9977dcc9f, type: 3}
       propertyPath: m_Name
       value: Guardian Drone
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 7c8f9a4aa9f4bf74c8f9f9d9977dcc9f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3015,6 +3023,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Lab
       objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: 24ad96dd4d0efae4cb55223a99cdca30, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3262,6 +3274,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_Name
       value: Assault Trooper
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8207024150470454005, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_AnchorMax.x
@@ -4806,6 +4822,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Pulsar Tank
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4902,7 +4922,7 @@ PrefabInstance:
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 1832241708}
+      objectReference: {fileID: 891442398}
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Positions.Array.data[0].x
       value: -96.9884
@@ -5226,11 +5246,69 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseStructure
       objectReference: {fileID: 0}
+    - target: {fileID: 7639526730160681910, guid: d175452430e9a09418fee93a0913fc12, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d175452430e9a09418fee93a0913fc12, type: 3}
+--- !u!21 &891442398
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Universal Render Pipeline/Unlit
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddPrecomputedVelocity: 0
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _BlendOp: 0
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
+    - _QueueOffset: 0
+    - _SampleGI: 0
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _Surface: 0
+    - _XRMotionVectorsPass: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
+    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1 &891997144
 GameObject:
   m_ObjectHideFlags: 0
@@ -6976,6 +7054,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Firehawk
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7404,6 +7486,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
       propertyPath: m_Name
       value: Scout Drone
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8102,10 +8188,10 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 1
-  m_VoxelSize: 0.01
+  m_VoxelSize: 0.0625
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 01b947bd17c2fec43b77e74694d22781, type: 2}
-  m_BuildHeightMesh: 0
+  m_BuildHeightMesh: 1
 --- !u!1001 &1555665404
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12049,6 +12135,10 @@ PrefabInstance:
     - target: {fileID: 4876573636871858164, guid: f5b5f4937077f4643af2dabb70753f14, type: 3}
       propertyPath: m_Layer
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4876573636871858164, guid: f5b5f4937077f4643af2dabb70753f14, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4876573636871858164, guid: f5b5f4937077f4643af2dabb70753f14, type: 3}
       propertyPath: m_TagString
@@ -26317,6 +26407,10 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 9056742405263676495, guid: 13a71c83bc16cbe4288b27e8aefb6327, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056742405263676495, guid: 13a71c83bc16cbe4288b27e8aefb6327, type: 3}
       propertyPath: m_TagString
       value: Untagged
       objectReference: {fileID: 0}
@@ -26521,6 +26615,10 @@ PrefabInstance:
     - target: {fileID: 7636683964052424660, guid: bfa5dd8a4e68b7643b799cd39793440d, type: 3}
       propertyPath: m_Name
       value: Tier1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: bfa5dd8a4e68b7643b799cd39793440d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28097,60 +28195,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProductionSlot
   button: {fileID: 0}
   iconImage: {fileID: 0}
---- !u!21 &1832241708
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Universal Render Pipeline/Unlit
-  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
-    - _AlphaToMask: 0
-    - _Blend: 0
-    - _BlendOp: 0
-    - _Cull: 2
-    - _Cutoff: 0.5
-    - _DstBlend: 0
-    - _DstBlendAlpha: 0
-    - _QueueOffset: 0
-    - _SampleGI: 0
-    - _SrcBlend: 1
-    - _SrcBlendAlpha: 1
-    - _Surface: 0
-    - _XRMotionVectorsPass: 1
-    - _ZWrite: 1
-    m_Colors:
-    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
-    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1 &1838819217
 GameObject:
   m_ObjectHideFlags: 0
@@ -28247,6 +28291,10 @@ PrefabInstance:
     - target: {fileID: 7636683964052424660, guid: 8cf6ce7512319444aa0998b140fc187d, type: 3}
       propertyPath: m_Name
       value: Tier3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: 8cf6ce7512319444aa0998b140fc187d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28555,6 +28603,10 @@ PrefabInstance:
     - target: {fileID: 7636683964052424660, guid: a1afb913cb6c8e54388e6960d529804f, type: 3}
       propertyPath: m_Name
       value: Tier2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: a1afb913cb6c8e54388e6960d529804f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -29900,6 +29952,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: d9657408020de9a44918eef6a3214c70, type: 3}
       propertyPath: m_Name
       value: Ranger Infantry Fighting Vehicle
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: d9657408020de9a44918eef6a3214c70, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
