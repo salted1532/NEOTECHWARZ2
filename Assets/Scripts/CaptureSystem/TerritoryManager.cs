@@ -7,6 +7,9 @@ public static class TerritoryManager
 {
     private static readonly List<TerritoryZone> zones = new List<TerritoryZone>();
 
+    // TerritoryFogReveal 등 zone을 직접 순회해야 하는 외부 코드를 위한 읽기 전용 접근
+    public static IReadOnlyList<TerritoryZone> Zones => zones;
+
     public static void Register(TerritoryZone zone)
     {
         if (!zones.Contains(zone)) zones.Add(zone);

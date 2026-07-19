@@ -259,6 +259,11 @@ namespace FischlWorks_FogWar
         [SerializeField]
         private bool LogOutOfRange = false;
 
+        // FogRevealer 반영이 끝난 직후, 텍스처를 굽기 직전 지점에서 다른 시스템(예: 점령지 강제 시야)이
+        // fogField를 추가로 손볼 수 있게 열어주는 훅. LateUpdate 등 이후 타이밍에서 반영하면 이번 주기의
+        // 텍스처 캡처를 놓치게 되므로, 반드시 이 시점에 반영해야 한다.
+        public event Action OnBeforeFogTextureUpdate;
+
         // External shadowcaster module
         public Shadowcaster shadowcaster { get; private set; } = new Shadowcaster();
 
@@ -473,6 +478,8 @@ namespace FischlWorks_FogWar
                     fogRevealer._CurrentLevelCoordinates,
                     Mathf.RoundToInt(fogRevealer._SightRange / unitScale));
             }
+
+            OnBeforeFogTextureUpdate?.Invoke();
 
             UpdateFogPlaneTextureTarget();
         }

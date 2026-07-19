@@ -356,7 +356,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 19481816}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.42261827, y: 0, z: 0, w: 0.9063079}
+  m_LocalRotation: {x: 0.46174863, y: 0, z: 0, w: 0.8870109}
   m_LocalPosition: {x: -80, y: 15, z: -111.56}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -364,7 +364,7 @@ Transform:
   - {fileID: 1954033221}
   - {fileID: 1057876441}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 50, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 55, y: 0, z: 0}
 --- !u!1 &42568837
 GameObject:
   m_ObjectHideFlags: 0
@@ -3223,60 +3223,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 535138266}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!21 &544297657
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Universal Render Pipeline/Unlit
-  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
-    - _AlphaToMask: 0
-    - _Blend: 0
-    - _BlendOp: 0
-    - _Cull: 2
-    - _Cutoff: 0.5
-    - _DstBlend: 0
-    - _DstBlendAlpha: 0
-    - _QueueOffset: 0
-    - _SampleGI: 0
-    - _SrcBlend: 1
-    - _SrcBlendAlpha: 1
-    - _Surface: 0
-    - _XRMotionVectorsPass: 1
-    - _ZWrite: 1
-    m_Colors:
-    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
-    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1001 &545246220
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4903,11 +4849,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1949417275165920072, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: debugOwner
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2417251053356206203, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2417251053356206203, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3927116910094325800, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Name
@@ -4919,6 +4869,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5255209892118076139, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5747561678752484674, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5747561678752484674, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6601878576318097427, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+      propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6601878576318097427, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
@@ -4976,7 +4938,7 @@ PrefabInstance:
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 544297657}
+      objectReference: {fileID: 1355635945}
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Positions.Array.data[0].x
       value: -96.9884
@@ -5096,6 +5058,10 @@ PrefabInstance:
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].value
       value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8341728653733691689, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9207662580619536009, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -7496,6 +7462,60 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
+--- !u!21 &1355635945
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Universal Render Pipeline/Unlit
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddPrecomputedVelocity: 0
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _BlendOp: 0
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
+    - _QueueOffset: 0
+    - _SampleGI: 0
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _Surface: 0
+    - _XRMotionVectorsPass: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
+    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1 &1403324090
 GameObject:
   m_ObjectHideFlags: 0
@@ -8155,6 +8175,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProductionSlot
   button: {fileID: 0}
   iconImage: {fileID: 0}
+--- !u!1 &1527518795 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 393860149687228720, guid: 43fe15fd8d690c74bb1dabc30c781e98, type: 3}
+  m_PrefabInstance: {fileID: 8673152543473951732}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1527518798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1527518795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a76ee8155d4689c4fa9e5c724084e9a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TerritoryFogReveal
 --- !u!1 &1532798076 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4876573636897533704, guid: f5b5f4937077f4643af2dabb70753f14, type: 3}
@@ -29976,19 +30013,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7166556407344312274, guid: 43fe15fd8d690c74bb1dabc30c781e98, type: 3}
       propertyPath: unitScale
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7166556407344312274, guid: 43fe15fd8d690c74bb1dabc30c781e98, type: 3}
-      propertyPath: rayStartHeight
-      value: 2
+      propertyPath: drawGizmos
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7166556407344312274, guid: 43fe15fd8d690c74bb1dabc30c781e98, type: 3}
+      propertyPath: LogOutOfRange
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7166556407344312274, guid: 43fe15fd8d690c74bb1dabc30c781e98, type: 3}
       propertyPath: levelDimensionX
-      value: 128
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 7166556407344312274, guid: 43fe15fd8d690c74bb1dabc30c781e98, type: 3}
       propertyPath: levelDimensionY
-      value: 128
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 7166556407344312274, guid: 43fe15fd8d690c74bb1dabc30c781e98, type: 3}
       propertyPath: keepRevealedTiles
@@ -30045,7 +30086,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 393860149687228720, guid: 43fe15fd8d690c74bb1dabc30c781e98, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1527518798}
   m_SourcePrefab: {fileID: 100100000, guid: 43fe15fd8d690c74bb1dabc30c781e98, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
