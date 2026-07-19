@@ -471,6 +471,7 @@ GameObject:
   - component: {fileID: -4819241414651212883}
   - component: {fileID: 9036445165335029168}
   - component: {fileID: -3865598169333852747}
+  - component: {fileID: 7116149765237121121}
   m_Layer: 9
   m_Name: Tier3
   m_TagString: Tier3
@@ -672,6 +673,20 @@ MonoBehaviour:
   destroyPrefab: {fileID: 1000013462590818, guid: 900b6a17c4205f844af8859f493b8caa, type: 3}
   destroyPoints:
   - {fileID: 6780748852691607914}
+--- !u!114 &7116149765237121121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
+  sightRange: 20
+  updateOnlyOnMove: 1
 --- !u!1001 &351461350170579882
 PrefabInstance:
   m_ObjectHideFlags: 0

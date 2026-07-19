@@ -929,6 +929,7 @@ GameObject:
   - component: {fileID: -8433558232098503672}
   - component: {fileID: -8984526298391883310}
   - component: {fileID: 9056132140947804330}
+  - component: {fileID: 8163829703384396057}
   m_Layer: 6
   m_Name: Guardian Drone
   m_TagString: AttackUnit
@@ -1165,6 +1166,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &8163829703384396057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
+  sightRange: 10
+  updateOnlyOnMove: 1
 --- !u!1 &8287700491229270693
 GameObject:
   m_ObjectHideFlags: 0

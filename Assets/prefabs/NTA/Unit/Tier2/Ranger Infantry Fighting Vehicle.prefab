@@ -719,6 +719,7 @@ GameObject:
   - component: {fileID: -6595556838437288612}
   - component: {fileID: -7653392222599426387}
   - component: {fileID: 1803068245205877688}
+  - component: {fileID: 13976751495931889}
   m_Layer: 6
   m_Name: Ranger Infantry Fighting Vehicle
   m_TagString: AttackUnit
@@ -973,6 +974,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &13976751495931889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
+  sightRange: 10
+  updateOnlyOnMove: 1
 --- !u!1 &7947122194143956580
 GameObject:
   m_ObjectHideFlags: 0
