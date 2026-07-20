@@ -683,6 +683,33 @@ public class RTSUnitController : MonoBehaviour
             SelectBuilding(building);
     }
 
+    // 더블클릭 시 카메라가 이동할 기준 좌표. 유닛이 여러 개면 리스트의 [0]번째(가장 먼저 저장/추가된) 유닛을 우선하고,
+    // 유닛이 하나도 없으면(건물만 지정된 그룹) 건물 [0]번째를 대신 사용한다.
+    public bool TryGetControlGroupFocusPosition(int groupIndex, out Vector3 position)
+    {
+        position = default;
+
+        if (groupIndex < 0 || groupIndex >= controlGroupUnits.Length)
+            return false;
+
+        controlGroupUnits[groupIndex].RemoveAll(unit => unit == null);
+        controlGroupBuildings[groupIndex].RemoveAll(building => building == null);
+
+        if (controlGroupUnits[groupIndex].Count > 0)
+        {
+            position = controlGroupUnits[groupIndex][0].transform.position;
+            return true;
+        }
+
+        if (controlGroupBuildings[groupIndex].Count > 0)
+        {
+            position = controlGroupBuildings[groupIndex][0].transform.position;
+            return true;
+        }
+
+        return false;
+    }
+
     #endregion
 
     #region UserControl 상태 전환

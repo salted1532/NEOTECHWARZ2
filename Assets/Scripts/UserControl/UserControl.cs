@@ -26,6 +26,9 @@ public class UserControl : MonoBehaviour
     private Camera mainCamera;
 
     [SerializeField]
+    private CameraControl mainCameraControl; // 더블클릭 시 카메라 이동에 사용 (MinimapController와 동일한 참조 방식)
+
+    [SerializeField]
     private RectTransform dragRectangle;
 
 
@@ -93,6 +96,12 @@ public class UserControl : MonoBehaviour
         KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9, KeyCode.Alpha0
     };
 
+    private const float ControlGroupDoubleClickThreshold = 0.3f; // 이 시간(초) 안에 같은 그룹 키를 다시 누르면 더블클릭으로 간주
+    private readonly float[] lastControlGroupPressTime = new float[10];
+
+    private const float UnitDoubleClickThreshold = 0.3f; // 이 시간(초) 안에 유닛을 다시 클릭하면 더블클릭으로 간주
+    private float lastUnitClickTime = float.NegativeInfinity;
+
     private void Awake()
     {
         mainCamera = Camera.main;
@@ -106,6 +115,9 @@ public class UserControl : MonoBehaviour
 
         start = Vector2.zero;
         end = Vector2.zero;
+
+        for (int i = 0; i < lastControlGroupPressTime.Length; i++)
+            lastControlGroupPressTime[i] = float.NegativeInfinity;
 
         DrawDragRectangle();
     }
@@ -211,7 +223,15 @@ public class UserControl : MonoBehaviour
                 if (Input.GetKey(KeyCode.LeftShift))
                     rtsUnitController.ShiftClickSelectUnit(unit);
                 else
-                    pendingLeftClickSelect = () => { if (unit != null) rtsUnitController.ClickSelectUnit(unit); };
+                {
+                    bool isDoubleClick = Time.time - lastUnitClickTime <= UnitDoubleClickThreshold;
+                    lastUnitClickTime = Time.time;
+
+                    if (isDoubleClick)
+                        pendingLeftClickSelect = () => { if (unit != null) SelectAllVisibleUnitsOfSameType(unit); };
+                    else
+                        pendingLeftClickSelect = () => { if (unit != null) rtsUnitController.ClickSelectUnit(unit); };
+                }
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
@@ -600,6 +620,17 @@ public class UserControl : MonoBehaviour
             {
                 rtsUnitController.SelectControlGroup(i);
 
+                bool isDoubleClick = Time.time - lastControlGroupPressTime[i] <= ControlGroupDoubleClickThreshold;
+                lastControlGroupPressTime[i] = Time.time;
+
+                if (isDoubleClick && mainCameraControl != null &&
+                    rtsUnitController.TryGetControlGroupFocusPosition(i, out Vector3 focusPosition))
+                {
+                    // MinimapController의 클릭 이동과 동일하게 z를 -30 보정해 카메라가 유닛 바로 위가 아니라 살짝 아래쪽에서 비추게 한다
+                    focusPosition.z -= 20f;
+                    mainCameraControl.JumpToWorldXZ(focusPosition);
+                }
+
                 // A/M/P로 들어간 "공격 위치/순찰/이동 위치 지정" 대기 모드에서만 빠져나온다 (Rally/BuildingMove는 그대로 유지)
                 if (UsercurrentState == OrderState.Attack || UsercurrentState == OrderState.Move || UsercurrentState == OrderState.Patrol)
                 {
@@ -695,6 +726,37 @@ public class UserControl : MonoBehaviour
         // 드래그로 걸린 유닛이 없으면(제자리 클릭이거나 빈 범위로 드래그) 마우스를 놓는 시점에 단일 클릭 선택을 확정한다.
         pendingLeftClickSelect?.Invoke();
         pendingLeftClickSelect = null;
+    }
+
+    // 더블클릭한 유닛과 같은 종류(GetUnitID() 일치)이면서 현재 카메라 화면 안에 보이는 유닛을 전부 선택한다.
+    private void SelectAllVisibleUnitsOfSameType(UnitController referenceUnit)
+    {
+        int unitID = referenceUnit.GetUnitID();
+        List<UnitController> matches = new List<UnitController>();
+
+        foreach (UnitController unit in rtsUnitController.UnitList)
+        {
+            if (unit == null || unit.GetUnitID() != unitID)
+                continue;
+
+            Vector3 screenPos = mainCamera.WorldToScreenPoint(unit.transform.position);
+
+            if (screenPos.z <= 0f)
+                continue; // 카메라 뒤쪽에 있으면 화면에 보이지 않는 것으로 취급
+
+            if (screenPos.x < 0f || screenPos.x > Screen.width || screenPos.y < 0f || screenPos.y > Screen.height)
+                continue;
+
+            matches.Add(unit);
+        }
+
+        if (matches.Count == 0)
+            return;
+
+        rtsUnitController.DeselectAll();
+
+        foreach (UnitController unit in matches)
+            rtsUnitController.DragSelectUnit(unit);
     }
 
     // 현재 명령 대기 상태(공격/이동/순찰/랠리)에 맞는 포인터 아이콘을 마우스가 가리키는 지면 위치에 표시한다.
