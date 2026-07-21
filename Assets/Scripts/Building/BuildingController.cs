@@ -23,6 +23,9 @@ public class BuildingController : MonoBehaviour, IDestructible
     // 이 건물의 유닛 생산 큐를 실제로 관리하는 자식 컴포넌트
     private UnitSpawner UnitSpawner;
 
+    // 이 건물(Lab)의 연구 큐를 실제로 관리하는 자식 컴포넌트
+    private ResearchQueue researchQueue;
+
     // 생산된 유닛이 스폰 후 이동할 집결 지점
     private Vector3 RallyPosition;
 
@@ -86,6 +89,7 @@ public class BuildingController : MonoBehaviour, IDestructible
         navMeshObstacle = GetComponent<NavMeshObstacle>();
 
         UnitSpawner = GetComponentInChildren<UnitSpawner>();
+        researchQueue = GetComponentInChildren<ResearchQueue>();
 
         // 기본 랠리 포인트는 건물 앞쪽(약간 -Z 방향)으로 설정
         RallyPosition = transform.position + new Vector3(0, 0, -2f);
@@ -414,6 +418,25 @@ public class BuildingController : MonoBehaviour, IDestructible
         return UnitSpawner != null ? UnitSpawner.ClearQueue() : null;
     }
 
+    // 연구소(Lab) 전용 위임 메서드들 (UnitSpawner 위임 메서드와 동일한 패턴)
+    public bool CanEnqueueResearch(ResearchType type) =>
+        researchQueue != null && researchQueue.CanEnqueue(type);
+
+    public int GetResearchLevel(ResearchType type) =>
+        researchQueue != null ? researchQueue.GetLevel(type) : 0;
+
+    public (int ore, int gas) GetResearchCost(ResearchType type) =>
+        researchQueue != null ? researchQueue.GetCost(type) : (0, 0);
+
+    public void EnqueueResearch(ResearchType type) => researchQueue?.Enqueue(type);
+
+    public IReadOnlyList<ResearchData> GetResearchQueue() => researchQueue?.GetResearchQueue();
+
+    public int CancelResearch(int index) => researchQueue != null ? researchQueue.Cancel(index) : -1;
+
+    public List<ResearchData> ClearResearchQueue() =>
+        researchQueue != null ? researchQueue.ClearQueue() : null;
+
     // 건물 파괴 처리: 대기열 환불, RTSUnitController의 관리 목록에서 제거, 인구수 반환 후 게임오브젝트를 파괴한다.
     // (HealthManager의 IDestructible 구현체로 호출됨)
     public void Die()
@@ -421,6 +444,7 @@ public class BuildingController : MonoBehaviour, IDestructible
         CancelPendingLandingFlight(); // 착륙 위치로 비행 중(또는 착륙 직전)에 파괴되면 예약해둔 그리드 셀/고스트를 정리
 
         rtsController?.RefundProductionQueue(ClearProductionQueue()); // 대기열에 남아있던 유닛들 환불
+        rtsController?.RefundResearchQueue(this, ClearResearchQueue()); // 대기열에 남아있던 연구들 환불
         rtsController?.BuildingList.Remove(this);
         rtsController?.selectedBuildingList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel 등)가 유령 참조를 들고 있지 않도록
         rtsController?.RemoveMaxPopulationForBuilding(buildingID); // 이 건물이 제공하던 인구수 한도를 반환

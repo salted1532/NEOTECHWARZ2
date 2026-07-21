@@ -799,12 +799,26 @@ public class UnitController : MonoBehaviour, IDestructible
         Debug.Log("공격성공!");
         if (enemy.TryGetComponent<HealthManager>(out var targetHealth))
         {
-            targetHealth.GetDamage(attackDamage, transform.position, attackType); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
+            int targetArmor = GetTargetArmor(enemy);
+            int finalDamage = Mathf.Max(1, GetAttackDamage() - targetArmor); // 방어력만큼 감산, 최소 1 데미지는 보장
+            targetHealth.GetDamage(finalDamage, transform.position, attackType); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
             GetComponent<UnitEffects>()?.PlayAttack();
         }
 
         alreadyAttacked = true;
         Invoke(nameof(ResetAttack), timeBetweenAttacks);
+    }
+
+    // 공격 대상의 방어력을 조회한다 (아군 유닛이면 연구 보너스가 반영된 GetArmor(), 적 유닛이면 EnemyController의 armor, 그 외(건물/자원)는 0).
+    private int GetTargetArmor(GameObject target)
+    {
+        if (target.TryGetComponent<UnitController>(out var friendlyUnit))
+            return friendlyUnit.GetArmor();
+
+        if (target.TryGetComponent<EnemyController>(out var enemyUnit))
+            return enemyUnit.GetArmor();
+
+        return 0;
     }
 
     //공격 리셋
@@ -1288,7 +1302,9 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public Sprite GetIcon() => icon;
     public int GetUnitID() => unitID;
-    public int GetAttackDamage() => attackDamage;
-    public int GetArmor() => armor;
+
+    // 연구소 업그레이드로 얻은 전역 보너스를 더해서 반환한다 (RTSUnitController를 거쳐서만 조회 - UpgradeManager는 직접 참조하지 않음).
+    public int GetAttackDamage() => attackDamage + (rtsController != null ? rtsController.GlobalAttackBonus : 0);
+    public int GetArmor() => armor + (rtsController != null ? rtsController.GlobalArmorBonus : 0);
     public AttackEffectType GetAttackType() => attackType;
 }

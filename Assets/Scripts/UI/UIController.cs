@@ -27,6 +27,8 @@ public class UIController : MonoBehaviour
 
         MainBase,          // Command center
 
+        LabBuilding,       // 연구소(Lab) 선택 (공격력/방어력 업그레이드)
+
         BaseStructureSelect // 건설 중인 건물 기반(BaseStructure) 선택
     }
 
@@ -186,6 +188,10 @@ public class UIController : MonoBehaviour
     [SerializeField] private Sprite wraithIcon;   // ShowAirportPanel
     [SerializeField] private Sprite guardianIcon; // ShowAirportPanel
 
+    [Header("Research Icons (ShowLabPanel)")]
+    [SerializeField] private Sprite attackResearchIcon;
+    [SerializeField] private Sprite armorResearchIcon;
+
     [Header("Common")]
     [SerializeField] private Sprite cancelIcon;
     [SerializeField] private Sprite liftOffIcon; // 리프트 버튼(지상 상태일 때)
@@ -211,6 +217,11 @@ public class UIController : MonoBehaviour
 
     private IReadOnlyList<ProductionData> currentQueue;
     private bool isShowingProductionQueue;
+
+    // 연구 대기열도 위 productionPanel/queueSlots/progressSlider를 그대로 재사용한다
+    // (Lab 패널과 생산 패널은 동시에 표시될 일이 없음)
+    private IReadOnlyList<ResearchData> currentResearchQueue;
+    private bool isShowingResearchQueue;
 
     [Header("Info Panel (SelectInfo)")]
     [SerializeField] private GameObject infoPanel;
@@ -415,6 +426,11 @@ public class UIController : MonoBehaviour
         currentQueue = queue;
         isShowingProductionQueue = true;
 
+        // 연구 큐 UI와 슬롯/슬라이더를 공유하므로, 생산 큐를 보여줄 땐 연구 큐 상태를 꺼서
+        // UpdateProductionProgress()가 지난 프레임의 연구 진행률을 덮어쓰지 않게 한다.
+        currentResearchQueue = null;
+        isShowingResearchQueue = false;
+
         UpdateQueue(queue, onCancel);
     }
 
@@ -429,6 +445,76 @@ public class UIController : MonoBehaviour
             slot.Clear();
 
         progressSlider.gameObject.SetActive(false);
+
+        currentQueue = null;
+        isShowingProductionQueue = false;
+
+        // 연구 큐도 같은 UI 오브젝트를 쓰므로 같이 꺼준다 (그래야 다음 프레임에 연구 진행률로 되살아나지 않음).
+        currentResearchQueue = null;
+        isShowingResearchQueue = false;
+    }
+
+    // 연구 대기열 슬롯 UI 갱신: UpdateQueue와 동일한 패턴이지만, UnitDataSO 조회 대신
+    // ResearchType → 아이콘(attackResearchIcon/armorResearchIcon) 매핑을 그대로 쓴다.
+    public void UpdateResearchQueue(
+        IReadOnlyList<ResearchData> queue,
+        Action<int> onCancel)
+    {
+        if (queue == null)
+        {
+            for (int i = 0; i < queueSlots.Length; i++)
+                SetEmptyQueueSlot(i);
+
+            return;
+        }
+
+        for (int i = 0; i < queueSlots.Length; i++)
+        {
+            if (i >= queue.Count)
+            {
+                SetEmptyQueueSlot(i);
+                continue;
+            }
+
+            int queueIndex = i;
+            Sprite icon = queue[queueIndex].Type == ResearchType.Attack ? attackResearchIcon : armorResearchIcon;
+
+            queueSlots[i].SetData(
+                new CommandButtonData(icon, () => onCancel(queueIndex))
+            );
+        }
+    }
+
+    // 연구 대기열 UI를 표시 상태로 전환하고 즉시 갱신한다 (생산 큐 UI와 동일한 패널/슬롯/슬라이더를 재사용).
+    public void ShowResearchUI(
+        IReadOnlyList<ResearchData> queue,
+        Action<int> onCancel)
+    {
+        if (productionPanel != null)
+            productionPanel.SetActive(true);
+
+        currentResearchQueue = queue;
+        isShowingResearchQueue = true;
+
+        currentQueue = null;
+        isShowingProductionQueue = false;
+
+        UpdateResearchQueue(queue, onCancel);
+    }
+
+    // Hide research queue & progress time
+    public void HideResearchUI()
+    {
+        if (productionPanel != null)
+            productionPanel.SetActive(false);
+
+        foreach (var slot in queueSlots)
+            slot.Clear();
+
+        progressSlider.gameObject.SetActive(false);
+
+        currentResearchQueue = null;
+        isShowingResearchQueue = false;
 
         currentQueue = null;
         isShowingProductionQueue = false;
@@ -447,9 +533,16 @@ public class UIController : MonoBehaviour
     }
 
     // Progress time display
-    // 생산시간 표시(프로그레스 바) 갱신: 대기열 맨 앞 항목의 진행률을 슬라이더에 반영한다.
+    // 생산/연구 시간 표시(프로그레스 바) 갱신: 대기열 맨 앞 항목의 진행률을 슬라이더에 반영한다.
     private void UpdateProductionProgress()
     {
+        if (isShowingResearchQueue && currentResearchQueue != null && currentResearchQueue.Count > 0)
+        {
+            progressSlider.gameObject.SetActive(true);
+            progressSlider.value = currentResearchQueue[0].Progress;
+            return;
+        }
+
         if (!isShowingProductionQueue ||
             currentQueue == null ||
             currentQueue.Count == 0)
@@ -994,6 +1087,23 @@ public class UIController : MonoBehaviour
             {
                 new CommandButtonData(wraithIcon, onWraith),
                 new CommandButtonData(guardianIcon, onGuardian)
+            },
+            LiftSlotOnlyProtected);
+    }
+
+    // Lab
+    // 연구소 선택 패널 (공격력/방어력 업그레이드 버튼)
+    public void ShowLabPanel(
+    ButtonAction onAttackResearch, bool attackInteractable,
+    ButtonAction onArmorResearch, bool armorInteractable)
+    {
+        CurrentState = UISelectionState.LabBuilding;
+
+        SetCommands(
+            new CommandButtonData[]
+            {
+                new CommandButtonData(attackResearchIcon, onAttackResearch, attackInteractable),
+                new CommandButtonData(armorResearchIcon, onArmorResearch, armorInteractable)
             },
             LiftSlotOnlyProtected);
     }

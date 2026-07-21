@@ -42,6 +42,8 @@ public class RTSUnitController : MonoBehaviour
     private UnitDataSO unitDatabase;
     [SerializeField]
     private BuildingDataSO buildingDatabase;
+    [SerializeField]
+    private UpgradeManager upgradeManager;
 
     // ===== 상태 하나로 통합 =====
     public enum SelectState
@@ -998,6 +1000,69 @@ public class RTSUnitController : MonoBehaviour
         return producedAny;
     }
 
+    // 연구 요청 (대표 건물 기준 - Lab이 여러 개 선택된 경우도 대표 건물 하나만 처리)
+    public bool TryResearch(ResearchType type)
+    {
+        BuildingController building = GetRepresentativeBuilding();
+        if (building == null || !building.CanEnqueueResearch(type))
+            return false;
+
+        var (ore, gas) = building.GetResearchCost(type);
+
+        if (!resourceManager.TrySpend(ore, gas))
+        {
+            Debug.Log("자원부족!");
+            return false;
+        }
+
+        building.EnqueueResearch(type);
+        return true;
+    }
+
+    // 대표 건물의 연구 대기열 반환 (UI 표시용)
+    public IReadOnlyList<ResearchData> GetResearchQueue()
+    {
+        return GetRepresentativeBuilding()?.GetResearchQueue();
+    }
+
+    // 지정한 연구를 지금 큐잉할 수 있는지 (버튼 활성화 여부 판단용)
+    public bool CanResearch(ResearchType type)
+    {
+        BuildingController building = GetRepresentativeBuilding();
+        return building != null && building.CanEnqueueResearch(type);
+    }
+
+    // 대기열 취소 (취소된 연구 비용만큼 환불, 대표 건물 기준)
+    public void CancelResearch(int index)
+    {
+        BuildingController building = GetRepresentativeBuilding();
+        if (building == null)
+            return;
+
+        int canceledType = building.CancelResearch(index);
+        if (canceledType < 0)
+            return;
+
+        RefundResearch(building, (ResearchType)canceledType);
+    }
+
+    private void RefundResearch(BuildingController building, ResearchType type)
+    {
+        var (ore, gas) = building.GetResearchCost(type);
+        resourceManager.AddOre(ore);
+        resourceManager.AddGas(gas);
+    }
+
+    // 건물 파괴 시 대기열에 남아있던 연구들 환불 (RefundProductionQueue와 동일한 패턴)
+    public void RefundResearchQueue(BuildingController building, List<ResearchData> queue)
+    {
+        if (queue == null)
+            return;
+
+        foreach (ResearchData item in queue)
+            RefundResearch(building, item.Type);
+    }
+
     // buildingID에 해당하는 건물이 최소 1개 완공되어 있는지 (건설 중인 BaseStructure는 포함 안 됨)
     public bool HasCompletedBuilding(int buildingID) =>
         BuildingList.Exists(b => b != null && b.GetBuildingID() == buildingID);
@@ -1041,6 +1106,26 @@ public class RTSUnitController : MonoBehaviour
             : data.description;
 
         return ButtonAction.WithCost(callback, data.unitName, description, data.mineral, data.gas, data.population, shortcut);
+    }
+
+    // 연구 버튼용 ButtonAction 생성 (제목="Attack/Armor Upgrade Lv.N", 비용=다음 레벨 광물/가스, 최대 레벨이면 "MAX" 표시)
+    private ButtonAction ResearchButtonAction(ResearchType type)
+    {
+        BuildingController building = GetRepresentativeBuilding();
+        int currentLevel = building != null ? building.GetResearchLevel(type) : 0;
+        var (ore, gas) = building != null ? building.GetResearchCost(type) : (0, 0);
+
+        string baseTitle = type == ResearchType.Attack ? "Attack Upgrade" : "Armor Upgrade";
+        bool maxed = currentLevel >= ResearchQueue.MaxLevel;
+
+        string title = maxed ? $"{baseTitle} (MAX)" : $"{baseTitle} Lv.{currentLevel + 1}";
+        string description = maxed
+            ? $"{baseTitle} fully researched."
+            : (type == ResearchType.Attack
+                ? $"Research increased attack damage for all units. (Lv.{currentLevel} → Lv.{currentLevel + 1})"
+                : $"Research increased armor for all units. (Lv.{currentLevel} → Lv.{currentLevel + 1})");
+
+        return ButtonAction.WithCost(() => TryResearch(type), title, description, ore, gas, 0);
     }
 
     // 건물 건설 버튼용 ButtonAction 생성 (제목=건물명, 비용=광물/가스/인구수)
@@ -1212,11 +1297,19 @@ public class RTSUnitController : MonoBehaviour
                                 CancelProduction);
                             break;
 
-                        case BuildingState.SupplyDepot:
                         case BuildingState.Lab:
+                            uIController.ShowLabPanel(
+                                ResearchButtonAction(ResearchType.Attack), CanResearch(ResearchType.Attack),
+                                ResearchButtonAction(ResearchType.Armor), CanResearch(ResearchType.Armor));
+
+                            uIController.ShowResearchUI(GetResearchQueue(), CancelResearch);
+                            break;
+
+                        case BuildingState.SupplyDepot:
                         case BuildingState.None:
                             uIController.ClearBuildingPanelExceptLiftSlots(protectMoveSlot: false);
                             uIController.HideProductionUI();
+                            uIController.HideResearchUI();
                             break;
                     }
                 }
@@ -1367,6 +1460,17 @@ public class RTSUnitController : MonoBehaviour
     public int GetMaxPopulation() => resourceManager.GetMaxPopulation();
     public void AddOre(int amount) => resourceManager.AddOre(amount);
     public void AddGas(int amount) => resourceManager.AddGas(amount);
+
+    #endregion
+
+    #region 업그레이드(연구) 전역 보너스 창구
+    // 실제 저장은 UpgradeManager가 담당하고, RTSUnitController는 그 창구 역할만 한다.
+    // ResearchQueue(연구소 큐)도 UnitController(유닛)도 UpgradeManager를 직접 참조하지 않고 이 메서드들만 사용한다.
+    public int GlobalAttackBonus => upgradeManager.GetBonus(ResearchType.Attack);
+    public int GlobalArmorBonus => upgradeManager.GetBonus(ResearchType.Armor);
+
+    // ResearchQueue가 연구 완료 시 호출 (UpgradeManager를 직접 모른 채로 보너스를 반영)
+    public void AddGlobalBonus(ResearchType type, int amount) => upgradeManager.AddBonus(type, amount);
 
     #endregion
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using FischlWorks_FogWar;
 
 
 // 플레이어의 마우스/키보드 입력을 해석하는 컨트롤러.
@@ -66,6 +67,7 @@ public class UserControl : MonoBehaviour
     private Texture2D currentCursorTexture; // 직전 프레임에 적용한 텍스처 (같으면 SetCursor 재호출 생략)
 
     private RTSUnitController rtsUnitController;
+    private csFogWar fogWar;
 
     private Vector2 start;
     private Vector2 end;
@@ -106,6 +108,11 @@ public class UserControl : MonoBehaviour
     {
         mainCamera = Camera.main;
         rtsUnitController = GetComponent<RTSUnitController>();
+
+        fogWar = FindFirstObjectByType<csFogWar>();
+
+        if (fogWar == null)
+            Debug.LogWarning($"{name}: csFogWar를 씬에서 찾지 못해 안개에 가려진 대상 클릭 차단 기능이 비활성화됩니다.", this);
 
         attackPointer = Instantiate(attackPointerPrefab);
         movePointer = Instantiate(pointerPrefab);
@@ -244,7 +251,7 @@ public class UserControl : MonoBehaviour
         {
             EnemyController enemy = enemyHit.transform.GetComponent<EnemyController>();
 
-            if (enemy != null)
+            if (enemy != null && IsRevealedByFog(enemyHit.point))
             {
                 if (UsercurrentState == OrderState.Attack)
                 {
@@ -389,7 +396,7 @@ public class UserControl : MonoBehaviour
         {
             ResourceNode node = OreHit.transform.GetComponent<ResourceNode>();
 
-            if (node != null)
+            if (node != null && IsRevealedByFog(OreHit.point))
             {
                 pendingLeftClickSelect = () => { if (node != null) rtsUnitController.ClickSelectResource(node); };
 
@@ -402,7 +409,7 @@ public class UserControl : MonoBehaviour
         {
             ResourceNode node = GasHit.transform.GetComponent<ResourceNode>();
 
-            if (node != null)
+            if (node != null && IsRevealedByFog(GasHit.point))
             {
                 pendingLeftClickSelect = () => { if (node != null) rtsUnitController.ClickSelectResource(node); };
 
@@ -470,11 +477,22 @@ public class UserControl : MonoBehaviour
 
             if (enemy != null)
             {
-                rtsUnitController.AttackSelectedUnits(enemy);
-                enemy.FlashMarker(); // 어느 적이 공격 대상인지 마커 깜빡임으로 표시
+                // 안개에 가려진 적은 추격 공격 대신 그 지점으로 이동만 시킨다 (보이지 않는 대상을 특정해서 명령할 수 없음)
+                if (IsRevealedByFog(enemyHit.point))
+                {
+                    rtsUnitController.AttackSelectedUnits(enemy);
+                    enemy.FlashMarker(); // 어느 적이 공격 대상인지 마커 깜빡임으로 표시
 
-                attackPointer.transform.position = enemy.transform.position;
-                attackPointer.SetActive(true);
+                    attackPointer.transform.position = enemy.transform.position;
+                    attackPointer.SetActive(true);
+                }
+                else
+                {
+                    rtsUnitController.MoveSelectedUnits(enemyHit.point);
+
+                    movePointer.transform.position = enemyHit.point;
+                    movePointer.SetActive(true);
+                }
 
                 return;
             }
@@ -548,8 +566,19 @@ public class UserControl : MonoBehaviour
             ResourceNode node = OreHit.transform.GetComponent<ResourceNode>();
             if (node != null)
             {
-                rtsUnitController.GatherSelectedUnits(node);
-                node.FlashMarker(); // 어느 자원이 채취 대상인지 마커 깜빡임으로 표시
+                // 안개에 가려진 자원은 채취 명령 대신 그 지점으로 이동만 시킨다
+                if (IsRevealedByFog(OreHit.point))
+                {
+                    rtsUnitController.GatherSelectedUnits(node);
+                    node.FlashMarker(); // 어느 자원이 채취 대상인지 마커 깜빡임으로 표시
+                }
+                else
+                {
+                    rtsUnitController.MoveSelectedUnits(OreHit.point);
+
+                    movePointer.transform.position = OreHit.point;
+                    movePointer.SetActive(true);
+                }
             }
         }
 
@@ -559,8 +588,19 @@ public class UserControl : MonoBehaviour
             ResourceNode node = GasHit.transform.GetComponent<ResourceNode>();
             if (node != null)
             {
-                rtsUnitController.GatherSelectedUnits(node);
-                node.FlashMarker(); // 어느 자원이 채취 대상인지 마커 깜빡임으로 표시
+                // 안개에 가려진 자원은 채취 명령 대신 그 지점으로 이동만 시킨다
+                if (IsRevealedByFog(GasHit.point))
+                {
+                    rtsUnitController.GatherSelectedUnits(node);
+                    node.FlashMarker(); // 어느 자원이 채취 대상인지 마커 깜빡임으로 표시
+                }
+                else
+                {
+                    rtsUnitController.MoveSelectedUnits(GasHit.point);
+
+                    movePointer.transform.position = GasHit.point;
+                    movePointer.SetActive(true);
+                }
             }
         }
     }
@@ -842,16 +882,25 @@ public class UserControl : MonoBehaviour
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, Mathf.Infinity, layerEnemy))
+        if (Physics.Raycast(ray, out RaycastHit enemyHit, Mathf.Infinity, layerEnemy) && IsRevealedByFog(enemyHit.point))
             return CursorTarget.Enemy;
 
         if (Physics.Raycast(ray, Mathf.Infinity, layerUnit | layerBuilding))
             return CursorTarget.Ally;
 
-        if (Physics.Raycast(ray, Mathf.Infinity, layerOre | layerGas))
+        if (Physics.Raycast(ray, out RaycastHit resourceHit, Mathf.Infinity, layerOre | layerGas) && IsRevealedByFog(resourceHit.point))
             return CursorTarget.Neutral;
 
         return CursorTarget.None;
+    }
+
+    // 안개에 가려져(현재 시야 밖) 있는 대상은 클릭 선택/명령/호버 대상에서 제외한다. fogWar가 없는 씬에서는 항상 보이는 것으로 취급.
+    private bool IsRevealedByFog(Vector3 worldPosition)
+    {
+        if (fogWar == null)
+            return true;
+
+        return fogWar.CheckVisibility(worldPosition, 0);
     }
 
     private void SetCursorTexture(Texture2D texture)

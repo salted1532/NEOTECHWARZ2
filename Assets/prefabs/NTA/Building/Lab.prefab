@@ -171,6 +171,7 @@ GameObject:
   - component: {fileID: 8930109125239737442}
   - component: {fileID: -8937272862018730580}
   - component: {fileID: -6578766766923549491}
+  - component: {fileID: -4482163489716210618}
   m_Layer: 9
   m_Name: Lab
   m_TagString: Lab
@@ -385,6 +386,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
   sightRange: 15
   updateOnlyOnMove: 1
+--- !u!114 &-4482163489716210618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3a275afdc9ba424ca286bab2a52b295, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResearchQueue
+  attackResearchTime:
+  - 60
+  - 90
+  - 120
+  armorResearchTime:
+  - 60
+  - 90
+  - 120
+  researchOreCost: 64000000c8000000fa000000
+  researchGasCost: 64000000c8000000fa000000
+  attackBonusPerLevel: 1
+  armorBonusPerLevel: 1
 --- !u!1 &8143427856847520182
 GameObject:
   m_ObjectHideFlags: 0
