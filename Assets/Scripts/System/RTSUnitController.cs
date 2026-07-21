@@ -194,9 +194,37 @@ public class RTSUnitController : MonoBehaviour
     /// </summary>
     private void DeselectUnit(UnitController unit)
     {
-        RTScurrentSate = SelectState.None;
         unit.DeselectUnit();
         selectedUnitList.Remove(unit);
+
+        if (selectedUnitList.Count == 0)
+            RTScurrentSate = SelectState.None;
+    }
+
+    // Squad_panel Shift+Click: 그 유닛만 선택 목록에서 제거한다 (나머지는 그대로 선택 유지).
+    public void RemoveUnitFromSelection(UnitController unit)
+    {
+        if (unit == null || !selectedUnitList.Contains(unit))
+            return;
+
+        DeselectUnit(unit);
+    }
+
+    // Squad_panel Ctrl+Click: 현재 선택 목록에서 그 유닛과 같은 종류(unitID)만 남기고 나머지는 선택 해제한다.
+    public void KeepOnlySameUnitTypeInSelection(UnitController unit)
+    {
+        if (unit == null)
+            return;
+
+        int unitID = unit.GetUnitID();
+
+        // 뒤에서부터 순회 - 앞에서부터 Remove하면 인덱스가 밀려서 일부를 건너뛸 수 있다.
+        for (int i = selectedUnitList.Count - 1; i >= 0; i--)
+        {
+            UnitController other = selectedUnitList[i];
+            if (other != null && other.GetUnitID() != unitID)
+                DeselectUnit(other);
+        }
     }
 
     /// <summary>
@@ -448,9 +476,36 @@ public class RTSUnitController : MonoBehaviour
     /// </summary>
     private void Deselectbuilding(BuildingController building)
     {
-        RTScurrentSate = SelectState.None;
         building.DeselecBuilding();
         selectedBuildingList.Remove(building);
+
+        if (selectedBuildingList.Count == 0)
+            RTScurrentSate = SelectState.None;
+    }
+
+    // Squad_panel Shift+Click: 그 건물만 선택 목록에서 제거한다 (나머지는 그대로 선택 유지).
+    public void RemoveBuildingFromSelection(BuildingController building)
+    {
+        if (building == null || !selectedBuildingList.Contains(building))
+            return;
+
+        Deselectbuilding(building);
+    }
+
+    // Squad_panel Ctrl+Click: 현재 선택 목록에서 그 건물과 같은 종류(buildingID)만 남기고 나머지는 선택 해제한다.
+    public void KeepOnlySameBuildingTypeInSelection(BuildingController building)
+    {
+        if (building == null)
+            return;
+
+        int buildingID = building.GetBuildingID();
+
+        for (int i = selectedBuildingList.Count - 1; i >= 0; i--)
+        {
+            BuildingController other = selectedBuildingList[i];
+            if (other != null && other.GetBuildingID() != buildingID)
+                Deselectbuilding(other);
+        }
     }
     public void SetRallySelectBuilding(Vector3 position)
     {
@@ -460,31 +515,29 @@ public class RTSUnitController : MonoBehaviour
         }
     }
 
-    // "리프트" 버튼: 선택된 건물(단일 취급)을 공중으로 띄운다.
+    // "리프트" 버튼: 선택된 건물들 중 대표 건물을 공중으로 띄운다.
     public void LiftSelectedBuilding()
     {
-        if (selectedBuildingList.Count == 0) return;
-        selectedBuildingList[0].LiftOff();
+        GetRepresentativeBuilding()?.LiftOff();
     }
 
-    // "착륙" 버튼: 선택된 건물(단일 취급)의 착륙 위치 선택 모드로 진입한다.
+    // "착륙" 버튼: 선택된 건물들 중 대표 건물의 착륙 위치 선택 모드로 진입한다.
     public void BeginLandingSelectedBuilding()
     {
-        if (selectedBuildingList.Count == 0) return;
-        selectedBuildingList[0].BeginLanding();
+        GetRepresentativeBuilding()?.BeginLanding();
     }
 
-    // 선택된 건물(단일 취급)이 현재 공중에 떠 있는지 (UserControl 우클릭 분기용)
+    // 선택된 건물들 중 대표 건물이 현재 공중에 떠 있는지 (UserControl 우클릭 분기용)
     public bool IsSelectedBuildingLifted()
     {
-        return selectedBuildingList.Count > 0 && selectedBuildingList[0].IsLifted();
+        BuildingController building = GetRepresentativeBuilding();
+        return building != null && building.IsLifted();
     }
 
-    // 공중에 뜬 건물을 공중유닛처럼 우클릭/Move버튼 지점으로 수평 이동시킨다 (착륙하지 않고 계속 공중에 떠 있음).
+    // 공중에 뜬 대표 건물을 공중유닛처럼 우클릭/Move버튼 지점으로 수평 이동시킨다 (착륙하지 않고 계속 공중에 떠 있음).
     public void MoveSelectedLiftedBuilding(Vector3 destination)
     {
-        if (selectedBuildingList.Count == 0) return;
-        selectedBuildingList[0].MoveWhileLifted(destination);
+        GetRepresentativeBuilding()?.MoveWhileLifted(destination);
     }
 
     #endregion
@@ -744,48 +797,40 @@ public class RTSUnitController : MonoBehaviour
 
     #region 생산 관련
 
-    public void SpawnUnit(int unitID)
-    {
-        if (selectedBuildingList.Count == 0)
-        {
-            Debug.LogWarning("No buildings selected for spawning units.");
-            return;
-        }
-
-        for (int i = 0; i < selectedBuildingList.Count; ++i)
-        {
-            BuildingController building = selectedBuildingList[i];
-
-            building.SpawnUnit(unitID);
-        }
-    }
-
-    //건물의 대기열 정보 반환용
+    //건물의 대기열 정보 반환용 (대표 건물 기준)
     public IReadOnlyList<ProductionData> GetProductionQueue()
     {
-        if (selectedBuildingList.Count == 0)
-            return null;
-
-        return selectedBuildingList[0].GetProductionQueue();
+        return GetRepresentativeBuilding()?.GetProductionQueue();
     }
 
-    //생산 진행 시간 반환
+    //생산 진행 시간 반환 (대표 건물 기준)
     public float GetProductionProgress()
     {
-        if (selectedBuildingList.Count == 0)
-            return 0f;
-
-        return selectedBuildingList[0].GetProductionProgress();
+        BuildingController building = GetRepresentativeBuilding();
+        return building != null ? building.GetProductionProgress() : 0f;
     }
 
-    //대기열 취소 (취소된 유닛 가격만큼 환불)
+    //대기열 취소 (취소된 유닛 가격만큼 환불, 대표 건물 기준)
     public void CancelProduction(int index)
     {
-        if (selectedBuildingList.Count == 0)
+        BuildingController building = GetRepresentativeBuilding();
+        if (building == null)
             return;
 
-        int canceledUnitID = selectedBuildingList[0].CancelProduction(index);
+        int canceledUnitID = building.CancelProduction(index);
         RefundUnit(canceledUnitID);
+    }
+
+    // ESC 단축키 전용: 대기열의 "맨 뒤" 항목(가장 최근에 추가된 항목)부터 하나씩 취소한다.
+    // 큐가 꽉 찼으면 인덱스 4 → 3 → 2 → ... 순서로, ESC를 누를 때마다 한 칸씩 역순 취소된다.
+    public void CancelLastQueuedProduction()
+    {
+        IReadOnlyList<ProductionData> queue = GetProductionQueue();
+
+        if (queue == null || queue.Count == 0)
+            return;
+
+        CancelProduction(queue.Count - 1);
     }
 
     // 생산 건물이 파괴됐을 때 대기열에 남아있던 유닛들을 전부 환불한다.
@@ -849,7 +894,66 @@ public class RTSUnitController : MonoBehaviour
             resourceManager.ReleasePopulation(data.population);
     }
 
-    /// 유닛 생산 요청 (선택된 건물들에게 큐잉하기 전에 대기열/자원부터 확인)
+    // 여러 건물이 섞여 선택됐을 때 패널/생산 대기열/리프트 버튼에 쓸 "대표 건물"을 우선순위
+    // (MainBase > Tier1 > Tier2 > Tier3 > SupplyDepot > Lab)로 고른다. 우선순위 태그의 건물이 하나도
+    // 없으면(이론상 발생 안 함) 선택된 첫 번째 건물을 그대로 쓴다.
+    private static readonly string[] BuildingPriorityTags =
+        { "MainBase", "Tier1", "Tier2", "Tier3", "SupplyDepot", "Lab" };
+
+    private BuildingController GetRepresentativeBuilding()
+    {
+        if (selectedBuildingList.Count == 0)
+            return null;
+
+        foreach (string tag in BuildingPriorityTags)
+        {
+            BuildingController match = selectedBuildingList.Find(b => b != null && b.CompareTag(tag));
+            if (match != null)
+                return match;
+        }
+
+        return selectedBuildingList[0];
+    }
+
+    // 건물 태그 → 커맨드 패널 상태 매핑 (SelectBuilding()의 태그 스위치와 동일한 짝짓기).
+    private static BuildingState TagToBuildingState(string tag)
+    {
+        switch (tag)
+        {
+            case "MainBase": return BuildingState.MainBaseSelect;
+            case "Tier1": return BuildingState.Tier1Select;
+            case "Tier2": return BuildingState.Tier2Select;
+            case "Tier3": return BuildingState.Tier3Select;
+            case "SupplyDepot": return BuildingState.SupplyDepot;
+            case "Lab": return BuildingState.Lab;
+            default: return BuildingState.None;
+        }
+    }
+
+    // 유닛 ID가 어느 건물 태그에서 생산 가능한지 매핑 (SelectBuilding()의 태그 스위치와 동일한 짝짓기).
+    // 다른 티어 건물이 섞여 선택됐을 때 그 유닛을 생산할 수 없는 건물을 걸러내기 위함.
+    private static string GetProducerTagForUnit(int unitID)
+    {
+        switch (unitID)
+        {
+            case UnitID.Worker:
+                return "MainBase";
+            case UnitID.Marine:
+            case UnitID.Vulture:
+                return "Tier1";
+            case UnitID.Goliath:
+            case UnitID.Tank:
+                return "Tier2";
+            case UnitID.Wraith:
+            case UnitID.Guardian:
+                return "Tier3";
+            default:
+                return null;
+        }
+    }
+
+    /// 유닛 생산 요청 (선택된 건물 각각에 대해 생산 가능 여부/대기열/자원을 확인하고,
+    /// 실제로 큐잉되는 건물 수만큼만 비용을 차감한다)
     public bool TryProduceUnit(int unitID)
     {
         UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
@@ -859,25 +963,39 @@ public class RTSUnitController : MonoBehaviour
         if (selectedBuildingList.Count == 0)
             return false;
 
-        // 대기열이 가득 찼으면 자원을 소모하기 전에 여기서 먼저 걸러낸다 (자원만 쓰고 큐잉은 안 되는 사고 방지)
-        if (selectedBuildingList[0].IsProductionQueueFull())
+        string producerTag = GetProducerTagForUnit(unitID);
+        bool producedAny = false;
+
+        for (int i = 0; i < selectedBuildingList.Count; ++i)
         {
-            Debug.Log("대기열 가득참!");
-            return false;
+            BuildingController building = selectedBuildingList[i];
+
+            // 다른 티어 건물이 섞여 선택된 경우, 이 유닛을 생산할 수 없는 건물은 건너뛴다.
+            if (producerTag != null && !building.CompareTag(producerTag))
+                continue;
+
+            // 대기열이 가득 찼으면 이 건물은 건너뛴다 (자원만 쓰고 큐잉은 안 되는 사고 방지)
+            if (building.IsProductionQueueFull())
+                continue;
+
+            if (!resourceManager.TrySpend(data.mineral, data.gas, data.population))
+            {
+                if (resourceManager.GetOre() < data.mineral || resourceManager.GetGas() < data.gas)
+                    Debug.Log("자원부족!");
+                else
+                    Debug.Log("인구수부족!");
+
+                break; // 자원이 부족해진 시점부터는 나머지 건물도 어차피 불가능하므로 중단
+            }
+
+            building.SpawnUnit(unitID); // 이 건물 1곳에만 큐잉 (건물마다 자원을 개별 차감했으므로 1:1 대응)
+            producedAny = true;
         }
 
-        if (!resourceManager.TrySpend(data.mineral, data.gas, data.population))
-        {
-            if (resourceManager.GetOre() < data.mineral || resourceManager.GetGas() < data.gas)
-                Debug.Log("자원부족!");
-            else
-                Debug.Log("인구수부족!");
+        if (!producedAny)
+            Debug.Log("생산 불가 (대기열 가득 참, 자원 부족, 또는 이 유닛을 생산할 수 있는 건물 없음)");
 
-            return false; // 자원/인구 부족 → 여기서 그냥 반환, 아무 것도 소모 안 됨
-        }
-
-        SpawnUnit(unitID); // 기존 메소드: selectedBuildingList에 실제 큐잉
-        return true;
+        return producedAny;
     }
 
     /// 건물 건설 요청 (PlacementSystem이 실제로 배치를 확정하기 직전에 호출)
@@ -941,8 +1059,18 @@ public class RTSUnitController : MonoBehaviour
 
     private void UpdateUI()
     {
+        // 건물과 유닛이 함께 선택된 경우 유닛 명령 패널을 우선한다 (Shift+클릭으로 유닛/건물을 섞어
+        // 선택해도 selectedUnitList가 하나라도 있으면 항상 유닛 패널이 보임).
+        SelectState uiState = RTScurrentSate;
+
+        if ((uiState == SelectState.UnitSelect || uiState == SelectState.BuildingSelect)
+            && selectedUnitList.Count > 0)
+        {
+            uiState = SelectState.UnitSelect;
+        }
+
         //UIController에서 현재 상황에 맞게 UI창 상태 변경
-        switch (RTScurrentSate)
+        switch (uiState)
         {
             case SelectState.UnitSelect:
                 switch (UnitSelectState)
@@ -973,7 +1101,7 @@ public class RTSUnitController : MonoBehaviour
                 // 유닛을 여러 마리 선택했으면 Squad_panel만, 한 마리면 Info_panel만 보여준다.
                 if (selectedUnitList.Count > 1)
                 {
-                    uIController.ShowSquadPanel(selectedUnitList, ClickSelectUnit);
+                    uIController.ShowSquadPanel(selectedUnitList, ClickSelectUnit, RemoveUnitFromSelection, KeepOnlySameUnitTypeInSelection);
                 }
                 else if (selectedUnitList.Count == 1)
                 {
@@ -988,8 +1116,14 @@ public class RTSUnitController : MonoBehaviour
 
             case SelectState.BuildingSelect:
 
-                // 건물은 항상 단일 선택 취급 (Squad_panel은 유닛 다중 선택 전용) -> Info_panel 표시
-                if (selectedBuildingList.Count > 0)
+                BuildingController representativeBuilding = GetRepresentativeBuilding();
+
+                // 건물을 여러 개 선택했으면 Squad_panel(아이콘 그리드), 한 개면 Info_panel을 보여준다 (유닛과 동일한 패턴).
+                if (selectedBuildingList.Count > 1)
+                {
+                    uIController.ShowBuildingSquadPanel(selectedBuildingList, ClickSelectBuilding, RemoveBuildingFromSelection, KeepOnlySameBuildingTypeInSelection);
+                }
+                else if (selectedBuildingList.Count == 1)
                 {
                     BuildingController building = selectedBuildingList[0];
                     uIController.ShowInfoPanel(building.GetIcon(), GetBuildingName(building.GetBuildingID()), building.GetComponent<HealthManager>());
@@ -1000,7 +1134,8 @@ public class RTSUnitController : MonoBehaviour
                 }
 
                 // 공중에 뜬 건물은 생산/연구 등 모든 커맨드를 막고 아래에서 Land/Move 버튼만 노출한다.
-                bool selectedBuildingLifted = selectedBuildingList.Count > 0 && selectedBuildingList[0].IsLifted();
+                // (여러 건물이 섞여 선택돼도 항상 대표 건물 하나를 기준으로 판단해 패널을 통일한다)
+                bool selectedBuildingLifted = representativeBuilding != null && representativeBuilding.IsLifted();
 
                 if (selectedBuildingLifted)
                 {
@@ -1011,7 +1146,10 @@ public class RTSUnitController : MonoBehaviour
                 }
                 else
                 {
-                    switch (BuildingSelectState)
+                    // 우선순위(MainBase > Tier1 > Tier2 > Tier3 > SupplyDepot > Lab)에 따라 뽑힌 대표 건물의
+                    // 태그로 어느 생산 패널을 보여줄지 정한다. 예: MainBase + Tier1(병영) 선택 시 MainBase가
+                    // 우선이므로 일꾼 생산 버튼이 보인다.
+                    switch (representativeBuilding != null ? TagToBuildingState(representativeBuilding.tag) : BuildingState.None)
                     {
                         case BuildingState.MainBaseSelect:
                             uIController.ShowMainBasePanel(
@@ -1061,18 +1199,16 @@ public class RTSUnitController : MonoBehaviour
                 }
 
                 // 리프트 가능한 건물이면(전용 패널이 없는 SupplyDepot/Lab 포함) 고정 슬롯에 리프트/착륙 버튼을 덧붙인다.
-                if (selectedBuildingList.Count > 0 && selectedBuildingList[0].CanLift())
+                if (representativeBuilding != null && representativeBuilding.CanLift())
                 {
-                    BuildingController building = selectedBuildingList[0];
-
                     uIController.ShowBuildingLiftCommand(
-                        building.IsLifted(),
-                        building.IsLifted()
+                        representativeBuilding.IsLifted(),
+                        representativeBuilding.IsLifted()
                             ? ButtonAction.Simple(BeginLandingSelectedBuilding, "Land", "Choose a landing site. \nshortcut key [<color=yellow>L</color>]", KeyCode.L)
                             : ButtonAction.Simple(LiftSelectedBuilding, "Lift Off", "Lift the building into the air. \nshortcut key [<color=yellow>L</color>]", KeyCode.L));
 
                     // 공중에 뜬 상태에서만 고정 슬롯(0번)에 "이동" 버튼을 추가로 노출한다.
-                    if (building.IsLifted())
+                    if (representativeBuilding.IsLifted())
                     {
                         uIController.ShowBuildingMoveCommand(
                             ButtonAction.Simple(EnterBuildingMoveMode, "Move", "Move to a location while airborne. \nshortcut key [<color=yellow>M</color>]", KeyCode.M));

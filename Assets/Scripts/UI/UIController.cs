@@ -36,6 +36,10 @@ public class UIController : MonoBehaviour
     public readonly struct ButtonAction
     {
         public Action Callback { get; }
+        // Squad_panel 전용: Shift+Click(선택 목록에서 제거)/Ctrl+Click(같은 종류만 남기기) 콜백.
+        // 일반 커맨드 버튼(WithCost/Simple)은 항상 null - ProductionSlot이 null이면 기본 Callback으로 처리한다.
+        public Action ShiftClickCallback { get; }
+        public Action CtrlClickCallback { get; }
         public string Title { get; }
         public string Description { get; }
         public int Ore { get; }
@@ -46,6 +50,8 @@ public class UIController : MonoBehaviour
 
         private ButtonAction(
             Action callback,
+            Action shiftClickCallback,
+            Action ctrlClickCallback,
             string title,
             string description,
             int ore,
@@ -55,6 +61,8 @@ public class UIController : MonoBehaviour
             KeyCode shortcut)
         {
             Callback = callback;
+            ShiftClickCallback = shiftClickCallback;
+            CtrlClickCallback = ctrlClickCallback;
             Title = title;
             Description = description;
             Ore = ore;
@@ -67,7 +75,7 @@ public class UIController : MonoBehaviour
         // 이동/공격/정지 등 비용이 없는 일반 명령 버튼용
         public static ButtonAction Simple(Action callback, string title, string description, KeyCode shortcut = KeyCode.None)
         {
-            return new ButtonAction(callback, title, description, 0, 0, 0, false, shortcut);
+            return new ButtonAction(callback, null, null, title, description, 0, 0, 0, false, shortcut);
         }
 
         // 유닛 생산/건물 건설처럼 광물/가스/인구 비용이 있는 버튼용
@@ -80,7 +88,18 @@ public class UIController : MonoBehaviour
             int population,
             KeyCode shortcut = KeyCode.None)
         {
-            return new ButtonAction(callback, title, description, ore, gas, population, true, shortcut);
+            return new ButtonAction(callback, null, null, title, description, ore, gas, population, true, shortcut);
+        }
+
+        // Squad_panel 슬롯 전용: 기본 클릭 외에 Shift+Click/Ctrl+Click 동작을 추가로 지정한다.
+        public static ButtonAction WithModifierClicks(
+            Action callback,
+            Action shiftClickCallback,
+            Action ctrlClickCallback,
+            string title,
+            string description)
+        {
+            return new ButtonAction(callback, shiftClickCallback, ctrlClickCallback, title, description, 0, 0, 0, false, KeyCode.None);
         }
     }
 
@@ -90,6 +109,8 @@ public class UIController : MonoBehaviour
     {
         public Sprite Icon { get; }
         public Action Callback { get; }
+        public Action ShiftClickCallback { get; }
+        public Action CtrlClickCallback { get; }
         public bool Interactable { get; }
         public string Title { get; }
         public string Description { get; }
@@ -106,6 +127,8 @@ public class UIController : MonoBehaviour
         {
             Icon = icon;
             Callback = action.Callback;
+            ShiftClickCallback = action.ShiftClickCallback;
+            CtrlClickCallback = action.CtrlClickCallback;
             Interactable = interactable;
             Title = action.Title;
             Description = action.Description;
@@ -210,7 +233,16 @@ public class UIController : MonoBehaviour
 
     private readonly List<UnitController> squadUnitsSnapshot = new List<UnitController>();
     private Action<UnitController> squadOnSelectUnit;
+    private Action<UnitController> squadOnShiftClickUnit;
+    private Action<UnitController> squadOnCtrlClickUnit;
     private int squadCurrentPage;
+
+    // 건물 다중 선택용 (유닛과 같은 squadPanel/squadSlots를 공유 - 유닛/건물 선택은 항상 배타적으로 표시됨)
+    private readonly List<BuildingController> squadBuildingsSnapshot = new List<BuildingController>();
+    private Action<BuildingController> squadOnSelectBuilding;
+    private Action<BuildingController> squadOnShiftClickBuilding;
+    private Action<BuildingController> squadOnCtrlClickBuilding;
+    private bool squadShowingBuildings;
 
     private void Start()
     {
@@ -597,7 +629,11 @@ public class UIController : MonoBehaviour
     // selectedUnitList를 12마리씩 페이지로 나누고, 현재 페이지의 12마리만 squadSlots에 채운다.
     // 매 프레임 호출되므로(UpdateUI) 선택 내용이 실제로 바뀐 경우에만 페이지를 0으로 리셋한다.
     // 슬롯을 클릭하면 onSelectUnit(그 유닛)이 호출되어 단일 선택으로 좁혀지도록 한다.
-    public void ShowSquadPanel(IReadOnlyList<UnitController> units, Action<UnitController> onSelectUnit)
+    public void ShowSquadPanel(
+        IReadOnlyList<UnitController> units,
+        Action<UnitController> onSelectUnit,
+        Action<UnitController> onShiftClickUnit,
+        Action<UnitController> onCtrlClickUnit)
     {
         HideInfoPanel();
         HideProductionUI();
@@ -606,6 +642,9 @@ public class UIController : MonoBehaviour
             squadPanel.SetActive(true);
 
         squadOnSelectUnit = onSelectUnit;
+        squadOnShiftClickUnit = onShiftClickUnit;
+        squadOnCtrlClickUnit = onCtrlClickUnit;
+        squadShowingBuildings = false;
 
         if (!SquadUnitsEqual(squadUnitsSnapshot, units))
         {
@@ -621,7 +660,40 @@ public class UIController : MonoBehaviour
         RefreshSquadSlots();
     }
 
-    // 페이지 버튼(page1~5) 클릭 시 호출: 해당 페이지의 12마리로 슬롯을 다시 채운다.
+    // 건물 다중 선택(Shift+클릭) 시 유닛과 같은 방식으로 Squad_panel에 건물 아이콘 그리드를 보여준다.
+    // 생산 대기열/커맨드 패널(HideProductionUI 등)은 건드리지 않는다 - RTSUnitController.UpdateUI()가
+    // "대표 건물" 기준으로 바로 이어서 갱신한다.
+    public void ShowBuildingSquadPanel(
+        IReadOnlyList<BuildingController> buildings,
+        Action<BuildingController> onSelectBuilding,
+        Action<BuildingController> onShiftClickBuilding,
+        Action<BuildingController> onCtrlClickBuilding)
+    {
+        HideInfoPanel();
+
+        if (squadPanel != null)
+            squadPanel.SetActive(true);
+
+        squadOnSelectBuilding = onSelectBuilding;
+        squadOnShiftClickBuilding = onShiftClickBuilding;
+        squadOnCtrlClickBuilding = onCtrlClickBuilding;
+        squadShowingBuildings = true;
+
+        if (!SquadBuildingsEqual(squadBuildingsSnapshot, buildings))
+        {
+            squadBuildingsSnapshot.Clear();
+            squadBuildingsSnapshot.AddRange(buildings);
+            squadCurrentPage = 0;
+        }
+
+        int pageCount = Mathf.Max(1, Mathf.CeilToInt((float)squadBuildingsSnapshot.Count / SquadUnitsPerPage));
+        squadCurrentPage = Mathf.Clamp(squadCurrentPage, 0, pageCount - 1);
+
+        UpdateSquadPageButtons(pageCount);
+        RefreshSquadBuildingSlots();
+    }
+
+    // 페이지 버튼(page1~5) 클릭 시 호출: 해당 페이지의 12개(유닛 또는 건물)로 슬롯을 다시 채운다.
     public void SelectSquadPage(int page)
     {
         if (squadPageButtons == null || page < 0 || page >= squadPageButtons.Length)
@@ -631,7 +703,11 @@ public class UIController : MonoBehaviour
             return;
 
         squadCurrentPage = page;
-        RefreshSquadSlots();
+
+        if (squadShowingBuildings)
+            RefreshSquadBuildingSlots();
+        else
+            RefreshSquadSlots();
     }
 
     // 현재 squadCurrentPage 기준으로 squadSlots(12칸)를 채운다.
@@ -649,13 +725,34 @@ public class UIController : MonoBehaviour
             if (unitIndex < squadUnitsSnapshot.Count)
             {
                 UnitController unit = squadUnitsSnapshot[unitIndex];
-                squadSlots[i].SetData(new CommandButtonData(unit.GetIcon(), () => squadOnSelectUnit(unit)));
+                squadSlots[i].SetData(new CommandButtonData(
+                    unit.GetIcon(),
+                    ButtonAction.WithModifierClicks(
+                        () => squadOnSelectUnit(unit),
+                        () => squadOnShiftClickUnit(unit),
+                        () => squadOnCtrlClickUnit(unit),
+                        GetUnitDisplayName(unit),
+                        "Click: Select Unit\nShift+Click: Deselect Unit\nCtrl+Click: Select Unit Type")));
             }
             else
             {
                 squadSlots[i].Clear();
             }
         }
+    }
+
+    // Squad_panel 툴팁 제목용 유닛 이름 조회 (database에 없으면 "Unit"로 대체 - Title이 비어있으면
+    // ProductionSlot이 툴팁 자체를 안 띄우므로 항상 비어있지 않은 값을 돌려줘야 한다).
+    private string GetUnitDisplayName(UnitController unit)
+    {
+        if (database != null)
+        {
+            UnitData data = database.unitData.Find(d => d.ID == unit.GetUnitID());
+            if (data != null && !string.IsNullOrEmpty(data.unitName))
+                return data.unitName.Trim();
+        }
+
+        return "Unit";
     }
 
     // 선택된 유닛 수로 채워지는 페이지 버튼만 보이도록 켠다 (예: 36마리면 1~3페이지만 SetActive(true), 나머지는 숨김).
@@ -689,7 +786,52 @@ public class UIController : MonoBehaviour
         }
     }
 
+    // 현재 squadCurrentPage 기준으로 squadSlots(12칸)를 건물로 채운다 (RefreshSquadSlots의 건물 버전).
+    private void RefreshSquadBuildingSlots()
+    {
+        int startIndex = squadCurrentPage * SquadUnitsPerPage;
+
+        for (int i = 0; i < squadSlots.Length; i++)
+        {
+            if (squadSlots[i] == null)
+                continue;
+
+            int buildingIndex = startIndex + i;
+
+            if (buildingIndex < squadBuildingsSnapshot.Count)
+            {
+                BuildingController building = squadBuildingsSnapshot[buildingIndex];
+                squadSlots[i].SetData(new CommandButtonData(
+                    building.GetIcon(),
+                    ButtonAction.WithModifierClicks(
+                        () => squadOnSelectBuilding(building),
+                        () => squadOnShiftClickBuilding(building),
+                        () => squadOnCtrlClickBuilding(building),
+                        "Building",
+                        "Click: Select Building\nShift+Click: Deselect Building\nCtrl+Click: Select Building Type")));
+            }
+            else
+            {
+                squadSlots[i].Clear();
+            }
+        }
+    }
+
     private static bool SquadUnitsEqual(List<UnitController> current, IReadOnlyList<UnitController> incoming)
+    {
+        if (current.Count != incoming.Count)
+            return false;
+
+        for (int i = 0; i < current.Count; i++)
+        {
+            if (current[i] != incoming[i])
+                return false;
+        }
+
+        return true;
+    }
+
+    private static bool SquadBuildingsEqual(List<BuildingController> current, IReadOnlyList<BuildingController> incoming)
     {
         if (current.Count != incoming.Count)
             return false;
@@ -712,7 +854,9 @@ public class UIController : MonoBehaviour
             squadSlots[i]?.Clear();
 
         squadUnitsSnapshot.Clear();
+        squadBuildingsSnapshot.Clear();
         squadCurrentPage = 0;
+        squadShowingBuildings = false;
     }
 
     // Worker

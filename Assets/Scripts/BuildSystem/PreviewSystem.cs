@@ -131,6 +131,15 @@ public class PreviewSystem : MonoBehaviour
         {
             hm.SetHealthBarVisible(false);
         }
+
+        // 프리뷰/고스트는 실제 건물이 아니므로 안개를 걷으면 안 된다. FogRevealerAgent는 Start()에서
+        // csFogWar에 자신을 등록하는데, 비활성화된 컴포넌트는 Unity가 Start()를 호출하지 않으므로
+        // 여기서 꺼두면 애초에 시야 소스로 등록되지 않는다.
+        FogRevealerAgent[] fogRevealers = obj.GetComponentsInChildren<FogRevealerAgent>();
+        foreach (FogRevealerAgent fra in fogRevealers)
+        {
+            fra.enabled = false;
+        }
     }
 
     // 배치가 확정된 위치에 "일꾼이 도착할 때까지 남아있는" 정적 건설 고스트를 생성한다.

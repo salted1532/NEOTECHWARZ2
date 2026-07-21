@@ -80,6 +80,21 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void OnClick()
     {
+        bool ctrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+        bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+        if (ctrlHeld && data.CtrlClickCallback != null)
+        {
+            data.CtrlClickCallback.Invoke();
+            return;
+        }
+
+        if (shiftHeld && data.ShiftClickCallback != null)
+        {
+            data.ShiftClickCallback.Invoke();
+            return;
+        }
+
         callback?.Invoke();
     }
 

@@ -25,15 +25,9 @@ public class TooltipUI : MonoBehaviour
     [SerializeField] private TMP_Text gasText;
     [SerializeField] private TMP_Text populationText;
 
-    [Header("Compact (설명/비용 없이 제목 한 줄만 표시할 때)")]
-    [SerializeField] private float compactVerticalPadding = 10f; // 제목 높이 위아래로 남길 여백 합
-
     private bool isVisible;
     private RectTransform currentTarget;
-
-    // Show()가 배경 크기/제목 위치를 건드리므로, 설명/비용이 있는 원래 레이아웃으로 되돌릴 때 쓸 기본값을 캐싱해둔다.
-    private Vector2 defaultRootSize;
-    private Vector2 defaultTitlePosition;
+    private TooltipContentFitter contentFitter;
 
     private void Awake()
     {
@@ -45,12 +39,12 @@ public class TooltipUI : MonoBehaviour
         {
             foreach (Graphic graphic in root.GetComponentsInChildren<Graphic>(true))
                 graphic.raycastTarget = false;
-
-            defaultRootSize = root.sizeDelta;
         }
 
-        if (titleText != null)
-            defaultTitlePosition = titleText.rectTransform.anchoredPosition;
+        // 크기 계산은 전담 컴포넌트(TooltipContentFitter)에 위임한다 - 씬/프리팹에 새로 필드를
+        // 연결할 필요 없이, 이미 갖고 있는 참조를 그대로 넘겨서 코드로만 구성한다.
+        contentFitter = gameObject.AddComponent<TooltipContentFitter>();
+        contentFitter.Configure(root, titleText, descriptionText, costRows);
 
         Hide();
     }
@@ -115,33 +109,14 @@ public class TooltipUI : MonoBehaviour
             if (populationText != null) populationText.text = population.ToString();
         }
 
-        // 설명/비용 없이 제목 한 줄만 있는 경우(예: Attack Damge/Armor 호버) 배경을 제목 높이에 맞게 줄이고,
-        // 그 외(기존 명령/생산 버튼 툴팁)에는 원래 크기·위치를 그대로 유지한다.
-        bool isCompact = string.IsNullOrEmpty(description) && !hasCost;
-        ApplyCompactLayout(isCompact);
+        // 크기 계산은 TooltipContentFitter에 위임 - 제목만/설명 포함/비용 포함/설명이 몇 줄이든
+        // 이 한 호출로 전부 처리된다.
+        contentFitter.Fit(!string.IsNullOrEmpty(description), hasCost);
 
-        // 텍스트가 바뀌어 크기가 달라질 수 있으니, 위치 계산 전에 레이아웃을 즉시 갱신한다.
+        // 위치 계산 전에 레이아웃을 즉시 갱신한다 (Fit() 내부에서 이미 필요한 만큼 갱신하지만,
+        // 안전하게 한 번 더 - 기존 코드와 동일한 안전장치).
         LayoutRebuilder.ForceRebuildLayoutImmediate(root);
         PositionAboveTarget(target);
-    }
-
-    private void ApplyCompactLayout(bool isCompact)
-    {
-        if (root == null || titleText == null)
-            return;
-
-        if (!isCompact)
-        {
-            root.sizeDelta = defaultRootSize;
-            titleText.rectTransform.anchoredPosition = defaultTitlePosition;
-            return;
-        }
-
-        RectTransform titleRect = titleText.rectTransform;
-        float compactHeight = titleRect.sizeDelta.y + compactVerticalPadding;
-
-        root.sizeDelta = new Vector2(defaultRootSize.x, compactHeight);
-        titleRect.anchoredPosition = new Vector2(defaultTitlePosition.x, 0f);
     }
 
     // target(호버 중인 버튼)의 상단 중앙을 기준으로, 툴팁이 그 위에 뜨도록 위치를 계산한다.
