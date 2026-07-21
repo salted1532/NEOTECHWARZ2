@@ -1155,13 +1155,13 @@ public class UIController : MonoBehaviour
         }
     }
 
-    // 리프트 불가능한 건물을 선택했을 때(CanLift() == false) 이전에 선택했던 다른 건물의 리프트/이동 버튼이
-    // 잔상으로 남지 않도록 두 슬롯을 정리한다.
+    // 리프트 불가능한 건물을 선택했을 때(CanLift() == false) 이전에 선택했던 다른 건물의 리프트 버튼이
+    // 잔상으로 남지 않도록 정리한다. 이동(0번) 슬롯은 건드리지 않는다 - 그 슬롯은 항상 방금 실행된 패널
+    // 표시 로직(ShowXPanel/ClearBuildingPanelExceptLiftSlots)이 이미 올바르게 채우거나 비워둔 상태라,
+    // 여기서 다시 지우면 Lab처럼 canLift=false이면서 슬롯 0에 실제 커맨드(공격 업그레이드 등)를 쓰는
+    // 패널의 버튼을 지워버리는 버그가 생긴다.
     public void ClearBuildingLiftSlots()
     {
-        if (BuildingMoveSlotIndex < slots.Length)
-            slots[BuildingMoveSlotIndex]?.Clear();
-
         if (BuildingLiftSlotIndex < slots.Length)
             slots[BuildingLiftSlotIndex]?.Clear();
     }
