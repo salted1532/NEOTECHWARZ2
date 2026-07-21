@@ -912,7 +912,9 @@ public class UIController : MonoBehaviour
     ButtonAction onSupplyDepot,
     ButtonAction onBarracks,
     ButtonAction onFactory,
+    bool factoryUnlocked,
     ButtonAction onAirport,
+    bool airportUnlocked,
     ButtonAction onLab,
     ButtonAction onCancel)
     {
@@ -923,8 +925,8 @@ public class UIController : MonoBehaviour
             new CommandButtonData(commandCenterIcon, onCommandCenter),
             new CommandButtonData(supplyDepotIcon, onSupplyDepot),
             new CommandButtonData(barracksIcon, onBarracks),
-            new CommandButtonData(factoryIcon, onFactory),
-            new CommandButtonData(airportIcon, onAirport),
+            new CommandButtonData(factoryIcon, onFactory, factoryUnlocked),
+            new CommandButtonData(airportIcon, onAirport, airportUnlocked),
             new CommandButtonData(labIcon, onLab),
             new CommandButtonData(cancelIcon, onCancel)
         );

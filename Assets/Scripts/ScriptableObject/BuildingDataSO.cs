@@ -37,6 +37,9 @@ public class BuildingData
     public int maxpopulationamount { get; private set; }
     [field: SerializeField]
     public int productionTime { get; private set; }
+    // 이 건물을 짓기 전에 미리 완공되어 있어야 하는 건물의 ID (RTSUnitController.BuildingID 상수, 0이면 조건 없음)
+    [field: SerializeField]
+    public int requiredBuildingID { get; private set; }
     [field: SerializeField]
     public GameObject Prefab { get; private set; }
 }

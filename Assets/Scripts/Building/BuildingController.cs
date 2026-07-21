@@ -376,6 +376,14 @@ public class BuildingController : MonoBehaviour, IDestructible
     public Sprite GetIcon() => icon;
     public int GetBuildingID() => buildingID;
 
+    // 프리뷰/고스트용: PreviewSystem이 이 컴포넌트를 비활성화(Start() 자체가 안 돎)하기 직전에 호출해,
+    // 마커(및 그 자식의 상시 재생 파티클인 Circle Select 등)가 켜진 채로 노출되지 않도록 미리 숨긴다.
+    public void HideMarkerForGhost()
+    {
+        if (buildingMarker != null)
+            buildingMarker.SetActive(false);
+    }
+
     // 현재 생산 대기열 목록을 반환 (UI 표시용, UnitSpawner에 위임)
     public IReadOnlyList<ProductionData> GetProductionQueue()
     {

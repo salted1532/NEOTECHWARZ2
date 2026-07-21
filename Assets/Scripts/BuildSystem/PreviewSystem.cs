@@ -140,6 +140,19 @@ public class PreviewSystem : MonoBehaviour
         {
             fra.enabled = false;
         }
+
+        // 프리뷰/고스트는 실제로 지어진 건물이 아니므로 RTSUnitController.BuildingList(테크 트리 선행
+        // 조건 판정용)에 등록되면 안 된다. BuildingController.Start()가 아예 호출되지 않도록 미리
+        // 비활성화한다(FogRevealerAgent와 동일한 이유 - doc/0190).
+        // Start()를 꺼버리면 그 안의 buildingMarker.SetActive(false)도 같이 스킵되어, 마커 하위의
+        // 상시 재생 파티클(Circle Select 등)이 켜진 채로 보이게 된다 - 비활성화 전에 먼저 마커를
+        // 직접 숨긴다 (doc/0191).
+        BuildingController[] buildingControllers = obj.GetComponentsInChildren<BuildingController>();
+        foreach (BuildingController bc in buildingControllers)
+        {
+            bc.HideMarkerForGhost();
+            bc.enabled = false;
+        }
     }
 
     // 배치가 확정된 위치에 "일꾼이 도착할 때까지 남아있는" 정적 건설 고스트를 생성한다.

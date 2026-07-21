@@ -998,11 +998,28 @@ public class RTSUnitController : MonoBehaviour
         return producedAny;
     }
 
+    // buildingID에 해당하는 건물이 최소 1개 완공되어 있는지 (건설 중인 BaseStructure는 포함 안 됨)
+    public bool HasCompletedBuilding(int buildingID) =>
+        BuildingList.Exists(b => b != null && b.GetBuildingID() == buildingID);
+
+    // buildingID 건설에 필요한 선행 건물 조건을 만족하는지 (선행 건물이 없으면 항상 true)
+    public bool IsBuildingPrerequisiteMet(int buildingID)
+    {
+        BuildingData data = buildingDatabase.buildingData.Find(d => d.ID == buildingID);
+        if (data == null || data.requiredBuildingID == 0)
+            return true;
+
+        return HasCompletedBuilding(data.requiredBuildingID);
+    }
+
     /// 건물 건설 요청 (PlacementSystem이 실제로 배치를 확정하기 직전에 호출)
     public bool TryConstructBuilding(int buildingID)
     {
         BuildingData data = buildingDatabase.buildingData.Find(d => d.ID == buildingID);
         if (data == null)
+            return false;
+
+        if (!IsBuildingPrerequisiteMet(buildingID))
             return false;
 
         return resourceManager.TrySpend(data.mineral, data.gas);
@@ -1036,6 +1053,12 @@ public class RTSUnitController : MonoBehaviour
         string description = string.IsNullOrEmpty(data.description)
             ? $"Construct {data.Name}."
             : data.description;
+
+        if (data.requiredBuildingID != 0 && !HasCompletedBuilding(data.requiredBuildingID))
+        {
+            string requiredName = GetBuildingName(data.requiredBuildingID);
+            description += $"\n<color=red>Requires {requiredName}</color>";
+        }
 
         return ButtonAction.WithCost(callback, data.Name, description, data.mineral, data.gas, data.population, shortcut);
     }
@@ -1290,7 +1313,9 @@ public class RTSUnitController : MonoBehaviour
                     BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.SupplyDepot), BuildingID.SupplyDepot, KeyCode.S),
                     BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Barracks), BuildingID.Barracks, KeyCode.B),
                     BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Factory), BuildingID.Factory, KeyCode.F),
+                    IsBuildingPrerequisiteMet(BuildingID.Factory),
                     BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Airport), BuildingID.Airport, KeyCode.P),
+                    IsBuildingPrerequisiteMet(BuildingID.Airport),
                     BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Lab), BuildingID.Lab, KeyCode.L),
                     ButtonAction.Simple(
                         CancelBuildMode,
