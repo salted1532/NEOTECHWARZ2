@@ -606,7 +606,7 @@ Transform:
   m_GameObject: {fileID: 6688049277625271492}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.397, z: -0.063}
+  m_LocalPosition: {x: 0, y: 0.647, z: 0.687}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -783,7 +783,11 @@ MonoBehaviour:
   unitID: 3
   attackDamage: 20
   armor: 0
-  attackType: 3
+  attackType: 2
+  armorType: 0
+  sizeType: 0
+  bonusVersusArmorType: 0
+  bonusVersusArmorPercent: 0
   moveSpeed: 10
   arriveDistance: 1.2
   stuckTimer: 0
@@ -1002,7 +1006,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6418255393187126362, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.9
+      value: -0.65
       objectReference: {fileID: 0}
     - target: {fileID: 6418255393187126362, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
       propertyPath: m_LocalPosition.z

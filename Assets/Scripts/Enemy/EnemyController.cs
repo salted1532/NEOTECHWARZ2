@@ -18,6 +18,9 @@ public class EnemyController : MonoBehaviour, IDestructible
     // UnitController와 동일한 패턴: Info_panel에서 UnitDamage/UnitArmor 아이콘 호버 시 표시할 값.
     [SerializeField] private int attackDamage;
     [SerializeField] private int armor;
+    // 이 적 유닛이 "공격받을 때" 적용되는 분류 (UnitController.Attack()의 배율 계산에 쓰임)
+    [SerializeField] private ArmorType armorType = ArmorType.Light;
+    [SerializeField] private SizeType sizeType = SizeType.Medium;
 
     [SerializeField] private float flashInterval = 0.3f; // 공격 명령(우클릭/A) 피드백 깜빡임 간격
     [SerializeField] private int flashCount = 3;          // 깜빡이는 횟수
@@ -83,6 +86,8 @@ public class EnemyController : MonoBehaviour, IDestructible
     public string GetEnemyName() => enemyName;
     public int GetAttackDamage() => attackDamage;
     public int GetArmor() => armor;
+    public ArmorType GetArmorType() => armorType;
+    public SizeType GetSizeType() => sizeType;
 
     // 사망 처리: 선택 목록에서 제거하고 게임오브젝트를 파괴한다 (HealthManager의 IDestructible 구현체로 호출됨).
     public void Die()

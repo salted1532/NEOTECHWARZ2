@@ -1066,10 +1066,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitController
   unitMarker: {fileID: 8287700491229270693}
   icon: {fileID: 21300000, guid: d6e905e97221d6141ae8f9bd7256fb0a, type: 3}
-  unitID: 7
+  unitID: 9
   attackDamage: 25
   armor: 0
   attackType: 1
+  armorType: 1
+  sizeType: 2
+  bonusVersusArmorType: 1
+  bonusVersusArmorPercent: 40
   moveSpeed: 3
   arriveDistance: 1.2
   stuckTimer: 0

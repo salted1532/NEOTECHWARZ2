@@ -98,6 +98,15 @@ public class HealthManager : MonoBehaviour
         OnHealthChanged?.Invoke(currentHp, maxHealth);
     }
 
+    // 유닛이 생산되어 스폰되는 시점 전용: 최대 체력을 새로 지정하는 동시에 그만큼 꽉 채운다.
+    // 건설 중 서서히 차오르게 하는 SetMaxHealth와 달리, 방금 생산된 유닛은 항상 풀피로 시작해야 하므로 currentHp도 함께 채운다.
+    public void InitializeHealth(int newMax)
+    {
+        maxHealth = Mathf.Max(0, newMax);
+        currentHp = maxHealth;
+        OnHealthChanged?.Invoke(currentHp, maxHealth);
+    }
+
     // 현재 체력을 절대값으로 지정한다 (데미지/회복처럼 상대적 증감이 아니라 특정 값으로 강제 설정).
     public void SetHealth(int newCurrent)
     {

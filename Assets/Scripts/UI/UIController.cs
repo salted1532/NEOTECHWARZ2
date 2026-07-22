@@ -179,14 +179,8 @@ public class UIController : MonoBehaviour
     [SerializeField] private Sprite airportIcon;
     [SerializeField] private Sprite labIcon;
 
-    [Header("Unit Icons (ShowMainBasePanel / ShowBarracksPanel / ShowFactoryPanel / ShowAirportPanel)")]
-    [SerializeField] private Sprite workerIcon;   // ShowMainBasePanel
-    [SerializeField] private Sprite marineIcon;   // ShowBarracksPanel
-    [SerializeField] private Sprite vultureIcon;  // ShowBarracksPanel
-    [SerializeField] private Sprite goliathIcon;  // ShowFactoryPanel
-    [SerializeField] private Sprite tankIcon;     // ShowFactoryPanel
-    [SerializeField] private Sprite wraithIcon;   // ShowAirportPanel
-    [SerializeField] private Sprite guardianIcon; // ShowAirportPanel
+    // 유닛 생산 패널 아이콘은 더 이상 여기 고정 필드로 두지 않고, UnitData.Icon을 그대로 사용한다
+    // (ShowUnitProductionPanel 참고). 새 유닛을 추가해도 이 파일을 건드릴 필요가 없도록 하기 위함.
 
     [Header("Research Icons (ShowLabPanel)")]
     [SerializeField] private Sprite attackResearchIcon;
@@ -1025,70 +1019,16 @@ public class UIController : MonoBehaviour
         );
     }
 
-    // Main base
-    // 본진(커맨드센터) 선택 패널 (일꾼 생산 버튼)
-    public void ShowMainBasePanel(ButtonAction onTrainWorker)
+    // Unit production (MainBase / Tier1 / Tier2 / Tier3)
+    // tier별 유닛 생산 패널 (본진/병영/공장/우주공항 공용). 버튼 개수가 유닛 데이터 개수만큼 가변적이므로
+    // 4개로 나뉘어 있던 ShowMainBasePanel/ShowBarracksPanel/ShowFactoryPanel/ShowAirportPanel을 통합했다.
+    // 실제 버튼 구성(어느 유닛을 넣을지)은 RTSUnitController.ShowUnitTierPanel()이 UnitData.tier로 판단해서 넘긴다.
+    public void ShowUnitProductionPanel(UISelectionState state, CommandButtonData[] commands)
     {
-        CurrentState = UISelectionState.MainBase;
+        CurrentState = state;
 
         // 리프트 슬롯(8)은 여기 포함되지 않아도 건드리지 않는다 - RTSUnitController가 바로 뒤이어 독립적으로 채운다.
-        SetCommands(
-            new CommandButtonData[]
-            {
-                new CommandButtonData(workerIcon, onTrainWorker)
-            },
-            LiftSlotOnlyProtected);
-    }
-
-    // Barracks
-    // 병영(Tier1 건물) 선택 패널 (마린/벌처 생산 버튼)
-    public void ShowBarracksPanel(
-    ButtonAction onMarine,
-    ButtonAction onFirebat)
-    {
-        CurrentState = UISelectionState.Tier1Building;
-
-        SetCommands(
-            new CommandButtonData[]
-            {
-                new CommandButtonData(marineIcon, onMarine),
-                new CommandButtonData(vultureIcon, onFirebat)
-            },
-            LiftSlotOnlyProtected);
-    }
-
-    // Factory
-    // 공장(Tier2 건물) 선택 패널 (골리앗/탱크 생산 버튼)
-    public void ShowFactoryPanel(
-    ButtonAction onGoliath,
-    ButtonAction onTank)
-    {
-        CurrentState = UISelectionState.Tier2Building;
-
-        SetCommands(
-            new CommandButtonData[]
-            {
-                new CommandButtonData(goliathIcon, onGoliath),
-                new CommandButtonData(tankIcon, onTank)
-            },
-            LiftSlotOnlyProtected);
-    }
-
-    // Starport
-    // 우주공항(Tier3 건물) 선택 패널 (레이스/가디언 생산 버튼)
-    public void ShowAirportPanel(
-    ButtonAction onWraith,
-    ButtonAction onGuardian)
-    {
-        CurrentState = UISelectionState.Tier3Building;
-
-        SetCommands(
-            new CommandButtonData[]
-            {
-                new CommandButtonData(wraithIcon, onWraith),
-                new CommandButtonData(guardianIcon, onGuardian)
-            },
-            LiftSlotOnlyProtected);
+        SetCommands(commands, LiftSlotOnlyProtected);
     }
 
     // Lab

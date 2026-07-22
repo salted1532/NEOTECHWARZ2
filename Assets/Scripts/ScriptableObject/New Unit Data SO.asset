@@ -18,96 +18,160 @@ MonoBehaviour:
 
       shortcut key [<color=yellow>W</color>]'
     <ID>k__BackingField: 1
+    <tier>k__BackingField: 0
+    <armorType>k__BackingField: 0
+    <sizeType>k__BackingField: 0
     <hp>k__BackingField: 40
     <attackDamge>k__BackingField: 5
-    <attackRange>k__BackingField: 1
+    <attackRange>k__BackingField: 2
     <mineral>k__BackingField: 50
     <gas>k__BackingField: 0
     <population>k__BackingField: 1
     <productionTime>k__BackingField: 12
     <Icon>k__BackingField: {fileID: 21300000, guid: f9088a500c2a2184c90293aea40e17bb, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
+    <shortcutKey>k__BackingField: 119
   - <unitName>k__BackingField: 'Assault Trooper '
     <description>k__BackingField: 'train Assault Trooper
 
       shortcut key [<color=yellow>A</color>]'
     <ID>k__BackingField: 2
+    <tier>k__BackingField: 1
+    <armorType>k__BackingField: 0
+    <sizeType>k__BackingField: 0
     <hp>k__BackingField: 40
     <attackDamge>k__BackingField: 5
-    <attackRange>k__BackingField: 5
+    <attackRange>k__BackingField: 12
     <mineral>k__BackingField: 50
     <gas>k__BackingField: 0
     <population>k__BackingField: 1
     <productionTime>k__BackingField: 15
     <Icon>k__BackingField: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+    <shortcutKey>k__BackingField: 97
   - <unitName>k__BackingField: 'Scout Drone '
     <description>k__BackingField: 'train Scout Drone
 
       shortcut key [<color=yellow>S</color>]'
     <ID>k__BackingField: 3
+    <tier>k__BackingField: 1
+    <armorType>k__BackingField: 0
+    <sizeType>k__BackingField: 0
     <hp>k__BackingField: 75
-    <attackDamge>k__BackingField: 5
-    <attackRange>k__BackingField: 6
+    <attackDamge>k__BackingField: 6
+    <attackRange>k__BackingField: 14
     <mineral>k__BackingField: 75
     <gas>k__BackingField: 0
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 19
     <Icon>k__BackingField: {fileID: 21300000, guid: 6919d5112ea74a64ebb34ca252c20ba2, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
+    <shortcutKey>k__BackingField: 115
+  - <unitName>k__BackingField: 'Sharpshooter '
+    <description>k__BackingField: 'train Sharpshooter
+
+      shortcut key [<color=yellow>S</color>]'
+    <ID>k__BackingField: 4
+    <tier>k__BackingField: 1
+    <armorType>k__BackingField: 0
+    <sizeType>k__BackingField: 0
+    <hp>k__BackingField: 45
+    <attackDamge>k__BackingField: 10
+    <attackRange>k__BackingField: 20
+    <mineral>k__BackingField: 125
+    <gas>k__BackingField: 75
+    <population>k__BackingField: 1
+    <productionTime>k__BackingField: 50
+    <Icon>k__BackingField: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 0a3d03c6c4dd93c4083d5542b823c86b, type: 3}
+    <shortcutKey>k__BackingField: 115
   - <unitName>k__BackingField: 'Ranger IFV '
     <description>k__BackingField: 'train Ranger IFV
 
       shortcut key [<color=yellow>R</color>]'
-    <ID>k__BackingField: 4
-    <hp>k__BackingField: 100
-    <attackDamge>k__BackingField: 10
-    <attackRange>k__BackingField: 6
+    <ID>k__BackingField: 5
+    <tier>k__BackingField: 2
+    <armorType>k__BackingField: 1
+    <sizeType>k__BackingField: 1
+    <hp>k__BackingField: 150
+    <attackDamge>k__BackingField: 6
+    <attackRange>k__BackingField: 14
     <mineral>k__BackingField: 100
     <gas>k__BackingField: 50
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 25
     <Icon>k__BackingField: {fileID: 21300000, guid: 04b3f4d7f72d40a48b0eff1ac5006315, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: d9657408020de9a44918eef6a3214c70, type: 3}
+    <shortcutKey>k__BackingField: 105
   - <unitName>k__BackingField: 'Pulasr Tank '
     <description>k__BackingField: 'train Pulasr Tank
 
       shortcut key [<color=yellow>P</color>]'
-    <ID>k__BackingField: 5
+    <ID>k__BackingField: 6
+    <tier>k__BackingField: 2
+    <armorType>k__BackingField: 1
+    <sizeType>k__BackingField: 2
     <hp>k__BackingField: 150
     <attackDamge>k__BackingField: 20
-    <attackRange>k__BackingField: 7
+    <attackRange>k__BackingField: 20
     <mineral>k__BackingField: 150
     <gas>k__BackingField: 100
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 31
     <Icon>k__BackingField: {fileID: 21300000, guid: 2cf1e1b8455dc8346b3135d7ea2df0cd, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
+    <shortcutKey>k__BackingField: 112
+  - <unitName>k__BackingField: SkyLancer
+    <description>k__BackingField: 'train SkyLancer
+
+      shortcut key [<color=yellow>S</color>]'
+    <ID>k__BackingField: 7
+    <tier>k__BackingField: 2
+    <armorType>k__BackingField: 1
+    <sizeType>k__BackingField: 1
+    <hp>k__BackingField: 125
+    <attackDamge>k__BackingField: 8
+    <attackRange>k__BackingField: 18
+    <mineral>k__BackingField: 100
+    <gas>k__BackingField: 50
+    <population>k__BackingField: 2
+    <productionTime>k__BackingField: 40
+    <Icon>k__BackingField: {fileID: 21300000, guid: f9088a500c2a2184c90293aea40e17bb, type: 3}
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: cf2cc00187f9ce246b71529e2a55dd05, type: 3}
+    <shortcutKey>k__BackingField: 115
   - <unitName>k__BackingField: 'Firehawk '
     <description>k__BackingField: 'train Firehawk
 
       shortcut key [<color=yellow>F</color>]'
-    <ID>k__BackingField: 6
+    <ID>k__BackingField: 8
+    <tier>k__BackingField: 3
+    <armorType>k__BackingField: 0
+    <sizeType>k__BackingField: 1
     <hp>k__BackingField: 150
-    <attackDamge>k__BackingField: 15
-    <attackRange>k__BackingField: 7
+    <attackDamge>k__BackingField: 8
+    <attackRange>k__BackingField: 18
     <mineral>k__BackingField: 150
     <gas>k__BackingField: 100
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 37
     <Icon>k__BackingField: {fileID: 21300000, guid: 06ad55446842ade4298efca8384bf7dc, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
+    <shortcutKey>k__BackingField: 102
   - <unitName>k__BackingField: 'Guardian Drone '
     <description>k__BackingField: 'train Guardian Drone
 
       shortcut key [<color=yellow>G</color>]'
-    <ID>k__BackingField: 7
+    <ID>k__BackingField: 9
+    <tier>k__BackingField: 3
+    <armorType>k__BackingField: 1
+    <sizeType>k__BackingField: 2
     <hp>k__BackingField: 400
-    <attackDamge>k__BackingField: 30
-    <attackRange>k__BackingField: 7
+    <attackDamge>k__BackingField: 25
+    <attackRange>k__BackingField: 20
     <mineral>k__BackingField: 400
     <gas>k__BackingField: 300
     <population>k__BackingField: 6
     <productionTime>k__BackingField: 63
     <Icon>k__BackingField: {fileID: 21300000, guid: d6e905e97221d6141ae8f9bd7256fb0a, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7c8f9a4aa9f4bf74c8f9f9d9977dcc9f, type: 3}
+    <shortcutKey>k__BackingField: 100

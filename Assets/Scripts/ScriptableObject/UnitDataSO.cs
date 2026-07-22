@@ -25,6 +25,18 @@ public class UnitData
     [field: SerializeField]
     public int ID { get; private set; }
 
+    // 이 유닛을 생산할 수 있는 건물 종류: 0=본진(MainBase), 1=병영(Tier1), 2=공장(Tier2), 3=우주공항(Tier3).
+    // 이 값만 지정하면 코드 수정 없이 해당 건물의 생산 패널에 자동으로 나타난다.
+    [field: SerializeField]
+    public int tier { get; private set; }
+
+    // 장갑 타입(경장갑/중장갑)과 크기 타입(소형/중형/대형). 실제 전투 계산에는 유닛 프리팹의 UnitController 값이
+    // 쓰이고(기존 attackDamage/armor/attackType과 동일한 방식), 여기 값은 생산 패널 등 표시용.
+    [field: SerializeField]
+    public ArmorType armorType { get; private set; }
+    [field: SerializeField]
+    public SizeType sizeType { get; private set; }
+
     [field: SerializeField]
     public int hp { get; private set; }
 
@@ -47,4 +59,8 @@ public class UnitData
     public Sprite Icon { get; private set; }
     [field: SerializeField]
     public GameObject Prefab { get; private set; }
+
+    // 이 유닛의 생산 버튼을 대신 누르는 키보드 단축키 (없으면 KeyCode.None)
+    [field: SerializeField]
+    public KeyCode shortcutKey { get; private set; }
 }

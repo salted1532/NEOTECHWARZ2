@@ -44,6 +44,8 @@ public class RTSUnitController : MonoBehaviour
     private BuildingDataSO buildingDatabase;
     [SerializeField]
     private UpgradeManager upgradeManager;
+    [SerializeField]
+    private DamageMultiplierTableSO damageMultiplierTable;
 
     // ===== 상태 하나로 통합 =====
     public enum SelectState
@@ -932,26 +934,37 @@ public class RTSUnitController : MonoBehaviour
         }
     }
 
-    // 유닛 ID가 어느 건물 태그에서 생산 가능한지 매핑 (SelectBuilding()의 태그 스위치와 동일한 짝짓기).
+    // tier(0~3) 값 자체를 건물 태그 문자열로 바꾸는 고정 매핑 (tier 필드의 정의 그 자체).
+    private static readonly string[] TierProducerTags = { "MainBase", "Tier1", "Tier2", "Tier3" };
+
+    // 유닛 ID가 어느 건물 태그에서 생산 가능한지, UnitData.tier 값으로부터 조회한다.
     // 다른 티어 건물이 섞여 선택됐을 때 그 유닛을 생산할 수 없는 건물을 걸러내기 위함.
-    private static string GetProducerTagForUnit(int unitID)
+    private string GetProducerTagForUnit(int unitID)
     {
-        switch (unitID)
+        UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
+        if (data == null || data.tier < 0 || data.tier >= TierProducerTags.Length)
+            return null;
+
+        return TierProducerTags[data.tier];
+    }
+
+    private static readonly UISelectionState[] TierPanelStates =
+        { UISelectionState.MainBase, UISelectionState.Tier1Building, UISelectionState.Tier2Building, UISelectionState.Tier3Building };
+
+    // tier(0=본진,1=병영,2=공장,3=우주공항)에 속한 유닛을 unitDatabase에서 모두 찾아 생산 버튼 패널을 구성한다.
+    // UnitDataSO에 유닛을 추가하고 tier 값만 지정하면, 코드 수정 없이 해당 건물 패널에 자동으로 나타난다.
+    private void ShowUnitTierPanel(int tier)
+    {
+        List<UnitData> unitsInTier = unitDatabase.unitData.FindAll(d => d.tier == tier);
+        CommandButtonData[] commands = new CommandButtonData[unitsInTier.Count];
+
+        for (int i = 0; i < unitsInTier.Count; ++i)
         {
-            case UnitID.Worker:
-                return "MainBase";
-            case UnitID.Marine:
-            case UnitID.Vulture:
-                return "Tier1";
-            case UnitID.Goliath:
-            case UnitID.Tank:
-                return "Tier2";
-            case UnitID.Wraith:
-            case UnitID.Guardian:
-                return "Tier3";
-            default:
-                return null;
+            UnitData data = unitsInTier[i];
+            commands[i] = new CommandButtonData(data.Icon, UnitButtonAction(() => TryProduceUnit(data.ID), data.ID, data.shortcutKey));
         }
+
+        uIController.ShowUnitProductionPanel(TierPanelStates[tier], commands);
     }
 
     /// 유닛 생산 요청 (선택된 건물 각각에 대해 생산 가능 여부/대기열/자원을 확인하고,
@@ -1260,38 +1273,28 @@ public class RTSUnitController : MonoBehaviour
                     switch (representativeBuilding != null ? TagToBuildingState(representativeBuilding.tag) : BuildingState.None)
                     {
                         case BuildingState.MainBaseSelect:
-                            uIController.ShowMainBasePanel(
-                                UnitButtonAction(() => TryProduceUnit(UnitID.Worker), UnitID.Worker, KeyCode.W));
+                            ShowUnitTierPanel(0);
                             uIController.ShowProductionUI(
                                 GetProductionQueue(),
                                 CancelProduction);
                             break;
 
                         case BuildingState.Tier1Select:
-                            uIController.ShowBarracksPanel(
-                                UnitButtonAction(() => TryProduceUnit(UnitID.Marine), UnitID.Marine, KeyCode.A),
-                                UnitButtonAction(() => TryProduceUnit(UnitID.Vulture), UnitID.Vulture, KeyCode.S));
-
+                            ShowUnitTierPanel(1);
                             uIController.ShowProductionUI(
                                 GetProductionQueue(),
                                 CancelProduction);
                             break;
 
                         case BuildingState.Tier2Select:
-                            uIController.ShowFactoryPanel(
-                                UnitButtonAction(() => TryProduceUnit(UnitID.Goliath), UnitID.Goliath, KeyCode.I),
-                                UnitButtonAction(() => TryProduceUnit(UnitID.Tank), UnitID.Tank, KeyCode.P));
-
+                            ShowUnitTierPanel(2);
                             uIController.ShowProductionUI(
                                 GetProductionQueue(),
                                 CancelProduction);
                             break;
 
                         case BuildingState.Tier3Select:
-                            uIController.ShowAirportPanel(
-                                UnitButtonAction(() => TryProduceUnit(UnitID.Wraith), UnitID.Wraith, KeyCode.F),
-                                UnitButtonAction(() => TryProduceUnit(UnitID.Guardian), UnitID.Guardian, KeyCode.D));
-
+                            ShowUnitTierPanel(3);
                             uIController.ShowProductionUI(
                                 GetProductionQueue(),
                                 CancelProduction);
@@ -1468,6 +1471,10 @@ public class RTSUnitController : MonoBehaviour
     // ResearchQueue(연구소 큐)도 UnitController(유닛)도 UpgradeManager를 직접 참조하지 않고 이 메서드들만 사용한다.
     public int GlobalAttackBonus => upgradeManager.GetBonus(ResearchType.Attack);
     public int GlobalArmorBonus => upgradeManager.GetBonus(ResearchType.Armor);
+    public DamageMultiplierTableSO DamageMultiplierTable => damageMultiplierTable;
+
+    // unitID로 UnitData를 조회한다 (UnitController가 자기 자신의 스탯을 SO에서 가져올 때 사용).
+    public UnitData GetUnitData(int unitID) => unitDatabase.unitData.Find(d => d.ID == unitID);
 
     // ResearchQueue가 연구 완료 시 호출 (UpgradeManager를 직접 모른 채로 보너스를 반영)
     public void AddGlobalBonus(ResearchType type, int amount) => upgradeManager.AddBonus(type, amount);

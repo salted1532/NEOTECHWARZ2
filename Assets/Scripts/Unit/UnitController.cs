@@ -35,6 +35,15 @@ public class UnitController : MonoBehaviour, IDestructible
     // 이 유닛의 공격 수단 (총기 든 유닛은 Bullet, 탱크류는 Explosive 등) - 피격 이펙트 선택에 사용됨
     [SerializeField] private AttackEffectType attackType = AttackEffectType.Bullet;
 
+    // 이 유닛이 "공격받을 때" 적용되는 분류 (DamageMultiplierTableSO/고유 보너스 판정에 쓰임)
+    [SerializeField] private ArmorType armorType = ArmorType.Light;
+    [SerializeField] private SizeType sizeType = SizeType.Medium;
+
+    [Header("고유 추가 데미지 (해당 없으면 Percent를 0으로 둘 것)")]
+    [Tooltip("이 유닛이 특정 장갑 타입 상대로만 추가 데미지를 줄 때 설정 (예: 저격수 = Heavy, 80)")]
+    [SerializeField] private ArmorType bonusVersusArmorType = ArmorType.Light;
+    [SerializeField] private float bonusVersusArmorPercent = 0f;
+
     private NavMeshAgent navMeshAgent;
 
     [SerializeField]
@@ -201,6 +210,10 @@ public class UnitController : MonoBehaviour, IDestructible
 
         rtsController = FindFirstObjectByType<RTSUnitController>();
         rtsController.UnitList.Add(this);
+
+        // 생산 큐를 거쳤든 씬에 직접 배치됐든, 어떤 경로로 만들어진 인스턴스든 항상 자기 unitID로
+        // UnitDataSO를 조회해서 스스로 스탯을 적용한다 (UnitSpawner가 밖에서 push하던 방식 대체).
+        ApplyUnitData(rtsController.GetUnitData(unitID));
     }
 
     // Update is called once per frame
@@ -800,13 +813,31 @@ public class UnitController : MonoBehaviour, IDestructible
         if (enemy.TryGetComponent<HealthManager>(out var targetHealth))
         {
             int targetArmor = GetTargetArmor(enemy);
-            int finalDamage = Mathf.Max(1, GetAttackDamage() - targetArmor); // 방어력만큼 감산, 최소 1 데미지는 보장
+            int finalDamage = CalculateFinalDamage(enemy, targetArmor);
             targetHealth.GetDamage(finalDamage, transform.position, attackType); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
             GetComponent<UnitEffects>()?.PlayAttack();
         }
 
         alreadyAttacked = true;
         Invoke(nameof(ResetAttack), timeBetweenAttacks);
+    }
+
+    // 공격방식×대상크기 배율(DamageMultiplierTableSO)과 이 유닛의 고유 장갑타입 보너스를 곱연산으로 적용한 뒤,
+    // 대상의 고정 방어력을 감산해 최종 데미지를 계산한다. 최소 1은 항상 보장.
+    private int CalculateFinalDamage(GameObject target, int targetArmor)
+    {
+        SizeType targetSize = GetTargetSizeType(target);
+        ArmorType targetArmorType = GetTargetArmorType(target);
+
+        DamageMultiplierTableSO table = rtsController != null ? rtsController.DamageMultiplierTable : null;
+        float sizeMultiplier = table != null ? table.GetMultiplier(attackType, targetSize) : 1f;
+
+        float bonusMultiplier = (bonusVersusArmorPercent != 0f && targetArmorType == bonusVersusArmorType)
+            ? 1f + bonusVersusArmorPercent / 100f
+            : 1f;
+
+        int scaledAttack = Mathf.RoundToInt(GetAttackDamage() * sizeMultiplier * bonusMultiplier);
+        return Mathf.Max(1, scaledAttack - targetArmor);
     }
 
     // 공격 대상의 방어력을 조회한다 (아군 유닛이면 연구 보너스가 반영된 GetArmor(), 적 유닛이면 EnemyController의 armor, 그 외(건물/자원)는 0).
@@ -819,6 +850,30 @@ public class UnitController : MonoBehaviour, IDestructible
             return enemyUnit.GetArmor();
 
         return 0;
+    }
+
+    // 공격 대상의 크기 타입을 조회한다 (건물/자원 등 타입 정보가 없는 대상은 Medium → 배율 100%로 영향 없음).
+    private SizeType GetTargetSizeType(GameObject target)
+    {
+        if (target.TryGetComponent<UnitController>(out var friendlyUnit))
+            return friendlyUnit.GetSizeType();
+
+        if (target.TryGetComponent<EnemyController>(out var enemyUnit))
+            return enemyUnit.GetSizeType();
+
+        return SizeType.Medium;
+    }
+
+    // 공격 대상의 장갑 타입을 조회한다 (건물/자원 등은 고유 보너스가 적용될 일이 없으므로 Light를 기본값으로 반환).
+    private ArmorType GetTargetArmorType(GameObject target)
+    {
+        if (target.TryGetComponent<UnitController>(out var friendlyUnit))
+            return friendlyUnit.GetArmorType();
+
+        if (target.TryGetComponent<EnemyController>(out var enemyUnit))
+            return enemyUnit.GetArmorType();
+
+        return ArmorType.Light;
     }
 
     //공격 리셋
@@ -1307,4 +1362,25 @@ public class UnitController : MonoBehaviour, IDestructible
     public int GetAttackDamage() => attackDamage + (rtsController != null ? rtsController.GlobalAttackBonus : 0);
     public int GetArmor() => armor + (rtsController != null ? rtsController.GlobalArmorBonus : 0);
     public AttackEffectType GetAttackType() => attackType;
+    public ArmorType GetArmorType() => armorType;
+    public SizeType GetSizeType() => sizeType;
+
+    // 생산 시점에 UnitDataSO의 값으로 전투 스탯(체력/공격력/사거리/아이콘/장갑타입/크기타입)을 덮어쓴다.
+    // 프리팹 자체에 미리 박아둔 값은 인스펙터 프리뷰/테스트용 기본값 역할만 하고, 실제로 생산되어 스폰된
+    // 유닛은 이 메서드를 통해 UnitDataSO 값을 반영받는다 (UnitSpawner.Spawn()에서 호출).
+    public void ApplyUnitData(UnitData data)
+    {
+        if (data == null)
+            return;
+
+        icon = data.Icon;
+        attackDamage = data.attackDamge;
+        armorType = data.armorType;
+        sizeType = data.sizeType;
+
+        if (attackRange != null)
+            attackRange.UnitRange = data.attackRange;
+
+        GetComponent<HealthManager>()?.InitializeHealth(data.hp);
+    }
 }
