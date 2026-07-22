@@ -392,7 +392,7 @@ MonoBehaviour:
   armorType: 0
   sizeType: 0
   bonusVersusArmorType: 1
-  bonusVersusArmorPercent: 0
+  bonusVersusArmorPercent: 80
   moveSpeed: 10
   arriveDistance: 1.2
   stuckTimer: 0
@@ -443,10 +443,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
-  muzzlePrefab: {fileID: 100006, guid: caec3b9681e55cb46afeb40d817c75d5, type: 3}
+  muzzlePrefab: {fileID: 100002, guid: 4410f8f51fa02aa479c6d727f542154c, type: 3}
   firePoints:
   - {fileID: 7346205282417612151}
-  moveTrailPrefab: {fileID: 100000, guid: facfb523f81e2dc4fa90851bdfb1884e, type: 3}
+  moveTrailPrefab: {fileID: 0}
   moveTrailPoints:
   - {fileID: 6215852022674760169}
   moveTrailRotationFollowSpeed: 6

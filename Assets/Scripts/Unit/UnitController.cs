@@ -1377,6 +1377,7 @@ public class UnitController : MonoBehaviour, IDestructible
         attackDamage = data.attackDamge;
         armorType = data.armorType;
         sizeType = data.sizeType;
+        timeBetweenAttacks = data.attackSpeed;
 
         if (attackRange != null)
             attackRange.UnitRange = data.attackRange;

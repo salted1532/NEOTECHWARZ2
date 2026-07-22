@@ -30,8 +30,8 @@ public class UnitData
     [field: SerializeField]
     public int tier { get; private set; }
 
-    // 장갑 타입(경장갑/중장갑)과 크기 타입(소형/중형/대형). 실제 전투 계산에는 유닛 프리팹의 UnitController 값이
-    // 쓰이고(기존 attackDamage/armor/attackType과 동일한 방식), 여기 값은 생산 패널 등 표시용.
+    // 장갑 타입(경장갑/중장갑)과 크기 타입(소형/중형/대형). 유닛이 스폰될 때 UnitController.ApplyUnitData()가
+    // 이 값을 그대로 가져다 쓰므로(doc/0205), 실제 전투 계산에도 여기 값이 반영된다.
     [field: SerializeField]
     public ArmorType armorType { get; private set; }
     [field: SerializeField]
@@ -45,6 +45,12 @@ public class UnitData
 
     [field: SerializeField]
     public int attackRange { get; private set; }
+
+    // 공격 1회 후 다음 공격까지 걸리는 시간(초). 값이 작을수록 더 빨리(자주) 공격한다.
+    // (UnitController.timeBetweenAttacks와 동일한 의미 - "공격속도"가 아니라 "공격 간격"이지만
+    // 기획 쪽 명칭인 attackSpeed를 그대로 필드명으로 씀)
+    [field: SerializeField]
+    public float attackSpeed { get; private set; }
 
     [field: SerializeField]
     public int mineral { get; private set; }
