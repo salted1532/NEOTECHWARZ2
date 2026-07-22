@@ -431,7 +431,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e52a2baafe3771a46a413624bedb5f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRange
-  UnitRange: 14
+  UnitRange: 20
 --- !u!1 &7069137052622472766
 GameObject:
   m_ObjectHideFlags: 0
@@ -601,11 +601,11 @@ MonoBehaviour:
   unitMarker: {fileID: 8287700491229270693}
   icon: {fileID: 21300000, guid: 2cf1e1b8455dc8346b3135d7ea2df0cd, type: 3}
   unitID: 6
-  attackDamage: 30
+  attackDamage: 20
   armor: 0
   attackType: 1
   armorType: 1
-  sizeType: 1
+  sizeType: 2
   bonusVersusArmorType: 0
   bonusVersusArmorPercent: 0
   moveSpeed: 10

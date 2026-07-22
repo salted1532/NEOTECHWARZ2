@@ -670,7 +670,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e52a2baafe3771a46a413624bedb5f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRange
-  UnitRange: 12
+  UnitRange: 14
 --- !u!1 &6254271554561517612
 GameObject:
   m_ObjectHideFlags: 0
@@ -875,10 +875,10 @@ MonoBehaviour:
   unitMarker: {fileID: 8287700491229270693}
   icon: {fileID: 21300000, guid: 04b3f4d7f72d40a48b0eff1ac5006315, type: 3}
   unitID: 5
-  attackDamage: 12
+  attackDamage: 6
   armor: 0
   attackType: 1
-  armorType: 0
+  armorType: 1
   sizeType: 1
   bonusVersusArmorType: 0
   bonusVersusArmorPercent: 0
@@ -918,7 +918,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 125
+  maxHealth: 150
   healthSlider: {fileID: 751408824970754016}
 --- !u!114 &-7653392222599426387
 MonoBehaviour:

@@ -189,7 +189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e52a2baafe3771a46a413624bedb5f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRange
-  UnitRange: 8
+  UnitRange: 20
 --- !u!1 &6941577830194116490
 GameObject:
   m_ObjectHideFlags: 0
@@ -386,7 +386,7 @@ MonoBehaviour:
   unitMarker: {fileID: 8287700491229270693}
   icon: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
   unitID: 4
-  attackDamage: 6
+  attackDamage: 10
   armor: 0
   attackType: 0
   armorType: 0
@@ -404,7 +404,7 @@ MonoBehaviour:
     m_Bits: 0
   UnitcurrentState: 0
   alreadyAttacked: 0
-  timeBetweenAttacks: 0.6
+  timeBetweenAttacks: 1
   DepositOre: {fileID: 0}
   DepositGas: {fileID: 0}
   gatherInteractRange: 2
@@ -429,7 +429,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 40
+  maxHealth: 45
   healthSlider: {fileID: 7635752030612211742}
 --- !u!114 &5990702166823489546
 MonoBehaviour:

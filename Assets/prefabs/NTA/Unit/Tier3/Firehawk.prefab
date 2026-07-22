@@ -431,7 +431,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e52a2baafe3771a46a413624bedb5f46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRange
-  UnitRange: 14
+  UnitRange: 18
 --- !u!1 &5523897713309174080
 GameObject:
   m_ObjectHideFlags: 0
@@ -804,7 +804,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 120
+  maxHealth: 150
   healthSlider: {fileID: 2668760606211593488}
 --- !u!114 &1368692939571230335
 MonoBehaviour:
