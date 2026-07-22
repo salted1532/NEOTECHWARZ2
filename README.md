@@ -26,6 +26,7 @@ Assets/
 │  ├─ CaptureSystem/    # 거점 점령(밀당식 Ally↔Neutral↔Enemy 순환) + 다각형 영토 판정(TerritoryZone/TerritoryManager)
 │  ├─ Effects/          # 공격/이동/피격/사망/건물 이착륙/건설 이펙트 재생 시스템(EffectPlayer 등)
 │  ├─ Enemy/            # 적 유닛 컨트롤러 (마커/스탯 데이터만, AI 로직은 미구현)
+│  ├─ FogOfWar/         # 전장의 안개(csFogWar) 연동 어댑터 — 유닛/건물 시야 소스 등록(FogRevealerAgent), 점령 영토 강제 시야 확보(TerritoryFogReveal)
 │  ├─ Resource/         # 자원 노드 및 자원 관리 (`ResourceController.cs`는 미사용 빈 스텁)
 │  ├─ ScriptableObject/ # 유닛/건물 데이터 정의(SO)
 │  ├─ System/           # RTS 유닛 통합 컨트롤 시스템
@@ -34,8 +35,8 @@ Assets/
 │  ├─ UnitSpawner/      # 유닛 생산/스폰
 │  └─ UserControl/      # 유닛 선택 및 명령 입력 처리, 마우스 커서 상태 전환
 ├─ Scenes/              # 게임 씬 (SampleScene, TestScene — TestScene이 1스테이지 맵(Mission1) 복원용 씬)
-├─ prefabs/             # 유닛/건물 프리팹 (`NTA/`, 현재는 기본 프리미티브 메시 사용), 맵 프리팹(`Maps/Mission1~5`, YuME 타일맵 기반 — 실제 사용 중인 건 Mission1뿐)
-├─ AssetFolder/         # 3rd-party 모델링/스카이박스 에셋 (Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox, TZ_Futuristic Panel Textures, LowPolyWater_Pack) — 임포트 + URP 머티리얼 변환 완료, 게임플레이 프리팹(`prefabs/NTA/`)에는 아직 미적용
+├─ prefabs/             # 유닛/건물 프리팹 (`NTA/`, 유닛은 전부·건물은 대부분 기본 프리미티브 메시 사용 — 병영 건물에만 실제 모델 1개 적용 시작), 맵 프리팹(`Maps/Mission1~5`, YuME 타일맵 기반 — 실제 사용 중인 건 Mission1뿐)
+├─ AssetFolder/         # 3rd-party 에셋 — 모델링/스카이박스(Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox, TZ_Futuristic Panel Textures, LowPolyWater_Pack, 임포트+URP 머티리얼 변환 완료했지만 게임플레이 프리팹엔 대부분 미적용 — 병영 건물에 실제 모델 1개 적용 시작) + 전장의 안개 플러그인(`AOSFogWar`/csFogWar, 실제로 적용되어 작동 중)
 ├─ Material, Shader/    # 머티리얼 및 커스텀 셰이더
 └─ Settings/            # URP 렌더 파이프라인 설정 + 포스트프로세싱 Volume Profile(Bloom/Color Adjustments/SSAO)
 
@@ -43,7 +44,7 @@ doc/                     # 세션별 작업 로그 + 코드 변경 전/후 diff 
 Docs/                    # 스크립트별 코드 문서(역할/필드/메소드) — 세션 로그는 doc/로 이동됨
 ```
 
-> `FogOfWar/` 폴더는 아직 없습니다 — 전장의 안개는 설계 문서([`doc/0069`](doc/0069-fog-of-war-design.md))만 있고 실제 구현은 안 된 상태입니다 (아래 로드맵 참고).
+> 전장의 안개(Fog of War)는 3rd-party 플러그인 `csFogWar`(`AssetFolder/AOSFogWar/`) 기반으로 구현 완료되어 유닛/건물 9+6종 전체와 점령 영토에 연동돼 있습니다 — 최초 설계는 [`doc/0069`](doc/0069-fog-of-war-design.md), 실제 구현 시작은 [`doc/0166`](doc/0166-fogofwar-folder-and-eye-script-design.md), 이후 버그수정까지 `doc/0166`~`0197` 참고.
 
 ### 핵심 스크립트
 
@@ -65,8 +66,9 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `ResourceManager` | 팀의 광물/가스/인구수 중앙 관리, 인구수 한도 상한(200) | [doc](Docs/ResourceManager.md) |
 | `ResourceNode` | 자원 채취 지점, 대기열(줄서기) 및 고갈 처리 | [doc](Docs/ResourceNode.md) |
 | `HealthManager` | 체력/데미지/치유/사망 처리 공용 컴포넌트, 절대값 지정(SetHealth/SetMaxHealth) | [doc](Docs/HealthManager.md) |
-| `UnitDataSO` | 유닛 스탯(체력/공격력/비용 등) 데이터베이스 | [doc](Docs/UnitDataSO.md) |
+| `UnitDataSO` | 유닛 스탯 데이터베이스 — 체력/공격력/사거리/공격속도/아이콘/장갑타입/크기타입까지 스폰되는 유닛이 자기 `unitID`로 직접 조회해 스스로 적용(`UnitController.ApplyUnitData`, `doc/0205`), `tier`로 생산 가능 건물 자동 분류(`doc/0200`) | [doc](Docs/UnitDataSO.md) |
 | `BuildingDataSO` | 건물 스펙(비용/크기/생산시간/인구수 제공량 등) 데이터베이스 | [doc](Docs/BuildingDataSO.md) |
+| `DamageMultiplierTableSO` | 공격 방식(소총/폭발/레이저/화염) × 대상 크기(소형/중형/대형) 데미지 배율표 — 코드가 아니라 별도 에셋으로 분리해 인스펙터에서 밸런스 조정 가능 | [doc](doc/0201-armor-size-damage-multiplier-system.md) |
 | `CameraControl` | RTS 시점 카메라 이동/줌 — 지형 티어(`Layer1`/`Layer2` 태그) 감지로 언덕마다 줌 범위·현재 높이 자동 보정 | [doc](Docs/CameraControl.md) |
 | `MinimapController` | 미니맵 표시 및 클릭 시 카메라 이동 | [doc](Docs/MinimapController.md) |
 | `MinimapViewIndicator` | 메인 카메라 시야를 미니맵 위에 반투명 사각형으로 표시, 줌/회전에 따라 매 프레임 크기·위치 자동 갱신(미니맵 밖으로 안 나가게 클리핑) | [doc](Docs/MinimapViewIndicator.md) |
@@ -74,6 +76,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `CaptureSystem` | 거점 점령 — 트리거 범위 내 아군/적 유닛 수에 따라 부호 있는 점령치를 밀당, 양쪽 다 있으면 교착, Ally↔Neutral↔Enemy 3단계 순환 전환(항상 Neutral 경유), 진행 중일 때만 점령바 노출 | [doc](doc/0146-tug-of-war-capture-cycle-implementation.md) |
 | `TerritoryZone` | 인스펙터에서 핀(꼭짓점) 개수만 늘리면 자동 생성되는 다각형 영토 범위(오목 다각형도 판정 가능), 소유자에 따라 외곽선 색이 흰색/초록/빨강으로 자동 전환 | [doc](doc/0133-territoryzone-implementation.md) |
 | `TerritoryManager` | 씬의 모든 `TerritoryZone`을 등록해 특정 좌표가 아군 영토 안인지 한 번에 질의(여러 영토가 겹치면 합집합) | [doc](doc/0141-territory-restriction-implementation-design.md) |
+| `FogRevealerAgent` | 유닛/건물에 부착해 `csFogWar`에 자신을 시야 소스로 등록/해제하는 어댑터(기존 컨트롤러는 건드리지 않음) | [doc](doc/0166-fogofwar-folder-and-eye-script-design.md) |
+| `TerritoryFogReveal` | 아군이 점령한 `TerritoryZone` 내부를 시야 소스 없이도 항상 밝게 강제 반영 | [doc](doc/0166-fogofwar-folder-and-eye-script-design.md) |
 | `UIController` | 커맨드 패널, 생산 대기열, 자원 표시 UI 총괄, 버튼별 키보드 단축키 데이터 보유 | [doc](Docs/UIController.md) |
 | `ProductionSlot` | 커맨드/생산 대기열의 버튼 슬롯 하나, 자기 단축키 자동 감지 + 눌림 효과 재현 | [doc](Docs/ProductionSlot.md) |
 | `TooltipUI` | 버튼/스탯 호버 시 툴팁 표시 | [doc](Docs/TooltipUI.md) |
@@ -88,7 +92,12 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `VehicleShake` | 지상 차량 유닛이 이동 중일 때 DOTween으로 흔들림을 재현하는 컴포넌트 | [doc](doc/0120-vehicle-shake-and-animation-folder.md) |
 | `AutoRotate` | 레이더 접시/터렛 헤드 등을 DOTween으로 조건 없이 지속 회전시키는 컴포넌트 | [doc](doc/0147-autorotate-dotween-script.md) |
 
-> 위 12개(`EffectPlayer`~`AutoRotate`, `MinimapViewIndicator` 제외)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
+> 문서 칸이 `doc/NNNN-...` 형식인 스크립트(`DamageMultiplierTableSO`, `CaptureSystem`~`TerritoryFogReveal`, `EffectPlayer`~`AutoRotate` 등)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
+
+### 유닛/건물 수치 문서
+
+- [`Docs/UnitAndBuildingStats.md`](Docs/UnitAndBuildingStats.md) — 유닛 9종 + 건물 6종의 현재 스탯을 정해진 양식(유닛명/ID/생산티어/공격범위/공격방식/장갑/크기/가격&인구수/생산시간/체력/공격력/사거리/공격속도/단축키)으로 정리한 최신 레퍼런스. `UnitDataSO`/`BuildingDataSO`에 적힌 실제 값 기준.
+- [`Docs/UnitBalanceReference.md`](Docs/UnitBalanceReference.md) — 어떤 값이 실제로 게임에 반영되는지(SO vs 프리팹) 조사한 감사 기록, 설계 스펙과 실측값이 어긋났던 부분들의 이력.
 
 ## 주요 기능
 
@@ -100,7 +109,10 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - **건물 이동(리프트)**: 건물을 공중으로 띄워(그리드 점유 해제) 공중유닛처럼 우클릭으로 자유 이동시키거나, 착륙 위치를 지정해 그 자리로 날아가 착륙(그리드 재등록) — 이동 중에도 공중 유닛과 동일하게 발밑 지형을 따라가는 지형 추적 비행 적용, 이륙/이동/착륙 전 구간에서 메쉬 피벗 오프셋까지 반영해 고도 기준이 일관됨. 공중에 뜬 동안은 생산/커맨드가 전부 잠기고 Land/Move 버튼만 노출, 생산 대기열이 남아있으면 이륙 자체가 차단됨. 메인기지 건설 시 자원(광물/가스)과 최소 거리(기본 7칸, 인스펙터 조정 가능) 이격 규칙 적용(다른 건물엔 미적용)
 - **자원 시스템**: `ResourceManager` 기반 광물/가스/인구수 관리(한도 200), 건물 건설·유닛 생산 시 실제 자원/인구수 소모, 대기열 취소·생산 건물 파괴·건설 취소/파괴·건설 이동 중 취소·건설 이동 중 일꾼 사망 시 가격만큼 환불, 유닛 사망 시 인구수 반환, 자원 노드 대기열(줄서기)
 - **전투**: 사거리 기반 자동 교전, 공격력/방어력 스탯, 적 강제 지정, 아군 강제 공격(오인사격, 완공 건물 + 건설 중인 `BaseStructure` 포함)
+- **데미지 배율 시스템**: 유닛을 장갑 타입(경장갑/중장갑)과 크기 타입(소형/중형/대형)으로 분류하고, 공격 방식(소총/폭발/레이저/화염)별로 대상 크기에 따른 데미지 배율을 적용 — 배율표는 코드가 아니라 `DamageMultiplierTableSO` 에셋으로 분리해 인스펙터에서 조정 가능. 일부 유닛은 특정 장갑 타입 상대로 고유 추가 데미지(%)도 보유(예: 저격수 vs 중장갑, 스카이랜서 vs 경장갑). 최종 데미지는 `공격력 × 크기배율 × 고유보너스배율 → 반올림 → 고정방어력 감산 → 최소 1 보장` 순서로 계산
+- **유닛 생산(자동 분류 + 자가 동기화)**: `UnitDataSO`에 유닛 항목을 추가하고 `tier`(0=본진/1=병영/2=공장/3=우주공항) 값만 지정하면 코드 수정 없이 해당 건물의 생산 패널에 자동으로 나타남. 스폰된 유닛은 자기 `unitID`로 `UnitDataSO`를 스스로 조회해 체력/공격력/사거리/공격속도/아이콘/장갑·크기 타입을 반영(`UnitController.ApplyUnitData`) — 생산 큐를 거쳤든 씬에 직접 배치했든 항상 적용됨
 - **점령/영토 시스템**: 거점(`CaptureSystem`)은 트리거 범위 내 아군/적 유닛 수에 따라 점령치를 밀당하며 Ally↔Neutral↔Enemy 3단계로 순환 전환(항상 Neutral을 거침), 양쪽이 동시에 있으면 교착. `TerritoryZone`은 인스펙터에서 핀 개수만 조절하면 자동 생성/정리되는 다각형 영토(오목 다각형 포함)로 소유자별 외곽선 색이 자동 전환되고, `TerritoryManager`가 전체 영토를 등록해 좌표 질의를 제공. 건물 배치(칸 전부가 아군 영토 안이어야 함), 자원 채취(영토 밖 노드 채취 불가, 채취 중 영토 상실 시 즉시 중단), 유닛 생산(영토 밖이면 대기열 유지한 채 타이머 정지), 건설 진행(영토 밖이면 담당 일꾼 유무와 별개로 일시정지)이 전부 영토 여부에 실제로 게이팅됨
+- **전장의 안개(Fog of War)**: 3rd-party 플러그인 `csFogWar` 기반, `FogRevealerAgent`를 유닛/건물에 부착해 시야 소스로 등록(기존 컨트롤러는 안 건드림), 아군이 점령한 `TerritoryZone`은 `TerritoryFogReveal`이 시야 소스 없이도 항상 밝게 강제 반영
 - **체력바 UI**: 유닛/건물 공용 `HealthManager`에 `Slider` 연결 시 체력 변화에 맞춰 자동 갱신, 만피 상태에선 자동으로 숨겨지고 피해를 입는 즉시 표시(회복해서 만피로 돌아가면 다시 숨김), `HealthBarBillboard`로 카메라의 X(피치) 각도만 따라 회전(Y/Z 고정)해 유닛이 돌아도 체력바 자체는 방향을 유지
 - **키보드 단축키**: 선택 상태(유닛/일꾼/건설모드/생산 패널/공중 건물)별 버튼에 단축키 배정 — 버튼이 자기 단축키를 직접 감지해 클릭과 동일하게 동작 + 눌림 시각 효과, 현재 패널에 없는 버튼의 단축키는 자동으로 비활성
 - **명령 취소**: 공격/이동/순찰/랠리/건물이동 등 대기 중인 명령 모드를 ESC로 즉시 취소(포인터 마커도 함께 사라짐)
@@ -108,7 +120,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - **이펙트 시스템**: `EffectPlayer` 공용 헬퍼로 공격(총구)/이동(트레일)/피격(공격 타입별 4종: 총기·폭발·레이저·화염)/사망/건물 이착륙/건설 진행·완공·파괴 이펙트를 재생 — 유닛/건물 프리팹에 붙는 `UnitEffects`/`BuildingEffects`/`ConstructionEffects`가 각각 전담, 스폰 위치는 `List<Transform>`으로 다중 지점 지정 가능(비워두면 오브젝트 자신 위치 하나로 폴백), 피격 이펙트는 콜라이더 표면의 공격자 쪽 지점에서 방향까지 계산해 재생
 - **모션 연출**: 이동 트레일은 `TrailRotationFollower`로 위치는 매 프레임 추적하되 회전만 Slerp로 서서히 따라가 급회전 시 부자연스럽게 홱 도는 문제 방지(급회전 중엔 크기/방출량도 축소), 공중 유닛/리프트 중인 건물은 `HoverBob`으로 DOTween 기반 부유(호버링) 애니메이션, 지상 차량 유닛은 이동 중 `VehicleShake`로 DOTween 기반 흔들림 연출 — 둘 다 루트가 아닌 비주얼 자식 오브젝트에 부착해 이동 로직(루트 트랜스폼 직접 갱신)과 충돌하지 않음
 - **UI**: 패널 기반 커맨드 UI, Info Panel(공격력/방어력 호버 툴팁), Squad Panel(최대 60마리 페이지네이션), 생산 대기열 UI, 미니맵
-- **그래픽/비주얼**: URP Volume 포스트프로세싱(Bloom, Color Adjustments) + SSAO 적용, 빌드 프리뷰/셀 커서/이동·공격 명령 포인터는 전용 레이어 + 오버레이 카메라로 포스트프로세싱 미적용 처리, 3rd-party 유닛/건물 모델링 에셋(Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox) 임포트 및 Built-in → URP 머티리얼 변환 완료(게임플레이 프리팹에 실제 모델 적용은 아직 로드맵)
+- **그래픽/비주얼**: URP Volume 포스트프로세싱(Bloom, Color Adjustments) + SSAO 적용, 빌드 프리뷰/셀 커서/이동·공격 명령 포인터는 전용 레이어 + 오버레이 카메라로 포스트프로세싱 미적용 처리, 3rd-party 유닛/건물 모델링 에셋(Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox) 임포트 및 Built-in → URP 머티리얼 변환 완료(게임플레이 프리팹 적용은 병영 건물 1개만 시작, 나머지는 로드맵)
 
 > 스크립트별 상세 동작 방식은 위 표의 [`Docs/`](Docs) 링크를 참고하세요. 요청 단위의 작업 로그(요청 내용, 코드 변경 전/후, 기능 설계 노트 포함)는 [`doc/`](doc) 폴더에 `0001-`부터 번호순으로 정리되어 있습니다.
 
@@ -139,6 +151,15 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 아군 유닛 우클릭 시 계속 따라다니기("Follow") — Idle 상태 유지로 도중에 만나는 적은 자동 교전, 대상과의 거리가 두 유닛 반경 합만큼 가까워지면 정지(지상/공중 모두 유닛 크기 비례로 밀어붙이거나 겹치지 않게 계산)
 - [x] 일꾼의 "건물 건설" 동작 — 일꾼이 현장으로 이동해 `BaseStructure`(건설 중 건물 기반)에 붙어서 건설 진행(아래 "건설 진행 시스템" 참고), 건설 중엔 다른 명령 불가. 현장 도착 전 다른 명령으로 취소되거나 이동 중 사망해도 건물 가격 전액 환불
 - [x] 유닛 사망 시 자신이 차지하던 인구수를 현재 인구수에서 자동 반환
+- [x] 생산 가능 건물 자동 분류 — `UnitDataSO`에 `tier`(0=본진/1=병영/2=공장/3=우주공항) 값만 지정하면 코드 수정 없이 해당 건물 생산 패널에 자동으로 나타남
+- [x] 유닛 스탯 자가 동기화 — 유닛이 스폰 시 `Start()`에서 자기 `unitID`로 `UnitDataSO`를 직접 조회해 체력/공격력/사거리/공격속도/아이콘/장갑·크기 타입을 스스로 적용, 생산 큐를 거쳤든 씬에 직접 배치됐든 항상 적용됨
+- [x] 신규 유닛 2종 추가 — Sharpshooter(저격수, 병영), SkyLancer(스카이랜서, 공장), 둘 다 특정 장갑 타입 상대 고유 추가 데미지 보유
+
+### 데미지 시스템
+- [x] 장갑 타입(경장갑/중장갑) × 크기 타입(소형/중형/대형) × 공격 방식(소총/폭발/레이저/화염) 3축 분류
+- [x] 공격 방식별 대상 크기 데미지 배율표 — `DamageMultiplierTableSO` 에셋으로 코드와 분리, 인스펙터에서 밸런스 조정 가능(기본값: 소총 100/80/60%, 폭발 70/100/130%, 레이저 100/100/100%, 화염 130/100/60%)
+- [x] 유닛별 고유 장갑타입 추가 데미지(%) — 예: 저격수 vs 중장갑 +80%, 스카이랜서 vs 경장갑 +50%, 파이어호크 vs 경장갑 +30%, 가디언 드론 vs 중장갑 +40%
+- [x] 최종 데미지 계산 순서: `공격력(연구 보너스 포함) × 크기배율 × 고유보너스배율 → 반올림 → 대상 고정방어력 감산 → 최소 1 보장`
 
 ### 건물 / 생산
 - [x] 건물 배치(그리드 기반, 배치 가능 여부 판정)
@@ -183,11 +204,16 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 다각형 영토(`TerritoryZone`) — 인스펙터 핀 개수 조절만으로 자동 생성/정리, 오목 다각형 판정 가능, 소유자별 외곽선 색 자동 전환(흰/초록/빨강), 여러 영토 등록/질의(`TerritoryManager`, 겹치면 합집합)
 - [x] 영토 기반 게임플레이 제한 — 건물 배치는 그리드 칸 전부가 아군 영토 안일 때만 가능(프리뷰 자동 빨간색), 자원 채취는 영토 밖 노드 신규 채취 불가 + 채취 중 영토 상실 시 즉시 중단, 유닛 생산은 영토 밖이면 대기열 유지한 채 타이머만 정지, 건설 진행(`BaseStructure`)도 영토 밖이면 일시정지
 
+### 전장의 안개 (Fog of War)
+- [x] 3rd-party 플러그인 `csFogWar`(`AssetFolder/AOSFogWar/`) 연동 — `FogRevealerAgent`를 유닛/건물 프리팹에 부착해 시야 소스로 등록/해제(기존 컨트롤러는 안 건드리는 어댑터 방식)
+- [x] 아군이 점령한 `TerritoryZone` 내부는 시야 소스가 없어도 항상 밝게 강제 반영(`TerritoryFogReveal`), 점령이 풀리면 자연히 다시 안개가 낌
+- [x] 유닛/건물 전체(9종+6종) 및 `BaseStructure`(건설 중 건물)까지 시야 소스로 연결 완료
+
 ### 그래픽 / 비주얼
 - [x] URP Volume 포스트프로세싱 — Bloom(붉은끼 tint), Color Adjustments(대비/노출 보정), Tonemapping은 현재 None
 - [x] Screen Space Ambient Occlusion(SSAO) — URP Renderer Feature로 적용
 - [x] 빌드 프리뷰 고스트/셀 커서/유닛 이동·공격 명령 포인터는 전용 레이어(`Indicators`) + 오버레이 카메라(`Indicator Camera`, Depth Only + PostProcessing 끔)로 분리해 포스트프로세싱(Bloom/Color Adjustments)이 적용되지 않도록 처리
-- [x] 3rd-party 유닛/건물/자연 모델링 에셋 임포트 — Canopus-III Low-Poly Sci-Fi Desert Units Set, Yoge Stylized Nature, Animated Sun Skybox, TZ_Futuristic Panel Textures Lite, LowPolyWater_Pack, 전부 Built-in RP 셰이더로 제작돼 있던 것을 URP(Lit/Unlit)로 변환해 마젠타/핑크 깨짐 해결(게임플레이 유닛/건물 프리팹에 실제 모델을 적용하는 작업은 아직 로드맵)
+- [x] 3rd-party 유닛/건물/자연 모델링 에셋 임포트 — Canopus-III Low-Poly Sci-Fi Desert Units Set, Yoge Stylized Nature, Animated Sun Skybox, TZ_Futuristic Panel Textures Lite, LowPolyWater_Pack, 전부 Built-in RP 셰이더로 제작돼 있던 것을 URP(Lit/Unlit)로 변환해 마젠타/핑크 깨짐 해결(게임플레이 유닛 프리팹은 아직 전부 기본 프리미티브 메시, 건물 프리팹은 병영에 실제 모델 1개 적용 시작 — 나머지 적용은 로드맵)
 - [x] 1스테이지 맵 복원 — `TestScene` 씬 + `Mission1` 프리팹(YuME 타일맵 기반, `Layer1`/`Layer2` 태그로 언덕 단 구분), 게임 분위기/색감 확인용 프로토타입(`Mission2~5` 프리팹은 아직 미사용, 캠페인 맵은 추후 별도 제작 예정)
 
 ### UI
@@ -206,14 +232,15 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 
 ## 로드맵 (미구현)
 
-- [ ] 유닛/건물 모델링 실제 적용 — 3rd-party 에셋(Canopus-III, Yoge) 임포트 및 URP 머티리얼 변환은 완료됐지만, 게임플레이 유닛/건물 프리팹(`prefabs/NTA/`)은 아직 기본 프리미티브 메시(캡슐/큐브/구)를 그대로 사용 중 — 실제 모델 교체는 남은 작업
+- [ ] 유닛/건물 모델링 실제 적용 — 3rd-party 에셋(Canopus-III, Yoge) 임포트 및 URP 머티리얼 변환은 완료됐고 건물 쪽엔 실제 모델 1개(병영의 레이더 초소) 적용을 시작했지만, 유닛 프리팹(`prefabs/NTA/Unit/`)은 전부 아직 기본 프리미티브 메시(캡슐/큐브/구) 그대로 — 나머지 실제 모델 교체는 남은 작업
 - [ ] 사망 시 래그돌/사망 애니메이션 — 현재는 사망 즉시 `Destroy(gameObject)` + 파티클 스폰만 지원(옵션 A), 오브젝트를 유지한 채 애니메이션 재생 후 지연 파괴하는 구조(옵션 B, doc/0105 3.5절)는 미구현
-- [ ] 전장의 안개(Fog of War) 구현 — 설계 + 제안 코드는 [`doc/0069`](doc/0069-fog-of-war-design.md)에 정리돼 있으나 실제 `Assets/Scripts` 반영은 아직 승인 대기 상태
-- [ ] Enemy AI 구현 — `EnemyController`는 현재 마커/아이콘/공격력·방어력 데이터만 갖고 있고, 실제로 공격하거나 이동하는 AI 로직은 없음(플레이어 유닛이 일방적으로 공격하는 대상)
-- [ ] 유닛/건물 사운드, 사운드 매니저
-- [ ] 메인 화면, 설정창 UI
+- [ ] Enemy AI 구현 — `EnemyController`는 현재 마커/아이콘/공격력·방어력 데이터만 갖고 있고, 실제로 공격하거나 이동하는 AI 로직은 없음(플레이어 유닛이 일방적으로 공격하는 대상), 1대1 AI도 별도 구상 필요
+- [ ] 유닛/건물 사운드, 사운드 매니저 — 전용 시스템 없음(`EffectPlayer`가 스폰하는 이펙트 프리팹에 `AudioSource`가 붙어있으면 같이 재생되는 부수 효과뿐)
+- [ ] 메인 화면, 설정창 UI — 현재 씬은 `SampleScene`/`TestScene`뿐, 별도 메뉴/설정 씬 없음
 - [ ] UI 버튼 하단 이미지 등 비주얼 개선
 - [ ] `AttackRange`의 자동 사거리 탐지가 `BaseStructure`(건설 중인 건물)를 대상으로 삼는 경로 — 현재는 A 모드 강제 공격(오인사격 포함)으로만 공격 가능하고, 자동 교전 대상에는 포함되지 않음
+- [ ] 캠페인 맵/스테이지 구성 — 0~5 메인 스테이지 + 서브 스테이지 약 4개 기획 예정, `Mission2~5` 프리팹은 존재하지만 아직 어느 씬에서도 사용되지 않음(1스테이지 `Mission1`만 분위기 확인용 프로토타입으로 사용 중)
+- [ ] 지원기(Support Ship) 유닛 — 공격 없이 주변 아군 버프를 주는 티어3 유닛으로 구상 중, 프리팹/SO 데이터/버프 시스템 전부 미착수
 
 ## UI 설계 노트 (기획 원문 정리)
 
@@ -281,8 +308,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | 유닛 명령(Worker 전용) | 자원 반환 R · 건설모드 진입 B |
 | 건설모드(건물 선택) | 사령부 C · 보급고 S · 병영 B · 공장 F · 우주공항 P · 연구소 L · 건설모드 나가기 T |
 | 생산(메인기지) | 일꾼 W |
-| 생산(병영) | 어썰트 트루퍼 A · 스카웃 드론 S |
-| 생산(공장) | 레인저 IFV I · 펄스 탱크 P |
+| 생산(병영) | 어썰트 트루퍼 A · 스카웃 드론 S · Sharpshooter S (스카웃 드론과 단축키 중복 — 조정 필요) |
+| 생산(공장) | 레인저 IFV I · 펄스탱크 P · SkyLancer S |
 | 생산(공항) | 파이어호크 F · 가디언 드론 D |
 | `BaseStructure` 선택 시 | 건설 취소(환불) T |
 | 건물 선택(지상) | 리프트(이륙) L |
