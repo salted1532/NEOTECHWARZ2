@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 117040090842538675}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.098, y: -0.485, z: 1.299}
+  m_LocalPosition: {x: 0.008, y: -0.485, z: 1.299}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -332,37 +332,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &3758534610561616366
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4621746123084675537}
-  m_Layer: 6
-  m_Name: FirePos (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4621746123084675537
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3758534610561616366}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.097, y: -0.485, z: 1.299}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 768760043591592085}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3840408542556960036
 GameObject:
   m_ObjectHideFlags: 0
@@ -629,6 +598,7 @@ GameObject:
   - component: {fileID: 1368692939571230335}
   - component: {fileID: 9056132140947804330}
   - component: {fileID: -7218591119231241375}
+  - component: {fileID: 1471125879285909424}
   m_Layer: 6
   m_Name: Firehawk
   m_TagString: AttackUnit
@@ -650,7 +620,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7977086520093529377}
-  - {fileID: 4621746123084675537}
   - {fileID: 6456954103525794244}
   - {fileID: 74508636468665617}
   - {fileID: 781083850700746058}
@@ -823,7 +792,6 @@ MonoBehaviour:
   muzzlePrefab: {fileID: 1207662428487738, guid: cb32a3bff9f94d14bb98fdeb2db37856, type: 3}
   firePoints:
   - {fileID: 7977086520093529377}
-  - {fileID: 4621746123084675537}
   moveTrailPrefab: {fileID: 100002, guid: 6eb61d053ef59c741b08db039096149c, type: 3}
   moveTrailPoints:
   - {fileID: 6456954103525794244}
@@ -880,6 +848,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
   sightRange: 15
   updateOnlyOnMove: 1
+--- !u!114 &1471125879285909424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c286447ac98c8842b6da1f784de305d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LaserBeamAttack
+  laserBeamPrefab: {fileID: 1844130978594048, guid: b03ba3d7e534252418f427a739edc54b, type: 3}
+  firePoint: {fileID: 7977086520093529377}
+  beamDuration: 0.2
 --- !u!1 &7366345836310019418
 GameObject:
   m_ObjectHideFlags: 0

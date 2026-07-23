@@ -630,6 +630,7 @@ GameObject:
   - component: {fileID: -2382422543791111256}
   - component: {fileID: 1803068245205877688}
   - component: {fileID: -8613221060162932851}
+  - component: {fileID: 5833095929246735317}
   m_Layer: 6
   m_Name: Scout Drone
   m_TagString: AttackUnit
@@ -899,6 +900,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
   sightRange: 15
   updateOnlyOnMove: 1
+--- !u!114 &5833095929246735317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c286447ac98c8842b6da1f784de305d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LaserBeamAttack
+  laserBeamPrefab: {fileID: 1844130978594048, guid: b03ba3d7e534252418f427a739edc54b, type: 3}
+  firePoint: {fileID: 8636099856678386046}
+  beamDuration: 0.2
 --- !u!1 &8287700491229270693
 GameObject:
   m_ObjectHideFlags: 0

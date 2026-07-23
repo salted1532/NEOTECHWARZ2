@@ -840,6 +840,7 @@ public class UnitController : MonoBehaviour, IDestructible
             int finalDamage = CalculateFinalDamage(enemy, targetArmor);
             targetHealth.GetDamage(finalDamage, transform.position, attackType); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
             GetComponent<UnitEffects>()?.PlayAttack();
+            GetComponent<LaserBeamAttack>()?.Fire(enemy.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0218)
         }
 
         alreadyAttacked = true;
