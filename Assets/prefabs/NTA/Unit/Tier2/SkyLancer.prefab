@@ -880,6 +880,8 @@ MonoBehaviour:
   attackType: 1
   armorType: 1
   sizeType: 1
+  canAttackGround: 1
+  canAttackAir: 1
   bonusVersusArmorType: 0
   bonusVersusArmorPercent: 50
   moveSpeed: 10
@@ -946,7 +948,7 @@ MonoBehaviour:
   hitEffects:
     bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
     explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
-    laserHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    laserHitPrefab: {fileID: 1207662428487738, guid: cb32a3bff9f94d14bb98fdeb2db37856, type: 3}
     flameHitPrefab: {fileID: 100014, guid: 04876b7e195a7624ab34f532e53c64cb, type: 3}
   deathPrefab: {fileID: 1000013462590818, guid: 900b6a17c4205f844af8859f493b8caa, type: 3}
   deathPoints:
