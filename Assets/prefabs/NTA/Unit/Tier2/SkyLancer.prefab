@@ -1363,11 +1363,43 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2984487255201645593, guid: c55516cf991686047b668d094e532159, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5944170514141848326}
   m_SourcePrefab: {fileID: 100100000, guid: c55516cf991686047b668d094e532159, type: 3}
+--- !u!1 &488748714602408680 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2984487255201645593, guid: c55516cf991686047b668d094e532159, type: 3}
+  m_PrefabInstance: {fileID: 3432698414557015793}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5944170514141848326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488748714602408680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba4c991f307d574494cfa8c5bef0734, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretController
+  rotationSpeed: 360
+  recoilPart: {fileID: 3395365437594503870}
+  recoilLocalOffset: {x: 0, y: 0, z: -0.3}
+  recoilDuration: 0.08
+  recoilReturnDuration: 0.18
+  recoilEase: 6
+  recoilReturnEase: 27
 --- !u!4 &2105343564531954238 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3644762111632170191, guid: c55516cf991686047b668d094e532159, type: 3}
+  m_PrefabInstance: {fileID: 3432698414557015793}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3395365437594503870 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 53383372902376527, guid: c55516cf991686047b668d094e532159, type: 3}
   m_PrefabInstance: {fileID: 3432698414557015793}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8255961684045628646

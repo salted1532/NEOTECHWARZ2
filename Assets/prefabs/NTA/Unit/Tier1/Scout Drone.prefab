@@ -1065,12 +1065,39 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5934031178726573792, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4163288795476949780}
+    - targetCorrespondingSourceObject: {fileID: 5873319629362500504, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7778007742589532859}
   m_SourcePrefab: {fileID: 100100000, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
 --- !u!4 &1282244074593265877 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6418255393187126362, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
   m_PrefabInstance: {fileID: 5249309816792052879}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1827179842578638615 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5873319629362500504, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
+  m_PrefabInstance: {fileID: 5249309816792052879}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7778007742589532859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1827179842578638615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba4c991f307d574494cfa8c5bef0734, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretController
+  rotationSpeed: 360
+  recoilPart: {fileID: 3096129068121122610}
+  recoilLocalOffset: {x: 0, y: 0, z: -0.3}
+  recoilDuration: 0.08
+  recoilReturnDuration: 0.18
+  recoilEase: 6
+  recoilReturnEase: 27
 --- !u!1 &1909705040148001391 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5934031178726573792, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
@@ -1091,6 +1118,11 @@ MonoBehaviour:
   shakeStrength: 0.03
   vibrato: 15
   shakeCycleDuration: 0.2
+--- !u!4 &3096129068121122610 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7074842257861546941, guid: bab45442ccf06ee4c900ed7f424eefcc, type: 3}
+  m_PrefabInstance: {fileID: 5249309816792052879}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6829718026811034640
 PrefabInstance:
   m_ObjectHideFlags: 0

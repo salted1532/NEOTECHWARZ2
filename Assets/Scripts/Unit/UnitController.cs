@@ -112,6 +112,10 @@ public class UnitController : MonoBehaviour, IDestructible
     private int carryingAmount;
     private ResourceType carryingType;
 
+    // 차량형 유닛의 포탑(자식 오브젝트에 TurretController가 붙어있으면 세팅됨, 없으면 null - 일반 유닛은 영향 없음).
+    // 있으면 Attack()이 몸체 회전(RotateYOnly)을 건너뛰고 포탑이 대신 조준하며, 데미지가 들어갈 때 반동을 재생한다.
+    private TurretController turretController;
+
     private RTSUnitController rtsController;   // 기존 Start()에서 지역변수였던 것을 필드로 승격
 
     [SerializeField] 
@@ -189,6 +193,7 @@ public class UnitController : MonoBehaviour, IDestructible
     {
         isWorker = CompareTag("Worker");
         attackRange = GetComponentInChildren<AttackRange>();
+        turretController = GetComponentInChildren<TurretController>();
 
         if (!isAirUnit)
         {
@@ -782,6 +787,9 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public EnemyController GetOrderedTarget() => orderedTarget;
 
+    // TurretController가 조준 대상을 물어볼 때 쓰는 AttackRange 접근자.
+    public AttackRange GetAttackRange() => attackRange;
+
     // 아군 강제공격 중인지 (AttackRange가 다른 적으로 대상을 가로채지 않도록 확인하는 데 쓴다).
     public bool HasFriendlyOrder => hasFriendlyOrder;
 
@@ -818,7 +826,8 @@ public class UnitController : MonoBehaviour, IDestructible
             isMovingAirUnit = false;
         }
 
-        RotateYOnly(end);
+        if (turretController == null)
+            RotateYOnly(end); // 포탑 유닛(turretController != null)은 몸체를 안 돌린다 - 포탑이 대신 조준한다 (doc/0219)
 
 
         if (alreadyAttacked)
@@ -841,6 +850,7 @@ public class UnitController : MonoBehaviour, IDestructible
             targetHealth.GetDamage(finalDamage, transform.position, attackType); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
             GetComponent<UnitEffects>()?.PlayAttack();
             GetComponent<LaserBeamAttack>()?.Fire(enemy.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0218)
+            turretController?.FireRecoil(); // 포탑 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0219)
         }
 
         alreadyAttacked = true;
