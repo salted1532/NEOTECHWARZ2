@@ -75,10 +75,21 @@ public class AttackRange : MonoBehaviour
         }
     }
 
-    // 포탑 등 "조준만 하고 공격 여부는 별개로 판단하는" 스크립트가 쓴다. 실제 공격 가능 상태(Idle/Attack)와
-    // 무관하게 사거리 내 우선순위 대상을 그대로 반환한다 - 이동 명령 중에도(Move 상태라 자동 공격은 안 나가도)
-    // 포탑은 눈에 보이는 적을 계속 쳐다봐야 하므로.
-    public GameObject GetTrackingTarget() => GetPreferredTarget();
+    // 포탑 등 "조준만 하고 공격 여부는 별개로 판단하는" 스크립트가 쓴다. GetPreferredTarget()과 달리 명시
+    // 지정된 대상(아군 강제공격/적 추격 지정)이 있으면 사거리 트리거 안에 실제로 들어왔는지와 무관하게
+    // 그 대상을 그대로 돌려준다 - 공격 명령을 내리는 순간 포탑이 바로 그쪽을 보게 하기 위해서(추격 중이라
+    // 아직 사거리 밖이어도 미리 조준). 지정 대상이 아예 없을 때만(패시브 대기 상태) 사거리 내 최근접 적으로 대체한다.
+    public GameObject GetTrackingTarget()
+    {
+        if (unitController.HasFriendlyOrder)
+            return unitController.GetFriendlyTargetObject();
+
+        EnemyController ordered = unitController.GetOrderedTarget();
+        if (ordered != null)
+            return ordered.gameObject;
+
+        return GetClosestEnemy();
+    }
 
     // 명시적으로 지정된 추격 대상(우클릭/A 모드)이 있으면 다른 적은 전부 무시하고 오직 그 대상만 선택한다
     // (트리거 안에 아직 없으면 이번 프레임엔 대상 없음 - 다른 적으로 대체하지 않는다).

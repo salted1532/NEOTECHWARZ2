@@ -787,6 +787,10 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public EnemyController GetOrderedTarget() => orderedTarget;
 
+    // TurretController(AttackRange.GetTrackingTarget())가 아군 강제공격 대상을 조회할 때 쓴다.
+    // friendlyTarget 자체는 UnitController/BuildingController 겸용 MonoBehaviour라 비공개로 두고 GameObject만 노출.
+    public GameObject GetFriendlyTargetObject() => friendlyTarget != null ? friendlyTarget.gameObject : null;
+
     // TurretController가 조준 대상을 물어볼 때 쓰는 AttackRange 접근자.
     public AttackRange GetAttackRange() => attackRange;
 

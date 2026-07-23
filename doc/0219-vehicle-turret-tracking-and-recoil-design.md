@@ -144,7 +144,45 @@ public AttackRange GetAttackRange() => attackRange;
    - 데미지 적용 블록의 기존 `UnitEffects`/`LaserBeamAttack` 훅 옆에 `turretController?.FireRecoil();` 추가.
    - `public AttackRange GetAttackRange() => attackRange;` 게터 추가.
 
-### 7. 남은 수동 작업 (Unity 에디터)
+### 7-1. 버그 수정 — 포탑이 공격/이동 중 전혀 조준을 안 함
+
+**증상**: "공격 중에도 포탑이 적을 안 쳐다봄, 이동 중 사거리 안에 적이 있어도 안 쳐다봄" (두 상태 다 동일하게 실패).
+
+**원인**: `TurretController.Awake()`가 `unitController.GetAttackRange()`로 `AttackRange` 참조를 가져오는데, 이 값은
+`UnitController.Awake()`가 먼저 실행되어 `attackRange` 필드를 채워둬야 유효함. Unity는 **서로 다른 GameObject에 붙은
+컴포넌트들의 `Awake()` 호출 순서를 보장하지 않으므로**, Turret(자식 오브젝트)의 `Awake()`가 몸체(루트)
+`UnitController.Awake()`보다 먼저 실행되면 그 시점의 `attackRange`는 아직 `null`이고, `TurretController`는 그
+`null`을 그대로 캐싱해서 이후 영원히 조준을 못 함 — 공격/이동 상태 둘 다 같은 `attackRange`를 참조하니 증상이 동일하게 나타남.
+
+**수정**: `Assets/Scripts/Unit/TurretController.cs` — `AttackRange` 조회 코드를 `Awake()`에서 `Start()`로 이동.
+Unity는 씬의 모든 오브젝트의 `Awake()`가 끝난 뒤에만 `Start()`를 호출하는 걸 보장하므로, 이 시점엔
+`UnitController.attackRange`가 항상 채워져 있음. `recoilPart`/`recoilRestLocalPosition` 초기화(다른 오브젝트에
+의존하지 않음)는 그대로 `Awake()`에 남겨둠.
+
+### 7-2. 개선 — 아군 강제공격/지정 추격 대상은 사거리 무관하게 즉시 조준, 대상 없으면 정면으로 자연스럽게 복귀
+
+**요청**: "아군 공격이나 공격명령으로 특정 유닛을 공격하면 바로 그 유닛으로 포탑이 방향하도록 해줘. 적을 쳐다보다가
+사거리 범위 밖으로 나가면 원래 위치로 자연스럽게 돌아오도록."
+
+**문제였던 부분**:
+- 기존 `GetTrackingTarget()`이 `GetPreferredTarget()`을 그대로 재사용했는데, 이 메서드는 (1) 아군 강제공격
+  중(`HasFriendlyOrder`)이면 무조건 `null` 반환, (2) 지정 추격 대상(`orderedTarget`)이 있어도 `AttackRange`의
+  트리거 콜라이더 안(`enemiesInRange`)에 실제로 들어와 있어야만 반환 — 즉 추격해서 다가가는 중에는 포탑이 아직
+  조준을 못 함.
+- 대상이 사라지면(`target == null`) 그냥 `return`으로 끝나서 포탑이 마지막으로 봤던 방향에 그대로 멈춰 있었음.
+
+**수정**:
+1. `Assets/Scripts/Unit/AttackRange.cs` — `GetTrackingTarget()`을 `GetPreferredTarget()` 재사용 대신 독립 구현으로 교체:
+   아군 강제공격 대상(`unitController.GetFriendlyTargetObject()`, 신규) 또는 지정 추격 대상(`GetOrderedTarget()`)이
+   있으면 사거리 트리거 안에 들어왔는지와 무관하게 그 대상을 그대로 반환하고, 둘 다 없을 때만(패시브 대기)
+   사거리 내 최근접 적(`GetClosestEnemy()`)으로 대체.
+2. `Assets/Scripts/Unit/UnitController.cs` — `friendlyTarget`(private) 조회용 `GetFriendlyTargetObject()` 게터 추가.
+3. `Assets/Scripts/Unit/TurretController.cs` — `Awake()`에서 `restLocalRotation`(포탑의 원래 로컬 회전, 보통 정면)을
+   캐싱해두고, `Update()`에서 target이 없으면 `transform.parent.rotation * restLocalRotation`(몸체가 이동 중
+   방향을 틀어도 그 기준으로 갱신되는 "몸체 정면")을 목표 회전으로 삼아 기존과 동일한 `rotationSpeed`로
+   `RotateTowards` — 별도의 "복귀 중" 상태 없이 조준/복귀가 자연스럽게 하나의 로직으로 이어짐.
+
+### 7-3. 남은 수동 작업 (Unity 에디터)
 4절 그대로: 포탑을 쓸 유닛 프리팹의 Turret 오브젝트에 `TurretController` 컴포넌트를 추가하고, `Recoil Part`에 포신
 오브젝트를 할당한 뒤 `Rotation Speed`/반동 값들을 원하는 대로 조정. 플레이 모드에서 적이 사거리에 들어왔을 때
 포탑이 몸체보다 빠르게 돌아가는지, 이동 명령 중엔 몸체만 돌고 포탑은 계속 적을 쳐다보기만 하는지, 공격 시

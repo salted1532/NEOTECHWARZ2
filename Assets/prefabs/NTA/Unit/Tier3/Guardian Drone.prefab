@@ -267,11 +267,11 @@ Transform:
   m_GameObject: {fileID: 3495685422672553209}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.563, z: 2.907}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0.6074999, z: 3.7675}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 768760043591592085}
+  m_Father: {fileID: 7772527636050111073}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3818901384042885175
 GameObject:
@@ -950,7 +950,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8969036317305992285}
   - {fileID: 2090812934896102312}
   - {fileID: 2796212138661668246}
   - {fileID: 8168545361100734034}
@@ -1541,7 +1540,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5718745175873122126, guid: 746b62adb229e26418b5af4cc91d0dcf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8969036317305992285}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3420214958373469289, guid: 746b62adb229e26418b5af4cc91d0dcf, type: 3}
       insertIndex: -1
