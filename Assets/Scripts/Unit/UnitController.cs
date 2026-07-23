@@ -39,6 +39,11 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField] private ArmorType armorType = ArmorType.Light;
     [SerializeField] private SizeType sizeType = SizeType.Medium;
 
+    // 이 유닛이 "공격할 때" 적용되는 제한 - 지상/공중 유닛을 각각 공격할 수 있는지
+    // (UnitDataSO.canAttackGround/canAttackAir가 ApplyUnitData에서 그대로 반영됨). 둘 다 기본 true(제한 없음).
+    [SerializeField] private bool canAttackGround = true;
+    [SerializeField] private bool canAttackAir = true;
+
     [Header("고유 추가 데미지 (해당 없으면 Percent를 0으로 둘 것)")]
     [Tooltip("이 유닛이 특정 장갑 타입 상대로만 추가 데미지를 줄 때 설정 (예: 저격수 = Heavy, 80)")]
     [SerializeField] private ArmorType bonusVersusArmorType = ArmorType.Light;
@@ -469,6 +474,9 @@ public class UnitController : MonoBehaviour, IDestructible
     // 특정 적 유닛을 추격하여 공격한다 (우클릭 적 클릭 / A 모드에서 적 클릭).
     // 대상이 살아있는 한 매 프레임 최신 위치를 쫓아가고(AttackOrderTick), 사거리 안에 들어오면
     // AttackRange가 자동으로 공격을 실행한다.
+    // 참고: EnemyController에는 아직 공중 여부 개념이 없어(모든 적이 암묵적으로 지상 취급) 여기서는
+    // canAttackAir 차단을 적용하지 않는다. EnemyController에 isAirUnit이 추가되면(추후 작업)
+    // AttackFriendlyTarget과 동일한 패턴으로 CanAttackDomain(target.IsAirUnit()) 체크를 추가할 것.
     public void AttackUnitTarget(EnemyController target)
     {
         if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
@@ -517,6 +525,13 @@ public class UnitController : MonoBehaviour, IDestructible
     {
         if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
 
+        bool targetIsAir = IsAirborne(target);
+        if (!CanAttackDomain(targetIsAir))
+        {
+            Debug.Log($"{name}: 이 유닛은 {(targetIsAir ? "공중" : "지상")} 대상을 공격할 수 없습니다.");
+            return;
+        }
+
         CancelGatheringForNewCommand();
 
         orderedTarget = null;
@@ -530,7 +545,7 @@ public class UnitController : MonoBehaviour, IDestructible
         arrived = false;
         UnitcurrentState = UnitState.Attack;
 
-        MoveAgentTo(target.transform.position, IsAirborne(target));
+        MoveAgentTo(target.transform.position, targetIsAir);
     }
 
     // 아군 강제 공격을 매 프레임 갱신한다: 사거리 안이면 공격하고, 아니면 거리 제한 없이 계속 추격한다.
@@ -809,6 +824,15 @@ public class UnitController : MonoBehaviour, IDestructible
         if (alreadyAttacked)
             return;
 
+        bool targetIsAir = IsTargetAirborne(enemy);
+        if (!CanAttackDomain(targetIsAir))
+        {
+            // 쿨다운(alreadyAttacked)은 건드리지 않는다 - 대상이 다시 공격 가능한 도메인으로 돌아오면(예: 건물 착륙)
+            // 대기 없이 바로 다음 프레임에 공격을 재개할 수 있어야 하기 때문.
+            Debug.Log($"{name}: 이 유닛은 {(targetIsAir ? "공중" : "지상")} 대상을 공격할 수 없습니다.");
+            return;
+        }
+
         Debug.Log("공격성공!");
         if (enemy.TryGetComponent<HealthManager>(out var targetHealth))
         {
@@ -874,6 +898,20 @@ public class UnitController : MonoBehaviour, IDestructible
             return enemyUnit.GetArmorType();
 
         return ArmorType.Light;
+    }
+
+    // 공격 대상이 "지금" 공중 상태인지 조회한다. 건물은 이/착륙으로 실시간 바뀔 수 있어(BuildingController.IsLifted)
+    // 매 공격 사이클마다 다시 확인해야 한다 - 명령을 내린 시점에 캐싱해둔 값을 계속 쓰면 안 된다.
+    // EnemyController는 아직 공중 개념이 없어(doc/0213) 항상 지상(false)으로 취급한다.
+    private bool IsTargetAirborne(GameObject target)
+    {
+        if (target.TryGetComponent<UnitController>(out var friendlyUnit))
+            return friendlyUnit.IsAirUnit();
+
+        if (target.TryGetComponent<BuildingController>(out var building))
+            return building.IsLifted();
+
+        return false;
     }
 
     //공격 리셋
@@ -1365,6 +1403,10 @@ public class UnitController : MonoBehaviour, IDestructible
     public ArmorType GetArmorType() => armorType;
     public SizeType GetSizeType() => sizeType;
 
+    // 대상이 공중 유닛인지에 따라 이 유닛이 그 대상을 공격할 수 있는 도메인(지상/공중)인지 판정한다.
+    // (AttackUnitTarget/AttackFriendlyTarget의 명령 시점 차단, AttackRange의 자동 감지 필터링 양쪽에서 공용으로 사용)
+    public bool CanAttackDomain(bool targetIsAirUnit) => targetIsAirUnit ? canAttackAir : canAttackGround;
+
     // 생산 시점에 UnitDataSO의 값으로 전투 스탯(체력/공격력/사거리/아이콘/장갑타입/크기타입)을 덮어쓴다.
     // 프리팹 자체에 미리 박아둔 값은 인스펙터 프리뷰/테스트용 기본값 역할만 하고, 실제로 생산되어 스폰된
     // 유닛은 이 메서드를 통해 UnitDataSO 값을 반영받는다 (UnitSpawner.Spawn()에서 호출).
@@ -1378,6 +1420,8 @@ public class UnitController : MonoBehaviour, IDestructible
         armorType = data.armorType;
         sizeType = data.sizeType;
         timeBetweenAttacks = data.attackSpeed;
+        canAttackGround = data.canAttackGround;
+        canAttackAir = data.canAttackAir;
 
         if (attackRange != null)
             attackRange.UnitRange = data.attackRange;

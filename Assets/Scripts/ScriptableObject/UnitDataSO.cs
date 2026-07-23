@@ -52,6 +52,13 @@ public class UnitData
     [field: SerializeField]
     public float attackSpeed { get; private set; }
 
+    // 이 유닛이 지상/공중 유닛을 공격할 수 있는지. 기본값은 둘 다 true(기존 동작과 동일 - 제한 없음).
+    // 대공 사격이 불가능한 유닛은 canAttackAir를, 대지 공격이 불가능한 유닛은 canAttackGround를 false로.
+    [field: SerializeField]
+    public bool canAttackGround { get; private set; } = true;
+    [field: SerializeField]
+    public bool canAttackAir { get; private set; } = true;
+
     [field: SerializeField]
     public int mineral { get; private set; }
     [field: SerializeField]
