@@ -855,6 +855,7 @@ public class UnitController : MonoBehaviour, IDestructible
             GetComponent<UnitEffects>()?.PlayAttack();
             GetComponent<LaserBeamAttack>()?.Fire(enemy.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0218)
             turretController?.FireRecoil(); // 포탑 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0219)
+            GetComponent<UnitAnimatorDriver>()?.PlayFire(); // Animator가 있는 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0222)
         }
 
         alreadyAttacked = true;
