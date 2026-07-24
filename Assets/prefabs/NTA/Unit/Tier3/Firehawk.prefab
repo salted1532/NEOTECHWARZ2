@@ -1244,6 +1244,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7373335534411937334, guid: fe8a0da18c374d14aaaa1ad3ab2fb3e0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6668990055898895114}
+    - targetCorrespondingSourceObject: {fileID: 6174682936992191454, guid: fe8a0da18c374d14aaaa1ad3ab2fb3e0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5347078833008272231}
   m_SourcePrefab: {fileID: 100100000, guid: fe8a0da18c374d14aaaa1ad3ab2fb3e0, type: 3}
 --- !u!1 &4874858139828043429 stripped
 GameObject:
@@ -1270,6 +1273,30 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7861184017831505036, guid: fe8a0da18c374d14aaaa1ad3ab2fb3e0, type: 3}
   m_PrefabInstance: {fileID: 2735268529073571987}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8089944146026535757 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6174682936992191454, guid: fe8a0da18c374d14aaaa1ad3ab2fb3e0, type: 3}
+  m_PrefabInstance: {fileID: 2735268529073571987}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5347078833008272231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8089944146026535757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba4c991f307d574494cfa8c5bef0734, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretController
+  rotationSpeed: 360
+  recoilPart: {fileID: 0}
+  recoilLocalOffset: {x: 0, y: 0, z: -0.3}
+  recoilDuration: 0.08
+  recoilReturnDuration: 0.18
+  recoilEase: 6
+  recoilReturnEase: 27
 --- !u!1001 &6512661347697654272
 PrefabInstance:
   m_ObjectHideFlags: 0
