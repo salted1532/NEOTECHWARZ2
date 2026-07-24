@@ -23,14 +23,8 @@ public class UnitAnimatorDriver : MonoBehaviour
             return;
 
         animator.SetBool(IsMovingParam, unitController.IsCurrentlyMoving());
-    }
-
-    // UnitController.Attack()이 실제로 공격에 성공했을 때 호출한다 (doc/0222).
-    public void PlayFire()
-    {
-        if (animator == null)
-            return;
-
-        animator.SetTrigger(FireParam);
+        // 공격 중인 동안은 계속 true를 흘려보내 Fire 상태에 머무르게 한다 (doc/0225).
+        // 공격이 끝나면 false가 되어 애니메이터가 자체적으로 idle로 돌아간다.
+        animator.SetBool(FireParam, unitController.IsAttack());
     }
 }

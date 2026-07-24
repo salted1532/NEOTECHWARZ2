@@ -1522,6 +1522,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4916527176359590894, guid: 14c22f8bcb5d67d42a69fa2f1da0e9a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1684264685811951780}
+    - targetCorrespondingSourceObject: {fileID: 2822676650956924368, guid: 14c22f8bcb5d67d42a69fa2f1da0e9a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3239963744121813417}
     - targetCorrespondingSourceObject: {fileID: 4606500678799107036, guid: 14c22f8bcb5d67d42a69fa2f1da0e9a5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3656458715407154044}
@@ -1568,6 +1571,30 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5003575397805006506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba4c991f307d574494cfa8c5bef0734, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretController
+  rotationSpeed: 360
+  recoilPart: {fileID: 1122093613645081886}
+  recoilLocalOffset: {x: 0, y: 0, z: -0.3}
+  recoilDuration: 0.08
+  recoilReturnDuration: 0.18
+  recoilEase: 6
+  recoilReturnEase: 27
+--- !u!1 &6751458598115874982 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2822676650956924368, guid: 14c22f8bcb5d67d42a69fa2f1da0e9a5, type: 3}
+  m_PrefabInstance: {fileID: 8835454054443761014}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3239963744121813417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6751458598115874982}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ba4c991f307d574494cfa8c5bef0734, type: 3}
