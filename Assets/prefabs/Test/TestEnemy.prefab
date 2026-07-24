@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 9191480421945881482}
   - component: {fileID: -1181422328391644967}
   - component: {fileID: 7893471312712258934}
+  - component: {fileID: 3370982895530486659}
   m_Layer: 8
   m_Name: TestEnemy
   m_TagString: Enemy
@@ -38,6 +39,7 @@ Transform:
   m_Children:
   - {fileID: 88729584339966225}
   - {fileID: 4782059328379780972}
+  - {fileID: 5270652446994590752}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &5144879547453855001
@@ -112,7 +114,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -204,6 +206,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
   maxHealth: 100
   healthSlider: {fileID: 3378996217553183051}
+--- !u!114 &3370982895530486659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4698038001367890631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
+  muzzlePrefab: {fileID: 0}
+  firePoints: []
+  moveTrailPrefab: {fileID: 0}
+  moveTrailPoints: []
+  moveTrailRotationFollowSpeed: 6
+  moveTrailFastRotationThreshold: 90
+  moveTrailShrinkScale: 0.4
+  moveTrailShrinkLerpSpeed: 8
+  hitEffects:
+    bulletHitPrefab: {fileID: 100002, guid: 4372d15609961304da7ebb93600745f9, type: 3}
+    explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
+    laserHitPrefab: {fileID: 1207662428487738, guid: cb32a3bff9f94d14bb98fdeb2db37856, type: 3}
+    flameHitPrefab: {fileID: 100014, guid: 04876b7e195a7624ab34f532e53c64cb, type: 3}
+  deathPrefab: {fileID: 100014, guid: 04876b7e195a7624ab34f532e53c64cb, type: 3}
+  deathPoints:
+  - {fileID: 5270652446994590752}
 --- !u!1 &5286784239653861491
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,6 +325,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7709445644944964578
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5270652446994590752}
+  m_Layer: 8
+  m_Name: Deathpos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5270652446994590752
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7709445644944964578}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2406533709525597571}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &5346317996160539147
 PrefabInstance:
   m_ObjectHideFlags: 0
