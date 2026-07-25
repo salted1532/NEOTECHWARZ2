@@ -162,6 +162,21 @@ public class UIController : MonoBehaviour
     private const int BuildingLiftSlotIndex = 8;
     private static readonly HashSet<int> LiftSlotOnlyProtected = new HashSet<int> { BuildingLiftSlotIndex };
 
+    // 고급유닛 특성(트레이트) 선택으로 얻은 액티브 스킬 버튼의 고정 슬롯(doc/0228). BuildingLiftSlotIndex와
+    // 동일한 이유로 보호가 필요함 - RTSUnitController.UpdateUnitSkillUI()가 ShowAttackUnitPanel과는 별도로
+    // 매 프레임 독립적으로 이 슬롯만 갱신하므로, ShowAttackUnitPanel의 SetCommands가 이 슬롯을 건드리면
+    // (Clear→SetData가 같은 프레임에 반복되어) 단축키 클릭 시뮬레이션 코루틴이 끊길 수 있다.
+    private const int UnitSkillSlotIndex = 6;
+    private static readonly HashSet<int> UnitSkillSlotProtected = new HashSet<int> { UnitSkillSlotIndex };
+
+    // 고급유닛 특성(2택1) 선택 오버레이 "SkillSelect" (doc/0228). 커맨드 패널(slots[])과는 완전히 별개의
+    // 독립 UI 오브젝트 - order panel 위쪽에 겹쳐 보이도록 이미 배치되어 있음. 그래서 이 오버레이가 떠 있는
+    // 동안에도 이동/공격 등 기존 커맨드 패널 명령은 그대로(비모달) 사용할 수 있다.
+    [Header("Skill Trait Select Overlay (SkillSelect)")]
+    [SerializeField] private GameObject skillSelectPanel; // "SkillSelect" 루트 오브젝트
+    [SerializeField] private ProductionSlot[] skillSelectSlots; // Slot0=traitA(장점 극대화), Slot1=traitB(단점 보완)
+    [SerializeField] private float skillSelectVerticalMargin = 8f; // order panel 상단에서 얼마나 띄울지
+
     [Header("Command Icons (ShowWorkerPanel / ShowAttackUnitPanel)")]
     [SerializeField] private Sprite moveIcon;
     [SerializeField] private Sprite attackIcon;
@@ -257,6 +272,7 @@ public class UIController : MonoBehaviour
         HideProductionUI();
         HideInfoPanel();
         HideSquadPanel();
+        HideSkillSelectPanel();
         SetupSquadPageButtons();
         SetupInfoStatHoverTooltips();
     }
@@ -982,14 +998,33 @@ public class UIController : MonoBehaviour
     {
         CurrentState = UISelectionState.CombatUnit;
 
+        // UnitSkillSlotIndex(6)는 보호해서 여기서 건드리지 않는다 - RTSUnitController.UpdateUnitSkillUI()가
+        // ShowUnitSkillSlot()/ClearUnitSkillSlot()으로 독립적으로 관리한다 (doc/0228).
         SetCommands(
+            new CommandButtonData[]
+            {
+                new CommandButtonData(moveIcon, onMove),
+                new CommandButtonData(attackIcon, onAttack),
+                new CommandButtonData(stopIcon, onStop),
+                new CommandButtonData(patrolIcon, onPatrol),
+                new CommandButtonData(holdIcon, onHold)
+            },
+            UnitSkillSlotProtected);
+    }
 
-            new CommandButtonData(moveIcon, onMove),
-            new CommandButtonData(attackIcon, onAttack),
-            new CommandButtonData(stopIcon, onStop),
-            new CommandButtonData(patrolIcon, onPatrol),
-            new CommandButtonData(holdIcon, onHold)
-        );
+    // 특성(트레이트) 선택으로 얻은 액티브 스킬을 고정 슬롯(index 6)에 표시한다 (doc/0228).
+    // ShowAttackUnitPanel이 이 슬롯을 protectedSlotIndices로 보호하므로, 매 프레임 독립적으로 갱신해도
+    // Move/Attack 등 나머지 버튼과 간섭하지 않는다(BuildingLiftSlotIndex와 동일한 패턴).
+    public void ShowUnitSkillSlot(CommandButtonData data)
+    {
+        if (UnitSkillSlotIndex < slots.Length)
+            slots[UnitSkillSlotIndex]?.SetData(data);
+    }
+
+    public void ClearUnitSkillSlot()
+    {
+        if (UnitSkillSlotIndex < slots.Length)
+            slots[UnitSkillSlotIndex]?.Clear();
     }
 
     // Build mode
@@ -1046,6 +1081,67 @@ public class UIController : MonoBehaviour
                 new CommandButtonData(armorResearchIcon, onArmorResearch, armorInteractable)
             },
             LiftSlotOnlyProtected);
+    }
+
+    // Skill Trait Select Overlay ("SkillSelect", doc/0228)
+    // 고급유닛을 처음 선택했을 때(아직 특성을 안 골랐을 때) slot0=traitA/slot1=traitB에 카드를 채워 띄운다.
+    // 커맨드 패널(slots[])과 완전히 분리된 독립 오브젝트라 이 오버레이가 떠 있어도 이동/공격 등
+    // 기존 명령은 그대로 사용 가능하다(비모달).
+    public void ShowSkillSelectPanel(CommandButtonData traitA, CommandButtonData traitB)
+    {
+        if (skillSelectPanel != null)
+            skillSelectPanel.SetActive(true);
+
+        if (skillSelectSlots != null)
+        {
+            if (skillSelectSlots.Length > 0)
+                skillSelectSlots[0]?.SetData(traitA);
+            if (skillSelectSlots.Length > 1)
+                skillSelectSlots[1]?.SetData(traitB);
+        }
+
+        PositionSkillSelectAbovePanel();
+    }
+
+    public void HideSkillSelectPanel()
+    {
+        if (skillSelectPanel != null)
+            skillSelectPanel.SetActive(false);
+
+        if (skillSelectSlots != null)
+        {
+            for (int i = 0; i < skillSelectSlots.Length; i++)
+                skillSelectSlots[i]?.Clear();
+        }
+    }
+
+    // SkillSelect 오버레이를 커맨드 패널(panelRoot) 바로 위쪽 중앙에 붙인다. 화면 해상도나 커맨드 패널의
+    // 실제 배치가 달라져도 항상 맞게 뜨도록 보여줄 때마다 다시 계산한다 (예전에 이 오브젝트에 잘못 남아있던
+    // TooltipUI.PositionAboveTarget()과 동일한 방식 - 대상만 "호버 중인 버튼"에서 "panelRoot 고정"으로 바뀜, doc/0228).
+    // Canvas가 Screen Space - Overlay라 카메라 인자는 null로 충분하다.
+    private void PositionSkillSelectAbovePanel()
+    {
+        if (skillSelectPanel == null || panelRoot == null)
+            return;
+
+        RectTransform overlayRect = skillSelectPanel.transform as RectTransform;
+        RectTransform panelRect = panelRoot.transform as RectTransform;
+        RectTransform parentRect = overlayRect != null ? overlayRect.parent as RectTransform : null;
+
+        if (overlayRect == null || panelRect == null || parentRect == null)
+            return;
+
+        Vector3[] corners = new Vector3[4];
+        panelRect.GetWorldCorners(corners); // 0:bottom-left 1:top-left 2:top-right 3:bottom-right
+        Vector3 topCenterWorld = (corners[1] + corners[2]) * 0.5f;
+
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null, topCenterWorld);
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, screenPoint, null, out Vector2 localPoint))
+            return;
+
+        // 오버레이의 피벗이 중앙이라고 가정하고, 오버레이 절반 높이 + 여백만큼 위로 밀어 커맨드 패널과 겹치지 않게 한다.
+        localPoint.y += overlayRect.rect.height * 0.5f + skillSelectVerticalMargin;
+        overlayRect.anchoredPosition = localPoint;
     }
 
     // 건물 커맨드 패널의 고정 슬롯(BuildingLiftSlotIndex)에 리프트/착륙 버튼을 추가로 표시한다.

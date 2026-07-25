@@ -12,6 +12,15 @@ using static UnityEngine.GraphicsBuffer;
 // (UnitEffects가 이 값으로 총기/폭발형/레이저/화염 중 어떤 피격 이펙트를 재생할지 고른다).
 public enum AttackEffectType { Bullet, Explosive, Laser, Flame }
 
+// 고급유닛이 특성(트레이트) 선택으로 얻은 액티브 스킬의 실제 효과를 구현하는 컴포넌트가 구현하는 인터페이스.
+// 유닛 프리팹에 이 인터페이스를 구현한 MonoBehaviour(예: GoliathSkill.cs)를 붙이기만 하면
+// UnitController.UseTraitSkill()이 자동으로 찾아서 호출한다 - UnitController/RTSUnitController를
+// 건드리지 않고도 유닛별 스킬을 새로 추가/교체할 수 있게 하기 위한 연결점 (doc/0228).
+public interface IUnitSkill
+{
+    void Activate(UnitController unit, RTSUnitController.TraitChoice trait);
+}
+
 // 개별 유닛(일꾼/전투유닛/공중유닛 포함)의 이동, 전투, 순찰, 자원 채취(일꾼 전용) 상태머신을 담당하는 핵심 컴포넌트.
 // NavMeshAgent 기반 지상 이동과 직접 좌표 보간 기반 공중 이동을 모두 지원하며,
 // AttackRange가 사거리 내 적을 감지하면 이 컴포넌트의 Attack/ChaseTarget을 호출한다.
@@ -189,6 +198,11 @@ public class UnitController : MonoBehaviour, IDestructible
     private BaseStructure attachedStructure;
     private bool isConstructing;
 
+    // ===== 특성(트레이트) 스킬 - 고급유닛만 해당 (doc/0228) =====
+    // RTSUnitController.ChooseTrait()를 거쳐서만 채워짐 (유닛 종류 전체가 공유하는 선택이라 유닛 스스로 정하지 않음)
+    private RTSUnitController.TraitChoice currentTrait = RTSUnitController.TraitChoice.None;
+    private float skillCooldownRemaining;
+
     private void Awake()
     {
         isWorker = CompareTag("Worker");
@@ -224,6 +238,12 @@ public class UnitController : MonoBehaviour, IDestructible
         // 생산 큐를 거쳤든 씬에 직접 배치됐든, 어떤 경로로 만들어진 인스턴스든 항상 자기 unitID로
         // UnitDataSO를 조회해서 스스로 스탯을 적용한다 (UnitSpawner가 밖에서 push하던 방식 대체).
         ApplyUnitData(rtsController.GetUnitData(unitID));
+
+        // 이 유닛 종류가 이미 특성을 선택한 상태라면(예전에 다른 개체가 먼저 골랐음) 새로 생산된
+        // 이 유닛에도 자동으로 같은 선택을 적용한다 (doc/0228 - "모든 같은 유닛에 적용").
+        RTSUnitController.TraitChoice chosenTrait = rtsController.GetChosenTrait(unitID);
+        if (chosenTrait != RTSUnitController.TraitChoice.None)
+            ApplyTrait(chosenTrait);
     }
 
     // Update is called once per frame
@@ -292,6 +312,9 @@ public class UnitController : MonoBehaviour, IDestructible
                 attackMoveDestination = null;
             }
         }
+
+        if (skillCooldownRemaining > 0f)
+            skillCooldownRemaining -= Time.deltaTime;
 
         GatherTick();
         PatrolTick();
@@ -1442,5 +1465,36 @@ public class UnitController : MonoBehaviour, IDestructible
             attackRange.UnitRange = data.attackRange;
 
         GetComponent<HealthManager>()?.InitializeHealth(data.hp);
+    }
+
+    // ======================
+    // 특성(트레이트) 스킬 (doc/0228) - 실제 효과는 유닛별 IUnitSkill 구현체에 위임
+    // ======================
+    public RTSUnitController.TraitChoice GetCurrentTrait() => currentTrait;
+
+    // RTSUnitController.ChooseTrait()가 이 유닛 종류의 선택이 결정될 때(또는 새로 생산된 유닛이 기존 선택을
+    // 물려받을 때) 호출한다. 패시브 트레이트의 실제 스탯 보정 수치는 유닛 타입마다 다르므로, 여기서는
+    // "지금 어떤 트레이트를 장착했는지"만 기록하고, 구체적인 보정 적용은 스킬이 확정된 뒤 유닛별로 추가한다.
+    public void ApplyTrait(RTSUnitController.TraitChoice choice)
+    {
+        currentTrait = choice;
+    }
+
+    public bool CanUseSkill() => skillCooldownRemaining <= 0f;
+    public void StartSkillCooldown(float cooldown) => skillCooldownRemaining = cooldown;
+
+    // order panel 스킬 버튼(슬롯 6) 클릭/단축키로 호출되는 실제 진입점 (RTSUnitController.ActivateSkill 참고).
+    // 이 유닛 프리팹에 IUnitSkill을 구현한 컴포넌트(유닛별 전용 스킬 스크립트)가 붙어있으면 그쪽에 위임하고,
+    // 아직 그 유닛의 스킬이 구현되지 않았으면 로그만 남기고 아무 효과도 내지 않는다.
+    public void UseTraitSkill()
+    {
+        IUnitSkill skill = GetComponent<IUnitSkill>();
+        if (skill == null)
+        {
+            Debug.Log($"{name}: '{currentTrait}' 트레이트 스킬이 아직 구현되지 않았습니다 (IUnitSkill 컴포넌트 없음).");
+            return;
+        }
+
+        skill.Activate(this, currentTrait);
     }
 }

@@ -10,6 +10,32 @@ public class UnitDataSO : ScriptableObject
     public List<UnitData> unitData = new List<UnitData>();
 }
 
+// 고급유닛 특성(트레이트) 하나의 정의 - 특성 선택 오버레이(SkillSelect) 카드 + (액티브인 경우) order panel
+// 버튼/단축키에 필요한 정보를 모두 담는다 (doc/0228).
+[System.Serializable]
+public class UnitTraitOption
+{
+    [field: SerializeField]
+    public string skillName { get; private set; }
+
+    [field: SerializeField, TextArea(2, 4)]
+    public string description { get; private set; }
+
+    [field: SerializeField]
+    public Sprite icon { get; private set; }
+
+    // true면 order panel 슬롯 6에 버튼+단축키가 추가되는 액티브 스킬(쿨다운 있음).
+    // false면 버튼 없이 UnitController.ApplyTrait()에서 스탯/행동에 조용히 반영되는 패시브 특성.
+    [field: SerializeField]
+    public bool isActiveSkill { get; private set; }
+
+    [field: SerializeField]
+    public KeyCode shortcutKey { get; private set; } // isActiveSkill=true일 때만 사용
+
+    [field: SerializeField]
+    public float cooldown { get; private set; } // isActiveSkill=true일 때만 사용
+}
+
 // 유닛 하나의 스펙(체력/공격력/비용/생산시간/프리팹 등)을 정의하는 데이터 항목.
 [System.Serializable]
 public class UnitData
@@ -76,4 +102,12 @@ public class UnitData
     // 이 유닛의 생산 버튼을 대신 누르는 키보드 단축키 (없으면 KeyCode.None)
     [field: SerializeField]
     public KeyCode shortcutKey { get; private set; }
+
+    [Header("고급유닛 특성 (2택1, 비워두면 일반 유닛 - hasTraitChoice로 판정)")]
+    [field: SerializeField]
+    public bool hasTraitChoice { get; private set; }
+    [field: SerializeField]
+    public UnitTraitOption traitA { get; private set; } // 장점 극대화
+    [field: SerializeField]
+    public UnitTraitOption traitB { get; private set; } // 단점 보완
 }

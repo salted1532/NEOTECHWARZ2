@@ -25,6 +25,11 @@ public class RTSUnitController : MonoBehaviour
     private readonly List<UnitController>[] controlGroupUnits = new List<UnitController>[10];
     private readonly List<BuildingController>[] controlGroupBuildings = new List<BuildingController>[10];
 
+    // 고급유닛 특성(트레이트) 선택 상태 (doc/0228). UpgradeManager(연구 보너스)와 동급의,
+    // 매치 동안만 유지되는 unitID 단위 전역 상태. 유닛 개체가 아니라 "그 유닛 종류 전체"가 공유하는
+    // 선택이라 UnitController가 직접 들고 있지 않고 여기서만 기록/조회한다.
+    private readonly Dictionary<int, TraitChoice> chosenTraits = new Dictionary<int, TraitChoice>();
+
     // 맵에 존재하는 모든 유닛/건물/자원 노드
     public List<UnitController> UnitList;
     public List<BuildingController> BuildingList;
@@ -77,6 +82,9 @@ public class RTSUnitController : MonoBehaviour
         Lab
 
     }
+
+    // 고급유닛 특성(2택1) 선택 상태 (doc/0228). None=아직 안 고름.
+    public enum TraitChoice { None, A, B }
 
     public SelectState RTScurrentSate = SelectState.None;
     public BuildingState BuildingSelectState = BuildingState.None;
@@ -1176,6 +1184,101 @@ public class RTSUnitController : MonoBehaviour
 
     #endregion
 
+    #region 고급유닛 특성(트레이트) 스킬 시스템 (doc/0228)
+
+    public TraitChoice GetChosenTrait(int unitID) =>
+        chosenTraits.TryGetValue(unitID, out TraitChoice choice) ? choice : TraitChoice.None;
+
+    // 특성 선택 오버레이(SkillSelect)에서 유저가 하나를 고르면 호출된다.
+    // 1) 이 유닛 종류의 선택을 저장하고, 2) 지금 살아있는 같은 종류 유닛 전체에 즉시 반영한다.
+    // 이후 같은 unitID로 새로 생산되는 유닛도 UnitController.Start()에서 자동으로 같은 선택을 물려받는다.
+    public void ChooseTrait(int unitID, TraitChoice choice)
+    {
+        chosenTraits[unitID] = choice;
+
+        foreach (UnitController unit in UnitList)
+        {
+            if (unit != null && unit.GetUnitID() == unitID)
+                unit.ApplyTrait(choice);
+        }
+    }
+
+    // order panel 스킬 버튼(슬롯 6) 클릭/단축키로 호출된다. 선택된 유닛 중 이 스킬의 대상 unitID와
+    // 일치하는 유닛들만 각자 자기 쿨다운에 따라 개별적으로 스킬을 사용한다(여러 마리를 함께 선택했어도
+    // 한 마리씩 자기 쿨다운을 갖고 독립적으로 발동).
+    public void ActivateSkill(int unitID, UnitTraitOption trait)
+    {
+        foreach (UnitController unit in selectedUnitList)
+        {
+            if (unit == null || unit.GetUnitID() != unitID)
+                continue;
+
+            if (!unit.CanUseSkill())
+                continue;
+
+            unit.UseTraitSkill();
+            unit.StartSkillCooldown(trait.cooldown);
+        }
+    }
+
+    // 유닛 선택 UI가 갱신될 때마다(UpdateUI) 함께 호출되어, 선택된 유닛 종류에 따라 아래 셋 중 하나로 정리한다.
+    // - 고급유닛이 아니면: 오버레이/스킬슬롯 둘 다 숨김
+    // - 아직 특성을 안 골랐으면: SkillSelect 오버레이 표시 (order panel의 기존 명령은 그대로 사용 가능 - 비모달)
+    // - 이미 골랐으면: 오버레이는 숨기고, 액티브 스킬이면 order panel 슬롯 6에 스킬 버튼 표시(패시브면 버튼 없음)
+    private void UpdateUnitSkillUI()
+    {
+        if (selectedUnitList.Count == 0)
+        {
+            uIController.HideSkillSelectPanel();
+            uIController.ClearUnitSkillSlot();
+            return;
+        }
+
+        UnitController representative = selectedUnitList[0];
+        UnitData data = GetUnitData(representative.GetUnitID());
+
+        if (data == null || !data.hasTraitChoice)
+        {
+            uIController.HideSkillSelectPanel();
+            uIController.ClearUnitSkillSlot();
+            return;
+        }
+
+        TraitChoice chosen = GetChosenTrait(data.ID);
+
+        if (chosen == TraitChoice.None)
+        {
+            uIController.ClearUnitSkillSlot();
+            uIController.ShowSkillSelectPanel(
+                new CommandButtonData(data.traitA.icon, ButtonAction.Simple(
+                    () => ChooseTrait(data.ID, TraitChoice.A), data.traitA.skillName, data.traitA.description)),
+                new CommandButtonData(data.traitB.icon, ButtonAction.Simple(
+                    () => ChooseTrait(data.ID, TraitChoice.B), data.traitB.skillName, data.traitB.description)));
+            return;
+        }
+
+        uIController.HideSkillSelectPanel();
+
+        // 액티브/패시브 상관없이 슬롯 6엔 항상 선택된 트레이트를 넣는다(호버 시 설명을 볼 수 있어야 하므로).
+        // 액티브면 클릭/단축키로 실제 사용 가능하고, 패시브면 버튼만 비활성화(클릭 불가)로 보여준다.
+        UnitTraitOption trait = chosen == TraitChoice.A ? data.traitA : data.traitB;
+
+        string description = trait.isActiveSkill
+            ? $"{trait.description} \nshortcut key [<color=yellow>{trait.shortcutKey}</color>]"
+            : trait.description;
+
+        uIController.ShowUnitSkillSlot(new CommandButtonData(
+            trait.icon,
+            ButtonAction.Simple(
+                () => ActivateSkill(data.ID, trait),
+                trait.skillName,
+                description,
+                trait.isActiveSkill ? trait.shortcutKey : KeyCode.None),
+            trait.isActiveSkill)); // Interactable = 액티브일 때만 true (패시브는 추가는 되지만 클릭 불가)
+    }
+
+    #endregion
+
     #region UI관련
 
     private void UpdateUI()
@@ -1189,6 +1292,11 @@ public class RTSUnitController : MonoBehaviour
         {
             uiState = SelectState.UnitSelect;
         }
+
+        // 고급유닛 특성 선택 오버레이 / order panel 스킬 버튼(슬롯 6) 갱신 (doc/0228).
+        // switch보다 먼저, 매 프레임 무조건 호출해서 유닛 선택이 풀리고 건물/적 선택 등으로 넘어갈 때도
+        // 오버레이가 화면에 남아있지 않게 한다(내부에서 selectedUnitList.Count == 0이면 알아서 숨김).
+        UpdateUnitSkillUI();
 
         //UIController에서 현재 상황에 맞게 UI창 상태 변경
         switch (uiState)

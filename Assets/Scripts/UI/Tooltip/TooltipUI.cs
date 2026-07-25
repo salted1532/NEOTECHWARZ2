@@ -51,10 +51,28 @@ public class TooltipUI : MonoBehaviour
 
     private void Update()
     {
-        if (!isVisible || currentTarget == null)
+        if (!isVisible)
             return;
 
+        // OnPointerExit 콜백에만 의존하지 않는 안전장치: 클릭으로 호버 대상이 파괴/비활성화되거나
+        // (버튼 목록 재구성 등), 마우스가 화면/UI 밖으로 나가 OnPointerExit이 아예 발생하지 않는
+        // 경우까지 포함해서, 매 프레임 "마우스가 실제로 대상 위에 있는가"를 직접 확인한다.
+        if (!IsPointerOverTarget())
+        {
+            Hide();
+            return;
+        }
+
         PositionAboveTarget(currentTarget);
+    }
+
+    // currentTarget이 여전히 살아있고, 화면상 마우스 좌표가 그 사각형 범위 안에 있는지 확인한다.
+    private bool IsPointerOverTarget()
+    {
+        if (currentTarget == null || !currentTarget.gameObject.activeInHierarchy)
+            return false;
+
+        return RectTransformUtility.RectangleContainsScreenPoint(currentTarget, Input.mousePosition, uiCamera);
     }
 
     // 자원 비용이 없는 일반 명령 버튼용 (이동/공격/정지 등 - 제목/설명만 표시)
