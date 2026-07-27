@@ -37,6 +37,21 @@ public class EnemyAttackRange : MonoBehaviour
         }
     }
 
+    // 지금 이 순간 실제 공격 사거리(UnitRange) 안에 유효한 대상이 있는지. HasTargetInRange는 더 넓은
+    // 감지 콜라이더(UnitRange+margin) 기준이라 "지금 공격 중인가"를 나타내기엔 부적합해서 따로 둔다
+    // (doc/0253, UnitAnimatorDriver의 Fire 파라미터 판정용).
+    public bool HasTargetInAttackRange
+    {
+        get
+        {
+            GameObject target = GetClosestTarget();
+            if (target == null)
+                return false;
+
+            return Vector3.Distance(transform.position, target.transform.position) <= UnitRange;
+        }
+    }
+
     private void Awake()
     {
         enemyUnit = transform.parent.GetComponent<EnemyUnitController>();

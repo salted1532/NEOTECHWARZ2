@@ -235,8 +235,14 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
             // 있어서 뜨기도 전에 공격을 시작하면 그대로 바닥에 눌러붙은 채로 싸우는 문제가 있었다 (doc/0241).
             // 수평 이동 없이(현재 XZ 그대로) 수직으로만 계속 목표 고도로 수렴시킨다.
             float groundBelow = SampleGroundHeight(transform.position, transform.position.y - airCruiseAltitude);
-            targetPosition = new Vector3(transform.position.x, groundBelow + airCruiseAltitude, transform.position.z);
-            isMovingAirUnit = true;
+            float desiredY = groundBelow + airCruiseAltitude;
+            targetPosition = new Vector3(transform.position.x, desiredY, transform.position.z);
+
+            // 이미 목표 고도에 도달했으면 "이동 중"으로 다시 켜지 않는다 - 여기서 매 프레임 무조건 true로
+            // 켜면 공격이 지속되는 내내 IsCurrentlyMoving()이 true가 되어 이동 이펙트(엔진 트레일)가
+            // 멈추지 않는다(doc/0252). 임계값은 Update()의 도착 판정(arrivedVertically)과 동일하게 0.1.
+            if (Mathf.Abs(transform.position.y - desiredY) >= 0.1f)
+                isMovingAirUnit = true;
         }
 
         if (turretController == null)
@@ -412,7 +418,10 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     // ======================
     public bool IsIdle() => currentState == EnemyState.Idle;
     public bool IsMove() => currentState == EnemyState.Move;
-    public bool IsAttack() => currentState == EnemyState.Attack;
+    // currentState는 Idle/Move만 쓰고 Attack은 쓰지 않는다(doc/0236 - Attack에 멈추면 교전 종료 후
+    // 추적 재개가 안 됨). 대신 "지금 실제 사거리 안에 대상이 있어서 공격 중인가"를 EnemyAttackRange에
+    // 직접 물어본다 - UnitAnimatorDriver가 Fire 애니메이션을 켤 때 이 값을 쓴다(doc/0253).
+    public bool IsAttack() => attackRange != null && attackRange.HasTargetInAttackRange;
     public bool IsAirUnit() => isAirUnit;
 
     // 이동 이펙트(UnitEffects)가 상태머신을 직접 건드리지 않고 매 프레임 폴링으로 이동 여부를 판단할 수 있도록 노출

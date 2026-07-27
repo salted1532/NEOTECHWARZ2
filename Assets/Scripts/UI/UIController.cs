@@ -169,6 +169,10 @@ public class UIController : MonoBehaviour
     private const int UnitSkillSlotIndex = 6;
     private static readonly HashSet<int> UnitSkillSlotProtected = new HashSet<int> { UnitSkillSlotIndex };
 
+    // 슬롯 6이 이미 다른 오더 버튼(Worker의 Build)에 쓰이고 있을 때 스킬 버튼이 대신 들어갈 슬롯(doc/0251).
+    private const int UnitSkillFallbackSlotIndex = 7;
+    private static readonly HashSet<int> UnitSkillFallbackSlotProtected = new HashSet<int> { UnitSkillFallbackSlotIndex };
+
     // 고급유닛 특성(2택1) 선택 오버레이 "SkillSelect" (doc/0228). 커맨드 패널(slots[])과는 완전히 별개의
     // 독립 UI 오브젝트 - order panel 위쪽에 겹쳐 보이도록 이미 배치되어 있음. 그래서 이 오버레이가 떠 있는
     // 동안에도 이동/공격 등 기존 커맨드 패널 명령은 그대로(비모달) 사용할 수 있다.
@@ -978,16 +982,21 @@ public class UIController : MonoBehaviour
     {
         CurrentState = UISelectionState.Worker;
 
+        // 슬롯 7은 Worker용 스킬 대체 슬롯(doc/0251) - 지금은 항상 비어있지만, 나중에 Worker도 스킬이
+        // 생기면 RTSUnitController.UpdateUnitSkillUI()가 이 슬롯을 독립적으로 채운다. 여기서 같이
+        // Clear()해버리면 그때도 같은 버그(매 프레임 Clear/SetData 반복)가 재현되므로 미리 보호해둔다.
         SetCommands(
-
-            new CommandButtonData(moveIcon, onMove),
-            new CommandButtonData(attackIcon, onAttack),
-            new CommandButtonData(stopIcon, onStop),
-            new CommandButtonData(patrolIcon, onPatrol),
-            new CommandButtonData(holdIcon, onHold),
-            new CommandButtonData(returnIcon, onReturn),
-            new CommandButtonData(buildIcon, onBuild)
-        );
+            new CommandButtonData[]
+            {
+                new CommandButtonData(moveIcon, onMove),
+                new CommandButtonData(attackIcon, onAttack),
+                new CommandButtonData(stopIcon, onStop),
+                new CommandButtonData(patrolIcon, onPatrol),
+                new CommandButtonData(holdIcon, onHold),
+                new CommandButtonData(returnIcon, onReturn),
+                new CommandButtonData(buildIcon, onBuild)
+            },
+            UnitSkillFallbackSlotProtected);
     }
 
     // Combat unit
@@ -1018,16 +1027,19 @@ public class UIController : MonoBehaviour
     // 특성(트레이트) 선택으로 얻은 액티브 스킬을 고정 슬롯(index 6)에 표시한다 (doc/0228).
     // ShowAttackUnitPanel이 이 슬롯을 protectedSlotIndices로 보호하므로, 매 프레임 독립적으로 갱신해도
     // Move/Attack 등 나머지 버튼과 간섭하지 않는다(BuildingLiftSlotIndex와 동일한 패턴).
-    public void ShowUnitSkillSlot(CommandButtonData data)
+    // useFallbackSlot=true면(=슬롯 6을 이미 다른 오더 버튼이 쓰고 있으면, 현재는 Worker의 Build) 슬롯 7에 넣는다.
+    public void ShowUnitSkillSlot(CommandButtonData data, bool useFallbackSlot = false)
     {
-        if (UnitSkillSlotIndex < slots.Length)
-            slots[UnitSkillSlotIndex]?.SetData(data);
+        int index = useFallbackSlot ? UnitSkillFallbackSlotIndex : UnitSkillSlotIndex;
+        if (index < slots.Length)
+            slots[index]?.SetData(data);
     }
 
-    public void ClearUnitSkillSlot()
+    public void ClearUnitSkillSlot(bool useFallbackSlot = false)
     {
-        if (UnitSkillSlotIndex < slots.Length)
-            slots[UnitSkillSlotIndex]?.Clear();
+        int index = useFallbackSlot ? UnitSkillFallbackSlotIndex : UnitSkillSlotIndex;
+        if (index < slots.Length)
+            slots[index]?.Clear();
     }
 
     // Build mode

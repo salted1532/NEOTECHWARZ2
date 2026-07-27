@@ -1284,10 +1284,13 @@ public class RTSUnitController : MonoBehaviour
     // - 이미 골랐으면: 오버레이는 숨기고, 액티브 스킬이면 order panel 슬롯 6에 스킬 버튼 표시(패시브면 버튼 없음)
     private void UpdateUnitSkillUI()
     {
+        // Worker는 슬롯 6을 Build 버튼이 이미 쓰고 있으므로(doc/0251), 스킬은 그 다음 슬롯(7)으로 넘긴다.
+        bool useFallbackSlot = UnitSelectState == UnitState.Worker;
+
         if (selectedUnitList.Count == 0)
         {
             uIController.HideSkillSelectPanel();
-            uIController.ClearUnitSkillSlot();
+            uIController.ClearUnitSkillSlot(useFallbackSlot);
             return;
         }
 
@@ -1297,7 +1300,7 @@ public class RTSUnitController : MonoBehaviour
         if (data == null || !data.hasTraitChoice)
         {
             uIController.HideSkillSelectPanel();
-            uIController.ClearUnitSkillSlot();
+            uIController.ClearUnitSkillSlot(useFallbackSlot);
             return;
         }
 
@@ -1305,7 +1308,7 @@ public class RTSUnitController : MonoBehaviour
 
         if (chosen == TraitChoice.None)
         {
-            uIController.ClearUnitSkillSlot();
+            uIController.ClearUnitSkillSlot(useFallbackSlot);
             uIController.ShowSkillSelectPanel(
                 new CommandButtonData(data.traitA.icon, ButtonAction.Simple(
                     () => ChooseTrait(data.ID, TraitChoice.A), data.traitA.skillName, data.traitA.description)),
@@ -1331,7 +1334,8 @@ public class RTSUnitController : MonoBehaviour
                 trait.skillName,
                 description,
                 trait.isActiveSkill ? trait.shortcutKey : KeyCode.None),
-            trait.isActiveSkill)); // Interactable = 액티브일 때만 true (패시브는 추가는 되지만 클릭 불가)
+            trait.isActiveSkill), // Interactable = 액티브일 때만 true (패시브는 추가는 되지만 클릭 불가)
+            useFallbackSlot);
     }
 
     #endregion
