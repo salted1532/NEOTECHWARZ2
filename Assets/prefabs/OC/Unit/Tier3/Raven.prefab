@@ -206,6 +206,7 @@ GameObject:
   - component: {fileID: -1181422328391644967}
   - component: {fileID: 7893471312712258934}
   - component: {fileID: 3370982895530486659}
+  - component: {fileID: 5270083096770343336}
   m_Layer: 8
   m_Name: Raven
   m_TagString: Enemy
@@ -376,7 +377,7 @@ MonoBehaviour:
   airCruiseAltitude: 5
   airGroundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   timeBetweenAttacks: 1.2
 --- !u!114 &7893471312712258934
 MonoBehaviour:
@@ -422,6 +423,21 @@ MonoBehaviour:
   deathPrefab: {fileID: 1620140131458704099, guid: 378be02c67834834bbf4e33b3e39554e, type: 3}
   deathPoints:
   - {fileID: 5270652446994590752}
+--- !u!114 &5270083096770343336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4698038001367890631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c286447ac98c8842b6da1f784de305d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LaserBeamAttack
+  laserBeamPrefab: {fileID: 3861308579626577649}
+  firePoint: {fileID: 4980487437020474, guid: b9b15cdfa2b104c41b2ccb74ccf58ad6, type: 3}
+  beamDuration: 0.2
 --- !u!1 &5286784239653861491
 GameObject:
   m_ObjectHideFlags: 0

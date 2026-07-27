@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// 유닛 프리팹에 UnitController/HealthManager와 같이 부착하는 이펙트 전담 컴포넌트.
-// 공격/이동/피격/사망 이펙트를 담당하며, 상태머신(UnitController)이나 체력 관리(HealthManager) 코드에는
-// 최소한의 게터/이벤트만 추가하고 실제 재생 로직은 전부 이곳에 모아둔다(doc/0105 3.3절).
+// 유닛 프리팹에 UnitController(아군) 또는 EnemyUnitController(적)/HealthManager와 같이 부착하는 이펙트 전담
+// 컴포넌트. 공격/이동/피격/사망 이펙트를 담당하며, 상태머신(UnitController/EnemyUnitController)이나 체력
+// 관리(HealthManager) 코드에는 최소한의 게터/이벤트만 추가하고 실제 재생 로직은 전부 이곳에 모아둔다
+// (doc/0105 3.3절, doc/0233 - 적/아군 겸용으로 확장).
 public class UnitEffects : MonoBehaviour
 {
     [Header("공격 (비워두면 유닛 자신의 위치에서 재생)")]
@@ -30,13 +31,18 @@ public class UnitEffects : MonoBehaviour
     [SerializeField] private GameObject deathPrefab;
     [SerializeField] private List<Transform> deathPoints = new(); // 큰 유닛의 다중 폭발 지점(선택)
 
+    // 아군(UnitController)/적(EnemyUnitController) 둘 다 같은 프리팹 패턴(UnitController/HealthManager와 나란히
+    // 부착)을 쓰므로, 이 컴포넌트 하나로 양쪽 다 처리한다 - 프리팹에 어느 쪽이 붙어있는지에 따라 둘 중 하나만
+    // 채워지고 나머지는 null로 남는다 (doc/0233).
     private UnitController unitController;
+    private EnemyUnitController enemyUnitController;
     private HealthManager healthManager;
     private Collider bodyCollider; // 피격 이펙트 위치 계산용 (AttackRange의 트리거 콜라이더가 아니라 유닛 본체 콜라이더)
 
     private void Awake()
     {
         unitController = GetComponent<UnitController>();
+        enemyUnitController = GetComponent<EnemyUnitController>();
         healthManager = GetComponent<HealthManager>();
         bodyCollider = GetComponent<Collider>(); // 클릭 판정(UserControl의 layerUnit 레이캐스트)에 쓰는 것과 동일한 콜라이더
     }
@@ -59,10 +65,11 @@ public class UnitEffects : MonoBehaviour
         }
     }
 
-    // 이동 중 여부는 상태머신을 건드리지 않고 매 프레임 폴링으로 판단한다.
+    // 이동 중 여부는 상태머신을 건드리지 않고 매 프레임 폴링으로 판단한다 (아군/적 중 실제로 붙어있는 쪽만 물어봄).
     private void Update()
     {
-        bool moving = unitController != null && unitController.IsCurrentlyMoving();
+        bool moving = (unitController != null && unitController.IsCurrentlyMoving())
+            || (enemyUnitController != null && enemyUnitController.IsCurrentlyMoving());
         SetMoveTrail(moving);
     }
 

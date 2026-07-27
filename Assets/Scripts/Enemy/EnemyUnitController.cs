@@ -151,6 +151,8 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         attackMoveDestination = null;
         currentState = EnemyState.Move;
 
+        GetComponent<UnitEffects>()?.StopAttackEffects(); // 공격 중이었다면 이동 명령으로 전환되므로 재생 중인 공격 이펙트를 즉시 정지
+
         MoveAgentTo(destination);
     }
 
@@ -241,6 +243,8 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
             int targetArmor = GetTargetArmor(target);
             int finalDamage = CalculateFinalDamage(target, targetArmor);
             targetHealth.GetDamage(finalDamage, transform.position, attackType);
+            GetComponent<UnitEffects>()?.PlayAttack();
+            GetComponent<LaserBeamAttack>()?.Fire(target.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
         }
 
         alreadyAttacked = true;
@@ -398,6 +402,16 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     public bool IsMove() => currentState == EnemyState.Move;
     public bool IsAttack() => currentState == EnemyState.Attack;
     public bool IsAirUnit() => isAirUnit;
+
+    // 이동 이펙트(UnitEffects)가 상태머신을 직접 건드리지 않고 매 프레임 폴링으로 이동 여부를 판단할 수 있도록 노출
+    // (UnitController.IsCurrentlyMoving()과 동일한 패턴, doc/0233).
+    public bool IsCurrentlyMoving()
+    {
+        if (isAirUnit)
+            return isMovingAirUnit;
+
+        return navMeshAgent != null && !navMeshAgent.isStopped && navMeshAgent.velocity.sqrMagnitude > 0.01f;
+    }
 
     public bool CanAttackDomain(bool targetIsAirUnit) => targetIsAirUnit ? canAttackAir : canAttackGround;
 

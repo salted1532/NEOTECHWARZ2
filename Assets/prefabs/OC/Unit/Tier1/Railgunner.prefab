@@ -345,8 +345,8 @@ MonoBehaviour:
   sizeType: 0
   canAttackGround: 1
   canAttackAir: 1
-  bonusVersusArmorType: 0
-  bonusVersusArmorPercent: 0
+  bonusVersusArmorType: 1
+  bonusVersusArmorPercent: 80
   flashInterval: 0.3
   flashCount: 3
   isAirUnit: 0
@@ -425,8 +425,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c286447ac98c8842b6da1f784de305d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LaserBeamAttack
-  laserBeamPrefab: {fileID: 0}
-  firePoint: {fileID: 0}
+  laserBeamPrefab: {fileID: 1844130978594048, guid: b9b15cdfa2b104c41b2ccb74ccf58ad6, type: 3}
+  firePoint: {fileID: 6427180926210184788}
   beamDuration: 0.2
 --- !u!1 &5286784239653861491
 GameObject:
