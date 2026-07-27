@@ -15,7 +15,7 @@ public class FogRevealerAgent : MonoBehaviour
     private void Start()
     {
         // 이름 문자열(GameObject.Find)에 의존하지 않고, 이 프로젝트의 다른 컨트롤러들과 동일하게
-        // FindFirstObjectByType으로 찾는다(BuildingController/EnemyController와 동일 패턴).
+        // FindFirstObjectByType으로 찾는다(BuildingController/EnemyUnitController와 동일 패턴).
         fogWar = FindFirstObjectByType<csFogWar>();
 
         if (fogWar == null)

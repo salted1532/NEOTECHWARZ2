@@ -8,7 +8,7 @@ using UnityEditor;
 // 거점(비콘)의 소유 상태. Ally(초록) <-> Neutral(흰색) <-> Enemy(빨강)로, 항상 Neutral을 거쳐서 순환한다.
 public enum CaptureOwner { Neutral, Ally, Enemy }
 
-// 거점 포인트에 부착한다. 트리거 콜라이더 안에 있는 아군(UnitController)/적(EnemyController) 유닛 수에 따라
+// 거점 포인트에 부착한다. 트리거 콜라이더 안에 있는 아군(UnitController)/적(EnemyUnitController) 유닛 수에 따라
 // 부호 있는 점령치(controlValue)를 밀고 당기며, 어느 한쪽이 끝까지 도달하면 그 진영의 소유로 전환한다.
 // 양쪽이 동시에 있으면 교착 상태로 진행이 멈춘다. 콜라이더는 Is Trigger가 켜져 있어야 한다.
 public class CaptureSystem : MonoBehaviour
@@ -36,7 +36,7 @@ public class CaptureSystem : MonoBehaviour
 
     // 콜라이더 트리거 범위 안에 들어와 있는 아군/적 유닛 목록
     private readonly List<UnitController> alliesInRange = new List<UnitController>();
-    private readonly List<EnemyController> enemiesInRange = new List<EnemyController>();
+    private readonly List<EnemyUnitController> enemiesInRange = new List<EnemyUnitController>();
 
     // -captureDuration(완전 적 점령) ~ +captureDuration(완전 아군 점령), 0 = 중립. 0을 반드시 거쳐야
     // 반대 진영으로 넘어갈 수 있다 (Ally <-> Neutral <-> Enemy 순환).
@@ -61,7 +61,7 @@ public class CaptureSystem : MonoBehaviour
         {
             if (!alliesInRange.Contains(ally)) alliesInRange.Add(ally);
         }
-        else if (other.TryGetComponent<EnemyController>(out var enemy))
+        else if (other.TryGetComponent<EnemyUnitController>(out var enemy))
         {
             if (!enemiesInRange.Contains(enemy)) enemiesInRange.Add(enemy);
         }
@@ -71,7 +71,7 @@ public class CaptureSystem : MonoBehaviour
     {
         if (other.TryGetComponent<UnitController>(out var ally))
             alliesInRange.Remove(ally);
-        else if (other.TryGetComponent<EnemyController>(out var enemy))
+        else if (other.TryGetComponent<EnemyUnitController>(out var enemy))
             enemiesInRange.Remove(enemy);
     }
 

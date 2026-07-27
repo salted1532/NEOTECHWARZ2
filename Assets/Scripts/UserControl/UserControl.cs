@@ -249,7 +249,7 @@ public class UserControl : MonoBehaviour
         // 더 구체적인 대상(적)이 우선권을 가져야 "A 모드에서 적을 직접 지정"이 가능하다.
         if (clickedEnemy)
         {
-            EnemyController enemy = enemyHit.transform.GetComponent<EnemyController>();
+            EnemyUnitController enemy = enemyHit.transform.GetComponent<EnemyUnitController>();
 
             if (enemy != null && IsRevealedByFog(enemyHit.point))
             {
@@ -473,7 +473,7 @@ public class UserControl : MonoBehaviour
         // 땅 클릭보다 먼저 처리하고 여기서 return 한다.
         if (clickedEnemy && rtsUnitController.IsUnitSelect())
         {
-            EnemyController enemy = enemyHit.transform.GetComponent<EnemyController>();
+            EnemyUnitController enemy = enemyHit.transform.GetComponent<EnemyUnitController>();
 
             if (enemy != null)
             {

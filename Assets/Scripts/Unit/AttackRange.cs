@@ -84,7 +84,7 @@ public class AttackRange : MonoBehaviour
         if (unitController.HasFriendlyOrder)
             return unitController.GetFriendlyTargetObject();
 
-        EnemyController ordered = unitController.GetOrderedTarget();
+        EnemyUnitController ordered = unitController.GetOrderedTarget();
         if (ordered != null)
             return ordered.gameObject;
 
@@ -99,7 +99,7 @@ public class AttackRange : MonoBehaviour
         if (unitController.HasFriendlyOrder)
             return null; // 아군 강제 공격 중엔 다른 적을 무시한다 (FriendlyAttackTick이 전담 처리)
 
-        EnemyController ordered = unitController.GetOrderedTarget();
+        EnemyUnitController ordered = unitController.GetOrderedTarget();
 
         if (ordered != null)
             return enemiesInRange.Contains(ordered.gameObject) ? ordered.gameObject : null;

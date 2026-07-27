@@ -16,7 +16,7 @@ public class RTSUnitController : MonoBehaviour
     // 현재 선택된 유닛들
     public List<UnitController> selectedUnitList;
     public List<BuildingController> selectedBuildingList;
-    public List<EnemyController> selectedEnemyList;
+    public List<EnemyUnitController> selectedEnemyList;
     public ResourceNode selectedResourceNode; // 광물/가스는 항상 단일 선택
     public BaseStructure selectedBaseStructure; // 건설 중인 건물 기반도 항상 단일 선택
 
@@ -116,7 +116,7 @@ public class RTSUnitController : MonoBehaviour
     {
         selectedUnitList = new List<UnitController>();
         selectedBuildingList = new List<BuildingController>();
-        selectedEnemyList = new List<EnemyController>();
+        selectedEnemyList = new List<EnemyUnitController>();
         UnitList = new List<UnitController>();
         BuildingList = new List<BuildingController>();
         ResourceNodeList = new List<ResourceNode>();
@@ -288,7 +288,7 @@ public class RTSUnitController : MonoBehaviour
     /// <summary>
     /// 선택된 유닛으로 특정 적 유닛을 추격 공격 (우클릭 적 클릭 / A 모드에서 적 클릭)
     /// </summary>
-    public void AttackSelectedUnits(EnemyController target)
+    public void AttackSelectedUnits(EnemyUnitController target)
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
         {
@@ -559,7 +559,7 @@ public class RTSUnitController : MonoBehaviour
     /// <summary>
     /// 좌클릭 선택 처리 (적은 항상 단일 선택)
     /// </summary>
-    public void ClickSelectEnemy(EnemyController enemy)
+    public void ClickSelectEnemy(EnemyUnitController enemy)
     {
         DeselectAll();
         SelectEnemy(enemy);
@@ -567,7 +567,7 @@ public class RTSUnitController : MonoBehaviour
         Debug.Log("적 선택");
     }
 
-    private void SelectEnemy(EnemyController enemy)
+    private void SelectEnemy(EnemyUnitController enemy)
     {
         if (IsBuildMode())
             return;
@@ -668,7 +668,7 @@ public class RTSUnitController : MonoBehaviour
             building.DeselecBuilding();
         }
 
-        foreach (EnemyController enemy in selectedEnemyList)
+        foreach (EnemyUnitController enemy in selectedEnemyList)
         {
             enemy.DeselectEnemy();
         }
@@ -1453,7 +1453,7 @@ public class RTSUnitController : MonoBehaviour
 
                 if (selectedEnemyList.Count > 0)
                 {
-                    EnemyController enemy = selectedEnemyList[0];
+                    EnemyUnitController enemy = selectedEnemyList[0];
                     uIController.ShowInfoPanel(enemy.GetIcon(), enemy.GetEnemyName(), enemy.GetComponent<HealthManager>(), enemy.GetAttackDamage(), enemy.GetArmor());
                 }
                 else

@@ -149,7 +149,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // ===== 공격 명령 (우클릭 적 지정 / A 모드) =====
     [SerializeField] private float chaseLoseSightRange = 20f; // 지정 추격 대상과 이 거리 이상 벌어지면 "시야 이탈"로 간주
 
-    private EnemyController orderedTarget;   // 명시적으로 지정된 추격 대상 (없으면 null)
+    private EnemyUnitController orderedTarget;   // 명시적으로 지정된 추격 대상 (없으면 null)
     private Vector3? attackMoveDestination;  // 공격-이동 목적지 / 추격 중 마지막으로 확인된 위치 (교전 후 복귀할 지점)
     private AttackRange attackRange;         // 사거리 내 교전 대상 존재 여부 조회용 (자식 컴포넌트)
     // 지정 추격 대상과 한 번이라도 사거리 안에서 접촉했는지. 접촉 전(예: 맵 반대편의 먼 적을 지정한 직후)에는
@@ -502,10 +502,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // 특정 적 유닛을 추격하여 공격한다 (우클릭 적 클릭 / A 모드에서 적 클릭).
     // 대상이 살아있는 한 매 프레임 최신 위치를 쫓아가고(AttackOrderTick), 사거리 안에 들어오면
     // AttackRange가 자동으로 공격을 실행한다.
-    // 참고: EnemyController에는 아직 공중 여부 개념이 없어(모든 적이 암묵적으로 지상 취급) 여기서는
-    // canAttackAir 차단을 적용하지 않는다. EnemyController에 isAirUnit이 추가되면(추후 작업)
-    // AttackFriendlyTarget과 동일한 패턴으로 CanAttackDomain(target.IsAirUnit()) 체크를 추가할 것.
-    public void AttackUnitTarget(EnemyController target)
+    public void AttackUnitTarget(EnemyUnitController target)
     {
         if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
 
@@ -808,7 +805,7 @@ public class UnitController : MonoBehaviour, IDestructible
         }
     }
 
-    public EnemyController GetOrderedTarget() => orderedTarget;
+    public EnemyUnitController GetOrderedTarget() => orderedTarget;
 
     // TurretController(AttackRange.GetTrackingTarget())가 아군 강제공격 대상을 조회할 때 쓴다.
     // friendlyTarget 자체는 UnitController/BuildingController 겸용 MonoBehaviour라 비공개로 두고 GameObject만 노출.
@@ -902,13 +899,13 @@ public class UnitController : MonoBehaviour, IDestructible
         return Mathf.Max(1, scaledAttack - targetArmor);
     }
 
-    // 공격 대상의 방어력을 조회한다 (아군 유닛이면 연구 보너스가 반영된 GetArmor(), 적 유닛이면 EnemyController의 armor, 그 외(건물/자원)는 0).
+    // 공격 대상의 방어력을 조회한다 (아군 유닛이면 연구 보너스가 반영된 GetArmor(), 적 유닛이면 EnemyUnitController의 armor, 그 외(건물/자원)는 0).
     private int GetTargetArmor(GameObject target)
     {
         if (target.TryGetComponent<UnitController>(out var friendlyUnit))
             return friendlyUnit.GetArmor();
 
-        if (target.TryGetComponent<EnemyController>(out var enemyUnit))
+        if (target.TryGetComponent<EnemyUnitController>(out var enemyUnit))
             return enemyUnit.GetArmor();
 
         return 0;
@@ -920,7 +917,7 @@ public class UnitController : MonoBehaviour, IDestructible
         if (target.TryGetComponent<UnitController>(out var friendlyUnit))
             return friendlyUnit.GetSizeType();
 
-        if (target.TryGetComponent<EnemyController>(out var enemyUnit))
+        if (target.TryGetComponent<EnemyUnitController>(out var enemyUnit))
             return enemyUnit.GetSizeType();
 
         return SizeType.Medium;
@@ -932,7 +929,7 @@ public class UnitController : MonoBehaviour, IDestructible
         if (target.TryGetComponent<UnitController>(out var friendlyUnit))
             return friendlyUnit.GetArmorType();
 
-        if (target.TryGetComponent<EnemyController>(out var enemyUnit))
+        if (target.TryGetComponent<EnemyUnitController>(out var enemyUnit))
             return enemyUnit.GetArmorType();
 
         return ArmorType.Light;
@@ -940,11 +937,14 @@ public class UnitController : MonoBehaviour, IDestructible
 
     // 공격 대상이 "지금" 공중 상태인지 조회한다. 건물은 이/착륙으로 실시간 바뀔 수 있어(BuildingController.IsLifted)
     // 매 공격 사이클마다 다시 확인해야 한다 - 명령을 내린 시점에 캐싱해둔 값을 계속 쓰면 안 된다.
-    // EnemyController는 아직 공중 개념이 없어(doc/0213) 항상 지상(false)으로 취급한다.
+    // EnemyUnitController도 이제 isAirUnit 개념이 있어(doc/0231) 그 값을 그대로 물어본다.
     private bool IsTargetAirborne(GameObject target)
     {
         if (target.TryGetComponent<UnitController>(out var friendlyUnit))
             return friendlyUnit.IsAirUnit();
+
+        if (target.TryGetComponent<EnemyUnitController>(out var enemyUnit))
+            return enemyUnit.IsAirUnit();
 
         if (target.TryGetComponent<BuildingController>(out var building))
             return building.IsLifted();
