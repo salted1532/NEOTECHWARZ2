@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &652332936761482756
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 766971158301730268}
+  m_Layer: 6
+  m_Name: FirePos (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &766971158301730268
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652332936761482756}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.018000007, y: -0.3363515, z: 2.7911685}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9160981606648102172}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &670878647040245498
 GameObject:
   m_ObjectHideFlags: 0
@@ -68,7 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackRange
-  UnitRange: 0
+  UnitRange: 20
 --- !u!1 &2151467041808487892
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,6 +190,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2517033759310665826
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2551492909108722253}
+  m_Layer: 0
+  m_Name: MoveTrailPos (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2551492909108722253
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2517033759310665826}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
+  m_LocalPosition: {x: -0.331, y: 0.463, z: -1.228}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2406533709525597571}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &3861308579626577649
 GameObject:
   m_ObjectHideFlags: 0
@@ -184,11 +246,11 @@ Transform:
   m_GameObject: {fileID: 3861308579626577649}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.25, z: 2.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.0059999228, y: -0.3363515, z: 2.7911685}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2406533709525597571}
+  m_Father: {fileID: 8700239135740090201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4698038001367890631
 GameObject:
@@ -227,8 +289,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7939471783475269243}
-  - {fileID: 6427180926210184788}
   - {fileID: 3864484681293891201}
+  - {fileID: 3035094174299503260}
+  - {fileID: 2551492909108722253}
   - {fileID: 5270652446994590752}
   - {fileID: 2069027569877948976}
   - {fileID: 88729584339966225}
@@ -356,13 +419,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyUnitController
   enemyMarker: {fileID: 5286784239653861491}
-  icon: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
-  enemyName: Cyborg Soldier
-  attackDamage: 5
+  icon: {fileID: 21300000, guid: d6e905e97221d6141ae8f9bd7256fb0a, type: 3}
+  enemyName: Strike Drone
+  enemyUnitID: 9
+  attackDamage: 25
   armor: 1
-  attackType: 0
-  armorType: 0
-  sizeType: 1
+  attackType: 1
+  armorType: 1
+  sizeType: 2
   canAttackGround: 1
   canAttackAir: 1
   bonusVersusArmorType: 0
@@ -376,7 +440,7 @@ MonoBehaviour:
   airGroundLayer:
     serializedVersion: 2
     m_Bits: 0
-  timeBetweenAttacks: 1
+  timeBetweenAttacks: 1.2
 --- !u!114 &7893471312712258934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -389,7 +453,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 100
+  maxHealth: 400
   healthSlider: {fileID: 3378996217553183051}
 --- !u!114 &3370982895530486659
 MonoBehaviour:
@@ -403,12 +467,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
-  muzzlePrefab: {fileID: 0}
+  muzzlePrefab: {fileID: 100002, guid: 1e79672f70305e2409e20d61c53cb9a1, type: 3}
   firePoints:
   - {fileID: 6427180926210184788}
-  moveTrailPrefab: {fileID: 0}
+  - {fileID: 766971158301730268}
+  moveTrailPrefab: {fileID: 100002, guid: 6eb61d053ef59c741b08db039096149c, type: 3}
   moveTrailPoints:
   - {fileID: 3864484681293891201}
+  - {fileID: 3035094174299503260}
+  - {fileID: 2551492909108722253}
   moveTrailRotationFollowSpeed: 6
   moveTrailFastRotationThreshold: 90
   moveTrailShrinkScale: 0.4
@@ -512,6 +579,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6446988351072147609
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3035094174299503260}
+  m_Layer: 0
+  m_Name: MoveTrailPos (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3035094174299503260
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6446988351072147609}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
+  m_LocalPosition: {x: 0.318, y: 0.463, z: -1.228}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2406533709525597571}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &7494684464651511000
 GameObject:
   m_ObjectHideFlags: 0
@@ -537,7 +635,7 @@ Transform:
   m_GameObject: {fileID: 7494684464651511000}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
-  m_LocalPosition: {x: 0.0000024065375, y: 0, z: -1.75}
+  m_LocalPosition: {x: -0, y: 0.277, z: -1.395}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -790,12 +888,30 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1796017129943807632, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+    - {fileID: 1128392586139224622, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2927754802138661183, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 766971158301730268}
+    - targetCorrespondingSourceObject: {fileID: 3404250886672984954, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6427180926210184788}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
 --- !u!4 &5719401296979029271 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1791381989859332404, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+  m_PrefabInstance: {fileID: 6305920466050546723}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8700239135740090201 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3404250886672984954, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+  m_PrefabInstance: {fileID: 6305920466050546723}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &9160981606648102172 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2927754802138661183, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
   m_PrefabInstance: {fileID: 6305920466050546723}
   m_PrefabAsset: {fileID: 0}

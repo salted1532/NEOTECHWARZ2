@@ -17,6 +17,11 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private string enemyName; // Info_panel에 표시할 이름
 
+    // OC Unit Data SO(EnemyUnitDataSO)의 UnitData.ID와 매칭되는 값 - Start()에서 이 ID로 스탯을 조회해
+    // ApplyUnitData()로 덮어쓴다 (UnitController.unitID와 동일한 패턴, doc/0232).
+    [SerializeField]
+    private int enemyUnitID;
+
     // ===== 전투 스탯 (공격력/방어력) =====
     [SerializeField] private int attackDamage;
     [SerializeField] private int armor;
@@ -81,6 +86,10 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
             enemyMarker.SetActive(false);
 
         rtsController = FindFirstObjectByType<RTSUnitController>();
+
+        // 씬에 직접 배치됐든 나중에 스포너를 거쳐 생성됐든, 항상 자기 enemyUnitID로 OC Unit Data SO를
+        // 조회해서 스스로 스탯(체력/공격력/이름 등)을 적용한다 (UnitController.Start()와 동일한 패턴).
+        ApplyUnitData(rtsController != null ? rtsController.GetEnemyUnitData(enemyUnitID) : null);
     }
 
     private void Update()
@@ -394,6 +403,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
 
     public Sprite GetIcon() => icon;
     public string GetEnemyName() => enemyName;
+    public int GetEnemyUnitID() => enemyUnitID;
     public int GetAttackDamage() => attackDamage;
     public int GetArmor() => armor;
     public ArmorType GetArmorType() => armorType;

@@ -47,6 +47,9 @@ public class RTSUnitController : MonoBehaviour
     private UnitDataSO unitDatabase;
     [SerializeField]
     private BuildingDataSO buildingDatabase;
+    // OC(적 진영) 유닛 데이터베이스 - EnemyUnitController.Start()가 자기 enemyUnitID로 스탯을 조회할 때 사용 (doc/0232).
+    [SerializeField]
+    private EnemyUnitDataSO enemyUnitDatabase;
     [SerializeField]
     private UpgradeManager upgradeManager;
     [SerializeField]
@@ -1583,6 +1586,11 @@ public class RTSUnitController : MonoBehaviour
 
     // unitID로 UnitData를 조회한다 (UnitController가 자기 자신의 스탯을 SO에서 가져올 때 사용).
     public UnitData GetUnitData(int unitID) => unitDatabase.unitData.Find(d => d.ID == unitID);
+
+    // enemyUnitID로 OC Unit Data SO(EnemyUnitDataSO)에서 UnitData를 조회한다 (EnemyUnitController가
+    // 자기 자신의 스탯을 SO에서 가져올 때 사용, doc/0232).
+    public UnitData GetEnemyUnitData(int enemyUnitID) =>
+        enemyUnitDatabase != null ? enemyUnitDatabase.unitData.Find(d => d.ID == enemyUnitID) : null;
 
     // ResearchQueue가 연구 완료 시 호출 (UpgradeManager를 직접 모른 채로 보너스를 반영)
     public void AddGlobalBonus(ResearchType type, int amount) => upgradeManager.AddBonus(type, amount);

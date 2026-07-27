@@ -68,7 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackRange
-  UnitRange: 0
+  UnitRange: 18
 --- !u!1 &2151467041808487892
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,11 +356,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyUnitController
   enemyMarker: {fileID: 5286784239653861491}
-  icon: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
-  enemyName: Cyborg Soldier
-  attackDamage: 5
+  icon: {fileID: 21300000, guid: 06ad55446842ade4298efca8384bf7dc, type: 3}
+  enemyName: Raven
+  enemyUnitID: 8
+  attackDamage: 8
   armor: 1
-  attackType: 0
+  attackType: 2
   armorType: 0
   sizeType: 1
   canAttackGround: 1
@@ -376,7 +377,7 @@ MonoBehaviour:
   airGroundLayer:
     serializedVersion: 2
     m_Bits: 0
-  timeBetweenAttacks: 1
+  timeBetweenAttacks: 1.2
 --- !u!114 &7893471312712258934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -389,7 +390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 100
+  maxHealth: 150
   healthSlider: {fileID: 3378996217553183051}
 --- !u!114 &3370982895530486659
 MonoBehaviour:
@@ -403,10 +404,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
-  muzzlePrefab: {fileID: 0}
+  muzzlePrefab: {fileID: 1844130978594048, guid: b9b15cdfa2b104c41b2ccb74ccf58ad6, type: 3}
   firePoints:
   - {fileID: 6427180926210184788}
-  moveTrailPrefab: {fileID: 0}
+  moveTrailPrefab: {fileID: 100002, guid: 6eb61d053ef59c741b08db039096149c, type: 3}
   moveTrailPoints:
   - {fileID: 3864484681293891201}
   moveTrailRotationFollowSpeed: 6
@@ -418,7 +419,7 @@ MonoBehaviour:
     explosiveHitPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
     laserHitPrefab: {fileID: 1207662428487738, guid: cb32a3bff9f94d14bb98fdeb2db37856, type: 3}
     flameHitPrefab: {fileID: 100014, guid: 04876b7e195a7624ab34f532e53c64cb, type: 3}
-  deathPrefab: {fileID: 100014, guid: 04876b7e195a7624ab34f532e53c64cb, type: 3}
+  deathPrefab: {fileID: 1620140131458704099, guid: 378be02c67834834bbf4e33b3e39554e, type: 3}
   deathPoints:
   - {fileID: 5270652446994590752}
 --- !u!1 &5286784239653861491

@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackRange
-  UnitRange: 0
+  UnitRange: 20
 --- !u!1 &3861308579626577649
 GameObject:
   m_ObjectHideFlags: 0
@@ -139,12 +139,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3861308579626577649}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.0075, y: 0.1258, z: 1.0333}
+  m_LocalScale: {x: 1.0833336, y: 1, z: 1.0833336}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2406533709525597571}
+  m_Father: {fileID: 3103422176948082571}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4698038001367890631
 GameObject:
@@ -164,6 +164,7 @@ GameObject:
   - component: {fileID: 7893471312712258934}
   - component: {fileID: 3370982895530486659}
   - component: {fileID: 5216606494986298842}
+  - component: {fileID: 1893831155959136481}
   m_Layer: 8
   m_Name: Railgunner
   m_TagString: Enemy
@@ -184,7 +185,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 6427180926210184788}
   - {fileID: 3864484681293891201}
   - {fileID: 5270652446994590752}
   - {fileID: 2069027569877948976}
@@ -336,12 +336,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyUnitController
   enemyMarker: {fileID: 5286784239653861491}
   icon: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
-  enemyName: Cyborg Soldier
-  attackDamage: 5
-  armor: 1
-  attackType: 0
+  enemyName: Railgunner
+  enemyUnitID: 4
+  attackDamage: 10
+  armor: 0
+  attackType: 2
   armorType: 0
-  sizeType: 1
+  sizeType: 0
   canAttackGround: 1
   canAttackAir: 1
   bonusVersusArmorType: 0
@@ -368,7 +369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966838a43676e504cae38614e39928ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 100
+  maxHealth: 45
   healthSlider: {fileID: 3378996217553183051}
 --- !u!114 &3370982895530486659
 MonoBehaviour:
@@ -382,7 +383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
-  muzzlePrefab: {fileID: 0}
+  muzzlePrefab: {fileID: 100002, guid: 1e79672f70305e2409e20d61c53cb9a1, type: 3}
   firePoints:
   - {fileID: 6427180926210184788}
   moveTrailPrefab: {fileID: 0}
@@ -412,6 +413,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dcc5e7ed1a57504bb7df8534c86b1e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitAnimatorDriver
+--- !u!114 &1893831155959136481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4698038001367890631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c286447ac98c8842b6da1f784de305d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LaserBeamAttack
+  laserBeamPrefab: {fileID: 0}
+  firePoint: {fileID: 0}
+  beamDuration: 0.2
 --- !u!1 &5286784239653861491
 GameObject:
   m_ObjectHideFlags: 0
@@ -573,6 +589,46 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2406533709525597571}
     m_Modifications:
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.00065
+      objectReference: {fileID: 0}
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.006
+      objectReference: {fileID: 0}
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.0922974
+      objectReference: {fileID: 0}
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.09229468
+      objectReference: {fileID: 0}
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.70105845
+      objectReference: {fileID: 0}
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.70105624
+      objectReference: {fileID: 0}
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 195
+      objectReference: {fileID: 0}
     - target: {fileID: 532696864729194525, guid: b86238a05e7805944913facf7e441daf, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.1999999
@@ -635,6 +691,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 532696864729194525, guid: b86238a05e7805944913facf7e441daf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 552626145726532268}
+    - targetCorrespondingSourceObject: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6427180926210184788}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 878013178449345191, guid: b86238a05e7805944913facf7e441daf, type: 3}
       insertIndex: -1
@@ -664,6 +723,11 @@ MonoBehaviour:
 --- !u!4 &2904340517529213386 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 532696864729194525, guid: b86238a05e7805944913facf7e441daf, type: 3}
+  m_PrefabInstance: {fileID: 3398756098163849687}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3103422176948082571 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 304939306604097116, guid: b86238a05e7805944913facf7e441daf, type: 3}
   m_PrefabInstance: {fileID: 3398756098163849687}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5346317996160539147
