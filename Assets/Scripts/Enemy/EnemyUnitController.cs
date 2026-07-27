@@ -62,6 +62,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     // 공격-이동 목적지 (교전 후 복귀할 지점). null이면 공격-이동 중이 아님.
     private Vector3? attackMoveDestination;
     private EnemyAttackRange attackRange; // 사거리 내 대상 감지용 (자식 컴포넌트)
+    private TurretController turretController; // 차량형 유닛의 포탑(자식에 붙어있으면 세팅, 없으면 null - UnitController와 동일한 옵셔널 연동)
 
     private Coroutine flashRoutine;
     private RTSUnitController rtsController;
@@ -69,6 +70,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     private void Awake()
     {
         attackRange = GetComponentInChildren<EnemyAttackRange>();
+        turretController = GetComponentInChildren<TurretController>();
 
         if (!isAirUnit)
         {
@@ -237,7 +239,8 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
             isMovingAirUnit = true;
         }
 
-        RotateYOnly(end);
+        if (turretController == null)
+            RotateYOnly(end); // 포탑 유닛(turretController != null)은 몸체를 안 돌린다 - 포탑이 대신 조준한다 (UnitController.Attack()과 동일한 패턴)
 
         if (alreadyAttacked)
             return;
@@ -253,6 +256,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
             targetHealth.GetDamage(finalDamage, transform.position, attackType);
             GetComponent<UnitEffects>()?.PlayAttack();
             GetComponent<LaserBeamAttack>()?.Fire(target.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
+            turretController?.FireRecoil(); // 포탑 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
         }
 
         alreadyAttacked = true;
@@ -426,6 +430,9 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     public Sprite GetIcon() => icon;
     public string GetEnemyName() => enemyName;
     public int GetEnemyUnitID() => enemyUnitID;
+
+    // TurretController가 조준 대상을 물어볼 때 쓰는 EnemyAttackRange 접근자 (UnitController.GetAttackRange()와 동일한 용도).
+    public EnemyAttackRange GetAttackRange() => attackRange;
     public int GetAttackDamage() => attackDamage;
     public int GetArmor() => armor;
     public ArmorType GetArmorType() => armorType;

@@ -22,7 +22,8 @@ public class TurretController : MonoBehaviour
     [SerializeField] private Ease recoilEase = Ease.OutQuad;
     [SerializeField] private Ease recoilReturnEase = Ease.OutBack;
 
-    private AttackRange attackRange;
+    private AttackRange attackRange;             // 아군 유닛에 붙어있으면 세팅
+    private EnemyAttackRange enemyAttackRange;   // 적 유닛에 붙어있으면 세팅 (둘 중 하나만 채워짐)
     private Vector3 recoilRestLocalPosition;
     private Quaternion restLocalRotation; // 조준 대상이 없을 때 되돌아갈 "정면" 로컬 회전값 (보통 몸체 정면)
     private Tween recoilTween;
@@ -44,7 +45,14 @@ public class TurretController : MonoBehaviour
     private void Start()
     {
         UnitController unitController = GetComponentInParent<UnitController>();
-        attackRange = unitController != null ? unitController.GetAttackRange() : null;
+        if (unitController != null)
+        {
+            attackRange = unitController.GetAttackRange();
+            return;
+        }
+
+        EnemyUnitController enemyUnitController = GetComponentInParent<EnemyUnitController>();
+        enemyAttackRange = enemyUnitController != null ? enemyUnitController.GetAttackRange() : null;
     }
 
     // 조준할 대상이 있으면 그쪽을, 없으면(사거리 이탈 등으로 target == null) 몸체 기준 원래 정면으로
@@ -52,7 +60,9 @@ public class TurretController : MonoBehaviour
     // 방식이라 별도의 "복귀 중" 상태를 관리할 필요 없이 그냥 끊김 없이 이어진다.
     private void Update()
     {
-        GameObject target = attackRange != null ? attackRange.GetTrackingTarget() : null;
+        GameObject target = attackRange != null ? attackRange.GetTrackingTarget()
+            : enemyAttackRange != null ? enemyAttackRange.GetTrackingTarget()
+            : null;
         Quaternion desiredRotation;
 
         if (target != null)

@@ -104,6 +104,11 @@ public class EnemyAttackRange : MonoBehaviour
         }
     }
 
+    // 포탑(TurretController)이 조준 대상을 물어볼 때 쓴다. 플레이어 쪽 AttackRange.GetTrackingTarget()과
+    // 달리 지정 대상/아군 강제공격 개념이 없어서, 그냥 GetClosestTarget()과 동일하게 사거리 내 가장 가까운
+    // (도메인이 맞는) 대상을 그대로 돌려준다.
+    public GameObject GetTrackingTarget() => GetClosestTarget();
+
     // 감지된 대상 중 자신과의 거리(제곱 거리)가 가장 짧은 대상을 찾아 반환한다. 이 유닛이 공격할 수 없는
     // 도메인(지상 전용 유닛에게 공중 대상, 혹은 그 반대)의 대상은 아예 후보에서 제외한다 - 그래야 공격-이동
     // 중에 상대하지 못할 대상을 스쳐 지나가도 멈추거나 쫓아가지 않고 원래 목적지로 계속 이동한다.

@@ -607,8 +607,31 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4641279379937375252, guid: 6e186a0174101ea4eb532dd7c33668bd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3659261283694263847}
   m_SourcePrefab: {fileID: 100100000, guid: 6e186a0174101ea4eb532dd7c33668bd, type: 3}
+--- !u!1 &338091822484216800 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4641279379937375252, guid: 6e186a0174101ea4eb532dd7c33668bd, type: 3}
+  m_PrefabInstance: {fileID: 4960723484123721716}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3659261283694263847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338091822484216800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acd7820bbe8872a4fb8e421443669336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleShake
+  shakeStrength: 0.03
+  vibrato: 15
+  shakeCycleDuration: 0.2
 --- !u!4 &1151501022524506458 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5414157630471106222, guid: 6e186a0174101ea4eb532dd7c33668bd, type: 3}

@@ -8,23 +8,28 @@ public class UnitAnimatorDriver : MonoBehaviour
     private static readonly int IsMovingParam = Animator.StringToHash("IsMoving");
     private static readonly int FireParam = Animator.StringToHash("Fire");
 
-    private UnitController unitController;
+    private UnitController unitController;             // 아군 유닛에 붙어있으면 세팅
+    private EnemyUnitController enemyUnitController;    // 적 유닛에 붙어있으면 세팅 (doc/0242)
     private Animator animator;
 
     private void Awake()
     {
         unitController = GetComponent<UnitController>();
+        enemyUnitController = GetComponent<EnemyUnitController>();
         animator = GetComponentInChildren<Animator>(); // 비주얼 모델 자식에 붙어있는 Animator
     }
 
     private void Update()
     {
-        if (animator == null || unitController == null)
+        if (animator == null || (unitController == null && enemyUnitController == null))
             return;
 
-        animator.SetBool(IsMovingParam, unitController.IsCurrentlyMoving());
+        bool isMoving = unitController != null ? unitController.IsCurrentlyMoving() : enemyUnitController.IsCurrentlyMoving();
+        bool isAttacking = unitController != null ? unitController.IsAttack() : enemyUnitController.IsAttack();
+
+        animator.SetBool(IsMovingParam, isMoving);
         // 공격 중인 동안은 계속 true를 흘려보내 Fire 상태에 머무르게 한다 (doc/0225).
         // 공격이 끝나면 false가 되어 애니메이터가 자체적으로 idle로 돌아간다.
-        animator.SetBool(FireParam, unitController.IsAttack());
+        animator.SetBool(FireParam, isAttacking);
     }
 }

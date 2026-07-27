@@ -10,7 +10,8 @@ public class VehicleShake : MonoBehaviour
     [SerializeField] private int vibrato = 15;               // 흔들림 빈도 - 높을수록 더 잘게 떪
     [SerializeField] private float shakeCycleDuration = 0.2f; // 셰이크 한 사이클 길이 - 짧을수록 반응이 빠름
 
-    private UnitController unitController;
+    private UnitController unitController;               // 아군 유닛에 붙어있으면 세팅
+    private EnemyUnitController enemyUnitController;      // 적 유닛에 붙어있으면 세팅 (doc/0242)
     private Vector3 basePosition;
     private Tween shakeTween;
     private bool shaking;
@@ -18,13 +19,15 @@ public class VehicleShake : MonoBehaviour
     private void Awake()
     {
         unitController = GetComponentInParent<UnitController>();
+        enemyUnitController = GetComponentInParent<EnemyUnitController>();
         basePosition = transform.localPosition;
     }
 
     // UnitEffects/HoverBob과 동일한 폴링 패턴(doc/0105) - 상태머신을 직접 건드리지 않는다.
     private void Update()
     {
-        bool shouldShake = unitController != null && unitController.IsCurrentlyMoving();
+        bool shouldShake = (unitController != null && unitController.IsCurrentlyMoving())
+            || (enemyUnitController != null && enemyUnitController.IsCurrentlyMoving());
 
         if (shouldShake && !shaking)
             StartShake();

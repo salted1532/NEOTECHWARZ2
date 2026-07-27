@@ -613,8 +613,58 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1114464080724040647, guid: 8d637b4ff6a456a47bfc0d669b3a6b0e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6427180926210184788}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5934031178726573792, guid: 8d637b4ff6a456a47bfc0d669b3a6b0e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7098030918514325679}
+    - targetCorrespondingSourceObject: {fileID: 4877812423897917341, guid: 8d637b4ff6a456a47bfc0d669b3a6b0e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8129019492501509578}
   m_SourcePrefab: {fileID: 100100000, guid: 8d637b4ff6a456a47bfc0d669b3a6b0e, type: 3}
+--- !u!1 &474562084823804603 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4877812423897917341, guid: 8d637b4ff6a456a47bfc0d669b3a6b0e, type: 3}
+  m_PrefabInstance: {fileID: 4982251389798747430}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8129019492501509578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 474562084823804603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba4c991f307d574494cfa8c5bef0734, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretController
+  rotationSpeed: 360
+  recoilPart: {fileID: 5355866346655291105}
+  recoilLocalOffset: {x: 0, y: 0, z: -0.3}
+  recoilDuration: 0.08
+  recoilReturnDuration: 0.18
+  recoilEase: 6
+  recoilReturnEase: 27
+--- !u!1 &1692626507160193990 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5934031178726573792, guid: 8d637b4ff6a456a47bfc0d669b3a6b0e, type: 3}
+  m_PrefabInstance: {fileID: 4982251389798747430}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7098030918514325679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692626507160193990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acd7820bbe8872a4fb8e421443669336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleShake
+  shakeStrength: 0.03
+  vibrato: 15
+  shakeCycleDuration: 0.2
 --- !u!4 &2033017322368782716 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6418255393187126362, guid: 8d637b4ff6a456a47bfc0d669b3a6b0e, type: 3}

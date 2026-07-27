@@ -11,7 +11,8 @@ public class HoverBob : MonoBehaviour
     [SerializeField] private float bobDuration = 1.4f; // 한쪽 방향 이동에 걸리는 시간
     [SerializeField] private Ease bobEase = Ease.InOutSine;
 
-    private UnitController unitController;         // 있으면 "공중유닛" - 항상 공중이므로 항상 재생
+    private UnitController unitController;         // 있으면 아군 "공중유닛" - 항상 공중이므로 항상 재생
+    private EnemyUnitController enemyUnitController; // 있으면 적 "공중유닛" - 위와 동일한 판정 (doc/0242)
     private BuildingController buildingController;  // 있으면 "리프트 건물" - IsLifted()일 때만 재생
 
     private float baseY;
@@ -21,6 +22,7 @@ public class HoverBob : MonoBehaviour
     private void Awake()
     {
         unitController = GetComponentInParent<UnitController>();
+        enemyUnitController = GetComponentInParent<EnemyUnitController>();
         buildingController = GetComponentInParent<BuildingController>();
         baseY = transform.localPosition.y;
     }
@@ -29,6 +31,7 @@ public class HoverBob : MonoBehaviour
     private void Update()
     {
         bool shouldBob = (unitController != null && unitController.IsAirUnit())
+            || (enemyUnitController != null && enemyUnitController.IsAirUnit())
             || (buildingController != null && buildingController.IsLifted());
 
         if (shouldBob && !bobbing)

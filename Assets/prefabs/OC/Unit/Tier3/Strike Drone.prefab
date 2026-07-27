@@ -898,8 +898,58 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3404250886672984954, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6427180926210184788}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1411760565393116046, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3051181545083452462}
+    - targetCorrespondingSourceObject: {fileID: 1411760565393116046, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 393388331193402944}
   m_SourcePrefab: {fileID: 100100000, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+--- !u!4 &866782178181367047 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6594479920786520356, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+  m_PrefabInstance: {fileID: 6305920466050546723}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4905745463273568173 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1411760565393116046, guid: 5e5469c3d659cce4e9567644441da302, type: 3}
+  m_PrefabInstance: {fileID: 6305920466050546723}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3051181545083452462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4905745463273568173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94c8bba61d935104f8b65876c5307ccb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HoverBob
+  bobHeight: 0.25
+  bobDuration: 1.4
+  bobEase: 4
+--- !u!114 &393388331193402944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4905745463273568173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba4c991f307d574494cfa8c5bef0734, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretController
+  rotationSpeed: 360
+  recoilPart: {fileID: 866782178181367047}
+  recoilLocalOffset: {x: 0, y: 0, z: -0.3}
+  recoilDuration: 0.08
+  recoilReturnDuration: 0.18
+  recoilEase: 6
+  recoilReturnEase: 27
 --- !u!4 &5719401296979029271 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1791381989859332404, guid: 5e5469c3d659cce4e9567644441da302, type: 3}

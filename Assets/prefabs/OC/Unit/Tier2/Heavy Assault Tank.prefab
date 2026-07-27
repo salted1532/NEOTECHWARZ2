@@ -609,11 +609,66 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2939434563248894621, guid: 1d45c4a8e77da1a41884f7621d6a2fc7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6427180926210184788}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4733315693632023546, guid: 1d45c4a8e77da1a41884f7621d6a2fc7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6586747136078519494}
+    - targetCorrespondingSourceObject: {fileID: 4777716563401625810, guid: 1d45c4a8e77da1a41884f7621d6a2fc7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 204993918438810779}
   m_SourcePrefab: {fileID: 100100000, guid: 1d45c4a8e77da1a41884f7621d6a2fc7, type: 3}
+--- !u!1 &375624542941551099 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4777716563401625810, guid: 1d45c4a8e77da1a41884f7621d6a2fc7, type: 3}
+  m_PrefabInstance: {fileID: 5150894692904126761}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &204993918438810779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 375624542941551099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ba4c991f307d574494cfa8c5bef0734, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretController
+  rotationSpeed: 360
+  recoilPart: {fileID: 1704826544087241780}
+  recoilLocalOffset: {x: 0, y: 0, z: -0.3}
+  recoilDuration: 0.08
+  recoilReturnDuration: 0.18
+  recoilEase: 6
+  recoilReturnEase: 27
+--- !u!1 &489690477969875667 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4733315693632023546, guid: 1d45c4a8e77da1a41884f7621d6a2fc7, type: 3}
+  m_PrefabInstance: {fileID: 5150894692904126761}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6586747136078519494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 489690477969875667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acd7820bbe8872a4fb8e421443669336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleShake
+  shakeStrength: 0.03
+  vibrato: 15
+  shakeCycleDuration: 0.2
 --- !u!4 &972894384363763817 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5403137745516736832, guid: 1d45c4a8e77da1a41884f7621d6a2fc7, type: 3}
+  m_PrefabInstance: {fileID: 5150894692904126761}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1704826544087241780 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5824110735164497181, guid: 1d45c4a8e77da1a41884f7621d6a2fc7, type: 3}
   m_PrefabInstance: {fileID: 5150894692904126761}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &8048318771578436532 stripped
