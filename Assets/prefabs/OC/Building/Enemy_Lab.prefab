@@ -294,6 +294,9 @@ MonoBehaviour:
   buildingName: 
   icon: {fileID: 21300000, guid: f381402a9f77c0f4b9c919b57ddc66ef, type: 3}
   enemyBuildingID: 6
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!208 &875391073210738237
 NavMeshObstacle:
   m_ObjectHideFlags: 0
