@@ -270,6 +270,29 @@ public class UserControl : MonoBehaviour
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
+
+            // 적 건물 좌클릭 = 선택 또는 지정 공격 (A 모드 중이면 해당 건물을 강제로 공격, 아니면 선택, doc/0248)
+            EnemyBuildingController enemyBuilding = enemyHit.transform.GetComponent<EnemyBuildingController>();
+
+            if (enemyBuilding != null && IsRevealedByFog(enemyHit.point))
+            {
+                if (UsercurrentState == OrderState.Attack)
+                {
+                    rtsUnitController.AttackEnemyBuildingSelectedUnits(enemyBuilding);
+                    enemyBuilding.FlashMarker(); // 어느 건물이 공격 대상인지 마커 깜빡임으로 표시
+
+                    attackPointer.transform.position = enemyBuilding.transform.position;
+                    attackPointer.SetActive(true);
+
+                    UsercurrentState = OrderState.None;
+
+                    return;
+                }
+
+                pendingLeftClickSelect = () => { if (enemyBuilding != null) rtsUnitController.ClickSelectEnemyBuilding(enemyBuilding); };
+
+                return; // 👉 중요: 여기서 종료 (명령 안 함)
+            }
         }
 
         // 3. 건물 클릭 = 선택 또는 아군 건물 강제 공격 (A 모드 중이면 해당 건물을 강제로 공격, 아니면 선택)
@@ -484,6 +507,31 @@ public class UserControl : MonoBehaviour
                     enemy.FlashMarker(); // 어느 적이 공격 대상인지 마커 깜빡임으로 표시
 
                     attackPointer.transform.position = enemy.transform.position;
+                    attackPointer.SetActive(true);
+                }
+                else
+                {
+                    rtsUnitController.MoveSelectedUnits(enemyHit.point);
+
+                    movePointer.transform.position = enemyHit.point;
+                    movePointer.SetActive(true);
+                }
+
+                return;
+            }
+
+            // 적 건물 우클릭 = 지정 공격 (건물은 움직이지 않으므로 추격 개념 없이 파괴될 때까지 계속 공격, doc/0248)
+            EnemyBuildingController enemyBuilding = enemyHit.transform.GetComponent<EnemyBuildingController>();
+
+            if (enemyBuilding != null)
+            {
+                // 안개에 가려진 적 건물은 공격 명령 대신 그 지점으로 이동만 시킨다 (보이지 않는 대상을 특정해서 명령할 수 없음)
+                if (IsRevealedByFog(enemyHit.point))
+                {
+                    rtsUnitController.AttackEnemyBuildingSelectedUnits(enemyBuilding);
+                    enemyBuilding.FlashMarker(); // 어느 건물이 공격 대상인지 마커 깜빡임으로 표시
+
+                    attackPointer.transform.position = enemyBuilding.transform.position;
                     attackPointer.SetActive(true);
                 }
                 else

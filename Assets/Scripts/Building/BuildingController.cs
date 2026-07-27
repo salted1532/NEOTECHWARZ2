@@ -84,6 +84,18 @@ public class BuildingController : MonoBehaviour, IDestructible
 
         groundOffset = PlacementSystem.GetGroundOffsetY(gameObject);
 
+        // 씬에 직접 배치해둔 건물(정상 건설 흐름을 안 거친 시작 건물/테스트용 건물)도 시작하자마자 정확히
+        // 지면에 붙도록 위치를 보정한다. PlacementSystem을 거쳐 지어진 건물은 이미 지면 좌표로 스폰되므로
+        // 이 보정으로 값이 거의 안 바뀐다 (doc/0246).
+        SnapToGround();
+
+        // 씬에 직접 배치해둔 건물(정상 건설 흐름을 안 거쳐서 hasGridPosition이 아직 false인 건물)은
+        // 자기 크기(BuildingData.Size)에 맞춰 그리드 셀 중앙으로 위치를 맞추고, PlacementSystem의 그리드
+        // 점유 정보에도 스스로 등록한다 (doc/0247). 정상 건설 흐름을 거친 건물은 이미 hasGridPosition이
+        // true이므로(BaseStructure.CompleteConstruction에서 SetGridInfo 호출) 여기서 다시 건드리지 않는다.
+        if (!hasGridPosition)
+            RegisterToGridIfPossible();
+
         rtsController.BuildingList.Add(this);
 
         navMeshObstacle = GetComponent<NavMeshObstacle>();
@@ -184,6 +196,43 @@ public class BuildingController : MonoBehaviour, IDestructible
             return hit.point.y;
 
         return fallback;
+    }
+
+    // 현재 XZ 위치의 지면 높이 + groundOffset(피벗-지면 거리)으로 transform.position.y를 다시 맞춘다.
+    // groundLayer가 안 비었고 그 지점에서 레이캐스트가 실제로 지면을 잡을 때만 위치를 바꾼다 - 실패하면
+    // (fallback이 곧 현재 y - groundOffset이라) 원래 위치 그대로 유지된다(doc/0246).
+    private void SnapToGround()
+    {
+        float fallback = transform.position.y - groundOffset;
+        float ground = SampleGroundHeight(transform.position, fallback);
+
+        Vector3 pos = transform.position;
+        pos.y = ground + groundOffset;
+        transform.position = pos;
+    }
+
+    // 그리드 셀 좌표를 역산해 자기 크기에 맞춰 위치를 정렬하고, PlacementSystem의 그리드 점유 정보에
+    // 자신을 등록한다. buildingID로 조회한 BuildingData가 없거나 그 칸이 이미 다른 건물에 점유돼 있으면
+    // (예: 두 건물을 겹치게 배치해둔 실수) 아무것도 하지 않고 원래 위치/hasGridPosition=false 상태로 남는다.
+    private void RegisterToGridIfPossible()
+    {
+        if (placementSystem == null || rtsController == null)
+            return;
+
+        BuildingData data = rtsController.GetBuildingData(buildingID);
+        if (data == null)
+            return;
+
+        Vector3Int gridPos = placementSystem.WorldToGridCell(transform.position);
+
+        if (!placementSystem.RegisterBuildingGrid(gameObject, gridPos, data.Size, buildingID))
+            return;
+
+        // 그리드 셀 크기에 맞춰 XZ만 중앙정렬한다. Y는 방금 SnapToGround()로 맞춘 실제 지면 좌표를 그대로
+        // 넘겨서 유지한다 (그리드 셀 크기로 Y를 되돌리면 지형 높이와 어긋난다 - doc/0150과 동일한 이유).
+        transform.position = placementSystem.GetGroundPosition(gridPos, data.Size, transform.position.y);
+
+        SetGridInfo(gridPos);
     }
 
     public bool CanLift() => canLift;

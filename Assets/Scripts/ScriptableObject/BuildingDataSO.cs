@@ -40,6 +40,13 @@ public class BuildingData
     // 이 건물을 짓기 전에 미리 완공되어 있어야 하는 건물의 ID (RTSUnitController.BuildingID 상수, 0이면 조건 없음)
     [field: SerializeField]
     public int requiredBuildingID { get; private set; }
+    // 체력. 아군 건물(BuildingController)은 아직 이 값을 안 쓰고 프리팹의 HealthManager에 직접
+    // 박아두지만, 적 건물(EnemyBuildingController)은 이 값으로 스스로 체력을 초기화한다 (doc/0245).
+    [field: SerializeField]
+    public int hp { get; private set; }
+    // Info_panel에 표시할 아이콘. 아군 건물도 아직 안 쓰고 있음(마찬가지로 EnemyBuildingController 전용).
+    [field: SerializeField]
+    public Sprite Icon { get; private set; }
     [field: SerializeField]
     public GameObject Prefab { get; private set; }
 }

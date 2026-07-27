@@ -568,10 +568,13 @@ public class UIController : MonoBehaviour
     // ===== Info Panel (단일 유닛/건물 선택 시) =====
     // Squad_panel과는 항상 배타적이고, productionPanel과는 독립적으로 동시에 켜질 수 있다
     // (생산 건물 선택 시 ShowInfoPanel + ShowProductionUI가 같이 호출됨).
-    // 건물/자원 등 공격력·방어력이 없는 대상용 (0으로 표시됨)
+    // 건물 등 공격력·방어력 개념이 없는 대상용 - 아이콘 자체를 숨긴다 (ShowResourceInfoPanel/
+    // ShowBaseStructureInfoPanel과 동일한 패턴, doc/0249). 아군 건물(BuildingController)/
+    // 적 건물(EnemyBuildingController) 선택 둘 다 이 오버로드를 쓰므로 여기 한 곳만 고치면 양쪽에 대칭 적용된다.
     public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health)
     {
         ShowInfoPanel(icon, unitName, health, 0, 0);
+        SetCombatStatsVisible(false);
     }
 
     // 유닛 선택 시 공격력/방어력도 함께 받아 저장해둔다.

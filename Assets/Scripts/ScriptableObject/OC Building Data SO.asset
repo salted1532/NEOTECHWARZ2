@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBuildingDataSO
   buildingData:
   - <Name>k__BackingField: Omega Core
-    <description>k__BackingField: NTA CommandCenter 대응. OC 본진, Nanobot Repair 생산.
+    <description>k__BackingField: "NTA CommandCenter \uB300\uC751. OC \uBCF8\uC9C4,
+      Nanobot Repair \uC0DD\uC0B0."
     <ID>k__BackingField: 1
     <Size>k__BackingField: {x: 3, y: 3}
     <mineral>k__BackingField: 400
@@ -23,9 +24,12 @@ MonoBehaviour:
     <maxpopulationamount>k__BackingField: 10
     <productionTime>k__BackingField: 50
     <requiredBuildingID>k__BackingField: 0
-    <Prefab>k__BackingField: {fileID: 0}
+    <hp>k__BackingField: 1500
+    <Icon>k__BackingField: {fileID: 21300000, guid: 31f614dd41f450040b2b96fe0093d970, type: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: 78fe924d2053b004ea76bc750be7f871, type: 3}
   - <Name>k__BackingField: Cargo Silo
-    <description>k__BackingField: NTA SupplyDepot 대응. 인구수 공급.
+    <description>k__BackingField: "NTA SupplyDepot \uB300\uC751. \uC778\uAD6C\uC218
+      \uACF5\uAE09."
     <ID>k__BackingField: 2
     <Size>k__BackingField: {x: 2, y: 2}
     <mineral>k__BackingField: 100
@@ -34,9 +38,12 @@ MonoBehaviour:
     <maxpopulationamount>k__BackingField: 8
     <productionTime>k__BackingField: 25
     <requiredBuildingID>k__BackingField: 0
-    <Prefab>k__BackingField: {fileID: 0}
+    <hp>k__BackingField: 500
+    <Icon>k__BackingField: {fileID: 21300000, guid: 71da5815b92d5cd4c8762dd9ef7d5b8d, type: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: 83897057a276d304aa77f21f7a31637d, type: 3}
   - <Name>k__BackingField: Cyber Foundry
-    <description>k__BackingField: NTA Barracks 대응. 보병(사이보그) 생산.
+    <description>k__BackingField: "NTA Barracks \uB300\uC751. \uBCF4\uBCD1(\uC0AC\uC774\uBCF4\uADF8)
+      \uC0DD\uC0B0."
     <ID>k__BackingField: 3
     <Size>k__BackingField: {x: 3, y: 3}
     <mineral>k__BackingField: 150
@@ -45,9 +52,12 @@ MonoBehaviour:
     <maxpopulationamount>k__BackingField: 0
     <productionTime>k__BackingField: 37
     <requiredBuildingID>k__BackingField: 0
-    <Prefab>k__BackingField: {fileID: 0}
+    <hp>k__BackingField: 1000
+    <Icon>k__BackingField: {fileID: 21300000, guid: b237c9078ca9a9f44b20e2acc456f505, type: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: bd7f823a68eadbb45a7fc8eb5edda1ac, type: 3}
   - <Name>k__BackingField: Mech Yard
-    <description>k__BackingField: NTA Factory 대응. 차량/메크 생산.
+    <description>k__BackingField: "NTA Factory \uB300\uC751. \uCC28\uB7C9/\uBA54\uD06C
+      \uC0DD\uC0B0."
     <ID>k__BackingField: 4
     <Size>k__BackingField: {x: 3, y: 3}
     <mineral>k__BackingField: 200
@@ -56,9 +66,12 @@ MonoBehaviour:
     <maxpopulationamount>k__BackingField: 0
     <productionTime>k__BackingField: 37
     <requiredBuildingID>k__BackingField: 3
-    <Prefab>k__BackingField: {fileID: 0}
+    <hp>k__BackingField: 1250
+    <Icon>k__BackingField: {fileID: 21300000, guid: 0807f6fe106d72e4a97f1751f3d7ff1d, type: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
   - <Name>k__BackingField: Drone Hangar
-    <description>k__BackingField: NTA Spaceport 대응. 공중 드론 생산.
+    <description>k__BackingField: "NTA Spaceport \uB300\uC751. \uACF5\uC911 \uB4DC\uB860
+      \uC0DD\uC0B0."
     <ID>k__BackingField: 5
     <Size>k__BackingField: {x: 3, y: 3}
     <mineral>k__BackingField: 150
@@ -67,9 +80,12 @@ MonoBehaviour:
     <maxpopulationamount>k__BackingField: 0
     <productionTime>k__BackingField: 37
     <requiredBuildingID>k__BackingField: 4
-    <Prefab>k__BackingField: {fileID: 0}
+    <hp>k__BackingField: 1300
+    <Icon>k__BackingField: {fileID: 21300000, guid: dd15a21c5d9100640bb815f22be622a6, type: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: c01369b9700ce5d4c82dbe7ad016855e, type: 3}
   - <Name>k__BackingField: Neural Lab
-    <description>k__BackingField: NTA Lab 대응. 공격/방어 연구.
+    <description>k__BackingField: "NTA Lab \uB300\uC751. \uACF5\uACA9/\uBC29\uC5B4
+      \uC5F0\uAD6C."
     <ID>k__BackingField: 6
     <Size>k__BackingField: {x: 2, y: 2}
     <mineral>k__BackingField: 150
@@ -78,4 +94,6 @@ MonoBehaviour:
     <maxpopulationamount>k__BackingField: 0
     <productionTime>k__BackingField: 37
     <requiredBuildingID>k__BackingField: 0
-    <Prefab>k__BackingField: {fileID: 0}
+    <hp>k__BackingField: 850
+    <Icon>k__BackingField: {fileID: 21300000, guid: f381402a9f77c0f4b9c919b57ddc66ef, type: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: 7fbe2d1fd9631c24a981df752e4a42bd, type: 3}

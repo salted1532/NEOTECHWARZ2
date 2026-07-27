@@ -45,10 +45,18 @@ public class PlacementSystem : MonoBehaviour
     // ===== 건물 리프트 이동(착륙 위치 선택) =====
     private BuildingController relocatingBuilding; // 현재 착륙 위치를 고르는 중인 건물(없으면 null)
 
+    // StructureData는 Awake()에서 만든다 - BuildingController.Start()가 씬에 미리 배치된 자기 자신을
+    // 그리드에 등록할 때 이 PlacementSystem을 참조하는데, 서로 다른 GameObject의 Start() 호출 순서는
+    // 유니티가 보장해주지 않는다. Awake()는 씬의 모든 Start()보다 항상 먼저 끝나므로 여기서 만들어야
+    // BuildingController.Start()가 먼저 실행돼도 StructureData가 항상 준비돼 있다 (doc/0247).
+    private void Awake()
+    {
+        StructureData = new();
+    }
+
     void Start()
     {
         StopPlacement();
-        StructureData = new();
         rtsController = FindFirstObjectByType<RTSUnitController>();
 
         SpawnStartingMainBase();
@@ -291,12 +299,35 @@ public class PlacementSystem : MonoBehaviour
         StopPlacement();
     }
 
+    // 월드 좌표 → 그리드 셀 좌표. BuildingController/EnemyBuildingController가 씬에 미리 배치된 자신의
+    // 위치로부터 자기 그리드 셀을 역산할 때 사용 (doc/0247).
+    public Vector3Int WorldToGridCell(Vector3 worldPos) => grid.WorldToCell(worldPos);
+
+    // 씬에 이미 배치돼 있는 건물(정상 건설 흐름을 거치지 않은 건물)이 게임 시작 시 자기 자신을 그리드
+    // 점유 정보에 등록할 때 호출한다 (BuildingController/EnemyBuildingController.Start(), doc/0247).
+    // 이미 그 칸이 점유돼 있으면(겹침) 등록하지 않고 false를 반환한다 - GridData.AddObjectAt은 겹치면
+    // 예외를 던지므로 반드시 CanPlaceObejctAt으로 먼저 확인해야 한다.
+    public bool RegisterBuildingGrid(GameObject buildingObject, Vector3Int gridPos, Vector2Int size, int id)
+    {
+        if (!StructureData.CanPlaceObejctAt(gridPos, size))
+        {
+            Debug.LogWarning($"{buildingObject.name}: 그리드 위치 {gridPos}가 이미 점유돼 있어 등록할 수 없습니다.");
+            return false;
+        }
+
+        placedGameObject.Add(buildingObject);
+        int placedIndex = placedGameObject.Count - 1;
+        StructureData.AddObjectAt(gridPos, size, id, placedIndex);
+
+        return true;
+    }
+
     /// <summary>
     /// Grid → World 변환 + XZ 중앙정렬. Y는 그리드 셀 크기로 양자화하지 않고, 호출부가 이미 알고 있는
     /// 실제 지면 좌표(groundY, 마우스 레이캐스트나 startPoint.transform.position.y 등)를 그대로 쓴다.
     /// (그리드 셀 크기를 거쳐 Y를 되돌리면 cellSize.y 배수로 양자화돼 실제 지형 높이와 어긋난다 - doc/0150)
     /// </summary>
-    private Vector3 GetGroundPosition(Vector3Int gridPos, Vector2Int size, float groundY)
+    public Vector3 GetGroundPosition(Vector3Int gridPos, Vector2Int size, float groundY)
     {
         Vector3 basePos = grid.CellToWorld(gridPos);
         Vector3 cellSize = grid.cellSize;

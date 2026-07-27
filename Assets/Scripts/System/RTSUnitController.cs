@@ -17,6 +17,7 @@ public class RTSUnitController : MonoBehaviour
     public List<UnitController> selectedUnitList;
     public List<BuildingController> selectedBuildingList;
     public List<EnemyUnitController> selectedEnemyList;
+    public EnemyBuildingController selectedEnemyBuilding; // 적 건물도 항상 단일 선택 (doc/0244)
     public ResourceNode selectedResourceNode; // 광물/가스는 항상 단일 선택
     public BaseStructure selectedBaseStructure; // 건설 중인 건물 기반도 항상 단일 선택
 
@@ -50,6 +51,10 @@ public class RTSUnitController : MonoBehaviour
     // OC(적 진영) 유닛 데이터베이스 - EnemyUnitController.Start()가 자기 enemyUnitID로 스탯을 조회할 때 사용 (doc/0232).
     [SerializeField]
     private EnemyUnitDataSO enemyUnitDatabase;
+    // OC(적 진영) 건물 데이터베이스 - EnemyBuildingController.Start()가 자기 enemyBuildingID로 이름/체력을
+    // 조회할 때 사용 (doc/0245).
+    [SerializeField]
+    private EnemyBuildingDataSO enemyBuildingDatabase;
     [SerializeField]
     private UpgradeManager upgradeManager;
     [SerializeField]
@@ -62,6 +67,7 @@ public class RTSUnitController : MonoBehaviour
         UnitSelect,
         BuildingSelect,
         EnemySelect,
+        EnemyBuildingSelect,
         OreSelect,
         BaseStructureSelect,
         BuildMode
@@ -352,6 +358,18 @@ public class RTSUnitController : MonoBehaviour
     }
 
     /// <summary>
+    /// 적 건물 지정 공격 (우클릭 적 건물 클릭 / A 모드에서 적 건물 클릭): 건물은 움직이지 않으므로
+    /// AttackFriendlyTarget(거리 상관없이 파괴될 때까지 계속 추격/공격)을 그대로 재사용한다 (doc/0248).
+    /// </summary>
+    public void AttackEnemyBuildingSelectedUnits(EnemyBuildingController target)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].AttackFriendlyTarget(target);
+        }
+    }
+
+    /// <summary>
     /// 아군 구조체(건설 중인 BaseStructure) 강제 공격 (A 모드에서 아군 구조체 좌클릭): 대상이 파괴(건설 취소)될 때까지 끝까지 공격한다.
     /// </summary>
     public void AttackFriendlyStructureSelectedUnits(BaseStructure target)
@@ -583,6 +601,40 @@ public class RTSUnitController : MonoBehaviour
 
     #endregion
 
+    #region EnemyBuilding선택 관련
+
+    /// <summary>
+    /// 좌클릭 선택 처리 (적 건물은 항상 단일 선택)
+    /// </summary>
+    public void ClickSelectEnemyBuilding(EnemyBuildingController building)
+    {
+        DeselectAll();
+        SelectEnemyBuilding(building);
+    }
+
+    private void SelectEnemyBuilding(EnemyBuildingController building)
+    {
+        if (IsBuildMode())
+            return;
+
+        RTScurrentSate = SelectState.EnemyBuildingSelect;
+
+        building.SelectEnemyBuilding();
+        selectedEnemyBuilding = building;
+    }
+
+    // 적 건물이 파괴되어 사라질 때 선택 상태가 유령 참조로 남지 않도록 정리한다.
+    public void ClearSelectedEnemyBuildingIfMatches(EnemyBuildingController building)
+    {
+        if (selectedEnemyBuilding != building)
+            return;
+
+        selectedEnemyBuilding = null;
+        RTScurrentSate = SelectState.None;
+    }
+
+    #endregion
+
     #region Ore/Gas선택 관련
 
     /// <summary>
@@ -676,6 +728,7 @@ public class RTSUnitController : MonoBehaviour
             enemy.DeselectEnemy();
         }
 
+        selectedEnemyBuilding?.DeselectEnemyBuilding();
         selectedResourceNode?.DeselectResource();
         selectedBaseStructure?.DeselectStructure();
 
@@ -683,6 +736,7 @@ public class RTSUnitController : MonoBehaviour
         selectedUnitList.Clear();
         selectedBuildingList.Clear();
         selectedEnemyList.Clear();
+        selectedEnemyBuilding = null;
         selectedResourceNode = null;
         selectedBaseStructure = null;
     }
@@ -1469,6 +1523,24 @@ public class RTSUnitController : MonoBehaviour
                 uIController.HideSquadPanel();
                 break;
 
+            case SelectState.EnemyBuildingSelect:
+
+                if (selectedEnemyBuilding != null)
+                {
+                    // 건물은 공격을 하지 않으므로 공격력/방어력 없이 아이콘/이름/체력만 표시 (3-인자 오버로드,
+                    // 아군 건물 Info_panel과 동일한 패턴).
+                    uIController.ShowInfoPanel(selectedEnemyBuilding.GetIcon(), selectedEnemyBuilding.GetBuildingName(), selectedEnemyBuilding.GetComponent<HealthManager>());
+                }
+                else
+                {
+                    uIController.HideInfoPanel();
+                }
+
+                uIController.ClearPanel();
+                uIController.HideProductionUI();
+                uIController.HideSquadPanel();
+                break;
+
             case SelectState.OreSelect:
 
                 if (selectedResourceNode != null)
@@ -1587,10 +1659,19 @@ public class RTSUnitController : MonoBehaviour
     // unitID로 UnitData를 조회한다 (UnitController가 자기 자신의 스탯을 SO에서 가져올 때 사용).
     public UnitData GetUnitData(int unitID) => unitDatabase.unitData.Find(d => d.ID == unitID);
 
+    // buildingID로 BuildingDataSO에서 BuildingData를 조회한다 (BuildingController가 씬에 미리 배치된
+    // 자신의 Size를 SO에서 가져와 그리드에 등록할 때 사용, doc/0247).
+    public BuildingData GetBuildingData(int buildingID) => buildingDatabase.buildingData.Find(d => d.ID == buildingID);
+
     // enemyUnitID로 OC Unit Data SO(EnemyUnitDataSO)에서 UnitData를 조회한다 (EnemyUnitController가
     // 자기 자신의 스탯을 SO에서 가져올 때 사용, doc/0232).
     public UnitData GetEnemyUnitData(int enemyUnitID) =>
         enemyUnitDatabase != null ? enemyUnitDatabase.unitData.Find(d => d.ID == enemyUnitID) : null;
+
+    // enemyBuildingID로 OC Building Data SO(EnemyBuildingDataSO)에서 BuildingData를 조회한다
+    // (EnemyBuildingController가 자기 자신의 이름/체력을 SO에서 가져올 때 사용, doc/0245).
+    public BuildingData GetEnemyBuildingData(int enemyBuildingID) =>
+        enemyBuildingDatabase != null ? enemyBuildingDatabase.buildingData.Find(d => d.ID == enemyBuildingID) : null;
 
     // ResearchQueue가 연구 완료 시 호출 (UpgradeManager를 직접 모른 채로 보너스를 반영)
     public void AddGlobalBonus(ResearchType type, int amount) => upgradeManager.AddBonus(type, amount);
