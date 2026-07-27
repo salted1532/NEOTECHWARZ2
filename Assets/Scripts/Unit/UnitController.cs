@@ -846,8 +846,12 @@ public class UnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = AirTargetPosition(transform.position, true); // 제자리 정지 - 현재 고도를 그대로 유지
-            isMovingAirUnit = false;
+            // 공격 중에도 목표 고도(airCruiseAltitude)까지는 계속 상승한다 - 우주공항에서 막 생성되자마자
+            // 근처에 적이 있어서 뜨기도 전에 공격을 시작하면 그대로 바닥에 눌러붙은 채로 싸우는 문제가
+            // 있었다 (doc/0241). 수평 이동 없이(현재 XZ 그대로) 수직으로만 계속 목표 고도로 수렴시킨다.
+            float groundBelow = SampleGroundHeight(transform.position, transform.position.y - airCruiseAltitude);
+            targetPosition = new Vector3(transform.position.x, groundBelow + airCruiseAltitude, transform.position.z);
+            isMovingAirUnit = true;
         }
 
         if (turretController == null)
@@ -1462,7 +1466,10 @@ public class UnitController : MonoBehaviour, IDestructible
         canAttackAir = data.canAttackAir;
 
         if (attackRange != null)
+        {
             attackRange.UnitRange = data.attackRange;
+            attackRange.EnsureDetectionRadius(); // 감지 반경이 새 사거리보다 좁아지지 않도록 보장 (doc/0239 안전장치)
+        }
 
         GetComponent<HealthManager>()?.InitializeHealth(data.hp);
     }

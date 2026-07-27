@@ -76,7 +76,12 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = AirTargetPosition(transform.position, true);
+            // 시작 시점에 "자기 위치로 이동" 명령을 내린 것과 동일하게 처리한다 - destinationIsAirborne을
+            // 기본값(false)으로 둬서 현재 XZ의 지면 높이 + airCruiseAltitude로 목적지를 계산하고,
+            // isMovingAirUnit을 true로 켜서 Update()가 실제로 그 높이까지 떠오르게 한다 (UnitController.Awake()와
+            // 동일한 패턴). 씬에 바닥 위치로 배치해둔 테스트 오브젝트도 시작하자마자 자동으로 떠오른다.
+            targetPosition = AirTargetPosition(transform.position);
+            isMovingAirUnit = true;
         }
     }
 
@@ -224,11 +229,14 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         }
         else
         {
-            targetPosition = AirTargetPosition(transform.position, true); // 제자리 정지 - 현재 고도를 그대로 유지
-            isMovingAirUnit = false;
+            // 공격 중에도 목표 고도(airCruiseAltitude)까지는 계속 상승한다 - 생성되자마자 근처에 상대가
+            // 있어서 뜨기도 전에 공격을 시작하면 그대로 바닥에 눌러붙은 채로 싸우는 문제가 있었다 (doc/0241).
+            // 수평 이동 없이(현재 XZ 그대로) 수직으로만 계속 목표 고도로 수렴시킨다.
+            float groundBelow = SampleGroundHeight(transform.position, transform.position.y - airCruiseAltitude);
+            targetPosition = new Vector3(transform.position.x, groundBelow + airCruiseAltitude, transform.position.z);
+            isMovingAirUnit = true;
         }
 
-        currentState = EnemyState.Attack;
         RotateYOnly(end);
 
         if (alreadyAttacked)
@@ -440,7 +448,10 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         canAttackAir = data.canAttackAir;
 
         if (attackRange != null)
+        {
             attackRange.UnitRange = data.attackRange;
+            attackRange.EnsureDetectionRadius(); // 감지 반경이 새 사거리보다 좁아지지 않도록 보장 (doc/0239 안전장치)
+        }
 
         GetComponent<HealthManager>()?.InitializeHealth(data.hp);
     }
