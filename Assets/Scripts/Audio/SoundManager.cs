@@ -28,7 +28,10 @@ public class SoundManager : MonoBehaviour
 
     [Header("나레이션 (유닛/건물에 안 묶이는 전역 음성)")]
     [SerializeField] private GlobalVoiceBankSO globalVoiceBank;
-    [SerializeField] private float globalVoiceCooldown = 6f; // 카테고리별 최소 재재생 간격(초) - "공격받았습니다" 스팸 방지
+    // 피격 경고음(유닛/건물)만 재생이 끝나도 곧바로 다시 울리지 않도록 별도 쿨다운을 둔다 - 전투 중
+    // 계속 두들겨 맞으면 알림이 끊임없이 울려서 시끄럽기 때문(doc/0273). 자원/인구부족·업그레이드
+    // 완료 등 나머지 나레이션은 doc/0271대로 "재생 중이 아니면 곧바로 재생" 규칙을 그대로 쓴다.
+    [SerializeField] private float underAttackWarningCooldown = 10f;
 
     // 풀에서 관리하는 AudioSource 1개 + "언제 재생을 시작했는지" - 전부 재생 중일 때 가장 오래된 걸 가로채기 위함.
     private class PooledSource
@@ -39,7 +42,14 @@ public class SoundManager : MonoBehaviour
 
     private readonly List<PooledSource> sfxPool = new List<PooledSource>();
     private readonly List<PooledSource> voicePool = new List<PooledSource>();
-    private readonly Dictionary<SoundClipSet, float> lastGlobalVoiceTime = new Dictionary<SoundClipSet, float>();
+
+    // 나레이션 카테고리(SoundClipSet)별로 "지금 그 카테고리를 재생 중인 AudioSource"를 기억해둔다 -
+    // 재생 중이면 같은 카테고리 재요청을 무시하고, 재생이 끝나면 다음 요청부터 다시 재생한다 (doc/0271).
+    private readonly Dictionary<SoundClipSet, AudioSource> activeGlobalVoiceSources = new Dictionary<SoundClipSet, AudioSource>();
+
+    // minInterval을 지정한 나레이션 카테고리(피격 경고음)에 한해서만 "마지막으로 재생을 시작한 시각"을
+    // 추가로 추적한다 (doc/0273).
+    private readonly Dictionary<SoundClipSet, float> lastGlobalVoiceStartTime = new Dictionary<SoundClipSet, float>();
 
     // 선택/이동/공격명령 음성 전용 채널 - 항상 이 소스 하나만 써서, "지금 어떤 유닛 종류의 대사가
     // 재생 중인지"를 정확히 추적할 수 있게 한다 (doc/0262~0264). 일반 voicePool과는 별개.
@@ -177,17 +187,32 @@ public class SoundManager : MonoBehaviour
         orderVoiceSource.Play();
     }
 
-    // 유닛/건물에 안 묶이는 나레이션 - 같은 SoundClipSet은 globalVoiceCooldown 동안 다시 재생하지 않는다(스팸 방지).
-    public void PlayGlobalVoice(SoundClipSet set)
+    // 유닛/건물에 안 묶이는 나레이션 - 같은 카테고리(SoundClipSet)의 경고음이 아직 재생 중이면 겹쳐
+    // 재생하지 않는다. 고정된 쿨다운 시간이 아니라 "재생이 끝났는지"로 판단하므로, 이전 재생이 끝난
+    // 뒤에는 곧바로 다음 명령/상황에서 다시 새로 랜덤 재생된다 (doc/0271 - 예전엔 고정 6초 쿨다운이라
+    // 그 안에 자원부족을 다시 겪어도 조용히 씹혔음).
+    // minInterval(초) > 0이면 추가로 "마지막 재생 시작 시각으로부터 이 시간이 지나야" 다시 재생한다 -
+    // 피격 경고음처럼 재생이 짧게 끝나도 계속 얻어맞으면 스팸되는 경우를 막기 위함(doc/0273).
+    public void PlayGlobalVoice(SoundClipSet set, float minInterval = 0f)
     {
         if (set == null || !set.HasClips)
             return;
 
-        if (lastGlobalVoiceTime.TryGetValue(set, out float last) && Time.time - last < globalVoiceCooldown)
+        if (activeGlobalVoiceSources.TryGetValue(set, out AudioSource activeSource)
+            && activeSource != null && activeSource.isPlaying)
             return;
 
-        lastGlobalVoiceTime[set] = Time.time;
-        PlayVoice(set);
+        if (minInterval > 0f
+            && lastGlobalVoiceStartTime.TryGetValue(set, out float lastStart)
+            && Time.time - lastStart < minInterval)
+            return;
+
+        AudioSource source = PlayFromPool(voicePool, set, voiceVolume, voiceMuted, spatialBlend: 0f, transform.position);
+        if (source != null)
+        {
+            activeGlobalVoiceSources[set] = source;
+            lastGlobalVoiceStartTime[set] = Time.time;
+        }
     }
 
     // 자주 쓰는 나레이션 카테고리는 호출부가 globalVoiceBank를 직접 null 체크하지 않도록 래핑해둔다.
@@ -201,9 +226,15 @@ public class SoundManager : MonoBehaviour
         if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.insufficientPopulation);
     }
 
-    public void PlayUnderAttackWarning()
+    // 피격 경고음은 유닛/건물 각각 독립적으로 underAttackWarningCooldown(기본 10초) 간격을 둔다.
+    public void PlayUnitUnderAttackWarning()
     {
-        if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.underAttackWarning);
+        if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.unitUnderAttackWarning, underAttackWarningCooldown);
+    }
+
+    public void PlayBuildingUnderAttackWarning()
+    {
+        if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.buildingUnderAttackWarning, underAttackWarningCooldown);
     }
 
     public void PlayUpgradeCompleteVoice()
@@ -211,14 +242,16 @@ public class SoundManager : MonoBehaviour
         if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.upgradeComplete);
     }
 
-    private void PlayFromPool(List<PooledSource> pool, SoundClipSet set, float categoryVolume, bool muted, float spatialBlend, Vector3 worldPos)
+    // AudioSource를 반환하는 이유: PlayGlobalVoice가 "이 카테고리가 지금 재생 중인지"를 나중에
+    // 확인할 수 있어야 하기 때문 (doc/0271). 반환값이 필요 없는 호출부(PlaySFX/PlayVoice 등)는 그냥 버린다.
+    private AudioSource PlayFromPool(List<PooledSource> pool, SoundClipSet set, float categoryVolume, bool muted, float spatialBlend, Vector3 worldPos)
     {
         if (set == null || !set.HasClips)
-            return;
+            return null;
 
         AudioClip clip = set.GetRandomClip();
         if (clip == null)
-            return;
+            return null;
 
         PooledSource pooled = GetAvailableSource(pool);
         AudioSource source = pooled.Source;
@@ -230,6 +263,8 @@ public class SoundManager : MonoBehaviour
         source.volume = EffectiveVolume(categoryVolume, muted) * set.volumeScale;
         pooled.StartedAt = Time.time;
         source.Play();
+
+        return source;
     }
 
     #endregion

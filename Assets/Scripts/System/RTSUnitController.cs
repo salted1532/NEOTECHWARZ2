@@ -1234,9 +1234,18 @@ public class RTSUnitController : MonoBehaviour
             return false;
 
         if (!IsBuildingPrerequisiteMet(buildingID))
-            return false;
+            return false; // 버튼 자체가 비활성화되므로(doc/0189) 일반 플레이에서는 도달하지 않는 방어용 분기
 
-        return resourceManager.TrySpend(data.mineral, data.gas);
+        if (!resourceManager.TrySpend(data.mineral, data.gas))
+        {
+            // 자원부족은 "건설 실패"(장애물 등)와 다른 원인이므로, 일꾼의 건설 실패 음성이 아니라
+            // 유닛 생산/연구와 동일한 전역 "자원부족" 나레이션을 재생한다 (doc/0272 - 예전엔 원인 구분
+            // 없이 항상 일꾼의 buildFailVoice가 나가서 장애물 음성처럼 들렸음).
+            SoundManager.Instance?.PlayInsufficientResourcesWarning();
+            return false;
+        }
+
+        return true;
     }
 
     #endregion

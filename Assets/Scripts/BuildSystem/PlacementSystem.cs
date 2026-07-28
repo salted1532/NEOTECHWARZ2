@@ -166,11 +166,10 @@ public class PlacementSystem : MonoBehaviour
         if (worker == null)
             return; // 건설을 맡을 일꾼이 없으면 배치하지 않음
 
+        // 자원부족 등 클릭 시점의 실패는 TryConstructBuilding 내부에서 전역 "자원부족" 나레이션을 재생한다
+        // (doc/0272) - 일꾼의 건설 실패 음성(PlayBuildFailVoice)은 도착 시 장애물 발견 케이스 전용으로 남겨둔다.
         if (rtsController == null || !rtsController.TryConstructBuilding(data.ID))
-        {
-            worker.GetComponent<UnitAudio>()?.PlayBuildFailVoice(); // "일꾼의 건설 실패 음성"
-            return; // 자원/인구가 부족하면 배치하지 않음 (여기서 자원이 실제로 차감됨)
-        }
+            return; // 자원/인구가 부족하거나 선행 건물 조건을 못 채우면 배치하지 않음
 
         Vector3 groundPos = GetGroundPosition(gridPos, data.Size, mousePos.y);
         Vector3 spawnPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab); // 완공될 건물 기준 높이 (고스트/일꾼 목적지용)

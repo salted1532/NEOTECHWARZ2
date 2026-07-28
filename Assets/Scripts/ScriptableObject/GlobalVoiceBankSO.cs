@@ -10,7 +10,9 @@ public class GlobalVoiceBankSO : ScriptableObject
     [field: SerializeField]
     public SoundClipSet insufficientPopulation { get; private set; }
     [field: SerializeField]
-    public SoundClipSet underAttackWarning { get; private set; }
+    public SoundClipSet unitUnderAttackWarning { get; private set; } // 화면 밖에서 아군 유닛이 공격받았을 때
+    [field: SerializeField]
+    public SoundClipSet buildingUnderAttackWarning { get; private set; } // 화면 밖에서 아군 건물이 공격받았을 때
     [field: SerializeField]
     public SoundClipSet upgradeComplete { get; private set; }
 }

@@ -90,6 +90,6 @@ public class BuildingAudio : MonoBehaviour
     private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType)
     {
         if (!SoundManager.IsWorldPositionOnScreen(transform.position))
-            SoundManager.Instance?.PlayUnderAttackWarning();
+            SoundManager.Instance?.PlayBuildingUnderAttackWarning();
     }
 }

@@ -13,18 +13,27 @@ MonoBehaviour:
   m_Name: Global Voice Bank SO
   m_EditorClassIdentifier: Assembly-CSharp::GlobalVoiceBankSO
   <insufficientResources>k__BackingField:
-    <clips>k__BackingField: []
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 29c823cc0ea290a4ba6d9cfdcbd045c5, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <insufficientPopulation>k__BackingField:
-    <clips>k__BackingField: []
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 8d6816ab4fcd88649a1b60ee7bde72f2, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
-  <underAttackWarning>k__BackingField:
-    <clips>k__BackingField: []
+  <unitUnderAttackWarning>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 89a2478c72fbbc84cbde32ef713a7c5c, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <buildingUnderAttackWarning>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 18c4c7d8e5a19f841aca8aadab631c57, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <upgradeComplete>k__BackingField:
-    <clips>k__BackingField: []
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 6869f8dfb3930754b8d8dad638fd8adb, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
