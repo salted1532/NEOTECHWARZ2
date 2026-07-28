@@ -165,6 +165,7 @@ GameObject:
   - component: {fileID: 3370982895530486659}
   - component: {fileID: 5216606494986298842}
   - component: {fileID: 1893831155959136481}
+  - component: {fileID: -8464300020049961208}
   m_Layer: 8
   m_Name: Railgunner
   m_TagString: Enemy
@@ -428,6 +429,18 @@ MonoBehaviour:
   laserBeamPrefab: {fileID: 1844130978594048, guid: b9b15cdfa2b104c41b2ccb74ccf58ad6, type: 3}
   firePoint: {fileID: 6427180926210184788}
   beamDuration: 0.2
+--- !u!114 &-8464300020049961208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4698038001367890631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c2ad14de2c2834da003b4d876c7eaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitAudio
 --- !u!1 &5286784239653861491
 GameObject:
   m_ObjectHideFlags: 0

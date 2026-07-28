@@ -330,6 +330,53 @@ public class SoundManager : MonoBehaviour
    사운드라 이번 Phase 3 훅 지점 표에는 포함하지 않았다(우선순위 낮음/후속 작업으로 미룸). 지금
    범위에 꼭 포함해야 하면 알려달라.
 
+## 구현 결과 (2026-07-28, "그런식으로 구현해줘" 승인 후)
+
+Phase 1~4를 한 번에 구현했다. 열린 질문 6개는 대부분 문서에 적어둔 가정대로 진행했고(질문 2/3/4는
+"이대로 가정" 문구 그대로 채택), 아래 2개는 구현 시점에 추가로 판단해 결정했다:
+
+- **열린 질문 5(AudioMixer)**: `.mixer` 에셋은 유니티 에디터 전용 복잡한 직렬화 포맷이라 텍스트 편집으로
+  안전하게 만들 수 없어서, **AudioMixer를 아예 쓰지 않고** `SoundManager`가 카테고리별 볼륨(주음량×배경음악
+  /효과음/음성)을 직접 곱해서 `AudioSource.volume`에 적용하는 방식으로 바꿨다. 기능(4개 볼륨 슬라이더 +
+  3개 뮤트 토글, 뮤트해도 슬라이더 값 보존)은 설계와 동일하고, 에디터에서 믹서를 미리 구성해둬야 하는
+  선행 작업이 없어졌다.
+- **선택/이동/공격명령 대사의 정확한 트리거 지점**: 드래그 선택(`DragSelectUnit`)은 박스 안에 들어오는
+  유닛마다 매 프레임 호출되는 구조라 여기에 훅을 걸면 대사가 스팸되므로, **`ClickSelectUnit`/
+  `ShiftClickSelectUnit`(클릭 1회 = 호출 1회)에만 선택 대사를 걸고 드래그 선택은 무음으로 남겨뒀다.**
+  이동/공격명령은 설계대로 `RTSUnitController`의 각 `~SelectedUnits` 진입점에 새로 추가한
+  `PlayRepresentativeUnitVoice()` 헬퍼로 "선택된 유닛 중 첫 번째 유효한 유닛 1마리"만 재생한다.
+
+### 실제로 만들어진/수정된 파일
+
+- 신규: `Assets/Scripts/Audio/SoundClipSet.cs`, `SoundManager.cs`, `UnitAudio.cs`, `BuildingAudio.cs`,
+  `Assets/Scripts/ScriptableObject/UnitSoundBankSO.cs`, `BuildingSoundBankSO.cs`, `GlobalVoiceBankSO.cs`,
+  `Assets/Scripts/UI/SoundSettingsPanel.cs`.
+- 수정: `UnitDataSO.cs`/`BuildingDataSO.cs`(`soundBank` 필드 추가), `UnitController.cs`(`Attack()`에
+  `PlayAttackSFX()`, `GatherTick()`의 `Gathering` 진입 시점에 `PlayGatherSFX()`), `UnitSpawner.cs`
+  (`Spawn()`에서 Instantiate 직후 `PlaySpawnSound()`), `BaseStructure.cs`(`Initialize()`에
+  `PlayConstructLoop()`, `CompleteConstruction()`에 `PlayConstructComplete()` + 담당 일꾼
+  `PlayBuildCompleteVoice()`), `PlacementSystem.cs`(자원/인구 부족으로 `TryConstructBuilding` 실패 시
+  일꾼의 `PlayBuildFailVoice()`), `RTSUnitController.cs`(`ClickSelectUnit`/`ShiftClickSelectUnit`에
+  선택 대사, `PlayRepresentativeUnitVoice` 헬퍼 + 이동/공격 6개 메서드에 훅, `SelectBuilding`에 건물
+  선택 음성, `TryProduceUnit`/`TryResearch`의 자원/인구 부족 로그 옆에 나레이션 경고, `AddGlobalBonus`에
+  업그레이드 완료 대사).
+- 사망 SFX/음성(`UnitAudio`/`BuildingAudio`의 `HandleDeath`/`HandleDestroyed`), 화면 밖 피격 경고
+  (`HandleDamaged`)는 기존 `UnitEffects`/`BuildingEffects`와 동일하게 `HealthManager.OnDamaged`/
+  `OnDeath` **이벤트 구독**만으로 동작해서, `UnitController.Die()`/`BuildingController.Die()` 자체는
+  코드 수정 없이 그대로 둠 (프리팹에 `UnitAudio`/`BuildingAudio` 컴포넌트를 붙이기만 하면 됨).
+
+### 아직 안 끝난 부분 (에디터에서 직접 해야 함)
+
+1. **프리팹에 컴포넌트 부착**: 유닛 프리팹에 `UnitAudio`, 건물/`BaseStructure` 프리팹에 `BuildingAudio`를
+   `HealthManager`/`UnitController`(또는 `EnemyUnitController`)와 나란히 추가해야 실제로 소리가 난다.
+2. **사운드 뱅크 에셋 제작 + 연결**: 유닛/건물 종류별로 `UnitSoundBankSO`/`BuildingSoundBankSO` 에셋을
+   만들고 클립을 채운 뒤, 각 `UnitData`/`BuildingData` 항목의 `soundBank` 필드에 연결. `GlobalVoiceBankSO`
+   1개도 만들어 `SoundManager` 인스펙터에 연결.
+3. **씬에 `SoundManager` 배치**: 빈 GameObject 하나에 `SoundManager` 컴포넌트를 붙이고, `bgmSource`
+   (Loop 꺼진 AudioSource)와 `bgmTracks`(3곡) 연결.
+4. **설정 UI 레이아웃**: `SoundSettingsPanel`은 로직만 있고, 실제 Canvas/슬라이더 4개/토글 3개 배치와
+   인스펙터 연결은 유니티 에디터 작업 필요.
+
 ## 요약/영향받는 파일 (구현 승인 시)
 
 - 신규 파일: `Assets/Scripts/Audio/SoundManager.cs`, `Assets/Scripts/Audio/SoundClipSet.cs`,

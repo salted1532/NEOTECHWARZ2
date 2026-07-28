@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bb2707c14e6c6c49be94336cd525a4f, type: 3}
+  m_Name: Sharpshooter Unit Sound Bank SO
+  m_EditorClassIdentifier: Assembly-CSharp::UnitSoundBankSO
+  <attackSFX>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <spawnSFX>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <deathSFX>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <skillSFX>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <gatherSFX>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <selectVoice>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: c2d24dff9e477584ca7517a510b1ad15, type: 3}
+    - {fileID: 8300000, guid: 06cf01bc54de1a54c8b54dfbff30bed8, type: 3}
+    - {fileID: 8300000, guid: a21d4806e8659fb40ad51a0458793f79, type: 3}
+    - {fileID: 8300000, guid: a634d8e203ac76b4790ddc18c042bab3, type: 3}
+    - {fileID: 8300000, guid: 0d9c8dfb18720e74e89b133b2537b159, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <moveVoice>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 18a5d4194ea1d2e49affbd64167854fe, type: 3}
+    - {fileID: 8300000, guid: 38116250b2ae4fa4d934a3353ecbbcc8, type: 3}
+    - {fileID: 8300000, guid: a80b6820ff499934fa0a77f6fd646527, type: 3}
+    - {fileID: 8300000, guid: 9a7a79903685a834593421f6c073c8c5, type: 3}
+    - {fileID: 8300000, guid: 1bc82e607614ae546965b015793b9166, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <attackOrderVoice>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: c9ccd49878f8d4947ad938b5429ff801, type: 3}
+    - {fileID: 8300000, guid: 7ee4dd7a09223fc4082e10cbdb8e88dd, type: 3}
+    - {fileID: 8300000, guid: 5b2859fa39b91394fb7d14bf0cca5e53, type: 3}
+    - {fileID: 8300000, guid: eaab2bfc5dcf9d848b3593ffd41153a9, type: 3}
+    - {fileID: 8300000, guid: 835e941cfe33b9249993a6eda9cf2a2c, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <spawnVoice>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: fc57ac9a6ab9dd340a4e1a46aaafebeb, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <deathVoice>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <buildCompleteVoice>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <buildFailVoice>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0

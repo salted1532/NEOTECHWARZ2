@@ -117,6 +117,7 @@ GameObject:
   - component: {fileID: -1181422328391644967}
   - component: {fileID: 7893471312712258934}
   - component: {fileID: 3370982895530486659}
+  - component: {fileID: 638088941455136069}
   m_Layer: 8
   m_Name: Nanobot Repair
   m_TagString: Enemy
@@ -354,6 +355,18 @@ MonoBehaviour:
   deathPrefab: {fileID: 100014, guid: 04876b7e195a7624ab34f532e53c64cb, type: 3}
   deathPoints:
   - {fileID: 5270652446994590752}
+--- !u!114 &638088941455136069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4698038001367890631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8c2ad14de2c2834da003b4d876c7eaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitAudio
 --- !u!1 &5286784239653861491
 GameObject:
   m_ObjectHideFlags: 0

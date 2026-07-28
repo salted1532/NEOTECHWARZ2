@@ -102,6 +102,11 @@ public class UnitData
     [field: SerializeField]
     public GameObject Prefab { get; private set; }
 
+    // 이 유닛 종류의 공격/생성/사망 SFX + 선택/이동/공격명령/생성/사망 음성을 모아둔 에셋 (비워두면 조용함).
+    // 유닛이 늘어나도 코드 수정 없이 새 UnitSoundBankSO 에셋만 만들어 연결하면 된다 (doc/0255).
+    [field: SerializeField]
+    public UnitSoundBankSO soundBank { get; private set; }
+
     // 이 유닛의 생산 버튼을 대신 누르는 키보드 단축키 (없으면 KeyCode.None)
     [field: SerializeField]
     public KeyCode shortcutKey { get; private set; }

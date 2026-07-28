@@ -156,6 +156,8 @@ public class RTSUnitController : MonoBehaviour
     {
         DeselectAll();
         SelectUnit(newUnit);
+        newUnit.GetComponent<UnitAudio>()?.PlaySelectVoice();
+        newUnit.GetComponent<UnitAudio>()?.PlaySelectSFX();
 
         Debug.Log("유닛 선택");
     }
@@ -172,6 +174,8 @@ public class RTSUnitController : MonoBehaviour
         else
         {
             SelectUnit(newUnit);
+            newUnit.GetComponent<UnitAudio>()?.PlaySelectVoice();
+            newUnit.GetComponent<UnitAudio>()?.PlaySelectSFX();
         }
     }
 
@@ -184,6 +188,13 @@ public class RTSUnitController : MonoBehaviour
         {
             SelectUnit(newUnit);
 
+            // 드래그로 여러 마리가 한꺼번에 선택돼도, 이번 드래그로 새로 선택된 첫 번째 유닛(리스트가
+            // 비어있다가 1개가 된 순간)의 대사만 재생한다 - 나머지는 재생하지 않음 (doc/0262).
+            if (selectedUnitList.Count == 1)
+            {
+                newUnit.GetComponent<UnitAudio>()?.PlaySelectVoice();
+                newUnit.GetComponent<UnitAudio>()?.PlaySelectSFX();
+            }
         }
     }
 
@@ -286,12 +297,36 @@ public class RTSUnitController : MonoBehaviour
             onCancelled: null);
     }
 
+    // 선택된 유닛 여러 마리에게 동시에 내리는 명령 1건당 대표 유닛 1마리의 대사만 재생한다
+    // (드래그로 다수 선택해도 이동/공격명령 대사가 겹쳐 시끄러워지지 않도록, doc/0255).
+    private void PlayRepresentativeUnitVoice(System.Action<UnitAudio> play)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            if (selectedUnitList[i] == null)
+                continue;
+
+            UnitAudio audio = selectedUnitList[i].GetComponent<UnitAudio>();
+            if (audio != null)
+            {
+                play(audio);
+                return;
+            }
+        }
+    }
+
     public void MoveSelectedUnits(Vector3 end)
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
         {
             selectedUnitList[i].MoveTo(end);
         }
+
+        PlayRepresentativeUnitVoice(audio =>
+        {
+            audio.PlayMoveVoice();
+            audio.PlayMoveSFX();
+        });
     }
 
     /// <summary>
@@ -303,6 +338,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].AttackUnitTarget(target);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
     }
 
     /// <summary>
@@ -314,6 +351,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].AttackMoveTo(end);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
     }
 
     /// <summary>
@@ -329,6 +368,8 @@ public class RTSUnitController : MonoBehaviour
 
             selectedUnitList[i].AttackFriendlyTarget(target);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
     }
 
     /// <summary>
@@ -355,6 +396,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].AttackFriendlyTarget(target);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
     }
 
     /// <summary>
@@ -367,6 +410,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].AttackFriendlyTarget(target);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
     }
 
     /// <summary>
@@ -378,6 +423,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].AttackFriendlyTarget(target);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
     }
     public void StopSelectedUnits()
     {
@@ -502,6 +549,7 @@ public class RTSUnitController : MonoBehaviour
 
         building.SelectBuilding();
         selectedBuildingList.Add(building);
+        building.GetComponent<BuildingAudio>()?.PlaySelectVoice();
     }
 
     /// <summary>
@@ -1067,9 +1115,15 @@ public class RTSUnitController : MonoBehaviour
             if (!resourceManager.TrySpend(data.mineral, data.gas, data.population))
             {
                 if (resourceManager.GetOre() < data.mineral || resourceManager.GetGas() < data.gas)
+                {
                     Debug.Log("자원부족!");
+                    SoundManager.Instance?.PlayInsufficientResourcesWarning();
+                }
                 else
+                {
                     Debug.Log("인구수부족!");
+                    SoundManager.Instance?.PlayInsufficientPopulationWarning();
+                }
 
                 break; // 자원이 부족해진 시점부터는 나머지 건물도 어차피 불가능하므로 중단
             }
@@ -1096,6 +1150,7 @@ public class RTSUnitController : MonoBehaviour
         if (!resourceManager.TrySpend(ore, gas))
         {
             Debug.Log("자원부족!");
+            SoundManager.Instance?.PlayInsufficientResourcesWarning();
             return false;
         }
 
@@ -1700,7 +1755,11 @@ public class RTSUnitController : MonoBehaviour
         enemyBuildingDatabase != null ? enemyBuildingDatabase.buildingData.Find(d => d.ID == enemyBuildingID) : null;
 
     // ResearchQueue가 연구 완료 시 호출 (UpgradeManager를 직접 모른 채로 보너스를 반영)
-    public void AddGlobalBonus(ResearchType type, int amount) => upgradeManager.AddBonus(type, amount);
+    public void AddGlobalBonus(ResearchType type, int amount)
+    {
+        upgradeManager.AddBonus(type, amount);
+        SoundManager.Instance?.PlayUpgradeCompleteVoice();
+    }
 
     #endregion
 

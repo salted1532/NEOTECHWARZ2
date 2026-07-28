@@ -99,6 +99,8 @@ public class UnitSpawner : MonoBehaviour
 
         GameObject spawnunit = Instantiate(data.Prefab, spawnPos, Quaternion.identity);
 
+        spawnunit.GetComponent<UnitAudio>()?.PlaySpawnSound();
+
         // 스탯 적용은 이제 유닛 자신이 Start()에서 처리한다 (UnitController.ApplyUnitData 참고) - 여기선 이동만 지시.
         if (spawnunit.TryGetComponent<UnitController>(out var unitController))
         {

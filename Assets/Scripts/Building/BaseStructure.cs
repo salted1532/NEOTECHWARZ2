@@ -83,6 +83,7 @@ public class BaseStructure : MonoBehaviour, IDestructible
         }
 
         GetComponent<ConstructionEffects>()?.StartLoop();
+        GetComponent<BuildingAudio>()?.PlayConstructLoop();
     }
 
     private void Update()
@@ -170,6 +171,7 @@ public class BaseStructure : MonoBehaviour, IDestructible
     private void CompleteConstruction()
     {
         GetComponent<ConstructionEffects>()?.StopLoopAndPlayComplete();
+        GetComponent<BuildingAudio>()?.PlayConstructComplete();
 
         BuildingData data = buildingDatabase != null
             ? buildingDatabase.buildingData.Find(d => d.ID == buildingID)
@@ -197,7 +199,10 @@ public class BaseStructure : MonoBehaviour, IDestructible
         }
 
         if (builder != null)
+        {
+            builder.GetComponent<UnitAudio>()?.PlayBuildCompleteVoice(); // "일꾼의 건설 완료 음성" - FinishConstruction보다 먼저 호출(파괴되기 전에)
             builder.FinishConstruction();
+        }
 
         rtsController?.ClearSelectedStructureIfMatches(this);
 

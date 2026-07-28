@@ -472,6 +472,8 @@ GameObject:
   - component: {fileID: 9036445165335029168}
   - component: {fileID: -3865598169333852747}
   - component: {fileID: 7116149765237121121}
+  - component: {fileID: 3045924314032452492}
+  - component: {fileID: 382044831858931869}
   m_Layer: 9
   m_Name: Tier3
   m_TagString: Tier3
@@ -687,6 +689,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
   sightRange: 15
   updateOnlyOnMove: 1
+--- !u!114 &3045924314032452492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 520de95fc06e45c49a046477da5d554e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingAudio
+--- !u!114 &382044831858931869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 520de95fc06e45c49a046477da5d554e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingAudio
 --- !u!1001 &351461350170579882
 PrefabInstance:
   m_ObjectHideFlags: 0

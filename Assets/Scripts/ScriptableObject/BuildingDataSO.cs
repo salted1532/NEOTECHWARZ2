@@ -49,4 +49,8 @@ public class BuildingData
     public Sprite Icon { get; private set; }
     [field: SerializeField]
     public GameObject Prefab { get; private set; }
+
+    // 이 건물 종류의 건설/파괴 SFX + 선택 음성을 모아둔 에셋 (비워두면 조용함, doc/0255).
+    [field: SerializeField]
+    public BuildingSoundBankSO soundBank { get; private set; }
 }

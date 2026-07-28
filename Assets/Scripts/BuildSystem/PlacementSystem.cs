@@ -167,7 +167,10 @@ public class PlacementSystem : MonoBehaviour
             return; // 건설을 맡을 일꾼이 없으면 배치하지 않음
 
         if (rtsController == null || !rtsController.TryConstructBuilding(data.ID))
+        {
+            worker.GetComponent<UnitAudio>()?.PlayBuildFailVoice(); // "일꾼의 건설 실패 음성"
             return; // 자원/인구가 부족하면 배치하지 않음 (여기서 자원이 실제로 차감됨)
+        }
 
         Vector3 groundPos = GetGroundPosition(gridPos, data.Size, mousePos.y);
         Vector3 spawnPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab); // 완공될 건물 기준 높이 (고스트/일꾼 목적지용)
@@ -180,6 +183,9 @@ public class PlacementSystem : MonoBehaviour
 
         // 클릭한 자리에 일꾼이 도착할 때까지 남아있을 고정 고스트를 생성
         GameObject ghost = preview.SpawnConstructionGhost(data.Prefab, spawnPos);
+
+        worker.GetComponent<UnitAudio>()?.PlayMoveVoice(); // 건설 위치로 이동을 시작하므로 이동 명령 음성 재생
+        worker.GetComponent<UnitAudio>()?.PlayMoveSFX();
 
         worker.GoBuild(
             spawnPos,
@@ -201,6 +207,17 @@ public class PlacementSystem : MonoBehaviour
     // 실제 완성된 건물은 BaseStructure 자신이 건설시간이 다 되면 생성한다.
     private void StartConstruction(BuildingData data, Vector3 groundPos, Vector3Int gridPos, int placedIndex, GameObject ghost, UnitController worker)
     {
+        // 일꾼이 이동하는 동안(클릭 시점엔 비어있었지만) 그 자리에 유닛/건물/지형지물 같은 장애물이
+        // 새로 생겼으면 건설 실패로 취급한다 - 그대로 겹쳐 짓지 않고 실패 음성 + 취소 + 환불 처리.
+        // 담당 일꾼 자신은 지금 막 그 자리에 도착해서 서 있는 상태라, 장애물 판정에서 제외한다.
+        if (IsBlocked(groundPos, data.Size, worker.gameObject))
+        {
+            worker.GetComponent<UnitAudio>()?.PlayBuildFailVoice();
+            CancelReservedConstruction(gridPos, ghost);
+            rtsController?.RefundBuilding(data.ID);
+            return;
+        }
+
         if (ghost != null)
             Destroy(ghost);
 
@@ -365,7 +382,9 @@ public class PlacementSystem : MonoBehaviour
     }
     // 건물이 들어설 영역에 유닛/장애물 등 blockingLayers에 속한 콜라이더가 있는지 물리 박스 검사로 확인한다.
     // 그리드 셀 점유 체크(StructureData)와 별개로, 실제 3D 공간상의 충돌까지 추가로 막기 위한 검사다.
-    private bool IsBlocked(Vector3 worldPos, Vector2Int size)
+    // ignoreObject: 이 오브젝트(및 그 자식) 콜라이더는 장애물로 치지 않는다 - 건설 위치에 도착해서
+    // 그 자리에 서 있는 담당 일꾼 자신이 장애물로 오인되지 않도록 하기 위함(doc/0268).
+    private bool IsBlocked(Vector3 worldPos, Vector2Int size, GameObject ignoreObject = null)
     {
         Vector3 cellSize = grid.cellSize;
 
@@ -386,14 +405,20 @@ public class PlacementSystem : MonoBehaviour
             blockingLayers
         );
 
+        bool blocked = false;
+
         foreach (Collider hit in hits)
         {
+            if (ignoreObject != null && hit.transform.IsChildOf(ignoreObject.transform))
+                continue; // 담당 일꾼 자신은 장애물로 치지 않음
+
             Debug.Log(
                 $"Blocked by : {hit.name} | Layer : {LayerMask.LayerToName(hit.gameObject.layer)}"
             );
+            blocked = true;
         }
 
-        return hits.Length > 0;
+        return blocked;
     }
 
     // 건물이 차지할 모든 셀 중 하나라도 자원(광물/가스) 노드와 minDistanceFromResource(칸, 원형 거리)보다

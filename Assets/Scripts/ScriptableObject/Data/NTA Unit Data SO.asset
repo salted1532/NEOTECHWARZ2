@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 92c9da5dc3b1c624dba21816b696e695, type: 3}
-  m_Name: New Unit Data SO
+  m_Name: NTA Unit Data SO
   m_EditorClassIdentifier: Assembly-CSharp::UnitDataSO
   unitData:
   - <unitName>k__BackingField: 'Worker Drone '
@@ -31,8 +31,10 @@ MonoBehaviour:
     <gas>k__BackingField: 0
     <population>k__BackingField: 1
     <productionTime>k__BackingField: 12
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 21300000, guid: f9088a500c2a2184c90293aea40e17bb, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: c3d16a6fe5c5f2748a77b13ca1ff3a61, type: 2}
     <shortcutKey>k__BackingField: 119
     <hasTraitChoice>k__BackingField: 0
     <traitA>k__BackingField:
@@ -67,8 +69,10 @@ MonoBehaviour:
     <gas>k__BackingField: 0
     <population>k__BackingField: 1
     <productionTime>k__BackingField: 15
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: cb79657de51b2f14489d1ba9d1775831, type: 2}
     <shortcutKey>k__BackingField: 97
     <hasTraitChoice>k__BackingField: 0
     <traitA>k__BackingField:
@@ -103,8 +107,10 @@ MonoBehaviour:
     <gas>k__BackingField: 0
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 19
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 21300000, guid: 6919d5112ea74a64ebb34ca252c20ba2, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: c563c439be1a8e0428a34335496d47c3, type: 2}
     <shortcutKey>k__BackingField: 100
     <hasTraitChoice>k__BackingField: 0
     <traitA>k__BackingField:
@@ -142,22 +148,29 @@ MonoBehaviour:
     <requiredBuildingID>k__BackingField: 6
     <Icon>k__BackingField: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 0a3d03c6c4dd93c4083d5542b823c86b, type: 3}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: 83e87e0e0bb357a41aad5587925ff7cf, type: 2}
     <shortcutKey>k__BackingField: 115
-    <hasTraitChoice>k__BackingField: 0
+    <hasTraitChoice>k__BackingField: 1
     <traitA>k__BackingField:
-      <skillName>k__BackingField: 
-      <description>k__BackingField: 
-      <icon>k__BackingField: {fileID: 0}
-      <isActiveSkill>k__BackingField: 0
+      <skillName>k__BackingField: Snipe
+      <description>k__BackingField: 'Fires a high-powered shot at a single target,
+        dealing 40 damage.
+
+'
+      <icon>k__BackingField: {fileID: 69412130, guid: 3aa596ea8f3dbed42bd789652c09ec01, type: 3}
+      <isActiveSkill>k__BackingField: 1
       <shortcutKey>k__BackingField: 0
-      <cooldown>k__BackingField: 0
+      <cooldown>k__BackingField: 5
     <traitB>k__BackingField:
-      <skillName>k__BackingField: 
-      <description>k__BackingField: 
-      <icon>k__BackingField: {fileID: 0}
+      <skillName>k__BackingField: Cloak
+      <description>k__BackingField: 'Enters stealth for 15 seconds, becoming untargetable
+        by enemy attacks. Attacking or using abilities breaks the cloak.
+
+'
+      <icon>k__BackingField: {fileID: -1898799734, guid: 560099958e629904ea2b58c08ead564b, type: 3}
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
-      <cooldown>k__BackingField: 0
+      <cooldown>k__BackingField: 5
   - <unitName>k__BackingField: 'Ranger IFV '
     <description>k__BackingField: 'train Ranger IFV
 
@@ -176,8 +189,10 @@ MonoBehaviour:
     <gas>k__BackingField: 50
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 25
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 21300000, guid: 04b3f4d7f72d40a48b0eff1ac5006315, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: d9657408020de9a44918eef6a3214c70, type: 3}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: f0e6fbd3e4a32ab48921f20a3934c886, type: 2}
     <shortcutKey>k__BackingField: 105
     <hasTraitChoice>k__BackingField: 0
     <traitA>k__BackingField:
@@ -212,8 +227,10 @@ MonoBehaviour:
     <gas>k__BackingField: 100
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 31
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 21300000, guid: 2cf1e1b8455dc8346b3135d7ea2df0cd, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: cf9c66e22e11f464b84b468573b6d203, type: 2}
     <shortcutKey>k__BackingField: 112
     <hasTraitChoice>k__BackingField: 0
     <traitA>k__BackingField:
@@ -248,24 +265,26 @@ MonoBehaviour:
     <gas>k__BackingField: 50
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 40
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 21300000, guid: f9088a500c2a2184c90293aea40e17bb, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: cf2cc00187f9ce246b71529e2a55dd05, type: 3}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: 7b18ba2bf8bbe6747b3c62d398c9d71d, type: 2}
     <shortcutKey>k__BackingField: 115
     <hasTraitChoice>k__BackingField: 1
     <traitA>k__BackingField:
-      <skillName>k__BackingField: "\uACF5\uC911\uACF5\uACA9 \uAC15\uD654!"
-      <description>k__BackingField: "\uACF5\uC911\uACF5\uACA9\uC5D0 \uD654\uC5FC
-        \uB3C4\uD2B8\uB380\uC744 \uB123\uC5B4\uC8FC\uB294 \uD328\uC2DC\uBE0C \uC2A4\uD0AC"
+      <skillName>k__BackingField: Air Superiority
+      <description>k__BackingField: Air attacks ignite enemy air units, dealing 2
+        damage per second for 7 seconds.
       <icon>k__BackingField: {fileID: 69412130, guid: 3aa596ea8f3dbed42bd789652c09ec01, type: 3}
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 5
     <traitB>k__BackingField:
-      <skillName>k__BackingField: "\uC9C0\uC0C1\uD3ED\uACA9"
-      <description>k__BackingField: "\uC6D0\uC73C\uB85C \uB41C \uBC94\uC704\uB97C
-        \uD3ED\uACA9\uD558\uB294 \uC2A4\uD0AC \uC2A4\uD0AC \uC0AC\uC6A9\uC2DC \uBC94\uC704
-        \uB0B4\uC5D0 \uBAA8\uB4E0 \uC720\uB2DB(\uC544\uAD70\uD3EC\uD568)\uC5D0\uAC8C
-        20\uB9CC\uD07C\uC5D0 \uB370\uBBF8\uC9C0\uB97C \uC90C"
+      <skillName>k__BackingField: 'Ground Bombardment '
+      <description>k__BackingField: 'Calls in an airstrike on a target area, dealing
+        20 damage to all units, including allies.
+
+'
       <icon>k__BackingField: {fileID: -1898799734, guid: 560099958e629904ea2b58c08ead564b, type: 3}
       <isActiveSkill>k__BackingField: 1
       <shortcutKey>k__BackingField: 0
@@ -288,8 +307,10 @@ MonoBehaviour:
     <gas>k__BackingField: 100
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 37
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 21300000, guid: 06ad55446842ade4298efca8384bf7dc, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: 44b0c2bea33c7be4495feb403cf25a85, type: 2}
     <shortcutKey>k__BackingField: 102
     <hasTraitChoice>k__BackingField: 0
     <traitA>k__BackingField:
@@ -324,21 +345,27 @@ MonoBehaviour:
     <gas>k__BackingField: 300
     <population>k__BackingField: 6
     <productionTime>k__BackingField: 63
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 21300000, guid: d6e905e97221d6141ae8f9bd7256fb0a, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7c8f9a4aa9f4bf74c8f9f9d9977dcc9f, type: 3}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: 71760c26a25c56546a9be66a746e41af, type: 2}
     <shortcutKey>k__BackingField: 100
-    <hasTraitChoice>k__BackingField: 0
+    <hasTraitChoice>k__BackingField: 1
     <traitA>k__BackingField:
-      <skillName>k__BackingField: 
-      <description>k__BackingField: 
-      <icon>k__BackingField: {fileID: 0}
+      <skillName>k__BackingField: 'Focused Barrage '
+      <description>k__BackingField: 'Unleashes three enhanced bombardments on a single
+        target, dealing a total of 300 damage.
+
+'
+      <icon>k__BackingField: {fileID: 69412130, guid: 3aa596ea8f3dbed42bd789652c09ec01, type: 3}
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
-      <cooldown>k__BackingField: 0
+      <cooldown>k__BackingField: 5
     <traitB>k__BackingField:
-      <skillName>k__BackingField: 
-      <description>k__BackingField: 
-      <icon>k__BackingField: {fileID: 0}
+      <skillName>k__BackingField: 'Shield Deployment '
+      <description>k__BackingField: Deploys an energy shield, granting 150 bonus
+        health.
+      <icon>k__BackingField: {fileID: -1898799734, guid: 560099958e629904ea2b58c08ead564b, type: 3}
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
-      <cooldown>k__BackingField: 0
+      <cooldown>k__BackingField: 5

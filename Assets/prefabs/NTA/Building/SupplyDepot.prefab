@@ -351,6 +351,8 @@ GameObject:
   - component: {fileID: 4967427582615997534}
   - component: {fileID: 2642398028925672474}
   - component: {fileID: -8944274357517233738}
+  - component: {fileID: 4559537965928840460}
+  - component: {fileID: 8387622760017448185}
   m_Layer: 9
   m_Name: SupplyDepot
   m_TagString: SupplyDepot
@@ -565,6 +567,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
   sightRange: 15
   updateOnlyOnMove: 1
+--- !u!114 &4559537965928840460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 520de95fc06e45c49a046477da5d554e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingAudio
+--- !u!114 &8387622760017448185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 520de95fc06e45c49a046477da5d554e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingAudio
 --- !u!1 &8362081631076696342
 GameObject:
   m_ObjectHideFlags: 0
