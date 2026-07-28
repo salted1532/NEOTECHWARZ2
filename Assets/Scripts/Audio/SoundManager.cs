@@ -23,6 +23,9 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private int sfxPoolSize = 16;
     [SerializeField] private int voicePoolSize = 4; // 음성은 SFX보다 훨씬 적어도 됨(동시에 여러 목소리가 겹치지 않는 편이 자연스러움)
 
+    [Header("SFX 카테고리 전용 부스트 (사용자 볼륨 슬라이더와 별개 - 클립 자체 음량이 작아 체감 볼륨을 전반적으로 키우고 싶을 때)")]
+    [SerializeField, Range(1f, 2f)] private float sfxBoost = 1.5f;
+
     [Header("인터페이스(버튼 클릭) 소리 - 위치 없는 SFX")]
     [SerializeField] private SoundClipSet uiClickSFX;
 
@@ -88,8 +91,8 @@ public class SoundManager : MonoBehaviour
         Instance = this;
 
         LoadVolumePrefs();
-        BuildPool(sfxPool, sfxSourcePrefab, sfxPoolSize, "SFXSource");
-        BuildPool(voicePool, voiceSourcePrefab, voicePoolSize, "VoiceSource");
+        BuildPool(sfxPool, sfxSourcePrefab, sfxPoolSize, "SFXSource", configureSpatialRolloff: true);
+        BuildPool(voicePool, voiceSourcePrefab, voicePoolSize, "VoiceSource", configureSpatialRolloff: false); // voicePool은 항상 spatialBlend=0(2D)로만 재생되므로 롤오프 설정이 무의미하다
 
         orderVoiceSource = new GameObject("OrderVoiceSource").AddComponent<AudioSource>();
         orderVoiceSource.transform.SetParent(transform);
@@ -106,7 +109,7 @@ public class SoundManager : MonoBehaviour
 
     #region 풀 구성/획득
 
-    private void BuildPool(List<PooledSource> pool, AudioSource prefab, int size, string namePrefix)
+    private void BuildPool(List<PooledSource> pool, AudioSource prefab, int size, string namePrefix, bool configureSpatialRolloff)
     {
         for (int i = 0; i < size; ++i)
         {
@@ -116,6 +119,17 @@ public class SoundManager : MonoBehaviour
 
             source.transform.SetParent(transform);
             source.playOnAwake = false;
+
+            // SFX 풀만: 유니티 기본 롤오프(Logarithmic, minDistance=1)는 카메라 거리(대략 10~45유닛,
+            // doc/0277)에서 너무 일찍 감쇠를 시작해 근접 전투에서도 거의 안 들렸다. 실제로 카메라를
+            // 바짝 당겨야(가까이 있을 때만) 들리도록 거리값을 게임 카메라 스케일에 맞춘다.
+            if (configureSpatialRolloff)
+            {
+                source.rolloffMode = AudioRolloffMode.Linear;
+                source.minDistance = 15f;
+                source.maxDistance = 80f;
+            }
+
             pool.Add(new PooledSource { Source = source });
         }
     }
@@ -144,11 +158,11 @@ public class SoundManager : MonoBehaviour
 
     // 위치가 있는 3D 효과음 (공격/사망/건설/파괴/채취 등 유닛·건물이 내는 소리).
     public void PlaySFX(SoundClipSet set, Vector3 worldPos) =>
-        PlayFromPool(sfxPool, set, sfxVolume, sfxMuted, spatialBlend: 1f, worldPos);
+        PlayFromPool(sfxPool, set, sfxVolume * sfxBoost, sfxMuted, spatialBlend: 1f, worldPos);
 
     // 위치가 없는 2D 효과음 (인터페이스 소리 등).
     public void PlaySFX2D(SoundClipSet set) =>
-        PlayFromPool(sfxPool, set, sfxVolume, sfxMuted, spatialBlend: 0f, transform.position);
+        PlayFromPool(sfxPool, set, sfxVolume * sfxBoost, sfxMuted, spatialBlend: 0f, transform.position);
 
     public void PlayUIClick() => PlaySFX2D(uiClickSFX);
 

@@ -325,7 +325,7 @@ public class RTSUnitController : MonoBehaviour
         PlayRepresentativeUnitVoice(audio =>
         {
             audio.PlayMoveVoice();
-            audio.PlayMoveSFX();
+            audio.PlayOrderSFX();
         });
     }
 
@@ -339,7 +339,11 @@ public class RTSUnitController : MonoBehaviour
             selectedUnitList[i].AttackUnitTarget(target);
         }
 
-        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
+        PlayRepresentativeUnitVoice(audio =>
+        {
+            audio.PlayAttackOrderVoice();
+            audio.PlayOrderSFX();
+        });
     }
 
     /// <summary>
@@ -352,7 +356,11 @@ public class RTSUnitController : MonoBehaviour
             selectedUnitList[i].AttackMoveTo(end);
         }
 
-        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
+        PlayRepresentativeUnitVoice(audio =>
+        {
+            audio.PlayAttackOrderVoice();
+            audio.PlayOrderSFX();
+        });
     }
 
     /// <summary>
@@ -369,7 +377,11 @@ public class RTSUnitController : MonoBehaviour
             selectedUnitList[i].AttackFriendlyTarget(target);
         }
 
-        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
+        PlayRepresentativeUnitVoice(audio =>
+        {
+            audio.PlayAttackOrderVoice();
+            audio.PlayOrderSFX();
+        });
     }
 
     /// <summary>
@@ -385,6 +397,8 @@ public class RTSUnitController : MonoBehaviour
 
             selectedUnitList[i].FollowUnit(target);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
     }
 
     /// <summary>
@@ -397,7 +411,11 @@ public class RTSUnitController : MonoBehaviour
             selectedUnitList[i].AttackFriendlyTarget(target);
         }
 
-        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
+        PlayRepresentativeUnitVoice(audio =>
+        {
+            audio.PlayAttackOrderVoice();
+            audio.PlayOrderSFX();
+        });
     }
 
     /// <summary>
@@ -411,7 +429,11 @@ public class RTSUnitController : MonoBehaviour
             selectedUnitList[i].AttackFriendlyTarget(target);
         }
 
-        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
+        PlayRepresentativeUnitVoice(audio =>
+        {
+            audio.PlayAttackOrderVoice();
+            audio.PlayOrderSFX();
+        });
     }
 
     /// <summary>
@@ -424,7 +446,11 @@ public class RTSUnitController : MonoBehaviour
             selectedUnitList[i].AttackFriendlyTarget(target);
         }
 
-        PlayRepresentativeUnitVoice(audio => audio.PlayAttackOrderVoice());
+        PlayRepresentativeUnitVoice(audio =>
+        {
+            audio.PlayAttackOrderVoice();
+            audio.PlayOrderSFX();
+        });
     }
     public void StopSelectedUnits()
     {
@@ -432,6 +458,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].StopUnit();
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
     }
     public void HoldSelectedUnits()
     {
@@ -439,6 +467,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].HoldUnit();
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
     }
 
     //자원 반환(Return Cargo) 명령
@@ -448,6 +478,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].ReturnCargo();
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
     }
 
     public void PatrolSelectedUnits(Vector3 end)
@@ -456,6 +488,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].PatrolUnit(end);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
     }
 
     //자원 채취 명령
@@ -465,6 +499,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].Gather(node);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
     }
 
     //건물 우클릭 명령 (일꾼이 자원을 들고 있으면 반환, 아니면 그냥 이동)
@@ -474,6 +510,8 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].MoveToBuilding(building);
         }
+
+        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
     }
 
     #endregion

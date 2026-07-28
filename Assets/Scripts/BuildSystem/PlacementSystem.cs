@@ -184,7 +184,7 @@ public class PlacementSystem : MonoBehaviour
         GameObject ghost = preview.SpawnConstructionGhost(data.Prefab, spawnPos);
 
         worker.GetComponent<UnitAudio>()?.PlayMoveVoice(); // 건설 위치로 이동을 시작하므로 이동 명령 음성 재생
-        worker.GetComponent<UnitAudio>()?.PlayMoveSFX();
+        worker.GetComponent<UnitAudio>()?.PlayOrderSFX();
 
         worker.GoBuild(
             spawnPos,
