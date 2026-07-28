@@ -94,6 +94,9 @@ public class UnitData
     public int population { get; private set; }
     [field: SerializeField]
     public int productionTime { get; private set; }
+    // 이 유닛을 생산하기 전에 미리 완공되어 있어야 하는 건물의 ID (RTSUnitController.BuildingID 상수, 0이면 조건 없음)
+    [field: SerializeField]
+    public int requiredBuildingID { get; private set; }
     [field: SerializeField]
     public Sprite Icon { get; private set; }
     [field: SerializeField]

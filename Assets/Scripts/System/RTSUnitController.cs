@@ -1026,7 +1026,10 @@ public class RTSUnitController : MonoBehaviour
         for (int i = 0; i < unitsInTier.Count; ++i)
         {
             UnitData data = unitsInTier[i];
-            commands[i] = new CommandButtonData(data.Icon, UnitButtonAction(() => TryProduceUnit(data.ID), data.ID, data.shortcutKey));
+            commands[i] = new CommandButtonData(
+                data.Icon,
+                UnitButtonAction(() => TryProduceUnit(data.ID), data.ID, data.shortcutKey),
+                IsUnitPrerequisiteMet(data.ID));
         }
 
         uIController.ShowUnitProductionPanel(TierPanelStates[tier], commands);
@@ -1038,6 +1041,9 @@ public class RTSUnitController : MonoBehaviour
     {
         UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
         if (data == null)
+            return false;
+
+        if (!IsUnitPrerequisiteMet(unitID))
             return false;
 
         if (selectedBuildingList.Count == 0)
@@ -1155,6 +1161,16 @@ public class RTSUnitController : MonoBehaviour
         return HasCompletedBuilding(data.requiredBuildingID);
     }
 
+    // unitID 생산에 필요한 선행 건물 조건을 만족하는지 (선행 건물이 없으면 항상 true)
+    public bool IsUnitPrerequisiteMet(int unitID)
+    {
+        UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
+        if (data == null || data.requiredBuildingID == 0)
+            return true;
+
+        return HasCompletedBuilding(data.requiredBuildingID);
+    }
+
     /// 건물 건설 요청 (PlacementSystem이 실제로 배치를 확정하기 직전에 호출)
     public bool TryConstructBuilding(int buildingID)
     {
@@ -1182,6 +1198,12 @@ public class RTSUnitController : MonoBehaviour
         string description = string.IsNullOrEmpty(data.description)
             ? $"Train {data.unitName}."
             : data.description;
+
+        if (data.requiredBuildingID != 0 && !HasCompletedBuilding(data.requiredBuildingID))
+        {
+            string requiredName = GetBuildingName(data.requiredBuildingID);
+            description += $"\n<color=red>Requires {requiredName}</color>";
+        }
 
         return ButtonAction.WithCost(callback, data.unitName, description, data.mineral, data.gas, data.population, shortcut);
     }

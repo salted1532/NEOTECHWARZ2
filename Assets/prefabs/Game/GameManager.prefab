@@ -1155,7 +1155,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -30.204082}
+  m_AnchoredPosition: {x: 0, y: -26.100004}
   m_SizeDelta: {x: 10, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3295859668963895007
@@ -5192,7 +5192,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 11.111111, y: -30.204082}
+  m_AnchoredPosition: {x: 11.111111, y: -26.1}
   m_SizeDelta: {x: 10, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6241451792900026369
@@ -5934,6 +5934,7 @@ MonoBehaviour:
   selectedUnitList: []
   selectedBuildingList: []
   selectedEnemyList: []
+  selectedEnemyBuilding: {fileID: 0}
   selectedResourceNode: {fileID: 0}
   selectedBaseStructure: {fileID: 0}
   UnitList: []
@@ -5945,6 +5946,8 @@ MonoBehaviour:
   resourceManager: {fileID: 3935914549240651066}
   unitDatabase: {fileID: 11400000, guid: 9ddd87f106a53d84fa6f58363a4de5e8, type: 2}
   buildingDatabase: {fileID: 11400000, guid: 6f69615904d465747a380db568c38542, type: 2}
+  enemyUnitDatabase: {fileID: 11400000, guid: c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8, type: 2}
+  enemyBuildingDatabase: {fileID: 11400000, guid: d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9, type: 2}
   upgradeManager: {fileID: 1626399243388647200}
   damageMultiplierTable: {fileID: 11400000, guid: 5f3830294deb42d0a2e29bc913e861ef, type: 2}
   RTScurrentSate: 0
@@ -8145,7 +8148,7 @@ Transform:
   m_GameObject: {fileID: 7697904211312809894}
   serializedVersion: 2
   m_LocalRotation: {x: 0.46174863, y: -0, z: -0, w: 0.8870109}
-  m_LocalPosition: {x: -80, y: 15, z: -111.56}
+  m_LocalPosition: {x: -75.8, y: 15, z: 68.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
