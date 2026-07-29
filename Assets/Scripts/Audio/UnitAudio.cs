@@ -92,29 +92,31 @@ public class UnitAudio : MonoBehaviour
             SoundManager.Instance?.PlayOrderVoice(bank.selectVoice, bank, "select");
     }
 
-    public void PlayMoveVoice()
+    // 이동/순찰 명령 시 재생 (구 PlayMoveVoice, doc/0289 - 순찰 명령까지 범위 확대).
+    public void PlayOrderVoice()
     {
         if (bank != null)
-            SoundManager.Instance?.PlayOrderVoice(bank.moveVoice, bank, "move");
+            SoundManager.Instance?.PlayOrderVoice(bank.orderVoice, bank, "order");
     }
 
-    // 선택 대사와 별개로 같이 나는 효과음(삑 소리 등, doc/0269) - 일반 SFX 풀로 재생되므로
-    // PlayOrderVoice의 끼어들기/코얼레싱 규칙과 무관하게 매번 독립적으로 재생된다.
+    // 선택 대사와 별개로 같이 나는 효과음(삑 소리 등, doc/0269) - 전용 단일 채널로 재생되어 재생 중이면
+    // 새 요청을 무시하고 끝난 뒤부터 다시 재생한다 (doc/0285).
     // 대사(Voice)처럼 2D로 재생한다 - 확인음은 카메라가 유닛에서 멀리 있어도(거리 감쇠 없이)
     // 항상 또렷하게 들려야 한다 (doc/0278). 공격/사망/채취 등 전투·근접 SFX는 3D 그대로 유지.
     public void PlaySelectSFX()
     {
         if (bank != null)
-            SoundManager.Instance?.PlaySFX2D(bank.selectSFX);
+            SoundManager.Instance?.PlaySelectSFX(bank.selectSFX);
     }
 
     // 이동/공격/순찰/정지/홀드/따라가기/채취/자원반환/건물이동 등 선택된 유닛에게 명령을 내리는
     // 모든 진입점에서 대표 유닛 1마리에 대해 호출된다 (doc/0279 - 이동 전용이던 moveSFX를 명령
     // 전반으로 확대). RTSUnitController의 각 명령 메서드가 대사(Voice) 재생과 나란히 호출한다.
+    // 전용 단일 채널로 재생되어 재생 중이면 새 요청을 무시하고 끝난 뒤부터 다시 재생한다 (doc/0285).
     public void PlayOrderSFX()
     {
         if (bank != null)
-            SoundManager.Instance?.PlaySFX2D(bank.orderSFX);
+            SoundManager.Instance?.PlayOrderSFX(bank.orderSFX);
     }
 
     public void PlayAttackOrderVoice()

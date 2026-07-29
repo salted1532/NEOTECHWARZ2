@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Assault Trooper Unit Sound Bank SO
   m_EditorClassIdentifier: Assembly-CSharp::UnitSoundBankSO
   <attackSFX>k__BackingField:
-    <clips>k__BackingField: []
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: eba2f54f254157b41bb635af719b3d59, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <spawnSFX>k__BackingField:
@@ -29,6 +30,14 @@ MonoBehaviour:
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <gatherSFX>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <selectSFX>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <orderSFX>k__BackingField:
     <clips>k__BackingField: []
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0

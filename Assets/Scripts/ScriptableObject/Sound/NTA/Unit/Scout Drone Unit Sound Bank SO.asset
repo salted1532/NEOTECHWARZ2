@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Scout Drone Unit Sound Bank SO
   m_EditorClassIdentifier: Assembly-CSharp::UnitSoundBankSO
   <attackSFX>k__BackingField:
-    <clips>k__BackingField: []
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 992d0ff18110adf4dbed9c45740f3922, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <spawnSFX>k__BackingField:
@@ -31,6 +32,15 @@ MonoBehaviour:
   <gatherSFX>k__BackingField:
     <clips>k__BackingField: []
     <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <selectSFX>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <orderSFX>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 4acfc12a4fd17ea48b969d9712f36c07, type: 3}
+    <volumeScale>k__BackingField: 0.1
     <pitchVariance>k__BackingField: 0
   <selectVoice>k__BackingField:
     <clips>k__BackingField:

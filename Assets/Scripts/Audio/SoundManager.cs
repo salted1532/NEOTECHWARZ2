@@ -23,8 +23,10 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private int sfxPoolSize = 16;
     [SerializeField] private int voicePoolSize = 4; // 음성은 SFX보다 훨씬 적어도 됨(동시에 여러 목소리가 겹치지 않는 편이 자연스러움)
 
-    [Header("SFX 카테고리 전용 부스트 (사용자 볼륨 슬라이더와 별개 - 클립 자체 음량이 작아 체감 볼륨을 전반적으로 키우고 싶을 때)")]
-    [SerializeField, Range(1f, 2f)] private float sfxBoost = 1.5f;
+
+    [Header("동시다발 SFX/Voice 스팸 방지 (여러 유닛이 동시에 공격/사망 등으로 같은 사운드를 트리거할 때 귀에 부담 주는 것 방지)")]
+    [SerializeField] private float sfxRetriggerInterval = 0.05f; // 같은 SoundClipSet은 이 시간(초) 이내 재요청 시 무시
+    [SerializeField] private int sfxMaxConcurrentPerSet = 4; // 같은 SoundClipSet이 동시에 재생 중일 수 있는 최대 개수
 
     [Header("인터페이스(버튼 클릭) 소리 - 위치 없는 SFX")]
     [SerializeField] private SoundClipSet uiClickSFX;
@@ -50,6 +52,12 @@ public class SoundManager : MonoBehaviour
     // 재생 중이면 같은 카테고리 재요청을 무시하고, 재생이 끝나면 다음 요청부터 다시 재생한다 (doc/0271).
     private readonly Dictionary<SoundClipSet, AudioSource> activeGlobalVoiceSources = new Dictionary<SoundClipSet, AudioSource>();
 
+    // SFX/Voice 동시다발 스팸 방지용 - 같은 SoundClipSet이 마지막으로 재생을 시작한 시각(최소 재생 간격
+    // 판정용)과, 각 AudioSource가 지금 어떤 SoundClipSet을 재생 중인지(동시 재생 개수 판정용)를 기억해둔다.
+    // 풀 소스가 가로채기로 재사용돼도 sourceCurrentSet은 매번 갱신되므로 항상 최신 상태를 반영한다.
+    private readonly Dictionary<SoundClipSet, float> lastSfxStartTime = new Dictionary<SoundClipSet, float>();
+    private readonly Dictionary<AudioSource, SoundClipSet> sourceCurrentSet = new Dictionary<AudioSource, SoundClipSet>();
+
     // minInterval을 지정한 나레이션 카테고리(피격 경고음)에 한해서만 "마지막으로 재생을 시작한 시각"을
     // 추가로 추적한다 (doc/0273).
     private readonly Dictionary<SoundClipSet, float> lastGlobalVoiceStartTime = new Dictionary<SoundClipSet, float>();
@@ -62,6 +70,12 @@ public class SoundManager : MonoBehaviour
     private AudioSource orderVoiceSource;
     private UnitSoundBankSO currentOrderVoiceUnitType;
 
+    // 명령 확인음(orderSFX)/선택 확인음(selectSFX) 전용 단일 채널 - orderVoiceSource와 동일한 패턴.
+    // 재생 중이면 새 요청은 무시하고, 재생이 끝난 뒤에 들어오는 요청부터 다시 재생한다. 서로 다른
+    // 이벤트(선택 vs 명령)라 한쪽이 재생 중이어도 다른 쪽을 막지 않도록 채널을 따로 둔다.
+    private AudioSource orderSFXSource;
+    private AudioSource selectSFXSource;
+
     private const string PrefMasterVolume = "Sound_MasterVolume";
     private const string PrefBGMVolume = "Sound_BGMVolume";
     private const string PrefSFXVolume = "Sound_SFXVolume";
@@ -70,13 +84,14 @@ public class SoundManager : MonoBehaviour
     private const string PrefSFXMuted = "Sound_SFXMuted";
     private const string PrefVoiceMuted = "Sound_VoiceMuted";
 
-    private float masterVolume = 1f;
-    private float bgmVolume = 1f;
-    private float sfxVolume = 1f;
-    private float voiceVolume = 1f;
-    private bool bgmMuted;
-    private bool sfxMuted;
-    private bool voiceMuted;
+    [Header("볼륨/뮤트 (임시 - 실제 설정 UI가 붙기 전까지 인스펙터에서 직접 조절/테스트용, doc/0288)")]
+    [SerializeField, Range(0f, 1f)] private float masterVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float bgmVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float voiceVolume = 1f;
+    [SerializeField] private bool bgmMuted;
+    [SerializeField] private bool sfxMuted;
+    [SerializeField] private bool voiceMuted;
 
     private int lastBGMTrackIndex = -1;
 
@@ -98,11 +113,23 @@ public class SoundManager : MonoBehaviour
         orderVoiceSource.transform.SetParent(transform);
         orderVoiceSource.playOnAwake = false;
         orderVoiceSource.spatialBlend = 0f;
+
+        orderSFXSource = new GameObject("OrderSFXSource").AddComponent<AudioSource>();
+        orderSFXSource.transform.SetParent(transform);
+        orderSFXSource.playOnAwake = false;
+        orderSFXSource.spatialBlend = 0f;
+
+        selectSFXSource = new GameObject("SelectSFXSource").AddComponent<AudioSource>();
+        selectSFXSource.transform.SetParent(transform);
+        selectSFXSource.playOnAwake = false;
+        selectSFXSource.spatialBlend = 0f;
     }
 
     // BGM 곡이 끝나면(Loop 미사용) 매 프레임 감지해서 다시 랜덤으로 다음 곡을 재생 - "무한 랜덤 반복" 요구사항.
     private void Update()
     {
+        ApplyBGMVolume(); // 인스펙터에서 master/bgmVolume/bgmMuted를 직접 바꿔도 재생 중인 BGM에 바로 반영되도록 (doc/0288)
+
         if (bgmTracks.Count > 0 && bgmSource != null && !bgmSource.isPlaying)
             PlayRandomBGMTrack();
     }
@@ -123,11 +150,13 @@ public class SoundManager : MonoBehaviour
             // SFX 풀만: 유니티 기본 롤오프(Logarithmic, minDistance=1)는 카메라 거리(대략 10~45유닛,
             // doc/0277)에서 너무 일찍 감쇠를 시작해 근접 전투에서도 거의 안 들렸다. 실제로 카메라를
             // 바짝 당겨야(가까이 있을 때만) 들리도록 거리값을 게임 카메라 스케일에 맞춘다.
+            // minDistance/maxDistance를 15~80에서 10~45로 좁혀서 카메라 줌 범위 전체가 감쇠 구간에
+            // 들어오게 함 - 줌 아웃할수록 더 꾸준히/가파르게 작아지도록 (doc/0286).
             if (configureSpatialRolloff)
             {
                 source.rolloffMode = AudioRolloffMode.Linear;
-                source.minDistance = 15f;
-                source.maxDistance = 80f;
+                source.minDistance = 10f;
+                source.maxDistance = 45f;
             }
 
             pool.Add(new PooledSource { Source = source });
@@ -156,25 +185,49 @@ public class SoundManager : MonoBehaviour
 
     #region 재생 API
 
-    // 위치가 있는 3D 효과음 (공격/사망/건설/파괴/채취 등 유닛·건물이 내는 소리).
+    // 위치가 있는 3D 효과음 (공격/사망/건설/파괴/채취 등 유닛·건물이 내는 소리). 여러 유닛이 동시에
+    // 트리거하는 경우가 흔해서 스팸 방지(limitSpam)를 켠다 (doc/0284).
     public void PlaySFX(SoundClipSet set, Vector3 worldPos) =>
-        PlayFromPool(sfxPool, set, sfxVolume * sfxBoost, sfxMuted, spatialBlend: 1f, worldPos);
+        PlayFromPool(sfxPool, set, sfxVolume, sfxMuted, spatialBlend: 1f, worldPos, limitSpam: true);
 
     // 위치가 없는 2D 효과음 (인터페이스 소리 등).
     public void PlaySFX2D(SoundClipSet set) =>
-        PlayFromPool(sfxPool, set, sfxVolume * sfxBoost, sfxMuted, spatialBlend: 0f, transform.position);
+        PlayFromPool(sfxPool, set, sfxVolume, sfxMuted, spatialBlend: 0f, transform.position, limitSpam: true);
 
     public void PlayUIClick() => PlaySFX2D(uiClickSFX);
 
-    // 유닛/건물 음성 - 스타1/2처럼 항상 또렷하게 들리도록 2D로 재생한다.
+    // 선택 확인음(selectSFX)/명령 확인음(orderSFX) - 재생 중이면 새 요청을 버리고, 끝난 뒤에 들어오는
+    // 요청부터 다시 재생한다 (doc/0285). doc/0284의 동시 4개 허용 스팸 방지(limitSpam)와 달리 이 둘은
+    // 항상 최대 1개만 재생되길 원해서 전용 단일 채널로 분리했다.
+    public void PlaySelectSFX(SoundClipSet set) => PlaySingleChannel(selectSFXSource, set);
+
+    public void PlayOrderSFX(SoundClipSet set) => PlaySingleChannel(orderSFXSource, set);
+
+    private void PlaySingleChannel(AudioSource source, SoundClipSet set)
+    {
+        if (set == null || !set.HasClips || source.isPlaying)
+            return;
+
+        AudioClip clip = set.GetRandomClip();
+        if (clip == null)
+            return;
+
+        source.clip = clip;
+        source.pitch = set.GetRandomPitch();
+        source.volume = EffectiveVolume(sfxVolume, sfxMuted) * set.volumeScale;
+        source.Play();
+    }
+
+    // 유닛/건물 음성(스폰/사망 대사 등) - 스타1/2처럼 항상 또렷하게 들리도록 2D로 재생한다. 여러 유닛이
+    // 동시에 죽거나 스폰될 때 대사가 겹쳐 시끄러워지지 않도록 스팸 방지도 함께 적용 (doc/0284).
     public void PlayVoice(SoundClipSet set) =>
-        PlayFromPool(voicePool, set, voiceVolume, voiceMuted, spatialBlend: 0f, transform.position);
+        PlayFromPool(voicePool, set, voiceVolume, voiceMuted, spatialBlend: 0f, transform.position, limitSpam: true);
 
     // 선택/이동/공격명령 음성 전용 (doc/0263, doc/0264). "다른 종류의 유닛을 선택"(category=="select"
     // 이고 이전에 재생하던 종류와 다름)했을 때만 재생 중이던 대사를 즉시 끊고 새로 재생한다. 같은
     // 종류의 유닛이면(단일 선택/드래그 선택을 섞어써도) 끊지 않는다 - 드래그로 여러 마리를 잡다가
     // 같은 종류를 또 클릭해도 재생 중이던 대사가 계속 이어진다. 그 외의 모든 경우(같은 종류 재선택,
-    // 이동/공격명령 전부)는 채널이 이미 재생 중이면 이번 요청을 그냥 버리고 재생 중이던 대사를 끝까지
+    // 이동/순찰/공격명령 전부)는 채널이 이미 재생 중이면 이번 요청을 그냥 버리고 재생 중이던 대사를 끝까지
     // 들려준다 - 그 다음에 들어오는 명령부터 다시 새로 랜덤 재생된다.
     // unitType: 이 유닛 "종류"를 식별하는 값으로 UnitSoundBankSO 참조를 그대로 쓴다(같은 종류는 항상
     // 같은 SoundBank 에셋을 공유하므로).
@@ -221,7 +274,7 @@ public class SoundManager : MonoBehaviour
             && Time.time - lastStart < minInterval)
             return;
 
-        AudioSource source = PlayFromPool(voicePool, set, voiceVolume, voiceMuted, spatialBlend: 0f, transform.position);
+        AudioSource source = PlayFromPool(voicePool, set, voiceVolume, voiceMuted, spatialBlend: 0f, transform.position); // 이미 위에서 자체 겹침/간격 방지를 했으므로 limitSpam 불필요
         if (source != null)
         {
             activeGlobalVoiceSources[set] = source;
@@ -258,10 +311,29 @@ public class SoundManager : MonoBehaviour
 
     // AudioSource를 반환하는 이유: PlayGlobalVoice가 "이 카테고리가 지금 재생 중인지"를 나중에
     // 확인할 수 있어야 하기 때문 (doc/0271). 반환값이 필요 없는 호출부(PlaySFX/PlayVoice 등)는 그냥 버린다.
-    private AudioSource PlayFromPool(List<PooledSource> pool, SoundClipSet set, float categoryVolume, bool muted, float spatialBlend, Vector3 worldPos)
+    // limitSpam=true면 doc/0284의 두 가지 방지 규칙을 적용한다: 같은 SoundClipSet이 sfxRetriggerInterval
+    // 이내에 재요청되면 무시(최소 재생 간격), 이미 sfxMaxConcurrentPerSet개만큼 동시 재생 중이면 무시
+    // (동일 사운드 동시 재생 제한). 여러 유닛이 같은 프레임에 같은 종류의 공격/사망 사운드를 동시에
+    // 트리거해도 소리가 무제한으로 겹쳐 쌓이지 않게 하기 위함.
+    private AudioSource PlayFromPool(List<PooledSource> pool, SoundClipSet set, float categoryVolume, bool muted, float spatialBlend, Vector3 worldPos, bool limitSpam = false)
     {
         if (set == null || !set.HasClips)
             return null;
+
+        if (limitSpam)
+        {
+            if (lastSfxStartTime.TryGetValue(set, out float lastStart) && Time.time - lastStart < sfxRetriggerInterval)
+                return null;
+
+            int concurrent = 0;
+            foreach (PooledSource p in pool)
+            {
+                if (p.Source.isPlaying && sourceCurrentSet.TryGetValue(p.Source, out SoundClipSet playingSet) && playingSet == set)
+                    ++concurrent;
+            }
+            if (concurrent >= sfxMaxConcurrentPerSet)
+                return null;
+        }
 
         AudioClip clip = set.GetRandomClip();
         if (clip == null)
@@ -277,6 +349,12 @@ public class SoundManager : MonoBehaviour
         source.volume = EffectiveVolume(categoryVolume, muted) * set.volumeScale;
         pooled.StartedAt = Time.time;
         source.Play();
+
+        if (limitSpam)
+        {
+            lastSfxStartTime[set] = Time.time;
+            sourceCurrentSet[source] = set;
+        }
 
         return source;
     }
@@ -311,15 +389,18 @@ public class SoundManager : MonoBehaviour
 
     private float EffectiveVolume(float categoryVolume, bool muted) => muted ? 0f : masterVolume * categoryVolume;
 
+    // PlayerPrefs에 실제로 저장된 적 있는 키만 덮어쓴다 - 아직 설정 UI가 없어서 저장된 적이 없다면 위
+    // 인스펙터 기본값이 그대로 유지된다(doc/0288). 나중에 UI가 SetXxxVolume을 호출해 저장하기 시작하면
+    // 그때부터는 저장된 값이 인스펙터 기본값보다 우선한다 - 정상적인 영속화 동작.
     private void LoadVolumePrefs()
     {
-        masterVolume = PlayerPrefs.GetFloat(PrefMasterVolume, 1f);
-        bgmVolume = PlayerPrefs.GetFloat(PrefBGMVolume, 1f);
-        sfxVolume = PlayerPrefs.GetFloat(PrefSFXVolume, 1f);
-        voiceVolume = PlayerPrefs.GetFloat(PrefVoiceVolume, 1f);
-        bgmMuted = PlayerPrefs.GetInt(PrefBGMMuted, 0) == 1;
-        sfxMuted = PlayerPrefs.GetInt(PrefSFXMuted, 0) == 1;
-        voiceMuted = PlayerPrefs.GetInt(PrefVoiceMuted, 0) == 1;
+        if (PlayerPrefs.HasKey(PrefMasterVolume)) masterVolume = PlayerPrefs.GetFloat(PrefMasterVolume);
+        if (PlayerPrefs.HasKey(PrefBGMVolume)) bgmVolume = PlayerPrefs.GetFloat(PrefBGMVolume);
+        if (PlayerPrefs.HasKey(PrefSFXVolume)) sfxVolume = PlayerPrefs.GetFloat(PrefSFXVolume);
+        if (PlayerPrefs.HasKey(PrefVoiceVolume)) voiceVolume = PlayerPrefs.GetFloat(PrefVoiceVolume);
+        if (PlayerPrefs.HasKey(PrefBGMMuted)) bgmMuted = PlayerPrefs.GetInt(PrefBGMMuted) == 1;
+        if (PlayerPrefs.HasKey(PrefSFXMuted)) sfxMuted = PlayerPrefs.GetInt(PrefSFXMuted) == 1;
+        if (PlayerPrefs.HasKey(PrefVoiceMuted)) voiceMuted = PlayerPrefs.GetInt(PrefVoiceMuted) == 1;
     }
 
     // 뮤트 토글은 볼륨을 0으로 내리는 게 아니라 재생 시 곱해지는 배율만 0으로 만든다 - 슬라이더가 들고 있는

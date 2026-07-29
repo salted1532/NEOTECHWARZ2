@@ -85,6 +85,11 @@ public class UnitData
     [field: SerializeField]
     public bool canAttackAir { get; private set; } = true;
 
+    // 공격 전달 방식 (doc/0290). Projectile 선택 시 해당 유닛 프리팹에 ProjectileAttack 컴포넌트를 붙이고
+    // 투사체 프리팹/firePoint를 연결해야 실제로 데미지가 들어간다 - 안 붙어있으면 Hitscan으로 자동 폴백.
+    [field: SerializeField]
+    public AttackDeliveryType attackDelivery { get; private set; } = AttackDeliveryType.Hitscan;
+
     [field: SerializeField]
     public int mineral { get; private set; }
     [field: SerializeField]

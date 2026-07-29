@@ -53,6 +53,10 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField] private bool canAttackGround = true;
     [SerializeField] private bool canAttackAir = true;
 
+    // 공격 전달 방식 (UnitDataSO.attackDelivery가 ApplyUnitData에서 그대로 반영됨, doc/0290).
+    // Projectile인데 ProjectileAttack 컴포넌트가 안 붙어있으면 Attack()에서 자동으로 Hitscan으로 폴백한다.
+    [SerializeField] private AttackDeliveryType attackDelivery = AttackDeliveryType.Hitscan;
+
     [Header("고유 추가 데미지 (해당 없으면 Percent를 0으로 둘 것)")]
     [Tooltip("이 유닛이 특정 장갑 타입 상대로만 추가 데미지를 줄 때 설정 (예: 저격수 = Heavy, 80)")]
     [SerializeField] private ArmorType bonusVersusArmorType = ArmorType.Light;
@@ -881,7 +885,14 @@ public class UnitController : MonoBehaviour, IDestructible
         {
             int targetArmor = GetTargetArmor(enemy);
             int finalDamage = CalculateFinalDamage(enemy, targetArmor);
-            targetHealth.GetDamage(finalDamage, transform.position, attackType); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
+
+            // Projectile이면 즉시 데미지를 넣지 않고 투사체가 명중했을 때 처음 적용한다 (doc/0290).
+            // ProjectileAttack이 안 붙어있으면(설정 실수) 데미지가 아예 안 들어가는 사고를 막기 위해 Hitscan으로 폴백.
+            if (attackDelivery == AttackDeliveryType.Projectile && TryGetComponent(out ProjectileAttack projectileAttack))
+                projectileAttack.Fire(enemy.transform, targetHealth, finalDamage, attackType);
+            else
+                targetHealth.GetDamage(finalDamage, transform.position, attackType); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
+
             GetComponent<UnitEffects>()?.PlayAttack();
             GetComponent<UnitAudio>()?.PlayAttackSFX();
             GetComponent<LaserBeamAttack>()?.Fire(enemy.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0218)
@@ -1472,6 +1483,7 @@ public class UnitController : MonoBehaviour, IDestructible
         timeBetweenAttacks = data.attackSpeed;
         canAttackGround = data.canAttackGround;
         canAttackAir = data.canAttackAir;
+        attackDelivery = data.attackDelivery;
 
         if (attackRange != null)
         {

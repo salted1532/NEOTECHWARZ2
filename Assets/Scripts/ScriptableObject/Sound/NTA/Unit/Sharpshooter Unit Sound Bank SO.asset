@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Sharpshooter Unit Sound Bank SO
   m_EditorClassIdentifier: Assembly-CSharp::UnitSoundBankSO
   <attackSFX>k__BackingField:
-    <clips>k__BackingField: []
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 201664f7673df3c449f5a6a53adfda16, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <spawnSFX>k__BackingField:

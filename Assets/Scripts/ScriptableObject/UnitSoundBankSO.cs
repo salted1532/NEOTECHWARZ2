@@ -29,8 +29,10 @@ public class UnitSoundBankSO : ScriptableObject
     [Header("Voice (음성)")]
     [field: SerializeField]
     public SoundClipSet selectVoice { get; private set; } // 3~4개 권장
-    [field: SerializeField]
-    public SoundClipSet moveVoice { get; private set; } // 3~4개 권장
+    // 이동/순찰 명령 시 대사 (구 moveVoice, doc/0289 - 순찰 명령까지 범위 확대). FormerlySerializedAs로
+    // 기존에 채워둔 moveVoice 클립 데이터를 그대로 승계한다.
+    [field: SerializeField, FormerlySerializedAs("<moveVoice>k__BackingField")]
+    public SoundClipSet orderVoice { get; private set; } // 3~4개 권장
     [field: SerializeField]
     public SoundClipSet attackOrderVoice { get; private set; } // 1~2개 권장
     [field: SerializeField]

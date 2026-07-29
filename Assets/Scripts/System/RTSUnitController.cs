@@ -324,7 +324,7 @@ public class RTSUnitController : MonoBehaviour
 
         PlayRepresentativeUnitVoice(audio =>
         {
-            audio.PlayMoveVoice();
+            audio.PlayOrderVoice();
             audio.PlayOrderSFX();
         });
     }
@@ -452,14 +452,13 @@ public class RTSUnitController : MonoBehaviour
             audio.PlayOrderSFX();
         });
     }
+    // 정지/홀드는 명령 확인음(orderSFX)을 재생하지 않는다 (doc/0289 - 사용자 요청).
     public void StopSelectedUnits()
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
         {
             selectedUnitList[i].StopUnit();
         }
-
-        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
     }
     public void HoldSelectedUnits()
     {
@@ -467,8 +466,6 @@ public class RTSUnitController : MonoBehaviour
         {
             selectedUnitList[i].HoldUnit();
         }
-
-        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
     }
 
     //자원 반환(Return Cargo) 명령
@@ -489,7 +486,11 @@ public class RTSUnitController : MonoBehaviour
             selectedUnitList[i].PatrolUnit(end);
         }
 
-        PlayRepresentativeUnitVoice(audio => audio.PlayOrderSFX());
+        PlayRepresentativeUnitVoice(audio =>
+        {
+            audio.PlayOrderVoice();
+            audio.PlayOrderSFX();
+        });
     }
 
     //자원 채취 명령

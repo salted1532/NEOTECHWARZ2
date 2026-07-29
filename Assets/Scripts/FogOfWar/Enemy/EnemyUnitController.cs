@@ -34,6 +34,10 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     [SerializeField] private bool canAttackGround = true;
     [SerializeField] private bool canAttackAir = true;
 
+    // 공격 전달 방식 (UnitController와 동일한 필드, doc/0290). Projectile인데 ProjectileAttack 컴포넌트가
+    // 안 붙어있으면 Attack()에서 자동으로 Hitscan으로 폴백한다.
+    [SerializeField] private AttackDeliveryType attackDelivery = AttackDeliveryType.Hitscan;
+
     [Header("고유 추가 데미지 (해당 없으면 Percent를 0으로 둘 것)")]
     [SerializeField] private ArmorType bonusVersusArmorType = ArmorType.Light;
     [SerializeField] private float bonusVersusArmorPercent = 0f;
@@ -259,7 +263,14 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         {
             int targetArmor = GetTargetArmor(target);
             int finalDamage = CalculateFinalDamage(target, targetArmor);
-            targetHealth.GetDamage(finalDamage, transform.position, attackType);
+
+            // Projectile이면 즉시 데미지를 넣지 않고 투사체가 명중했을 때 처음 적용한다 (doc/0290,
+            // UnitController.Attack()과 동일한 훅 지점). ProjectileAttack이 안 붙어있으면 Hitscan으로 폴백.
+            if (attackDelivery == AttackDeliveryType.Projectile && TryGetComponent(out ProjectileAttack projectileAttack))
+                projectileAttack.Fire(target.transform, targetHealth, finalDamage, attackType);
+            else
+                targetHealth.GetDamage(finalDamage, transform.position, attackType);
+
             GetComponent<UnitEffects>()?.PlayAttack();
             GetComponent<LaserBeamAttack>()?.Fire(target.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
             turretController?.FireRecoil(); // 포탑 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
@@ -462,6 +473,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         timeBetweenAttacks = data.attackSpeed;
         canAttackGround = data.canAttackGround;
         canAttackAir = data.canAttackAir;
+        attackDelivery = data.attackDelivery;
 
         if (attackRange != null)
         {

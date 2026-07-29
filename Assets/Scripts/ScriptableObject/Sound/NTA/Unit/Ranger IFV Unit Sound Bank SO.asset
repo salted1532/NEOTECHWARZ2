@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Ranger IFV Unit Sound Bank SO
   m_EditorClassIdentifier: Assembly-CSharp::UnitSoundBankSO
   <attackSFX>k__BackingField:
-    <clips>k__BackingField: []
-    <volumeScale>k__BackingField: 1
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: fd38873acf7b2894399889dbe433bd39, type: 3}
+    <volumeScale>k__BackingField: 0.824
     <pitchVariance>k__BackingField: 0
   <spawnSFX>k__BackingField:
     <clips>k__BackingField: []
@@ -31,6 +32,15 @@ MonoBehaviour:
   <gatherSFX>k__BackingField:
     <clips>k__BackingField: []
     <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <selectSFX>k__BackingField:
+    <clips>k__BackingField: []
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <orderSFX>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 01b33e1246c873e458921d0ce8b5ff7d, type: 3}
+    <volumeScale>k__BackingField: 0.1
     <pitchVariance>k__BackingField: 0
   <selectVoice>k__BackingField:
     <clips>k__BackingField:
