@@ -36,6 +36,12 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private int unitID;
 
+    // 영웅 유닛(스토리 등장인물) 전용 - unitID를 0(=UnitDataSO에 없는 값)으로 두면 ApplyUnitData가
+    // null 데이터를 받아 아무것도 덮어쓰지 않으므로 attackDamage/armorType/sizeType/HealthManager 값은
+    // 인스펙터에 넣은 값이 그대로 유지된다. 이름만 원래 ID 조회 방식이라 별도 필드가 필요해서 추가함 (doc/0304).
+    [SerializeField]
+    private string heroName;
+
     // ===== 전투 스탯 (공격력/방어력) =====
     // 공격력은 기존 AttackRange.AttackDamage였던 것을 이곳으로 옮겨 UnitController가 함께 관리한다.
     // Info_panel에서 UnitDamage/UnitArmor 아이콘 호버 시 표시할 값이기도 하다.
@@ -1458,6 +1464,7 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public Sprite GetIcon() => icon;
     public int GetUnitID() => unitID;
+    public string GetHeroName() => heroName;
 
     // 연구소 업그레이드로 얻은 전역 보너스를 더해서 반환한다 (RTSUnitController를 거쳐서만 조회 - UpgradeManager는 직접 참조하지 않음).
     public int GetAttackDamage() => attackDamage + (rtsController != null ? rtsController.GlobalAttackBonus : 0);

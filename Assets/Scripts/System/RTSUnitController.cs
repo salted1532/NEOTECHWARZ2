@@ -1521,7 +1521,9 @@ public class RTSUnitController : MonoBehaviour
                 else if (selectedUnitList.Count == 1)
                 {
                     UnitController unit = selectedUnitList[0];
-                    uIController.ShowInfoPanel(unit.GetIcon(), GetUnitName(unit.GetUnitID()), unit.GetComponent<HealthManager>(), unit.GetAttackDamage(), unit.GetArmor(),
+                    // 영웅 유닛(heroName이 채워진 unitID=0 유닛)은 이름을 데이터베이스 대신 자기 자신에게서 가져온다 (doc/0304).
+                    string displayName = string.IsNullOrEmpty(unit.GetHeroName()) ? GetUnitName(unit.GetUnitID()) : unit.GetHeroName();
+                    uIController.ShowInfoPanel(unit.GetIcon(), displayName, unit.GetComponent<HealthManager>(), unit.GetAttackDamage(), unit.GetArmor(),
                         unit.GetAttackType(), unit.GetArmorType(), unit.GetSizeType(), unit.GetShotCount());
                 }
                 else
