@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 // 투사체 공격 유닛에 붙이는 옵셔널 컴포넌트(UnitEffects/LaserBeamAttack과 동일하게 없으면 그냥 무시됨, doc/0290).
@@ -11,7 +12,10 @@ using UnityEngine;
 public class ProjectileAttack : MonoBehaviour
 {
     [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private Transform firePoint;
+    // 다연장 무기용 - UnitEffects.firePoints와 동일한 패턴(doc/0291). 비워두면 유닛 자신의 위치에서 1발
+    // 발사, 여러 개 채우면 공격 1회당 각 지점에서 동시에 1발씩(총 지점 수만큼) 발사되고 각각 명중 시
+    // 데미지가 따로 들어간다 - 지점 수만큼 데미지가 곱연산되는 효과이므로 다연장 무기 의도가 아니면 1개만.
+    [SerializeField] private List<Transform> firePoints = new();
     [SerializeField] private float projectileSpeed = 30f;
     [SerializeField] private float hitDistance = 0.5f; // 이 거리 안으로 들어오면 명중 처리 (물리 충돌 안 씀)
 
@@ -20,11 +24,26 @@ public class ProjectileAttack : MonoBehaviour
     // 경우는 없다고 가정, 데미지 계산 로직을 여기서 중복하지 않기 위함).
     public void Fire(Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType)
     {
-        if (projectilePrefab == null || firePoint == null || target == null)
+        if (projectilePrefab == null || target == null)
             return;
 
-        Vector3 toTarget = target.position - firePoint.position;
-        GameObject instance = Instantiate(projectilePrefab, firePoint.position, Quaternion.LookRotation(toTarget));
+        if (firePoints == null || firePoints.Count == 0)
+        {
+            FireFromPoint(transform, target, targetHealth, damage, attackType);
+            return;
+        }
+
+        foreach (Transform point in firePoints)
+        {
+            if (point != null)
+                FireFromPoint(point, target, targetHealth, damage, attackType);
+        }
+    }
+
+    private void FireFromPoint(Transform point, Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType)
+    {
+        Vector3 toTarget = target.position - point.position;
+        GameObject instance = Instantiate(projectilePrefab, point.position, Quaternion.LookRotation(toTarget));
         StartCoroutine(FlyRoutine(instance, target, targetHealth, damage, attackType));
     }
 
