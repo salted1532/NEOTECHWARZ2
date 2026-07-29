@@ -27,6 +27,7 @@
 | `currentQueue`, `isShowingProductionQueue` | 현재 표시 중인 대기열 캐시 |
 | `infoPanel`, `infoIcon`, `infoNameText`, `infoHpText`, `attackDamageImage`, `armorImage` | Info_panel 구성 요소 (체력/공격력/방어력 호버 툴팁 포함) |
 | `infoBoundHealth` | Info_panel이 현재 구독 중인 `HealthManager` (대상이 바뀌면 이전 구독 해제 후 갈아끼움) |
+| `infoAttackDamage`, `infoArmor`, `infoAttackType`, `infoArmorType`, `infoSizeType`, `infoShotCount` | 현재 선택된 유닛의 전투 스탯 캐시 — 공격/방어 아이콘 호버 툴팁에 그대로 표시됨(doc/0293) |
 | `squadPanel`, `squadSlots[]`, `squadPageButtons[]` | 다중 유닛 선택 시 Squad_panel(최대 60마리, 12마리×5페이지) |
 
 ## 메소드
@@ -58,10 +59,10 @@
 ### Info_panel (단일 유닛/건물/자원/BaseStructure 선택 시)
 | 메소드 | 설명 |
 |---|---|
-| `ShowInfoPanel(icon, name, health)` | 건물/자원 등 공격력·방어력이 없는 대상용 (0으로 표시, 아이콘은 계속 보임) |
-| `ShowInfoPanel(icon, name, health, attackDamage, armor)` | 유닛/적 선택 시 공격력/방어력도 함께 표시 (`SetCombatStatsVisible(true)`) |
+| `ShowInfoPanel(icon, name, health)` | 건물/자원 등 공격력·방어력이 없는 대상용 (기본값으로 표시, 아이콘은 숨김) |
+| `ShowInfoPanel(icon, name, health, attackDamage, armor, attackType, armorType, sizeType, shotCount)` | 유닛/적 선택 시 공격 관련 스탯 전부(공격타입/공격력/투사체 개수)와 방어 관련 스탯 전부(방어력/장갑타입/크기)를 함께 저장(`SetCombatStatsVisible(true)`, doc/0293) |
 | `SetCombatStatsVisible(visible)` (private) | 공격력/방어력 아이콘 자체를 보이거나 숨김 |
-| `SetupInfoStatHoverTooltips()` / `AddStatHoverTooltip(image, textProvider)` (private) | `attackDamageImage`/`armorImage`에 호버 이벤트를 걸어 `TooltipUI`로 수치 표시 |
+| `SetupInfoStatHoverTooltips()` / `AddStatHoverTooltip(image, textProvider)` (private) | `attackDamageImage`/`armorImage`에 호버 이벤트를 걸어 `TooltipUI`로 수치 표시. 공격 아이콘은 `"Attack Type : {타입}\nAttack Damage : {값}(xN)"`(투사체를 여러 발 동시에 쏘는 유닛만 xN 표기), 방어 아이콘은 `"Armor : {값}\nArmor Type : {타입}\nSize : {크기}"`(doc/0293) |
 | `HideInfoPanel()` | Info_panel을 숨기고 HealthManager 구독 해제 |
 | `ShowResourceInfoPanel(icon, resourceName, remainingAmount)` | 자원 노드(광물/가스) 선택 시: 공격력/방어력 숨김(`SetCombatStatsVisible(false)`), 체력 텍스트 자리에 남은 채취량 표시, HealthManager 구독 안 함 |
 | `ShowBaseStructureInfoPanel(icon, buildingName, health)` | `BaseStructure`(건설 중) 선택 시: 공격력/방어력 숨김, 체력은 실제 `HealthManager`를 그대로 구독(`BindInfoHealth`)해서 건설 진행에 따라 자동 갱신 |

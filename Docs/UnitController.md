@@ -20,6 +20,8 @@
 | `unitMarker` | 선택 표시 마커 (공격 대상 지정/따라다니기 지정 시 깜빡임에도 재사용) |
 | `icon`, `unitID` | Squad_panel 등 선택 UI 아이콘, `RTSUnitController.GetUnitName`으로 이름 조회 시 쓰는 ID |
 | `attackDamage`, `armor` | 전투 스탯. Info_panel 호버 툴팁에도 사용 |
+| `attackType`, `armorType`, `sizeType` | 공격 수단/장갑 타입/크기 타입 — 데미지 배율 계산과 Info_panel 툴팁에 사용 |
+| `attackDelivery` | 공격 전달 방식(`Hitscan`/`Projectile`, `AttackDeliveryType`) — `UnitDataSO.attackDelivery`가 `ApplyUnitData`에서 그대로 반영됨. `Projectile`이고 `ProjectileAttack` 컴포넌트가 붙어있으면 데미지를 명중 시점에 적용, 아니면 즉시 적용(doc/0290) |
 | `navMeshAgent` | 지상 유닛의 길찾기 에이전트 (`isAirUnit`이면 사용 안 함) |
 | `moveSpeed`, `arriveDistance` | 이동 속도, 도착 판정 거리 |
 | `targetPosition`, `isMovingAirUnit`, `isAirUnit` | 공중 유닛의 직접 좌표 이동에 사용 |
@@ -80,7 +82,7 @@
 | `AttackOrderTick()` (private) | 지정 추격 대상/공격-이동을 매 프레임 갱신 — 시야 이탈 판정, 교전 종료 후 이동 재개 |
 | `GetOrderedTarget()` | 현재 지정 추격 대상 반환 (`AttackRange`에서 조회) |
 | `ChaseTarget(pos)` | 사거리 밖 Idle 유닛을 `AttackRange`가 대상 쪽으로 추격 이동시킬 때 호출 |
-| `Attack(end, enemy)` | 이동 정지, 대상 방향 회전, 쿨다운 확인 후 `HealthManager.GetDamage(attackDamage)` 호출 |
+| `Attack(end, enemy)` | 이동 정지, 대상 방향 회전, 쿨다운 확인 후 최종 데미지 계산. `attackDelivery == Projectile`이고 `ProjectileAttack`이 붙어있으면 `ProjectileAttack.Fire()`(명중 시 데미지 적용)를 호출하고, 아니면 `HealthManager.GetDamage(..., isEnemyAttacker: false)`로 즉시 적용(doc/0290, 0292) |
 | `ResetAttack()` (private) | 공격 쿨다운 해제 |
 
 ### 아군 따라다니기 (우클릭 아군 유닛, 건설 중엔 무시됨)
@@ -125,7 +127,8 @@
 |---|---|
 | `Die()` | 채취/대기열 중이었다면 자리 반납, `RTSUnitController.UnitList`/`selectedUnitList`에서 제거 후 파괴. `HealthManager`의 `IDestructible` 구현체로 호출됨 |
 | `IsIdle()` / `IsMove()` / `IsAttack()` | `UnitState` 확인용 (주로 `AttackRange`에서 사용) |
-| `GetIcon()` / `GetUnitID()` / `GetAttackDamage()` / `GetArmor()` | Info_panel/Squad_panel 표시용 조회 |
+| `GetIcon()` / `GetUnitID()` / `GetAttackDamage()` / `GetArmor()` / `GetAttackType()` / `GetArmorType()` / `GetSizeType()` | Info_panel/Squad_panel 표시용 조회 |
+| `GetShotCount()` | 공격 1회당 동시에 나가는 투사체 개수 — `Projectile`이고 `ProjectileAttack`이 붙어있으면 그 `firePoints` 개수, 아니면 1(Hitscan은 항상 1발). Info_panel 툴팁의 "공격력 xN" 배수 표기에 사용(doc/0291, 0293) |
 
 ## 연관 컴포넌트
 

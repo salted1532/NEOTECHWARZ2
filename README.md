@@ -20,6 +20,7 @@ Unity로 제작 중인 스타크래프트 스타일의 RTS(실시간 전략) 게
 Assets/
 ├─ Scripts/
 │  ├─ Animation/        # 공중유닛/리프트 건물 호버링(HoverBob), 지상 차량 이동 셰이크(VehicleShake), 지속 회전(AutoRotate) - DOTween 기반
+│  ├─ Audio/            # 사운드 전담 싱글턴(SoundManager), 유닛/건물 사운드 재생 컴포넌트(UnitAudio/BuildingAudio), 랜덤 재생 클립 묶음(SoundClipSet)
 │  ├─ Building/        # 건물 컨트롤러, 건설 중 건물 기반(BaseStructure)
 │  ├─ BuildSystem/      # 건물 배치 시스템 (그리드, 미리보기, 입력)
 │  ├─ Camera/           # RTS 카메라/미니맵 이동·조작, 지형 티어별 줌 범위 보정, 미니맵 시야 사각형 표시
@@ -65,10 +66,13 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `InputManager` | 건물 배치 전용 입력 처리 (클릭/ESC/마우스 좌표) | [doc](Docs/InputManager.md) |
 | `ResourceManager` | 팀의 광물/가스/인구수 중앙 관리, 인구수 한도 상한(200) | [doc](Docs/ResourceManager.md) |
 | `ResourceNode` | 자원 채취 지점, 대기열(줄서기) 및 고갈 처리 | [doc](Docs/ResourceNode.md) |
-| `HealthManager` | 체력/데미지/치유/사망 처리 공용 컴포넌트, 절대값 지정(SetHealth/SetMaxHealth) | [doc](Docs/HealthManager.md) |
-| `UnitDataSO` | 유닛 스탯 데이터베이스 — 체력/공격력/사거리/공격속도/아이콘/장갑타입/크기타입까지 스폰되는 유닛이 자기 `unitID`로 직접 조회해 스스로 적용(`UnitController.ApplyUnitData`, `doc/0205`), `tier`로 생산 가능 건물 자동 분류(`doc/0200`) | [doc](Docs/UnitDataSO.md) |
+| `HealthManager` | 체력/데미지/치유/사망 처리 공용 컴포넌트, 절대값 지정(SetHealth/SetMaxHealth), 데미지 이벤트에 공격자 진영 정보(isEnemyAttacker) 포함 | [doc](Docs/HealthManager.md) |
+| `UnitDataSO` | 유닛 스탯 데이터베이스 — 체력/공격력/사거리/공격속도/아이콘/장갑타입/크기타입까지 스폰되는 유닛이 자기 `unitID`로 직접 조회해 스스로 적용(`UnitController.ApplyUnitData`, `doc/0205`), `tier`로 생산 가능 건물 자동 분류(`doc/0200`), 공격 전달 방식(Hitscan/Projectile) 선택 | [doc](Docs/UnitDataSO.md) |
 | `BuildingDataSO` | 건물 스펙(비용/크기/생산시간/인구수 제공량 등) 데이터베이스 | [doc](Docs/BuildingDataSO.md) |
 | `DamageMultiplierTableSO` | 공격 방식(소총/폭발/레이저/화염) × 대상 크기(소형/중형/대형) 데미지 배율표 — 코드가 아니라 별도 에셋으로 분리해 인스펙터에서 밸런스 조정 가능 | [doc](doc/0201-armor-size-damage-multiplier-system.md) |
+| `DamageTypes` | 전투 공용 열거형 모음(ArmorType/SizeType/AttackDeliveryType) | [doc](Docs/DamageTypes.md) |
+| `LaserBeamAttack` | 레이저 공격 유닛 전용 옵셔널 컴포넌트 — firePoint~대상을 매 프레임 월드 좌표로 잇는 재사용 빔(순수 시각효과, 데미지는 이미 적용된 뒤) | [doc](Docs/LaserBeamAttack.md) |
+| `ProjectileAttack` | 투사체 공격 유닛 전용 옵셔널 컴포넌트 — 발사마다 투사체를 생성해 대상을 추적, 명중 시점에 데미지 적용, 여러 firePoints 동시발사 지원 | [doc](Docs/ProjectileAttack.md) |
 | `CameraControl` | RTS 시점 카메라 이동/줌 — 지형 티어(`Layer1`/`Layer2` 태그) 감지로 언덕마다 줌 범위·현재 높이 자동 보정 | [doc](Docs/CameraControl.md) |
 | `MinimapController` | 미니맵 표시 및 클릭 시 카메라 이동 | [doc](Docs/MinimapController.md) |
 | `MinimapViewIndicator` | 메인 카메라 시야를 미니맵 위에 반투명 사각형으로 표시, 줌/회전에 따라 매 프레임 크기·위치 자동 갱신(미니맵 밖으로 안 나가게 클리핑) | [doc](Docs/MinimapViewIndicator.md) |
@@ -91,6 +95,14 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `HoverBob` | 공중 유닛/리프트 중인 건물의 비주얼 자식 오브젝트를 DOTween으로 둥실거리게 하는 컴포넌트 | [doc](doc/0119-dotween-hover-bob-design.md) |
 | `VehicleShake` | 지상 차량 유닛이 이동 중일 때 DOTween으로 흔들림을 재현하는 컴포넌트 | [doc](doc/0120-vehicle-shake-and-animation-folder.md) |
 | `AutoRotate` | 레이더 접시/터렛 헤드 등을 DOTween으로 조건 없이 지속 회전시키는 컴포넌트 | [doc](doc/0147-autorotate-dotween-script.md) |
+| `SoundManager` | 사운드 전담 싱글턴 — BGM/SFX/Voice 볼륨·뮤트 관리, AudioSource 풀링, 동시재생 스팸 방지, 명령확인음 전용 단일채널 | [doc](Docs/SoundManager.md) |
+| `SoundClipSet` | 랜덤 재생용 오디오 클립 묶음 직렬화 클래스 (모든 사운드 뱅크의 슬롯 타입) | [doc](Docs/SoundClipSet.md) |
+| `UnitAudio` | 유닛의 SFX(공격/생성/사망/스킬/채취)·Voice(선택/명령/생성/사망) 재생 전담 컴포넌트 | [doc](Docs/UnitAudio.md) |
+| `BuildingAudio` | 건물/BaseStructure의 SFX(건설/파괴)·Voice(선택) 재생 전담 컴포넌트 | [doc](Docs/BuildingAudio.md) |
+| `UnitSoundBankSO` | 유닛 종류별 사운드 뱅크 에셋 | [doc](Docs/UnitSoundBankSO.md) |
+| `BuildingSoundBankSO` | 건물 종류별 사운드 뱅크 에셋 | [doc](Docs/BuildingSoundBankSO.md) |
+| `GlobalVoiceBankSO` | 유닛/건물에 안 묶이는 전역 나레이션(자원/인구 부족, 피격 경고, 업그레이드 완료) 에셋 | [doc](Docs/GlobalVoiceBankSO.md) |
+| `SoundSettingsPanel` | 볼륨 슬라이더/뮤트 토글 UI 로직 (SoundManager API 연결, 실제 Canvas 배치는 미완료) | [doc](Docs/SoundSettingsPanel.md) |
 
 > 문서 칸이 `doc/NNNN-...` 형식인 스크립트(`DamageMultiplierTableSO`, `CaptureSystem`~`TerritoryFogReveal`, `EffectPlayer`~`AutoRotate` 등)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
 
@@ -108,7 +120,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - **건설 진행 시스템**: 건물 배치 클릭 시 즉시 완공되지 않고, 일꾼이 현장으로 이동해 `BaseStructure`(건물 기반, 실제 건물 크기(2x2/3x3)에 맞춰 자동 스케일)를 만들고 붙어서 건설 — 담당 일꾼이 없으면(사망 등) 건설이 자동 일시정지, 다른 일꾼을 우클릭으로 투입하면 재개. 건설 중엔 담당 일꾼이 다른 명령을 받지 못하며, 완공 전 취소하거나 파괴되면 건물 가격 전액 환불. 건설 중 입은 피해는 완공된 건물의 체력에 그대로 이어짐. 일꾼이 건설 현장에 도착하기 전(이동 중)에 다른 명령으로 취소되거나 그 도중에 사망해도 건물 가격 전액 환불
 - **건물 이동(리프트)**: 건물을 공중으로 띄워(그리드 점유 해제) 공중유닛처럼 우클릭으로 자유 이동시키거나, 착륙 위치를 지정해 그 자리로 날아가 착륙(그리드 재등록) — 이동 중에도 공중 유닛과 동일하게 발밑 지형을 따라가는 지형 추적 비행 적용, 이륙/이동/착륙 전 구간에서 메쉬 피벗 오프셋까지 반영해 고도 기준이 일관됨. 공중에 뜬 동안은 생산/커맨드가 전부 잠기고 Land/Move 버튼만 노출, 생산 대기열이 남아있으면 이륙 자체가 차단됨. 메인기지 건설 시 자원(광물/가스)과 최소 거리(기본 7칸, 인스펙터 조정 가능) 이격 규칙 적용(다른 건물엔 미적용)
 - **자원 시스템**: `ResourceManager` 기반 광물/가스/인구수 관리(한도 200), 건물 건설·유닛 생산 시 실제 자원/인구수 소모, 대기열 취소·생산 건물 파괴·건설 취소/파괴·건설 이동 중 취소·건설 이동 중 일꾼 사망 시 가격만큼 환불, 유닛 사망 시 인구수 반환, 자원 노드 대기열(줄서기)
-- **전투**: 사거리 기반 자동 교전, 공격력/방어력 스탯, 적 강제 지정, 아군 강제 공격(오인사격, 완공 건물 + 건설 중인 `BaseStructure` 포함)
+- **전투**: 사거리 기반 자동 교전, 공격력/방어력 스탯, 적 강제 지정, 아군 강제 공격(오인사격, 완공 건물 + 건설 중인 `BaseStructure` 포함), 공격 전달 방식(Hitscan/Projectile)을 유닛별로 선택 가능(`UnitDataSO.attackDelivery`) — Projectile은 `ProjectileAttack`이 투사체를 발사해 대상에 명중해야 데미지가 들어감, 여러 firePoints 지정 시 동시 발사(다연장)도 지원
 - **데미지 배율 시스템**: 유닛을 장갑 타입(경장갑/중장갑)과 크기 타입(소형/중형/대형)으로 분류하고, 공격 방식(소총/폭발/레이저/화염)별로 대상 크기에 따른 데미지 배율을 적용 — 배율표는 코드가 아니라 `DamageMultiplierTableSO` 에셋으로 분리해 인스펙터에서 조정 가능. 일부 유닛은 특정 장갑 타입 상대로 고유 추가 데미지(%)도 보유(예: 저격수 vs 중장갑, 스카이랜서 vs 경장갑). 최종 데미지는 `공격력 × 크기배율 × 고유보너스배율 → 반올림 → 고정방어력 감산 → 최소 1 보장` 순서로 계산
 - **유닛 생산(자동 분류 + 자가 동기화)**: `UnitDataSO`에 유닛 항목을 추가하고 `tier`(0=본진/1=병영/2=공장/3=우주공항) 값만 지정하면 코드 수정 없이 해당 건물의 생산 패널에 자동으로 나타남. 스폰된 유닛은 자기 `unitID`로 `UnitDataSO`를 스스로 조회해 체력/공격력/사거리/공격속도/아이콘/장갑·크기 타입을 반영(`UnitController.ApplyUnitData`) — 생산 큐를 거쳤든 씬에 직접 배치했든 항상 적용됨
 - **점령/영토 시스템**: 거점(`CaptureSystem`)은 트리거 범위 내 아군/적 유닛 수에 따라 점령치를 밀당하며 Ally↔Neutral↔Enemy 3단계로 순환 전환(항상 Neutral을 거침), 양쪽이 동시에 있으면 교착. `TerritoryZone`은 인스펙터에서 핀 개수만 조절하면 자동 생성/정리되는 다각형 영토(오목 다각형 포함)로 소유자별 외곽선 색이 자동 전환되고, `TerritoryManager`가 전체 영토를 등록해 좌표 질의를 제공. 건물 배치(칸 전부가 아군 영토 안이어야 함), 자원 채취(영토 밖 노드 채취 불가, 채취 중 영토 상실 시 즉시 중단), 유닛 생산(영토 밖이면 대기열 유지한 채 타이머 정지), 건설 진행(영토 밖이면 담당 일꾼 유무와 별개로 일시정지)이 전부 영토 여부에 실제로 게이팅됨
@@ -119,7 +131,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - **마우스 커서**: 기본 화살표 외에 선택 가능 대상(유닛/적/건물/광물/가스) 호버 시 선택 커서, 공격/이동 대기 상태(A/M/P/랠리/건물이동)에서 각각 공격/이동 커서로 전환(`UserControl`), UI 위에서는 항상 OS 기본 커서로 복귀
 - **이펙트 시스템**: `EffectPlayer` 공용 헬퍼로 공격(총구)/이동(트레일)/피격(공격 타입별 4종: 총기·폭발·레이저·화염)/사망/건물 이착륙/건설 진행·완공·파괴 이펙트를 재생 — 유닛/건물 프리팹에 붙는 `UnitEffects`/`BuildingEffects`/`ConstructionEffects`가 각각 전담, 스폰 위치는 `List<Transform>`으로 다중 지점 지정 가능(비워두면 오브젝트 자신 위치 하나로 폴백), 피격 이펙트는 콜라이더 표면의 공격자 쪽 지점에서 방향까지 계산해 재생
 - **모션 연출**: 이동 트레일은 `TrailRotationFollower`로 위치는 매 프레임 추적하되 회전만 Slerp로 서서히 따라가 급회전 시 부자연스럽게 홱 도는 문제 방지(급회전 중엔 크기/방출량도 축소), 공중 유닛/리프트 중인 건물은 `HoverBob`으로 DOTween 기반 부유(호버링) 애니메이션, 지상 차량 유닛은 이동 중 `VehicleShake`로 DOTween 기반 흔들림 연출 — 둘 다 루트가 아닌 비주얼 자식 오브젝트에 부착해 이동 로직(루트 트랜스폼 직접 갱신)과 충돌하지 않음
-- **UI**: 패널 기반 커맨드 UI, Info Panel(공격력/방어력 호버 툴팁), Squad Panel(최대 60마리 페이지네이션), 생산 대기열 UI, 미니맵
+- **UI**: 패널 기반 커맨드 UI, Info Panel(공격 아이콘 호버 시 공격타입/공격력(투사체 다연장 유닛은 xN 배수 표기), 방어 아이콘 호버 시 방어력/장갑타입/유닛 크기), Squad Panel(최대 60마리 페이지네이션), 생산 대기열 UI, 미니맵
+- **사운드**: `SoundManager` 싱글턴이 BGM(랜덤 무한 반복)/SFX/Voice 4개 카테고리 볼륨·뮤트를 관리, 유닛/건물 종류별 `SoundBank` 에셋(`UnitSoundBankSO`/`BuildingSoundBankSO`)으로 코드 수정 없이 사운드 추가, 명령·선택 확인음은 전용 단일 채널로 재생 중이면 새 요청을 버림, 동일 사운드가 짧은 시간에 몰리면 최소 재생 간격/동시 재생 개수 제한으로 스팸 방지, "적에게 공격받음" 경고음은 아군사격에는 울리지 않음(doc/0292) — 볼륨 슬라이더/뮤트 토글 UI(`SoundSettingsPanel`)는 로직만 있고 실제 Canvas 배치는 아직 안 됨(그동안 `SoundManager` 인스펙터에서 직접 조절)
 - **그래픽/비주얼**: URP Volume 포스트프로세싱(Bloom, Color Adjustments) + SSAO 적용, 빌드 프리뷰/셀 커서/이동·공격 명령 포인터는 전용 레이어 + 오버레이 카메라로 포스트프로세싱 미적용 처리, 3rd-party 유닛/건물 모델링 에셋(Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox) 임포트 및 Built-in → URP 머티리얼 변환 완료(게임플레이 프리팹 적용은 병영 건물 1개만 시작, 나머지는 로드맵)
 
 > 스크립트별 상세 동작 방식은 위 표의 [`Docs/`](Docs) 링크를 참고하세요. 요청 단위의 작업 로그(요청 내용, 코드 변경 전/후, 기능 설계 노트 포함)는 [`doc/`](doc) 폴더에 `0001-`부터 번호순으로 정리되어 있습니다.
@@ -146,7 +159,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 이동, 정지, 홀드, 순찰 (지상/공중 공통)
 - [x] 공중 유닛 이동 — NavMesh 대신 직접 좌표 보간이라 지형 제약을 받지 않음, 공중 유닛끼리 겹침을 유닛 크기(반경) 비례로 자동 분리, 매 프레임 발밑 지형을 재측정해 언덕 능선을 실제로 벗어나는 순간에 맞춰 고도가 자연스럽게 변하는 지형 추적 비행
 - [x] 공격 — 사거리 내 적 감지 후 메소드로 데미지 적용 (`AttackRange` + `UnitController.Attack`)
-- [x] 공격력 / 방어력 필드(`UnitController`, `EnemyController`) + Info Panel 호버 시 "Attack Damge : N" / "Armor : N" 툴팁
+- [x] 공격력 / 방어력 필드(`UnitController`, `EnemyUnitController`) + Info Panel 호버 시 공격 아이콘 = "Attack Type : N / Attack Damage : N(xN)", 방어 아이콘 = "Armor : N / Armor Type : N / Size : N" 툴팁(doc/0293)
+- [x] 공격 전달 방식 선택(Hitscan/Projectile) — `UnitDataSO.attackDelivery`로 유닛별 지정, Projectile은 `ProjectileAttack`이 투사체를 발사해 명중 시점에 데미지 적용(그 전엔 데미지 없음), firePoints를 여러 개 지정하면 다연장(동시발사)도 지원(doc/0290, 0291)
 - [x] 일꾼 자원 채취 (아래 "일꾼 채취 로직" 참고), 반납 대상은 가장 가까운 메인기지로 한정(다른 건물엔 반납하지 않음)
 - [x] 아군 유닛 우클릭 시 계속 따라다니기("Follow") — Idle 상태 유지로 도중에 만나는 적은 자동 교전, 대상과의 거리가 두 유닛 반경 합만큼 가까워지면 정지(지상/공중 모두 유닛 크기 비례로 밀어붙이거나 겹치지 않게 계산)
 - [x] 일꾼의 "건물 건설" 동작 — 일꾼이 현장으로 이동해 `BaseStructure`(건설 중 건물 기반)에 붙어서 건설 진행(아래 "건설 진행 시스템" 참고), 건설 중엔 다른 명령 불가. 현장 도착 전 다른 명령으로 취소되거나 이동 중 사망해도 건물 가격 전액 환불
@@ -218,7 +232,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 
 ### UI
 - [x] 커맨드 패널(선택 상태별 버튼 자동 전환)
-- [x] Info Panel(아이콘/이름/체력, 공격력·방어력 호버 툴팁), `BaseStructure` 선택 시 전용 Info Panel(공격력/방어력 숨김)
+- [x] Info Panel(아이콘/이름/체력, 공격 아이콘 호버 시 공격타입·공격력(xN 배수), 방어 아이콘 호버 시 방어력·장갑타입·크기), `BaseStructure` 선택 시 전용 Info Panel(공격력/방어력 숨김)
 - [x] Squad Panel(다중 선택 부대 표시, 개별 클릭 시 단일 선택 전환)
 - [x] Squad Panel 페이지네이션 — 12마리 × 5페이지, 최대 60마리, 필요한 페이지 버튼만 노출
 - [x] 커맨드/생산 버튼 호버 툴팁(`TooltipUI`), 제목만 있을 때 배경 크기 자동 축소(컴팩트 모드)
@@ -230,13 +244,24 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 유닛/건물별 체력바 UI — `HealthManager`의 `Slider` 필드가 체력 변화에 맞춰 자동 갱신, `HealthBarBillboard`로 카메라의 X(피치)만 따라 회전(Y/Z 고정)
 - [x] 부대지정 단축키(컨트롤 그룹) — `Ctrl+숫자` 저장, `Shift+숫자` 병합 추가, 숫자만 눌러 선택
 
+### 사운드
+- [x] `SoundManager` 싱글턴 — 주음량/배경음악/효과음/음성 4개 카테고리 볼륨·뮤트 관리, `PlayerPrefs` 영속화(설정 UI가 실제로 값을 저장하기 전까지는 인스펙터 기본값 유지), `AudioSource` 풀 순환 재사용(SFX 16개/Voice 4개)
+- [x] BGM — 곡 목록 중 매 판마다 랜덤 1곡, 끝나면 다시 랜덤 무한 반복(직전 곡 연속 방지)
+- [x] 유닛/건물 종류별 `SoundBank` 에셋(`UnitSoundBankSO`/`BuildingSoundBankSO`) — 코드 수정 없이 유닛/건물마다 공격/생성/사망/스킬/채취/건설/파괴 SFX와 선택/명령/생성/사망 Voice를 개별 지정, 유닛에 안 묶이는 나레이션은 `GlobalVoiceBankSO`(자원·인구 부족, 피격 경고, 업그레이드 완료)
+- [x] 3D 위치 기반 SFX — 카메라 거리에 따라 감쇠(전투/근접 SFX는 가까이 있을 때만 들림), 선택/명령 확인음과 대사(Voice)는 항상 2D로 또렷하게
+- [x] 명령/선택 확인음 전용 단일 채널 — 재생 중이면 새 요청을 버리고 끝난 뒤부터 재생(연속 명령 시 소리가 겹치지 않음)
+- [x] 동시다발 SFX/Voice 스팸 방지 — 같은 사운드가 짧은 시간 내 재요청되면 무시(최소 재생 간격), 동시 재생 개수 상한 초과 시 무시(여러 유닛이 한 프레임에 공격/사망해도 소리가 무제한으로 안 겹침)
+- [x] "적에게 공격받음" 경고음이 아군사격(오인사격)에는 울리지 않음 — 공격자 진영 정보(`isEnemyAttacker`)가 데미지 이벤트를 타고 끝까지 전달됨
+- [x] 볼륨 슬라이더/뮤트 토글 UI 로직(`SoundSettingsPanel`) — `SoundManager` API 연결까지 완료, 실제 Canvas/슬라이더/토글 배치는 아직 미완료(그동안 `SoundManager` 인스펙터에서 직접 조절)
+
 ## 로드맵 (미구현)
 
 - [ ] 유닛/건물 모델링 실제 적용 — 3rd-party 에셋(Canopus-III, Yoge) 임포트 및 URP 머티리얼 변환은 완료됐고 건물 쪽엔 실제 모델 1개(병영의 레이더 초소) 적용을 시작했지만, 유닛 프리팹(`prefabs/NTA/Unit/`)은 전부 아직 기본 프리미티브 메시(캡슐/큐브/구) 그대로 — 나머지 실제 모델 교체는 남은 작업
 - [ ] 사망 시 래그돌/사망 애니메이션 — 현재는 사망 즉시 `Destroy(gameObject)` + 파티클 스폰만 지원(옵션 A), 오브젝트를 유지한 채 애니메이션 재생 후 지연 파괴하는 구조(옵션 B, doc/0105 3.5절)는 미구현
-- [ ] Enemy AI 구현 — `EnemyController`는 현재 마커/아이콘/공격력·방어력 데이터만 갖고 있고, 실제로 공격하거나 이동하는 AI 로직은 없음(플레이어 유닛이 일방적으로 공격하는 대상), 1대1 AI도 별도 구상 필요
-- [ ] 유닛/건물 사운드, 사운드 매니저 — 전용 시스템 없음(`EffectPlayer`가 스폰하는 이펙트 프리팹에 `AudioSource`가 붙어있으면 같이 재생되는 부수 효과뿐)
-- [ ] 메인 화면, 설정창 UI — 현재 씬은 `SampleScene`/`TestScene`뿐, 별도 메뉴/설정 씬 없음
+- [ ] Enemy AI 구현 — `EnemyUnitController`는 현재 마커/아이콘/공격력·방어력 데이터만 갖고 있고, 실제로 공격하거나 이동하는 AI 로직은 없음(플레이어 유닛이 일방적으로 공격하는 대상), 1대1 AI도 별도 구상 필요
+- [ ] 건물 고유 스킬 추가 — 유닛 고급 특성(스킬 선택)처럼 건물 전용 고유 스킬은 아직 기획/구현 전
+- [ ] 메인 화면, 설정창 UI — 현재 씬은 `SampleScene`/`TestScene`뿐, 별도 메뉴 씬 없음. 볼륨 설정 로직(`SoundSettingsPanel`)은 준비돼 있지만 실제 화면 레이아웃은 미구현
+- [ ] 볼륨 설정 UI 실제 배치 — `SoundSettingsPanel`의 슬라이더 4개/토글 3개를 담을 Canvas를 아직 씬에 만들지 않음
 - [ ] UI 버튼 하단 이미지 등 비주얼 개선
 - [ ] `AttackRange`의 자동 사거리 탐지가 `BaseStructure`(건설 중인 건물)를 대상으로 삼는 경로 — 현재는 A 모드 강제 공격(오인사격 포함)으로만 공격 가능하고, 자동 교전 대상에는 포함되지 않음
 - [ ] 캠페인 맵/스테이지 구성 — 0~5 메인 스테이지 + 서브 스테이지 약 4개 기획 예정, `Mission2~5` 프리팹은 존재하지만 아직 어느 씬에서도 사용되지 않음(1스테이지 `Mission1`만 분위기 확인용 프로토타입으로 사용 중)
