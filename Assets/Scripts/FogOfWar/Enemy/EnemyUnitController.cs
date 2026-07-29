@@ -273,6 +273,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
                 targetHealth.GetDamage(finalDamage, transform.position, attackType, isEnemyAttacker: true);
 
             GetComponent<UnitEffects>()?.PlayAttack();
+            GetComponent<UnitAudio>()?.PlayAttackSFX();
             GetComponent<LaserBeamAttack>()?.Fire(target.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
             turretController?.FireRecoil(); // 포탑 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
         }
