@@ -49,7 +49,8 @@ public class ConstructionEffects : MonoBehaviour
         }
     }
 
-    private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType)
+    // isEnemyAttacker는 HealthManager.OnDamaged 시그니처를 맞추기 위해 받지만 여기선 안 씀(doc/0292).
+    private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType, bool isEnemyAttacker)
     {
         EffectPlayer.PlayHit(transform, bodyCollider, attackerPosition, hitEffects.GetPrefab(attackType));
     }

@@ -888,10 +888,12 @@ public class UnitController : MonoBehaviour, IDestructible
 
             // Projectile이면 즉시 데미지를 넣지 않고 투사체가 명중했을 때 처음 적용한다 (doc/0290).
             // ProjectileAttack이 안 붙어있으면(설정 실수) 데미지가 아예 안 들어가는 사고를 막기 위해 Hitscan으로 폴백.
+            // 공격자는 항상 아군(UnitController)이므로 isEnemyAttacker=false - 아군사격에 "적에게 공격받음"
+            // 경고음이 울리지 않도록 하기 위함(doc/0292).
             if (attackDelivery == AttackDeliveryType.Projectile && TryGetComponent(out ProjectileAttack projectileAttack))
-                projectileAttack.Fire(enemy.transform, targetHealth, finalDamage, attackType);
+                projectileAttack.Fire(enemy.transform, targetHealth, finalDamage, attackType, isEnemyAttacker: false);
             else
-                targetHealth.GetDamage(finalDamage, transform.position, attackType); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
+                targetHealth.GetDamage(finalDamage, transform.position, attackType, isEnemyAttacker: false); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
 
             GetComponent<UnitEffects>()?.PlayAttack();
             GetComponent<UnitAudio>()?.PlayAttackSFX();
@@ -1463,6 +1465,13 @@ public class UnitController : MonoBehaviour, IDestructible
     public AttackEffectType GetAttackType() => attackType;
     public ArmorType GetArmorType() => armorType;
     public SizeType GetSizeType() => sizeType;
+
+    // 공격 1회당 동시에 나가는 투사체 개수 (Projectile + ProjectileAttack의 firePoints가 여러 개일 때만
+    // 1 초과, doc/0291/0293) - 정보 패널 툴팁에서 "공격력 x2" 같은 배수 표기에 사용된다.
+    public int GetShotCount() =>
+        attackDelivery == AttackDeliveryType.Projectile && TryGetComponent(out ProjectileAttack projectileAttack)
+            ? projectileAttack.GetFirePointCount()
+            : 1;
 
     // 대상이 공중 유닛인지에 따라 이 유닛이 그 대상을 공격할 수 있는 도메인(지상/공중)인지 판정한다.
     // (AttackUnitTarget/AttackFriendlyTarget의 명령 시점 차단, AttackRange의 자동 감지 필터링 양쪽에서 공용으로 사용)

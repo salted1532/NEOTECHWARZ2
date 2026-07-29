@@ -26,7 +26,9 @@ public class HealthManager : MonoBehaviour
     // 피격 이펙트 전용 이벤트. OnHealthChanged는 Heal()에서도 발생해 "회복"과 구분이 안 되므로 별도로 둔다.
     // attackerPosition은 피격 이펙트를 콜라이더 표면의 "공격자 쪽" 지점에 스폰하는 데 쓰이고,
     // attackType은 총기/폭발형/레이저/화염 중 어떤 피격 이펙트를 재생할지 UnitEffects가 고르는 데 쓰인다.
-    public event System.Action<int, Vector3, AttackEffectType> OnDamaged;
+    // isEnemyAttacker: 공격자가 적 진영인지(true) 아군의 아군사격인지(false) - "적에게 공격받음" 경고음이
+    // 아군사격에는 울리지 않도록 UnitAudio/BuildingAudio가 이 값으로 판별한다 (doc/0292).
+    public event System.Action<int, Vector3, AttackEffectType, bool> OnDamaged;
 
     private void Awake()
     {
@@ -62,14 +64,15 @@ public class HealthManager : MonoBehaviour
     // 데미지를 적용한다. 이미 죽었거나 데미지가 0 이하면 무시하고, 체력이 0 이하가 되면 Die()를 호출한다.
     // attackerPosition: 데미지를 준 유닛의 위치 (피격 이펙트 방향 계산용, UnitEffects 참고).
     // attackType: 공격 수단 (피격 이펙트 종류 선택용, UnitEffects 참고).
-    public void GetDamage(int damage, Vector3 attackerPosition, AttackEffectType attackType)
+    // isEnemyAttacker: 공격자가 적 진영인지 - "적에게 공격받음" 경고음이 아군사격에는 울리지 않게 하는 데 쓰인다(doc/0292).
+    public void GetDamage(int damage, Vector3 attackerPosition, AttackEffectType attackType, bool isEnemyAttacker)
     {
         if (isDead || damage <= 0)
             return;
 
         currentHp = Mathf.Max(0, currentHp - damage);
         OnHealthChanged?.Invoke(currentHp, maxHealth);
-        OnDamaged?.Invoke(damage, attackerPosition, attackType);
+        OnDamaged?.Invoke(damage, attackerPosition, attackType, isEnemyAttacker);
 
         Debug.Log($"{gameObject.name} HP: {currentHp}/{maxHealth}");
 

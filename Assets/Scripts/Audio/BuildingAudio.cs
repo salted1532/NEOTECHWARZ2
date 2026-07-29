@@ -87,9 +87,11 @@ public class BuildingAudio : MonoBehaviour
             SoundManager.Instance?.PlaySFX(bank.destroySFX, transform.position);
     }
 
-    private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType)
+    // isEnemyAttacker가 false면(아군사격) 경고음을 울리지 않는다 - "적에게 공격받았습니다"는 실제로 적에게
+    // 공격받았을 때만 의미가 있다(doc/0292).
+    private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType, bool isEnemyAttacker)
     {
-        if (!SoundManager.IsWorldPositionOnScreen(transform.position))
+        if (isEnemyAttacker && !SoundManager.IsWorldPositionOnScreen(transform.position))
             SoundManager.Instance?.PlayBuildingUnderAttackWarning();
     }
 }

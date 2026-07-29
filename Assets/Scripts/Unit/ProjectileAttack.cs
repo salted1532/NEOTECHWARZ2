@@ -22,39 +22,45 @@ public class ProjectileAttack : MonoBehaviour
     // UnitController/EnemyUnitController.Attack()이 호출. targetHealth/damage/attackType은 발사 시점 기준으로
     // 미리 계산되어 넘어온다 - 장갑/배율은 명중 시점이 아니라 발사 시점 기준(비행 중 대상 장갑이 바뀌는
     // 경우는 없다고 가정, 데미지 계산 로직을 여기서 중복하지 않기 위함).
-    public void Fire(Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType)
+    // isEnemyAttacker: 발사자가 적 진영인지 - 명중 시 GetDamage()로 그대로 전달해 "적에게 공격받음" 경고음이
+    // 아군사격에는 안 울리게 한다(doc/0292).
+    public void Fire(Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType, bool isEnemyAttacker)
     {
         if (projectilePrefab == null || target == null)
             return;
 
         if (firePoints == null || firePoints.Count == 0)
         {
-            FireFromPoint(transform, target, targetHealth, damage, attackType);
+            FireFromPoint(transform, target, targetHealth, damage, attackType, isEnemyAttacker);
             return;
         }
 
         foreach (Transform point in firePoints)
         {
             if (point != null)
-                FireFromPoint(point, target, targetHealth, damage, attackType);
+                FireFromPoint(point, target, targetHealth, damage, attackType, isEnemyAttacker);
         }
     }
 
-    private void FireFromPoint(Transform point, Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType)
+    // 공격 1회당 동시에 발사되는 투사체 개수 (doc/0291 - firePoints가 비어있으면 1발). 정보 패널 툴팁에서
+    // "공격력 x2" 같은 배수 표기에 사용된다(doc/0293).
+    public int GetFirePointCount() => firePoints != null && firePoints.Count > 0 ? firePoints.Count : 1;
+
+    private void FireFromPoint(Transform point, Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType, bool isEnemyAttacker)
     {
         Vector3 toTarget = target.position - point.position;
         GameObject instance = Instantiate(projectilePrefab, point.position, Quaternion.LookRotation(toTarget));
-        StartCoroutine(FlyRoutine(instance, target, targetHealth, damage, attackType));
+        StartCoroutine(FlyRoutine(instance, target, targetHealth, damage, attackType, isEnemyAttacker));
     }
 
-    private IEnumerator FlyRoutine(GameObject instance, Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType)
+    private IEnumerator FlyRoutine(GameObject instance, Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType, bool isEnemyAttacker)
     {
         while (target != null) // 대상이 비행 중 파괴되면(다른 공격에 먼저 죽음) 데미지 없이 소멸
         {
             Vector3 toTarget = target.position - instance.transform.position;
             if (toTarget.magnitude <= hitDistance)
             {
-                targetHealth?.GetDamage(damage, instance.transform.position, attackType); // 명중 - 여기서 처음 데미지 적용
+                targetHealth?.GetDamage(damage, instance.transform.position, attackType, isEnemyAttacker); // 명중 - 여기서 처음 데미지 적용
                 break;
             }
 

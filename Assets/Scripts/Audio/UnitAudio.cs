@@ -150,9 +150,11 @@ public class UnitAudio : MonoBehaviour
     // attackerPosition/attackType은 HealthManager.OnDamaged 시그니처를 맞추기 위해 받지만, 여기선 화면
     // 밖에서 공격받았는지만 확인해 전역 나레이션(경고음)으로 알린다 - PlayGlobalVoice의 쿨다운 덕분에
     // 여러 유닛이 동시에 맞아도 경고음이 스팸되지 않는다.
-    private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType)
+    // isEnemyAttacker가 false면(아군사격) 경고음을 울리지 않는다 - "적에게 공격받았습니다"는 실제로 적에게
+    // 공격받았을 때만 의미가 있다(doc/0292).
+    private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType, bool isEnemyAttacker)
     {
-        if (!SoundManager.IsWorldPositionOnScreen(transform.position))
+        if (isEnemyAttacker && !SoundManager.IsWorldPositionOnScreen(transform.position))
             SoundManager.Instance?.PlayUnitUnderAttackWarning();
     }
 }

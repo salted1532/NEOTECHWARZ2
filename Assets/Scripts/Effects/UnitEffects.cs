@@ -108,7 +108,9 @@ public class UnitEffects : MonoBehaviour
     }
 
     // attackerPosition/attackType: HealthManager.OnDamaged가 넘겨줌 (EffectPlayer.PlayHit 참고).
-    private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType)
+    // isEnemyAttacker는 HealthManager.OnDamaged 시그니처를 맞추기 위해 받지만 여기선 안 씀 - 피격 이펙트는
+    // 아군사격이든 적 공격이든 똑같이 재생돼야 한다(doc/0292, 경고음만 구분하는 UnitAudio와 다름).
+    private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType, bool isEnemyAttacker)
     {
         EffectPlayer.PlayHit(transform, bodyCollider, attackerPosition, hitEffects.GetPrefab(attackType));
     }

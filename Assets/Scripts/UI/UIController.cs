@@ -247,6 +247,10 @@ public class UIController : MonoBehaviour
     private HealthManager infoBoundHealth; // 현재 Info_panel이 구독 중인 대상 (선택이 바뀌면 구독 해제 후 갈아끼움)
     private int infoAttackDamage;
     private int infoArmor;
+    private AttackEffectType infoAttackType;
+    private ArmorType infoArmorType;
+    private SizeType infoSizeType;
+    private int infoShotCount = 1; // 공격 1회당 동시에 나가는 투사체 개수 - 2 이상이면 툴팁에 "x2"로 표기 (doc/0293)
 
     [Header("Squad Panel (SelectInfo)")]
     [SerializeField] private GameObject squadPanel;
@@ -577,13 +581,15 @@ public class UIController : MonoBehaviour
     // 적 건물(EnemyBuildingController) 선택 둘 다 이 오버로드를 쓰므로 여기 한 곳만 고치면 양쪽에 대칭 적용된다.
     public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health)
     {
-        ShowInfoPanel(icon, unitName, health, 0, 0);
+        ShowInfoPanel(icon, unitName, health, 0, 0, AttackEffectType.Bullet, ArmorType.Light, SizeType.Medium, 1);
         SetCombatStatsVisible(false);
     }
 
-    // 유닛 선택 시 공격력/방어력도 함께 받아 저장해둔다.
-    // AttackDamageImage/ArmorImage 호버 시(SetupInfoStatHoverTooltips) 이 값을 툴팁으로 보여준다.
-    public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health, int attackDamage, int armor)
+    // 유닛 선택 시 공격 관련 스탯 전부(공격타입/공격력/투사체 개수)와 방어 관련 스탯 전부(방어력/장갑타입/
+    // 크기)를 함께 받아 저장해둔다. AttackDamageImage/ArmorImage 호버 시(SetupInfoStatHoverTooltips) 이
+    // 값을 툴팁으로 보여준다 (doc/0293).
+    public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health, int attackDamage, int armor,
+        AttackEffectType attackType, ArmorType armorType, SizeType sizeType, int shotCount)
     {
         HideSquadPanel();
 
@@ -601,6 +607,10 @@ public class UIController : MonoBehaviour
 
         infoAttackDamage = attackDamage;
         infoArmor = armor;
+        infoAttackType = attackType;
+        infoArmorType = armorType;
+        infoSizeType = sizeType;
+        infoShotCount = shotCount;
 
         SetCombatStatsVisible(true);
         BindInfoHealth(health);
@@ -616,12 +626,15 @@ public class UIController : MonoBehaviour
             armorImage.gameObject.SetActive(visible);
     }
 
-    // attackDamageImage/armorImage에 EventTrigger를 붙여, 호버 시 TooltipUI로 현재 선택 유닛의
-    // 공격력/방어력을 "Attack Damge : N" / "Armor : N" 형식으로 보여준다 (인스펙터에서 이미지만 연결하면 됨).
+    // attackDamageImage/armorImage에 EventTrigger를 붙여, 호버 시 TooltipUI로 현재 선택 유닛의 공격/방어
+    // 스탯을 전부 보여준다 (인스펙터에서 이미지만 연결하면 됨). 공격 아이콘은 공격타입/공격력(투사체를
+    // 여러 발 동시에 쏘는 유닛은 "x2"처럼 배수 표기), 방어 아이콘은 방어력/장갑타입/유닛 크기 (doc/0293).
     private void SetupInfoStatHoverTooltips()
     {
-        AddStatHoverTooltip(attackDamageImage, () => $"Attack Damge : {infoAttackDamage}");
-        AddStatHoverTooltip(armorImage, () => $"Armor : {infoArmor}");
+        AddStatHoverTooltip(attackDamageImage, () =>
+            $"Attack Type : {infoAttackType}\nAttack Damage : {infoAttackDamage}{(infoShotCount > 1 ? $" (x{infoShotCount})" : string.Empty)}");
+        AddStatHoverTooltip(armorImage, () =>
+            $"Armor : {infoArmor}\nArmor Type : {infoArmorType}\nSize : {infoSizeType}");
     }
 
     private void AddStatHoverTooltip(Image image, Func<string> textProvider)

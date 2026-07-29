@@ -266,10 +266,11 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
 
             // Projectile이면 즉시 데미지를 넣지 않고 투사체가 명중했을 때 처음 적용한다 (doc/0290,
             // UnitController.Attack()과 동일한 훅 지점). ProjectileAttack이 안 붙어있으면 Hitscan으로 폴백.
+            // 공격자는 항상 적 진영(EnemyUnitController)이므로 isEnemyAttacker=true (doc/0292).
             if (attackDelivery == AttackDeliveryType.Projectile && TryGetComponent(out ProjectileAttack projectileAttack))
-                projectileAttack.Fire(target.transform, targetHealth, finalDamage, attackType);
+                projectileAttack.Fire(target.transform, targetHealth, finalDamage, attackType, isEnemyAttacker: true);
             else
-                targetHealth.GetDamage(finalDamage, transform.position, attackType);
+                targetHealth.GetDamage(finalDamage, transform.position, attackType, isEnemyAttacker: true);
 
             GetComponent<UnitEffects>()?.PlayAttack();
             GetComponent<LaserBeamAttack>()?.Fire(target.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
@@ -455,8 +456,15 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     public EnemyAttackRange GetAttackRange() => attackRange;
     public int GetAttackDamage() => attackDamage;
     public int GetArmor() => armor;
+    public AttackEffectType GetAttackType() => attackType;
     public ArmorType GetArmorType() => armorType;
     public SizeType GetSizeType() => sizeType;
+
+    // 공격 1회당 동시에 나가는 투사체 개수 (UnitController.GetShotCount()와 동일한 패턴, doc/0291/0293).
+    public int GetShotCount() =>
+        attackDelivery == AttackDeliveryType.Projectile && TryGetComponent(out ProjectileAttack projectileAttack)
+            ? projectileAttack.GetFirePointCount()
+            : 1;
 
     // 생산/스폰 시점에 EnemyUnitDataSO(OC 데이터)의 값으로 스탯을 덮어쓴다. UnitController.ApplyUnitData와
     // 동일한 패턴 (doc/0230의 OC Unit Data SO를 나중에 "AI 관제소"/스포너가 이 메서드로 흘려보낼 수 있음).
