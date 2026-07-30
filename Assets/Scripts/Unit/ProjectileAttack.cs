@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,29 +45,18 @@ public class ProjectileAttack : MonoBehaviour
     // "공격력 x2" 같은 배수 표기에 사용된다(doc/0293).
     public int GetFirePointCount() => firePoints != null && firePoints.Count > 0 ? firePoints.Count : 1;
 
+    // 이동/명중은 이제 투사체 인스턴스 자신(Projectile 컴포넌트)이 담당한다 - 발사자가 비행 중 죽어도
+    // (doc/0319) 계속 날아가도록. 프리팹에 이미 Projectile이 붙어있으면 그걸 쓰고, 없으면 자동으로
+    // 추가한다(프리팹 에셋을 직접 수정할 필요 없음).
     private void FireFromPoint(Transform point, Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType, bool isEnemyAttacker)
     {
         Vector3 toTarget = target.position - point.position;
         GameObject instance = Instantiate(projectilePrefab, point.position, Quaternion.LookRotation(toTarget));
-        StartCoroutine(FlyRoutine(instance, target, targetHealth, damage, attackType, isEnemyAttacker));
-    }
 
-    private IEnumerator FlyRoutine(GameObject instance, Transform target, HealthManager targetHealth, int damage, AttackEffectType attackType, bool isEnemyAttacker)
-    {
-        while (target != null) // 대상이 비행 중 파괴되면(다른 공격에 먼저 죽음) 데미지 없이 소멸
-        {
-            Vector3 toTarget = target.position - instance.transform.position;
-            if (toTarget.magnitude <= hitDistance)
-            {
-                targetHealth?.GetDamage(damage, instance.transform.position, attackType, isEnemyAttacker); // 명중 - 여기서 처음 데미지 적용
-                break;
-            }
+        Projectile projectile = instance.GetComponent<Projectile>();
+        if (projectile == null)
+            projectile = instance.AddComponent<Projectile>();
 
-            instance.transform.position += toTarget.normalized * projectileSpeed * Time.deltaTime;
-            instance.transform.rotation = Quaternion.LookRotation(toTarget);
-            yield return null;
-        }
-
-        Destroy(instance);
+        projectile.Launch(target, targetHealth, damage, attackType, isEnemyAttacker, projectileSpeed, hitDistance);
     }
 }
