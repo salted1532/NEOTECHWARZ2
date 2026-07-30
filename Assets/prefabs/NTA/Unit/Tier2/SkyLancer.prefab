@@ -907,6 +907,7 @@ MonoBehaviour:
   unitMarker: {fileID: 8287700491229270693}
   icon: {fileID: 21300000, guid: f9088a500c2a2184c90293aea40e17bb, type: 3}
   unitID: 7
+  heroName: 
   attackDamage: 8
   armor: 0
   attackType: 1
@@ -1434,6 +1435,12 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1495329173376342796}
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4170081986206172789, guid: c55516cf991686047b668d094e532159, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3960432273937086965}
+    - targetCorrespondingSourceObject: {fileID: 4170081986206172789, guid: c55516cf991686047b668d094e532159, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7011681889210671148}
     - targetCorrespondingSourceObject: {fileID: 2984487255201645593, guid: c55516cf991686047b668d094e532159, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5944170514141848326}
@@ -1462,6 +1469,47 @@ MonoBehaviour:
   recoilReturnDuration: 0.18
   recoilEase: 6
   recoilReturnEase: 27
+--- !u!1 &1620309044044802180 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4170081986206172789, guid: c55516cf991686047b668d094e532159, type: 3}
+  m_PrefabInstance: {fileID: 3432698414557015793}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3960432273937086965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1620309044044802180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9f80318a0341c3498e0d387baf39a52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleIdleAnimation
+  turretController: {fileID: 5944170514141848326}
+  idleWaitTime: 10
+  turretWanderAngle: 45
+  turretWanderDuration: 1
+  turretHoldMin: 1
+  turretHoldMax: 2
+  idleShakeStrength: 0.01
+  idleShakeVibrato: 10
+  idleShakeCycleDuration: 0.15
+--- !u!114 &7011681889210671148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1620309044044802180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acd7820bbe8872a4fb8e421443669336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleShake
+  shakeStrength: 0.03
+  vibrato: 15
+  shakeCycleDuration: 0.2
 --- !u!4 &2105343564531954238 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3644762111632170191, guid: c55516cf991686047b668d094e532159, type: 3}

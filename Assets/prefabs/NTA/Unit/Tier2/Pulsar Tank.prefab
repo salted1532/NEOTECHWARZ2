@@ -601,6 +601,7 @@ MonoBehaviour:
   unitMarker: {fileID: 8287700491229270693}
   icon: {fileID: 21300000, guid: 2cf1e1b8455dc8346b3135d7ea2df0cd, type: 3}
   unitID: 6
+  heroName: 
   attackDamage: 20
   armor: 0
   attackType: 1
@@ -608,6 +609,7 @@ MonoBehaviour:
   sizeType: 2
   canAttackGround: 1
   canAttackAir: 1
+  attackDelivery: 0
   bonusVersusArmorType: 0
   bonusVersusArmorPercent: 0
   moveSpeed: 10
@@ -1088,6 +1090,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 306438625495933438, guid: 7b994b6521e87d1488c26b5a5189d737, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5510203965001688189}
+    - targetCorrespondingSourceObject: {fileID: 306438625495933438, guid: 7b994b6521e87d1488c26b5a5189d737, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8894308240012993147}
     - targetCorrespondingSourceObject: {fileID: 5173273350348175602, guid: 7b994b6521e87d1488c26b5a5189d737, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3826655909017791724}
@@ -1141,6 +1146,27 @@ MonoBehaviour:
   shakeStrength: 0.03
   vibrato: 10
   shakeCycleDuration: 0.2
+--- !u!114 &8894308240012993147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7288853161425062351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9f80318a0341c3498e0d387baf39a52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleIdleAnimation
+  turretController: {fileID: 3826655909017791724}
+  idleWaitTime: 10
+  turretWanderAngle: 45
+  turretWanderDuration: 1
+  turretHoldMin: 1
+  turretHoldMax: 2
+  idleShakeStrength: 0.01
+  idleShakeVibrato: 10
+  idleShakeCycleDuration: 0.15
 --- !u!4 &7956987501548737397 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1084066663127890756, guid: 7b994b6521e87d1488c26b5a5189d737, type: 3}
