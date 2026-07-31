@@ -1,8 +1,6 @@
 ﻿using System.Collections;
-using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Audio;
 
 // 공격 수단의 종류. 피격 이펙트를 공격자에 따라 다르게 재생하기 위해 HealthManager.GetDamage에 실어 보낸다
 // (UnitEffects가 이 값으로 총기/폭발형/레이저/화염 중 어떤 피격 이펙트를 재생할지 고른다).
@@ -93,9 +91,6 @@ public class UnitController : MonoBehaviour, IDestructible
     private float moveSpeed = 10f;
     [SerializeField]
     private float arriveDistance = 0.5f;
-    [SerializeField]
-    private float stuckTimer; //갇히거나 행동 실행 불가시 타이머
-
     private Vector3 targetPosition;
     [SerializeField]
     private bool isMovingAirUnit = false;
@@ -181,6 +176,10 @@ public class UnitController : MonoBehaviour, IDestructible
     private EnemyUnitController orderedTarget;   // 명시적으로 지정된 추격 대상 (없으면 null)
     private Vector3? attackMoveDestination;  // 공격-이동 목적지 / 추격 중 마지막으로 확인된 위치 (교전 후 복귀할 지점)
     private AttackRange attackRange;         // 사거리 내 교전 대상 존재 여부 조회용 (자식 컴포넌트)
+    private UnitEffects unitEffects;         // 공격/피격 이펙트 재생용 (없을 수 있는 옵셔널 컴포넌트)
+    private UnitAudio unitAudio;             // 공격/채취 SFX 재생용 (없을 수 있는 옵셔널 컴포넌트)
+    private LaserBeamAttack laserBeamAttack; // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0218)
+    private ProjectileAttack projectileAttack; // 투사체 발사 유닛만 붙어있는 옵셔널 컴포넌트
     // 지정 추격 대상과 한 번이라도 사거리 안에서 접촉했는지. 접촉 전(예: 맵 반대편의 먼 적을 지정한 직후)에는
     // 아무리 멀어도 "시야 이탈"로 취급하지 않고 무조건 계속 쫓아간다 - 그래야 이동 도중 우연히 지나치는
     // 다른 적에게 한눈팔지 않고 지정한 대상까지 끝까지 간다. 접촉 이후에만 chaseLoseSightRange가 적용된다.
@@ -251,6 +250,10 @@ public class UnitController : MonoBehaviour, IDestructible
         isWorker = CompareTag("Worker");
         attackRange = GetComponentInChildren<AttackRange>();
         turretController = GetComponentInChildren<TurretController>();
+        unitEffects = GetComponent<UnitEffects>();
+        unitAudio = GetComponent<UnitAudio>();
+        laserBeamAttack = GetComponent<LaserBeamAttack>();
+        TryGetComponent(out projectileAttack);
 
         if (!isAirUnit)
         {
@@ -544,7 +547,7 @@ public class UnitController : MonoBehaviour, IDestructible
         hasPendingSkillUnitOrder = false;
         hasPendingSkillAreaOrder = false;
 
-        GetComponent<UnitEffects>()?.StopAttackEffects(); // 이동/정지 등 다른 명령으로 공격이 취소되면 재생 중인 공격 이펙트도 즉시 정지
+        unitEffects?.StopAttackEffects(); // 이동/정지 등 다른 명령으로 공격이 취소되면 재생 중인 공격 이펙트도 즉시 정지
 
         CancelBuildOrder();
     }
@@ -648,9 +651,9 @@ public class UnitController : MonoBehaviour, IDestructible
             return;
         }
 
-        float distance = Vector3.Distance(transform.position, friendlyTarget.transform.position);
+        float sqrDistance = (transform.position - friendlyTarget.transform.position).sqrMagnitude;
 
-        if (attackRange != null && distance <= attackRange.UnitRange)
+        if (attackRange != null && sqrDistance <= attackRange.UnitRange * attackRange.UnitRange)
         {
             Attack(friendlyTarget.transform.position, friendlyTarget.gameObject); // 내부에서 정지 처리까지 함께 해준다
         }
@@ -764,7 +767,7 @@ public class UnitController : MonoBehaviour, IDestructible
         if (!hasBuildOrder)
             return;
 
-        if (Vector3.Distance(transform.position, buildDestination) > buildInteractRange)
+        if ((transform.position - buildDestination).sqrMagnitude > buildInteractRange * buildInteractRange)
             return;
 
         hasBuildOrder = false;
@@ -921,7 +924,12 @@ public class UnitController : MonoBehaviour, IDestructible
         if (alreadyAttacked)
             return;
 
-        bool targetIsAir = IsTargetAirborne(enemy);
+        // 대상 종류(아군 유닛 / 적 유닛)를 한 번만 조회해서, 아래 도메인 판정/데미지 계산 전체가 이 결과를 공유한다
+        // (예전엔 IsTargetAirborne/GetTargetArmor/GetTargetSizeType/GetTargetArmorType이 각자 다시 조회했음).
+        enemy.TryGetComponent<UnitController>(out var targetFriendlyUnit);
+        enemy.TryGetComponent<EnemyUnitController>(out var targetEnemyUnit);
+
+        bool targetIsAir = IsTargetAirborne(enemy, targetFriendlyUnit, targetEnemyUnit);
         if (!CanAttackDomain(targetIsAir))
         {
             // 쿨다운(alreadyAttacked)은 건드리지 않는다 - 대상이 다시 공격 가능한 도메인으로 돌아오면(예: 건물 착륙)
@@ -930,24 +938,23 @@ public class UnitController : MonoBehaviour, IDestructible
             return;
         }
 
-        Debug.Log("공격성공!");
         if (enemy.TryGetComponent<HealthManager>(out var targetHealth))
         {
-            int targetArmor = GetTargetArmor(enemy);
-            int finalDamage = CalculateFinalDamage(enemy, targetArmor);
+            int targetArmor = GetTargetArmor(targetFriendlyUnit, targetEnemyUnit);
+            int finalDamage = CalculateFinalDamage(targetFriendlyUnit, targetEnemyUnit, targetArmor);
 
             // Projectile이면 즉시 데미지를 넣지 않고 투사체가 명중했을 때 처음 적용한다 (doc/0290).
             // ProjectileAttack이 안 붙어있으면(설정 실수) 데미지가 아예 안 들어가는 사고를 막기 위해 Hitscan으로 폴백.
             // 공격자는 항상 아군(UnitController)이므로 isEnemyAttacker=false - 아군사격에 "적에게 공격받음"
             // 경고음이 울리지 않도록 하기 위함(doc/0292).
-            if (attackDelivery == AttackDeliveryType.Projectile && TryGetComponent(out ProjectileAttack projectileAttack))
+            if (attackDelivery == AttackDeliveryType.Projectile && projectileAttack != null)
                 projectileAttack.Fire(enemy.transform, targetHealth, finalDamage, attackType, isEnemyAttacker: false);
             else
                 targetHealth.GetDamage(finalDamage, transform.position, attackType, isEnemyAttacker: false); // 위치+공격 타입을 같이 넘겨 피격 이펙트 선택/방향 계산에 사용
 
-            GetComponent<UnitEffects>()?.PlayAttack();
-            GetComponent<UnitAudio>()?.PlayAttackSFX();
-            GetComponent<LaserBeamAttack>()?.Fire(enemy.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0218)
+            unitEffects?.PlayAttack();
+            unitAudio?.PlayAttackSFX();
+            laserBeamAttack?.Fire(enemy.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0218)
             turretController?.FireRecoil(); // 포탑 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0219)
 
             // 패시브 스킬(예: 스카이 랜서 "공중 강화" 도트)이 구독해서 쓰는 명중 이벤트 (doc/0323).
@@ -961,10 +968,10 @@ public class UnitController : MonoBehaviour, IDestructible
 
     // 공격방식×대상크기 배율(DamageMultiplierTableSO)과 이 유닛의 고유 장갑타입 보너스를 곱연산으로 적용한 뒤,
     // 대상의 고정 방어력을 감산해 최종 데미지를 계산한다. 최소 1은 항상 보장.
-    private int CalculateFinalDamage(GameObject target, int targetArmor)
+    private int CalculateFinalDamage(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit, int targetArmor)
     {
-        SizeType targetSize = GetTargetSizeType(target);
-        ArmorType targetArmorType = GetTargetArmorType(target);
+        SizeType targetSize = GetTargetSizeType(targetFriendlyUnit, targetEnemyUnit);
+        ArmorType targetArmorType = GetTargetArmorType(targetFriendlyUnit, targetEnemyUnit);
 
         DamageMultiplierTableSO table = rtsController != null ? rtsController.DamageMultiplierTable : null;
         float sizeMultiplier = table != null ? table.GetMultiplier(attackType, targetSize) : 1f;
@@ -978,37 +985,37 @@ public class UnitController : MonoBehaviour, IDestructible
     }
 
     // 공격 대상의 방어력을 조회한다 (아군 유닛이면 연구 보너스가 반영된 GetArmor(), 적 유닛이면 EnemyUnitController의 armor, 그 외(건물/자원)는 0).
-    private int GetTargetArmor(GameObject target)
+    private int GetTargetArmor(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit)
     {
-        if (target.TryGetComponent<UnitController>(out var friendlyUnit))
-            return friendlyUnit.GetArmor();
+        if (targetFriendlyUnit != null)
+            return targetFriendlyUnit.GetArmor();
 
-        if (target.TryGetComponent<EnemyUnitController>(out var enemyUnit))
-            return enemyUnit.GetArmor();
+        if (targetEnemyUnit != null)
+            return targetEnemyUnit.GetArmor();
 
         return 0;
     }
 
     // 공격 대상의 크기 타입을 조회한다 (건물/자원 등 타입 정보가 없는 대상은 Medium → 배율 100%로 영향 없음).
-    private SizeType GetTargetSizeType(GameObject target)
+    private SizeType GetTargetSizeType(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit)
     {
-        if (target.TryGetComponent<UnitController>(out var friendlyUnit))
-            return friendlyUnit.GetSizeType();
+        if (targetFriendlyUnit != null)
+            return targetFriendlyUnit.GetSizeType();
 
-        if (target.TryGetComponent<EnemyUnitController>(out var enemyUnit))
-            return enemyUnit.GetSizeType();
+        if (targetEnemyUnit != null)
+            return targetEnemyUnit.GetSizeType();
 
         return SizeType.Medium;
     }
 
     // 공격 대상의 장갑 타입을 조회한다 (건물/자원 등은 고유 보너스가 적용될 일이 없으므로 Light를 기본값으로 반환).
-    private ArmorType GetTargetArmorType(GameObject target)
+    private ArmorType GetTargetArmorType(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit)
     {
-        if (target.TryGetComponent<UnitController>(out var friendlyUnit))
-            return friendlyUnit.GetArmorType();
+        if (targetFriendlyUnit != null)
+            return targetFriendlyUnit.GetArmorType();
 
-        if (target.TryGetComponent<EnemyUnitController>(out var enemyUnit))
-            return enemyUnit.GetArmorType();
+        if (targetEnemyUnit != null)
+            return targetEnemyUnit.GetArmorType();
 
         return ArmorType.Light;
     }
@@ -1016,13 +1023,13 @@ public class UnitController : MonoBehaviour, IDestructible
     // 공격 대상이 "지금" 공중 상태인지 조회한다. 건물은 이/착륙으로 실시간 바뀔 수 있어(BuildingController.IsLifted)
     // 매 공격 사이클마다 다시 확인해야 한다 - 명령을 내린 시점에 캐싱해둔 값을 계속 쓰면 안 된다.
     // EnemyUnitController도 이제 isAirUnit 개념이 있어(doc/0231) 그 값을 그대로 물어본다.
-    private bool IsTargetAirborne(GameObject target)
+    private bool IsTargetAirborne(GameObject target, UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit)
     {
-        if (target.TryGetComponent<UnitController>(out var friendlyUnit))
-            return friendlyUnit.IsAirUnit();
+        if (targetFriendlyUnit != null)
+            return targetFriendlyUnit.IsAirUnit();
 
-        if (target.TryGetComponent<EnemyUnitController>(out var enemyUnit))
-            return enemyUnit.IsAirUnit();
+        if (targetEnemyUnit != null)
+            return targetEnemyUnit.IsAirUnit();
 
         if (target.TryGetComponent<BuildingController>(out var building))
             return building.IsLifted();
@@ -1344,7 +1351,7 @@ public class UnitController : MonoBehaviour, IDestructible
         switch (gatherState)
         {
             case GatherState.MovingToResource:
-                if (DistanceToTarget(gatherTargetNode.transform) <= gatherInteractRange)
+                if (SqrDistanceToTarget(gatherTargetNode.transform) <= gatherInteractRange * gatherInteractRange)
                 {
                     if (!isAirUnit)
                         navMeshAgent.isStopped = true; // 장애물 경계에서 계속 재탐색하며 맴도는 것 방지
@@ -1370,7 +1377,7 @@ public class UnitController : MonoBehaviour, IDestructible
                 {
                     gatherTimer = gatherDuration;
                     gatherState = GatherState.Gathering;
-                    GetComponent<UnitAudio>()?.PlayGatherSFX();
+                    unitAudio?.PlayGatherSFX();
                 }
                 break;
 
@@ -1402,7 +1409,7 @@ public class UnitController : MonoBehaviour, IDestructible
                 break;
 
             case GatherState.MovingToBase:
-                if (DistanceToTarget(depositTargetTransform) <= gatherInteractRange)
+                if (SqrDistanceToTarget(depositTargetTransform) <= gatherInteractRange * gatherInteractRange)
                 {
                     if (!isAirUnit)
                         navMeshAgent.isStopped = true;
@@ -1449,13 +1456,13 @@ public class UnitController : MonoBehaviour, IDestructible
         }
     }
 
-    // 건물처럼 콜라이더가 큰 대상은 피벗(중심)이 아니라 표면(가장 가까운 지점) 기준으로 거리 판정
-    private float DistanceToTarget(Transform target)
+    // 건물처럼 콜라이더가 큰 대상은 피벗(중심)이 아니라 표면(가장 가까운 지점) 기준으로 거리 판정 (제곱 거리로 반환)
+    private float SqrDistanceToTarget(Transform target)
     {
         if (target.TryGetComponent<Collider>(out var col))
-            return Vector3.Distance(transform.position, col.ClosestPoint(transform.position));
+            return (transform.position - col.ClosestPoint(transform.position)).sqrMagnitude;
 
-        return Vector3.Distance(transform.position, target.position);
+        return (transform.position - target.position).sqrMagnitude;
     }
 
     private Transform FindNearestDepositBuilding()
@@ -1485,10 +1492,9 @@ public class UnitController : MonoBehaviour, IDestructible
         CancelBuildOrder(); // 건설 위치로 이동 중(hasBuildOrder)에 사망해도, 다른 명령으로 취소될 때와 동일하게
                              // 그리드 예약 해제 + 건물 가격 환불(onCancelled 콜백, 0089)이 실행되도록 함
 
-        RTSUnitController controller = FindFirstObjectByType<RTSUnitController>();
-        controller?.UnitList.Remove(this);
-        controller?.selectedUnitList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel/Squad_panel 등)가 유령 참조를 들고 있지 않도록
-        controller?.ReleaseUnitPopulation(unitID); // 죽은 유닛이 차지하던 인구수를 현재 인구수에서 반환
+        rtsController?.UnitList.Remove(this);
+        rtsController?.selectedUnitList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel/Squad_panel 등)가 유령 참조를 들고 있지 않도록
+        rtsController?.ReleaseUnitPopulation(unitID); // 죽은 유닛이 차지하던 인구수를 현재 인구수에서 반환
 
         Destroy(gameObject);
     }
@@ -1524,7 +1530,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // 공격 1회당 동시에 나가는 투사체 개수 (Projectile + ProjectileAttack의 firePoints가 여러 개일 때만
     // 1 초과, doc/0291/0293) - 정보 패널 툴팁에서 "공격력 x2" 같은 배수 표기에 사용된다.
     public int GetShotCount() =>
-        attackDelivery == AttackDeliveryType.Projectile && TryGetComponent(out ProjectileAttack projectileAttack)
+        attackDelivery == AttackDeliveryType.Projectile && projectileAttack != null
             ? projectileAttack.GetFirePointCount()
             : 1;
 
@@ -1638,8 +1644,8 @@ public class UnitController : MonoBehaviour, IDestructible
                 return;
             }
 
-            float dist = Vector3.Distance(transform.position, pendingSkillUnitTarget.transform.position);
-            if (dist > pendingSkillTraitData.skillRange)
+            float sqrDist = (transform.position - pendingSkillUnitTarget.transform.position).sqrMagnitude;
+            if (sqrDist > pendingSkillTraitData.skillRange * pendingSkillTraitData.skillRange)
             {
                 MoveAgentTo(pendingSkillUnitTarget.transform.position); // 계속 추격 이동(대상이 움직이는 유닛일 수 있음)
                 return;
@@ -1654,8 +1660,8 @@ public class UnitController : MonoBehaviour, IDestructible
 
         if (hasPendingSkillAreaOrder)
         {
-            float dist = Vector3.Distance(transform.position, pendingSkillGroundTarget);
-            if (dist > pendingSkillTraitData.skillRange)
+            float sqrDist = (transform.position - pendingSkillGroundTarget).sqrMagnitude;
+            if (sqrDist > pendingSkillTraitData.skillRange * pendingSkillTraitData.skillRange)
                 return; // MoveAgentTo로 이미 그 지점으로 이동 중 - 도착할 때까지 대기
 
             StopUnit();

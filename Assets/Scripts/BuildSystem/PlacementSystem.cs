@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -411,9 +410,6 @@ public class PlacementSystem : MonoBehaviour
             if (ignoreObject != null && hit.transform.IsChildOf(ignoreObject.transform))
                 continue; // 담당 일꾼 자신은 장애물로 치지 않음
 
-            Debug.Log(
-                $"Blocked by : {hit.name} | Layer : {LayerMask.LayerToName(hit.gameObject.layer)}"
-            );
             blocked = true;
         }
 
@@ -444,9 +440,9 @@ public class PlacementSystem : MonoBehaviour
             {
                 float dx = cell.x - resourceCell.x;
                 float dz = cell.z - resourceCell.z;
-                float distance = Mathf.Sqrt(dx * dx + dz * dz);
+                float sqrDistance = dx * dx + dz * dz;
 
-                if (distance < minDistanceFromResource)
+                if (sqrDistance < minDistanceFromResource * minDistanceFromResource)
                     return true;
             }
         }

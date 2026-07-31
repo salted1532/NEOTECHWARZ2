@@ -48,7 +48,7 @@ public class EnemyAttackRange : MonoBehaviour
             if (target == null)
                 return false;
 
-            return Vector3.Distance(transform.position, target.transform.position) <= UnitRange;
+            return (transform.position - target.transform.position).sqrMagnitude <= UnitRange * UnitRange;
         }
     }
 
@@ -104,11 +104,11 @@ public class EnemyAttackRange : MonoBehaviour
         if (target == null)
             return;
 
-        float distance = Vector3.Distance(transform.position, target.transform.position);
+        float sqrDistance = (transform.position - target.transform.position).sqrMagnitude;
 
         if (enemyUnit.IsAttack() || enemyUnit.IsIdle())
         {
-            if (distance <= UnitRange)
+            if (sqrDistance <= UnitRange * UnitRange)
             {
                 enemyUnit.Attack(target.transform.position, target);
             }

@@ -32,6 +32,12 @@ public class TerritoryZone : MonoBehaviour
     private LineRenderer outlineRenderer;
     private Material runtimeMaterial; // outlineMaterial(또는 기본 셰이더)을 복제한 전용 인스턴스 — 이것만 색을 바꾼다
 
+    // GetPolygonXZ() 결과 캐시. 매 프레임 여러 시스템(BaseStructure/ResearchQueue/UnitController/UnitSpawner/
+    // FogRevealerAgent 등)이 Contains()를 통해 이 값을 호출하는데, 핀 위치는 런타임에 거의 안 바뀌므로
+    // 마지막으로 계산한 핀 위치와 지금 핀 위치가 완전히 같으면 재계산 없이 캐시를 그대로 돌려준다.
+    private Vector2[] cachedPolygon;
+    private Vector3[] cachedPinSnapshot;
+
     public CaptureOwner Owner { get => owner; set => owner = value; }
 
     private void OnEnable() => TerritoryManager.Register(this);
@@ -74,16 +80,43 @@ public class TerritoryZone : MonoBehaviour
         if (runtimeMaterial != null) runtimeMaterial.color = c; // 복제본만 수정 — 원본 에셋(outlineMaterial)은 안 건드림
     }
 
-    // 각 핀 위치에서 X, Z만 뽑아 다각형 정점 배열로 반환 (Y는 판정에 안 씀)
+    // 각 핀 위치에서 X, Z만 뽑아 다각형 정점 배열로 반환 (Y는 판정에 안 씀). 핀 위치가 마지막 계산 이후
+    // 그대로면 캐시를 재사용한다 - 결과값은 매번 새로 계산했을 때와 항상 동일하다.
     public Vector2[] GetPolygonXZ()
     {
+        if (IsPolygonCacheValid())
+            return cachedPolygon;
+
         var result = new Vector2[pinPoints.Count];
+        var snapshot = new Vector3[pinPoints.Count];
         for (int i = 0; i < pinPoints.Count; i++)
         {
-            if (pinPoints[i] == null) return new Vector2[0];
-            result[i] = new Vector2(pinPoints[i].position.x, pinPoints[i].position.z);
+            if (pinPoints[i] == null)
+            {
+                cachedPolygon = new Vector2[0];
+                cachedPinSnapshot = null;
+                return cachedPolygon;
+            }
+            snapshot[i] = pinPoints[i].position;
+            result[i] = new Vector2(snapshot[i].x, snapshot[i].z);
         }
-        return result;
+
+        cachedPolygon = result;
+        cachedPinSnapshot = snapshot;
+        return cachedPolygon;
+    }
+
+    private bool IsPolygonCacheValid()
+    {
+        if (cachedPolygon == null || cachedPinSnapshot == null) return false;
+        if (cachedPinSnapshot.Length != pinPoints.Count) return false;
+
+        for (int i = 0; i < pinPoints.Count; i++)
+        {
+            if (pinPoints[i] == null) return false;
+            if (pinPoints[i].position != cachedPinSnapshot[i]) return false;
+        }
+        return true;
     }
 
     // point-in-polygon (crossing-number). 오목한 다각형도 정확히 판정한다.

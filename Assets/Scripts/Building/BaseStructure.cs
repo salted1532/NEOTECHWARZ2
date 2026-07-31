@@ -42,6 +42,9 @@ public class BaseStructure : MonoBehaviour, IDestructible
         rtsController = FindFirstObjectByType<RTSUnitController>();
     }
 
+    private BuildingData GetBuildingData() =>
+        buildingDatabase != null ? buildingDatabase.buildingData.Find(d => d.ID == buildingID) : null;
+
     // PlacementSystem이 스폰 직후 호출해 지어질 건물 종류와 건설시간을 설정한다.
     // 완공될 건물의 최대체력/아이콘을 프리팹에서 미리 읽어와 HealthManager와 Info_panel 표시에 반영한다.
     // buildingSize/cellSize: 프리팹 자체는 3x3(6x6 유닛) 기준으로 만들어져 있어서, 2x2처럼 더 작은/다른 크기의
@@ -61,9 +64,7 @@ public class BaseStructure : MonoBehaviour, IDestructible
 
         int finalMaxHealth = 0;
 
-        BuildingData data = buildingDatabase != null
-            ? buildingDatabase.buildingData.Find(d => d.ID == buildingID)
-            : null;
+        BuildingData data = GetBuildingData();
 
         if (data != null && data.Prefab != null)
         {
@@ -173,9 +174,7 @@ public class BaseStructure : MonoBehaviour, IDestructible
         GetComponent<ConstructionEffects>()?.StopLoopAndPlayComplete();
         GetComponent<BuildingAudio>()?.PlayConstructComplete();
 
-        BuildingData data = buildingDatabase != null
-            ? buildingDatabase.buildingData.Find(d => d.ID == buildingID)
-            : null;
+        BuildingData data = GetBuildingData();
 
         if (data != null && data.Prefab != null)
         {

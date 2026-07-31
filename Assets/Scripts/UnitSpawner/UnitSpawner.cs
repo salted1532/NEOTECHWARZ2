@@ -54,17 +54,10 @@ public class UnitSpawner : MonoBehaviour
             return;
         }
 
-        Debug.Log($"unitData : {database.unitData}");
-
         if (productionQueue.Count >= MaxQueueSize)
             return;
 
-        int index = database.unitData.FindIndex(d =>
-        {
-            Debug.Log($"Compare: {d.ID} == {unitID}");
-            return d.ID == unitID;
-        });
-        //int index = database.unitData.FindIndex(d => d.ID == unitID);
+        int index = database.unitData.FindIndex(d => d.ID == unitID);
 
         if (index == -1)
         {

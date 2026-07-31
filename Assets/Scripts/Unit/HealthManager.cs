@@ -74,8 +74,6 @@ public class HealthManager : MonoBehaviour
         OnHealthChanged?.Invoke(currentHp, maxHealth);
         OnDamaged?.Invoke(damage, attackerPosition, attackType, isEnemyAttacker);
 
-        Debug.Log($"{gameObject.name} HP: {currentHp}/{maxHealth}");
-
         if (currentHp <= 0)
         {
             Die();

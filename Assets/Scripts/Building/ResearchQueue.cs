@@ -65,8 +65,12 @@ public class ResearchQueue : MonoBehaviour
     public int GetLevel(ResearchType type) => type == ResearchType.Attack ? attackLevel : armorLevel;
 
     // 같은 타입이 이미 대기열에 있는지 (공격 1업 연구 중에는 공격 2업을 큐잉할 수 없게 막기 위함)
-    private bool IsQueued(ResearchType type) =>
-        researchQueue.Exists(r => r.Type == type);
+    private bool IsQueued(ResearchType type)
+    {
+        foreach (var r in researchQueue)
+            if (r.Type == type) return true;
+        return false;
+    }
 
     public bool CanEnqueue(ResearchType type) =>
         GetLevel(type) < MaxLevel && !IsQueued(type) && researchQueue.Count < MaxQueueSize;

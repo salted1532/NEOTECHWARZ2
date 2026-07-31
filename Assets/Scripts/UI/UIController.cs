@@ -272,6 +272,12 @@ public class UIController : MonoBehaviour
     private Action<BuildingController> squadOnCtrlClickBuilding;
     private bool squadShowingBuildings;
 
+    // 스쿼드 슬롯은 ShowSquadPanel/ShowBuildingSquadPanel을 통해 매 프레임 호출되지만(RTSUnitController.UpdateUI),
+    // 선택된 유닛/건물 목록·페이지·모드(유닛/건물)가 그대로면 슬롯 버튼(아이콘+델리게이트)을 다시 만들 필요가 없다.
+    private bool squadContentDirty = true;
+    private int lastRefreshedSquadPage = -1;
+    private bool lastRefreshedWasBuildingMode;
+
     private void Start()
     {
         rtsUnitController = FindFirstObjectByType<RTSUnitController>();
@@ -291,15 +297,41 @@ public class UIController : MonoBehaviour
         UpdateResourceUI();
     }
 
-    // 자원(광물/가스)과 인구수 텍스트를 매 프레임 최신 값으로 갱신
+    // 자원(광물/가스)과 인구수 텍스트를 매 프레임 확인하되, 마지막으로 표시한 값과 같으면 다시 쓰지 않는다
+    // (TMP 텍스트 재할당은 매번 메시 재생성을 유발하므로, 값이 실제로 바뀔 때만 갱신해도 화면 결과는 동일함).
+    private int lastDisplayedOre = int.MinValue;
+    private int lastDisplayedGas = int.MinValue;
+    private int lastDisplayedPopulation = int.MinValue;
+    private int lastDisplayedMaxPopulation = int.MinValue;
+
     private void UpdateResourceUI()
     {
         if (rtsUnitController == null)
             return;
 
-        OreText.text = rtsUnitController.GetOre().ToString();
-        GasText.text = rtsUnitController.GetGas().ToString();
-        PopulationText.text = $"{rtsUnitController.GetPopulation()}/{rtsUnitController.GetMaxPopulation()}";
+        int ore = rtsUnitController.GetOre();
+        int gas = rtsUnitController.GetGas();
+        int population = rtsUnitController.GetPopulation();
+        int maxPopulation = rtsUnitController.GetMaxPopulation();
+
+        if (ore != lastDisplayedOre)
+        {
+            OreText.text = ore.ToString();
+            lastDisplayedOre = ore;
+        }
+
+        if (gas != lastDisplayedGas)
+        {
+            GasText.text = gas.ToString();
+            lastDisplayedGas = gas;
+        }
+
+        if (population != lastDisplayedPopulation || maxPopulation != lastDisplayedMaxPopulation)
+        {
+            PopulationText.text = $"{population}/{maxPopulation}";
+            lastDisplayedPopulation = population;
+            lastDisplayedMaxPopulation = maxPopulation;
+        }
     }
 
     // 커맨드 패널을 비우고 숨긴다 (선택 해제 시 호출)
@@ -774,13 +806,21 @@ public class UIController : MonoBehaviour
             squadUnitsSnapshot.Clear();
             squadUnitsSnapshot.AddRange(units);
             squadCurrentPage = 0;
+            squadContentDirty = true;
         }
 
         int pageCount = Mathf.Max(1, Mathf.CeilToInt((float)squadUnitsSnapshot.Count / SquadUnitsPerPage));
         squadCurrentPage = Mathf.Clamp(squadCurrentPage, 0, pageCount - 1);
 
         UpdateSquadPageButtons(pageCount);
-        RefreshSquadSlots();
+
+        if (squadContentDirty || lastRefreshedSquadPage != squadCurrentPage || lastRefreshedWasBuildingMode)
+        {
+            RefreshSquadSlots();
+            lastRefreshedSquadPage = squadCurrentPage;
+            lastRefreshedWasBuildingMode = false;
+            squadContentDirty = false;
+        }
     }
 
     // 건물 다중 선택(Shift+클릭) 시 유닛과 같은 방식으로 Squad_panel에 건물 아이콘 그리드를 보여준다.
@@ -807,13 +847,21 @@ public class UIController : MonoBehaviour
             squadBuildingsSnapshot.Clear();
             squadBuildingsSnapshot.AddRange(buildings);
             squadCurrentPage = 0;
+            squadContentDirty = true;
         }
 
         int pageCount = Mathf.Max(1, Mathf.CeilToInt((float)squadBuildingsSnapshot.Count / SquadUnitsPerPage));
         squadCurrentPage = Mathf.Clamp(squadCurrentPage, 0, pageCount - 1);
 
         UpdateSquadPageButtons(pageCount);
-        RefreshSquadBuildingSlots();
+
+        if (squadContentDirty || lastRefreshedSquadPage != squadCurrentPage || !lastRefreshedWasBuildingMode)
+        {
+            RefreshSquadBuildingSlots();
+            lastRefreshedSquadPage = squadCurrentPage;
+            lastRefreshedWasBuildingMode = true;
+            squadContentDirty = false;
+        }
     }
 
     // 페이지 버튼(page1~5) 클릭 시 호출: 해당 페이지의 12개(유닛 또는 건물)로 슬롯을 다시 채운다.
@@ -826,6 +874,9 @@ public class UIController : MonoBehaviour
             return;
 
         squadCurrentPage = page;
+        lastRefreshedSquadPage = page;
+        lastRefreshedWasBuildingMode = squadShowingBuildings;
+        squadContentDirty = false;
 
         if (squadShowingBuildings)
             RefreshSquadBuildingSlots();

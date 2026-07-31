@@ -46,6 +46,14 @@ public class CaptureSystem : MonoBehaviour
     {
         if (territoryZone == null) territoryZone = GetComponentInChildren<TerritoryZone>(true);
 
+        // 씬에 미리 설정해둔 시작 소유 상태(debugOwner)를 게임 시작 시점(Play 모드/빌드 모두)에 반영한다.
+        // 기존엔 OnValidate()가 에디터에서만 이 값을 CurrentOwner/territoryZone에 동기화했기 때문에,
+        // 빌드에서는 Awake()가 항상 기본값(Neutral)으로 시작해 에디터에서 저장한 상태를 덮어쓰는 버그가 있었다.
+        CurrentOwner = debugOwner;
+        controlValue = debugOwner == CaptureOwner.Ally ? captureDuration
+            : debugOwner == CaptureOwner.Enemy ? -captureDuration
+            : 0f;
+
         ApplyEffect(CurrentOwner);
 
         if (captureBar != null)

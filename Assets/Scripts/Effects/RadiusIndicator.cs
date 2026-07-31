@@ -9,6 +9,8 @@ public class RadiusIndicator : MonoBehaviour
     [SerializeField] private float lineWidth = 0.2f;
     [SerializeField] private Color color = new Color(1f, 0.4f, 0.1f, 0.9f);
 
+    private static Shader cachedLineShader; // Shader.Find 문자열 조회를 스킬 사용 때마다 반복하지 않도록 캐싱
+
     // 일회성 표시 - duration 뒤에 자동으로 사라진다 (스킬이 실제로 발동돼서 범위를 확인시켜줄 때).
     public static void Show(Vector3 center, float radius, float duration)
     {
@@ -43,7 +45,8 @@ public class RadiusIndicator : MonoBehaviour
         line.positionCount = segmentCount;
         line.startWidth = lineWidth;
         line.endWidth = lineWidth;
-        line.material = new Material(Shader.Find("Sprites/Default"));
+        if (cachedLineShader == null) cachedLineShader = Shader.Find("Sprites/Default");
+        line.material = new Material(cachedLineShader);
         line.startColor = color;
         line.endColor = color;
 

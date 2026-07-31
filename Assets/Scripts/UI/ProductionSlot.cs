@@ -22,6 +22,16 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private KeyCode shortcut = KeyCode.None; // 이 슬롯을 대신 "누르는" 키보드 단축키 (없으면 KeyCode.None)
     private bool isHovered; // 호버 중엔 Update()가 매 프레임 툴팁을 새로 갱신해서 쿨다운 잔여시간처럼 계속 바뀌는 설명도 실시간으로 보이게 한다
 
+    // 마지막으로 TooltipUI에 실제로 표시한 내용. 호버 중엔 매 프레임 확인하되, 내용이 지난 프레임과 완전히
+    // 같으면 TooltipUI.Show()(내부적으로 강제 레이아웃 리빌드 포함)를 다시 부르지 않는다 - 표시 결과는 동일함.
+    private bool hasShownTooltip;
+    private string lastTooltipTitle;
+    private string lastTooltipDescription;
+    private bool lastTooltipHasCost;
+    private int lastTooltipOre;
+    private int lastTooltipGas;
+    private int lastTooltipPopulation;
+
     private void Awake()
     {
         rectTransform = transform as RectTransform;
@@ -81,6 +91,7 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (isHovered)
         {
             isHovered = false;
+            hasShownTooltip = false;
             TooltipUI.Instance?.Hide();
         }
 
@@ -167,6 +178,7 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     public void OnPointerExit(PointerEventData eventData)
     {
         isHovered = false;
+        hasShownTooltip = false; // 실제로 숨겼으므로, 다음 호버 시엔 내용이 지난번과 같아도 다시 Show()해야 함
 
         if (TooltipUI.Instance != null)
             TooltipUI.Instance.Hide();
@@ -177,9 +189,28 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (!hasData || string.IsNullOrEmpty(data.Title) || TooltipUI.Instance == null)
             return;
 
+        bool unchanged = hasShownTooltip &&
+            lastTooltipTitle == data.Title &&
+            lastTooltipDescription == data.Description &&
+            lastTooltipHasCost == data.HasCost &&
+            lastTooltipOre == data.Ore &&
+            lastTooltipGas == data.Gas &&
+            lastTooltipPopulation == data.Population;
+
+        if (unchanged)
+            return; // 지난 프레임과 표시 내용이 완전히 같음 - 다시 그릴 필요 없음(결과는 동일)
+
         if (data.HasCost)
             TooltipUI.Instance.Show(rectTransform, data.Title, data.Description, data.Ore, data.Gas, data.Population);
         else
             TooltipUI.Instance.Show(rectTransform, data.Title, data.Description);
+
+        hasShownTooltip = true;
+        lastTooltipTitle = data.Title;
+        lastTooltipDescription = data.Description;
+        lastTooltipHasCost = data.HasCost;
+        lastTooltipOre = data.Ore;
+        lastTooltipGas = data.Gas;
+        lastTooltipPopulation = data.Population;
     }
 }

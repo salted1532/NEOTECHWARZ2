@@ -76,11 +76,11 @@ public class AttackRange : MonoBehaviour
         if (target == null)
             return;
 
-        float distance = Vector3.Distance(transform.position, target.transform.position);
+        float sqrDistance = (transform.position - target.transform.position).sqrMagnitude;
 
         if (unitController.IsAttack() || unitController.IsIdle())
         {
-            if (distance <= UnitRange)
+            if (sqrDistance <= UnitRange * UnitRange)
             {
                 unitController.Attack(target.transform.position, target);
             }

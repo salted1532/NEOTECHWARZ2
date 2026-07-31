@@ -34,7 +34,7 @@ public class Projectile : MonoBehaviour
         }
 
         Vector3 toTarget = target.position - transform.position;
-        if (toTarget.magnitude <= hitDistance)
+        if (toTarget.sqrMagnitude <= hitDistance * hitDistance)
         {
             targetHealth?.GetDamage(damage, transform.position, attackType, isEnemyAttacker); // 명중 - 여기서 처음 데미지 적용
             Destroy(gameObject);

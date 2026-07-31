@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using static UIController;
 
@@ -1122,23 +1121,72 @@ public class RTSUnitController : MonoBehaviour
     private static readonly UISelectionState[] TierPanelStates =
         { UISelectionState.MainBase, UISelectionState.Tier1Building, UISelectionState.Tier2Building, UISelectionState.Tier3Building };
 
+    // tier별 유닛 목록은 unitDatabase(런타임에 안 바뀌는 SO)에서 한 번만 뽑아 캐싱해둔다 - 매 프레임
+    // 다시 FindAll할 필요가 없다.
+    private readonly Dictionary<int, List<UnitData>> unitsByTierCache = new Dictionary<int, List<UnitData>>();
+
+    private List<UnitData> GetUnitsInTier(int tier)
+    {
+        if (!unitsByTierCache.TryGetValue(tier, out var list))
+        {
+            list = unitDatabase.unitData.FindAll(d => d.tier == tier);
+            unitsByTierCache[tier] = list;
+        }
+        return list;
+    }
+
+    // ShowUnitTierPanel이 마지막으로 만든 버튼 배열/활성화 상태 캐시. 이 패널은 UpdateUI()를 통해 매 프레임
+    // 호출되지만, 선행 건물 완공 여부(IsUnitPrerequisiteMet)가 프레임 사이에 실제로 바뀌지 않는 한
+    // CommandButtonData[]와 그 안의 델리게이트들을 다시 만들 필요가 없다.
+    private int lastTierPanelTier = -1;
+    private CommandButtonData[] lastTierPanelCommands;
+    private bool[] lastTierPanelInteractable;
+
     // tier(0=본진,1=병영,2=공장,3=우주공항)에 속한 유닛을 unitDatabase에서 모두 찾아 생산 버튼 패널을 구성한다.
     // UnitDataSO에 유닛을 추가하고 tier 값만 지정하면, 코드 수정 없이 해당 건물 패널에 자동으로 나타난다.
     private void ShowUnitTierPanel(int tier)
     {
-        List<UnitData> unitsInTier = unitDatabase.unitData.FindAll(d => d.tier == tier);
-        CommandButtonData[] commands = new CommandButtonData[unitsInTier.Count];
+        List<UnitData> unitsInTier = GetUnitsInTier(tier);
 
-        for (int i = 0; i < unitsInTier.Count; ++i)
+        bool needsRebuild = tier != lastTierPanelTier
+            || lastTierPanelCommands == null
+            || lastTierPanelInteractable == null
+            || lastTierPanelInteractable.Length != unitsInTier.Count;
+
+        if (!needsRebuild)
         {
-            UnitData data = unitsInTier[i];
-            commands[i] = new CommandButtonData(
-                data.Icon,
-                UnitButtonAction(() => TryProduceUnit(data.ID), data.ID, data.shortcutKey),
-                IsUnitPrerequisiteMet(data.ID));
+            for (int i = 0; i < unitsInTier.Count; i++)
+            {
+                if (lastTierPanelInteractable[i] != IsUnitPrerequisiteMet(unitsInTier[i].ID))
+                {
+                    needsRebuild = true;
+                    break;
+                }
+            }
         }
 
-        uIController.ShowUnitProductionPanel(TierPanelStates[tier], commands);
+        if (needsRebuild)
+        {
+            CommandButtonData[] commands = new CommandButtonData[unitsInTier.Count];
+            bool[] interactable = new bool[unitsInTier.Count];
+
+            for (int i = 0; i < unitsInTier.Count; ++i)
+            {
+                UnitData data = unitsInTier[i];
+                bool met = IsUnitPrerequisiteMet(data.ID);
+                interactable[i] = met;
+                commands[i] = new CommandButtonData(
+                    data.Icon,
+                    UnitButtonAction(() => TryProduceUnit(data.ID), data.ID, data.shortcutKey),
+                    met);
+            }
+
+            lastTierPanelCommands = commands;
+            lastTierPanelInteractable = interactable;
+            lastTierPanelTier = tier;
+        }
+
+        uIController.ShowUnitProductionPanel(TierPanelStates[tier], lastTierPanelCommands);
     }
 
     /// 유닛 생산 요청 (선택된 건물 각각에 대해 생산 가능 여부/대기열/자원을 확인하고,

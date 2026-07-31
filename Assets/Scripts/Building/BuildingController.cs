@@ -122,7 +122,7 @@ public class BuildingController : MonoBehaviour, IDestructible
         {
             transform.position = Vector3.MoveTowards(transform.position, verticalTarget, liftMoveSpeed * Time.deltaTime);
 
-            if (Vector3.Distance(transform.position, verticalTarget) < 0.05f)
+            if ((transform.position - verticalTarget).sqrMagnitude < 0.05f * 0.05f)
                 isAscending = false; // 목표 고도 도달 - 착륙 위치를 정할 때까지 공중에서 대기
 
             return;
@@ -176,7 +176,7 @@ public class BuildingController : MonoBehaviour, IDestructible
         {
             transform.position = Vector3.MoveTowards(transform.position, landingGroundDestination, liftMoveSpeed * Time.deltaTime);
 
-            if (Vector3.Distance(transform.position, landingGroundDestination) < 0.05f)
+            if ((transform.position - landingGroundDestination).sqrMagnitude < 0.05f * 0.05f)
             {
                 transform.position = landingGroundDestination;
                 Land();

@@ -137,13 +137,16 @@ public class TooltipUI : MonoBehaviour
         PositionAboveTarget(target);
     }
 
+    // GetWorldCorners용 버퍼. 호버 중엔 매 프레임 호출되므로 필드로 재사용해 매번 새 배열을 만들지 않는다.
+    private readonly Vector3[] worldCornersBuffer = new Vector3[4];
+
     // target(호버 중인 버튼)의 상단 중앙을 기준으로, 툴팁이 그 위에 뜨도록 위치를 계산한다.
     private void PositionAboveTarget(RectTransform target)
     {
         if (canvasRect == null || target == null)
             return;
 
-        Vector3[] corners = new Vector3[4];
+        Vector3[] corners = worldCornersBuffer;
         target.GetWorldCorners(corners); // 0:bottom-left 1:top-left 2:top-right 3:bottom-right
 
         Vector3 topCenterWorld = (corners[1] + corners[2]) * 0.5f;
