@@ -21,6 +21,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private float maxZoom = 35f; // 카메라 높이(Y) 상한 - 너무 멀리 못 나가게 (기준 지형고도 0 기준)
     [SerializeField] private LayerMask groundLayer; // 화면 중앙 지형 판정용 레이어 (지형/Ground)
     [SerializeField] private float tierZoomStep = 5f; // 지형 단(Layer1/Layer2 태그) 하나당 줌 범위 + 현재 줌이 같이 움직이는 양
+    [SerializeField] private float tierChangeDebounce = 0.15f; // 언덕 경계에서 raycast 판정이 프레임마다 흔들려도, 이 시간 동안 같은 단이 유지돼야 실제로 전환한다
 
     [Header("Rotate")]
     [SerializeField] private float rotateSpeed = 120f;     // Q/E 회전 속도 (초당 각도)
@@ -35,6 +36,8 @@ public class CameraControl : MonoBehaviour
     private float currentRotationAngle = 0f; // 기준(정면) 각도로부터 현재까지 회전한 누적 각도
 
     private int currentTerrainTier = 0; // 화면 중앙이 보고 있는 지형의 높이 단. 0=지상, 1=언덕(Layer1), 2=언덕 위 언덕(Layer2)
+    private int pendingTerrainTier = 0; // 방금 raycast로 샘플링된 단(아직 확정 전) - 디바운스 판정용
+    private float pendingTierTimer = 0f; // pendingTerrainTier가 currentTerrainTier와 다른 채로 유지된 시간
 
     private void Start()
     {
@@ -117,6 +120,8 @@ public class CameraControl : MonoBehaviour
             // 착각해 이미 0단 기준으로 세팅된 targetPosition.y에서 또 한 번 tierZoomStep을 빼버려 높이가
             // 틀어진다(예: 15로 돌아와야 하는데 10으로 돌아옴). 본진 복귀는 항상 0단 기준이므로 같이 리셋한다.
             currentTerrainTier = 0;
+            pendingTerrainTier = 0;
+            pendingTierTimer = 0f;
             return;
         }
 
@@ -153,15 +158,29 @@ public class CameraControl : MonoBehaviour
 
     // 화면 중앙이 보고 있는 지형의 단(tier)이 바뀌면, 줌 범위뿐 아니라 지금 카메라 높이 자체도
     // 그 차이만큼 같이 밀어 올리거나 내려서 "지형으로부터의 거리감"이 항상 동일하게 유지되도록 한다.
+    // 언덕과 언덕 아래 사이의 경계 지점에서는 raycast가 매 프레임 다른 단을 맞힐 수 있어(경계면 근처
+    // 지형 판정 자체가 프레임마다 왔다갔다함), 그 즉시 targetPosition.y를 밀면 카메라 목표 높이가
+    // 계속 튀어서 떨리는 것처럼 보인다 - 그래서 새 단이 tierChangeDebounce 동안 계속 유지될 때만 확정한다.
     private void HandleTerrainTier()
     {
-        int newTier = SampleTerrainTier();
+        int sampledTier = SampleTerrainTier();
 
-        if (newTier == currentTerrainTier)
+        if (sampledTier != pendingTerrainTier)
+        {
+            pendingTerrainTier = sampledTier;
+            pendingTierTimer = 0f;
+        }
+
+        if (pendingTerrainTier == currentTerrainTier)
             return;
 
-        targetPosition.y += (newTier - currentTerrainTier) * tierZoomStep;
-        currentTerrainTier = newTier;
+        pendingTierTimer += Time.deltaTime;
+
+        if (pendingTierTimer < tierChangeDebounce)
+            return; // 아직 경계 근처에서 판정이 흔들리는 중일 수 있음 - 확정하지 않고 대기
+
+        targetPosition.y += (pendingTerrainTier - currentTerrainTier) * tierZoomStep;
+        currentTerrainTier = pendingTerrainTier;
     }
 
     // 화면 정중앙 레이가 맞은 지형의 높이 단을 태그로 판정한다. 실제 지형 메시/콜라이더는

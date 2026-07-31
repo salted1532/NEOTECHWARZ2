@@ -31,6 +31,7 @@ public class UserControl : MonoBehaviour
 
     [SerializeField]
     private RectTransform dragRectangle;
+    private Canvas dragRectangleCanvas; // sizeDelta를 실제 화면 픽셀 크기로 되돌리기 위한 CanvasScaler 배율 조회용
 
 
     private GameObject pointer;
@@ -129,6 +130,9 @@ public class UserControl : MonoBehaviour
 
         attackPointer.SetActive(false);
         movePointer.SetActive(false);
+
+        if (dragRectangle != null)
+            dragRectangleCanvas = dragRectangle.GetComponentInParent<Canvas>();
 
         start = Vector2.zero;
         end = Vector2.zero;
@@ -798,10 +802,16 @@ public class UserControl : MonoBehaviour
     /// </summary>
     private void DrawDragRectangle()
     {
-        // 드래그 범위를 나타내는 Image UI의 위치
+        // 드래그 범위를 나타내는 Image UI의 위치 - RectTransform.position(월드 좌표)은 Overlay 캔버스에서
+        // 항상 실제 화면 픽셀 좌표와 1:1로 맞아떨어지므로(유니티가 캔버스 스케일과 무관하게 보정) 그대로 사용 가능.
         dragRectangle.position = (start + end) * 0.5f;
-        // 드래그 범위를 나타내는 Image UI의 크기
-        dragRectangle.sizeDelta = new Vector2(Mathf.Abs(start.x - end.x), Mathf.Abs(start.y - end.y));
+
+        // sizeDelta는 캔버스의 로컬(디자인) 단위라 CanvasScaler의 배율만큼 곱해져서 렌더링된다.
+        // start/end(Input.mousePosition)는 실제 화면 픽셀 좌표라서, 배율로 나눠주지 않으면 해상도가
+        // 기준 해상도(1920x1080)보다 큰 화면(QHD 등)에서 드래그한 실제 폭보다 박스가 더 크게(또는 더
+        // 작게) 그려진다 - doc/0340에서 CanvasScaler를 Scale With Screen Size로 바꾼 뒤 나타난 증상.
+        float scale = dragRectangleCanvas != null ? dragRectangleCanvas.scaleFactor : 1f;
+        dragRectangle.sizeDelta = new Vector2(Mathf.Abs(start.x - end.x), Mathf.Abs(start.y - end.y)) / scale;
     }
 
     /// <summary>

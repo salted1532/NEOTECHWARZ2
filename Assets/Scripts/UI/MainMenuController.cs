@@ -20,6 +20,19 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private GameObject mainMenuPanel; // 비워두면 이 스크립트가 붙은 오브젝트 자신을 사용
     [SerializeField] private GameObject optionsPanel;
 
+    // TestScene/SampleScene은 UserControl이 매 프레임 이 텍스처로 커서를 되돌리는데(호버 대상이 없으면
+    // 항상 기본 커서), MainScene은 RTS 게임플레이가 없어 UserControl 자체가 없다 보니 OS 기본 화살표가
+    // 그대로 남아있었다. 메뉴는 버튼 외엔 "호버 대상"이라는 개념이 없어 매 프레임 갱신할 필요 없이
+    // 한 번만 설정하면 다른 씬과 동일하게 보인다.
+    [Header("마우스 커서 (다른 씬과 동일하게)")]
+    [SerializeField] private Texture2D cursorTexture; // 비워두면 OS 기본 화살표 사용
+    [SerializeField] private Texture2D cursorHoverTexture; // 클릭 가능한 버튼 위에 있을 때 (비워두면 호버해도 커서 안 바뀜)
+    [SerializeField] private Vector2 cursorHotspot = Vector2.zero;
+    [SerializeField] private Camera uiCamera; // Canvas RenderMode가 Overlay면 비워둔다 (TooltipUI와 동일한 컨벤션)
+
+    private Button[] hoverableButtons;
+    private bool isHoveringButton;
+
     private void Awake()
     {
         if (mainMenuPanel == null)
@@ -32,6 +45,44 @@ public class MainMenuController : MonoBehaviour
 
         mainMenuPanel?.SetActive(true);  // 꺼진 채로 저장돼있어도 시작하면 항상 켜지도록
         optionsPanel?.SetActive(false);
+
+        hoverableButtons = new[] { playButton, optionButton, exitButton, optionCloseButton };
+
+        if (cursorTexture != null)
+            Cursor.SetCursor(cursorTexture, cursorHotspot, CursorMode.Auto);
+    }
+
+    // 클릭 가능한(interactable + 활성화된) 버튼 위에 마우스가 있는지 매 프레임 확인해서 커서를 바꾼다.
+    // TooltipUI.IsPointerOverTarget()과 동일한 방식(RectTransformUtility) - 버튼마다 별도 컴포넌트를
+    // 붙일 필요 없이 이미 갖고 있는 참조만으로 처리한다.
+    private void Update()
+    {
+        if (cursorHoverTexture == null)
+            return;
+
+        bool hovering = IsHoveringClickableButton();
+
+        if (hovering == isHoveringButton)
+            return;
+
+        isHoveringButton = hovering;
+        Cursor.SetCursor(hovering ? cursorHoverTexture : cursorTexture, cursorHotspot, CursorMode.Auto);
+    }
+
+    private bool IsHoveringClickableButton()
+    {
+        foreach (Button button in hoverableButtons)
+        {
+            if (button == null || !button.interactable || !button.gameObject.activeInHierarchy)
+                continue;
+
+            RectTransform rect = button.transform as RectTransform;
+
+            if (rect != null && RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, uiCamera))
+                return true;
+        }
+
+        return false;
     }
 
     private void OnPlayClicked() => SceneManager.LoadScene(testSceneName);

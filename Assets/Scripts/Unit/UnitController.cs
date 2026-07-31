@@ -1,12 +1,8 @@
 ﻿using System.Collections;
-using System.Net;
-using System.Resources;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Audio;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.GraphicsBuffer;
 
 // 공격 수단의 종류. 피격 이펙트를 공격자에 따라 다르게 재생하기 위해 HealthManager.GetDamage에 실어 보낸다
 // (UnitEffects가 이 값으로 총기/폭발형/레이저/화염 중 어떤 피격 이펙트를 재생할지 고른다).
