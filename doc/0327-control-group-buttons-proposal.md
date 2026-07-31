@@ -203,3 +203,25 @@ public class ControlGroupPanel : MonoBehaviour
 
 위 내용에 이견 없으면 `RTSUnitController.cs` 리팩터(`PurgeAndCountControlGroup` 추가) +
 `Assets/Scripts/UI/ControlGroupPanel.cs` 신규 파일을 그대로 반영한다.
+
+## 확인 결과 및 구현
+
+사용자가 2가지 결정 사항 답변: (1) 10번째 그룹(키보드 `0`) 표시는 **"0"**(권장안 "10" 대신 이걸로
+선택), (2) 버튼 클릭 시 그 부대를 선택(권장안 그대로).
+
+설계안대로 적용:
+- `RTSUnitController.cs`: `PurgeAndCountControlGroup(int)` 추가, `SelectControlGroup()`과
+  `TryGetControlGroupFocusPosition()`이 중복하던 `RemoveAll` 정리 로직을 이 메서드로 공용화.
+- `Assets/Scripts/UI/ControlGroupPanel.cs`(신규): `DisplayNumber()`는 인덱스 9(키보드 `0`)일 때
+  `"0"`을 반환하도록 반영.
+- `npx uloop-cli compile --wait-for-domain-reload true`로 컴파일 확인 — 에러 0개(신규 경고 1개는
+  기존 코드베이스 전역에 이미 있는 `FindFirstObjectByType` deprecated 경고와 동일한 패턴).
+
+## 남은 수동 작업 (사용자가 직접)
+
+- 버튼 프리팹: 루트에 `Button`, 자식 어딘가에 `TextMeshProUGUI` 하나 필요.
+- `Info_panel` 위에 `HorizontalLayoutGroup`이 달린 빈 컨테이너 오브젝트 배치.
+- 씬의 `ControlGroupPanel` 컴포넌트(신규로 아무 오브젝트에나 붙여야 함)에 위 프리팹/컨테이너를
+  인스펙터에서 연결.
+- PlayMode 테스트(부대 지정 → 버튼 생성 → 전멸 → 버튼 소멸 → 재지정 → 순서 복원)는 이번 세션에서
+  하지 않음.

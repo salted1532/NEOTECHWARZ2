@@ -1055,6 +1055,14 @@ public class UIController : MonoBehaviour
             slots[index]?.Clear();
     }
 
+    // 스킬 슬롯 위에 쿨다운 원형 오버레이를 갱신한다 (doc/0323 후속). normalizedRemaining: 1=방금 사용(꽉 참) ~ 0=사용 가능.
+    public void SetUnitSkillCooldown(float normalizedRemaining, bool useFallbackSlot = false)
+    {
+        int index = useFallbackSlot ? UnitSkillFallbackSlotIndex : UnitSkillSlotIndex;
+        if (index < slots.Length)
+            slots[index]?.SetCooldownFill(normalizedRemaining);
+    }
+
     // Build mode
     // 건설모드 패널 (건물 종류별 버튼 + 취소 버튼)
     public void ShowBuildPanel(

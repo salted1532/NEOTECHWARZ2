@@ -16,6 +16,7 @@ public class SkyLancerSkill : MonoBehaviour, IUnitSkill
     [SerializeField] private int bombardDamage = 20;
     [SerializeField] private GameObject bombardEffectPrefab;
     [SerializeField] private AudioClip bombardSfx;
+    [SerializeField] private float radiusIndicatorDuration = 2f; // 폭격 범위를 눈으로 확인할 수 있도록 보여주는 시간(초)
 
     private UnitController unit;
 
@@ -48,11 +49,12 @@ public class SkyLancerSkill : MonoBehaviour, IUnitSkill
     // 지상 폭격 - 액티브(범위 지정형). UnitController.SkillOrderTick이 사거리 안에 들어온 뒤에만 호출해준다.
     public void Activate(UnitController unit, RTSUnitController.TraitChoice trait, UnitTraitOption traitData, SkillActivationContext context)
     {
-        if (bombardEffectPrefab != null)
-            Instantiate(bombardEffectPrefab, context.groundPoint, Quaternion.identity);
+        EffectPlayer.Spawn(bombardEffectPrefab, context.groundPoint, Quaternion.identity); // null이면 조용히 무시됨(doc/0293 패턴)
 
         if (bombardSfx != null)
             AudioSource.PlayClipAtPoint(bombardSfx, context.groundPoint);
+
+        RadiusIndicator.Show(context.groundPoint, traitData.areaRadius, radiusIndicatorDuration); // 피해 범위를 눈으로 확인 가능하게
 
         Collider[] hits = Physics.OverlapSphere(context.groundPoint, traitData.areaRadius);
         HashSet<HealthManager> alreadyHit = new HashSet<HealthManager>();

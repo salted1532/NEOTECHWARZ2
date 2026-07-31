@@ -53,6 +53,12 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private int unitID;
 
+    // UnitSpawner.Spawn()이 Instantiate 직후(Start()가 돌기 전) true로 표시한다 - 생산 큐를 거친 유닛은
+    // 이미 큐잉 시점에 TryProduceUnit()이 인구수를 소모했으므로, Start()에서 또 인구수를 더하면 이중 계산된다.
+    // 이 값이 false로 남아있는 유닛(씬에 미리 배치된 시작 유닛 등)만 Start()에서 인구수를 반영한다.
+    [System.NonSerialized]
+    public bool spawnedByProduction;
+
     // 영웅 유닛(스토리 등장인물) 전용 - unitID를 0(=UnitDataSO에 없는 값)으로 두면 ApplyUnitData가
     // null 데이터를 받아 아무것도 덮어쓰지 않으므로 attackDamage/armorType/sizeType/HealthManager 값은
     // 인스펙터에 넣은 값이 그대로 유지된다. 이름만 원래 ID 조회 방식이라 별도 필드가 필요해서 추가함 (doc/0304).
@@ -279,6 +285,11 @@ public class UnitController : MonoBehaviour, IDestructible
         // 생산 큐를 거쳤든 씬에 직접 배치됐든, 어떤 경로로 만들어진 인스턴스든 항상 자기 unitID로
         // UnitDataSO를 조회해서 스스로 스탯을 적용한다 (UnitSpawner가 밖에서 push하던 방식 대체).
         ApplyUnitData(rtsController.GetUnitData(unitID));
+
+        // 생산 큐를 거치지 않은 유닛(씬에 미리 배치된 시작 유닛 등)만 여기서 인구수를 반영한다.
+        // 생산 큐를 거친 유닛은 이미 큐잉 시점(TryProduceUnit)에 인구수가 소모됐으므로 건너뛴다.
+        if (!spawnedByProduction)
+            rtsController.AddPopulationForExistingUnit(unitID);
 
         // 이 유닛 종류가 이미 특성을 선택한 상태라면(예전에 다른 개체가 먼저 골랐음) 새로 생산된
         // 이 유닛에도 자동으로 같은 선택을 적용한다 (doc/0228 - "모든 같은 유닛에 적용").
@@ -1566,6 +1577,7 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public bool CanUseSkill() => skillCooldownRemaining <= 0f;
     public void StartSkillCooldown(float cooldown) => skillCooldownRemaining = cooldown;
+    public float GetSkillCooldownRemaining() => skillCooldownRemaining; // 스킬 슬롯 쿨다운 원형 이펙트 표시용 (doc/0323 후속)
 
     // order panel 스킬 버튼(슬롯 6) 클릭/단축키로 호출되는 실제 진입점 (RTSUnitController.ActivateSkill 참고).
     // 이 유닛 프리팹에 IUnitSkill을 구현한 컴포넌트(유닛별 전용 스킬 스크립트)가 붙어있으면 그쪽에 위임하고,

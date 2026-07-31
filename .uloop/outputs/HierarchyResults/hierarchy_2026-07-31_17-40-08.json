@@ -1,0 +1,139 @@
+{
+  "ExportTimestamp": "2026-07-31 17:40:08",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "TestScene",
+    "nodeCount": 13,
+    "maxDepth": 1
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "TestScene",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 13,
+        "maxDepth": 1
+      },
+      "roots": [
+        {
+          "name": "Canvas",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 5,
+          "children": [
+            {
+              "name": "StageObject",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "DragRectangle",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "MiniMap",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "OrderButtons",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "SelectInfo",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "ResourceUI",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "SkillSelect",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "ToolTip",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "Option",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "OptionPanel",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "VictoryPanel",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "HorizontalLayoutGroup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

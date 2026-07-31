@@ -70,11 +70,13 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
 
     private Coroutine flashRoutine;
     private RTSUnitController rtsController;
+    private HealthManager healthManager; // 피격 시 공격받은 위치로 반격하러 가기 위한 이벤트 구독용
 
     private void Awake()
     {
         attackRange = GetComponentInChildren<EnemyAttackRange>();
         turretController = GetComponentInChildren<TurretController>();
+        healthManager = GetComponent<HealthManager>();
 
         if (!isAirUnit)
         {
@@ -89,6 +91,32 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
             targetPosition = AirTargetPosition(transform.position);
             isMovingAirUnit = true;
         }
+    }
+
+    private void OnEnable()
+    {
+        if (healthManager != null)
+            healthManager.OnDamaged += HandleAttacked;
+    }
+
+    private void OnDisable()
+    {
+        if (healthManager != null)
+            healthManager.OnDamaged -= HandleAttacked;
+    }
+
+    // 감지 범위 밖(사거리가 긴 원거리 유닛 등)에서 공격받으면 공격이 어디서 왔는지 모른 채 가만히 있던
+    // 문제를 해결한다 - 데미지 이벤트에 실려오는 attackerPosition으로 공격-이동해서 반격하러 간다
+    // (플레이어의 "A + 클릭"과 동일한 AttackMoveTo를 그대로 재사용, 이동 중 마주치는 다른 대상과도 자동 교전).
+    private void HandleAttacked(int damage, Vector3 attackerPosition, AttackEffectType attackType, bool isEnemyAttacker)
+    {
+        if (isEnemyAttacker)
+            return; // 공격자가 같은 진영(OC)이면 반응하지 않음 - 플레이어에게 공격받았을 때만 반격하러 간다
+
+        if (attackRange != null && attackRange.HasTargetInRange)
+            return; // 이미 사거리 안에서 교전 중이면 그대로 둔다(겹쳐서 새 이동 명령을 내리지 않음)
+
+        AttackMoveTo(attackerPosition);
     }
 
     private void Start()

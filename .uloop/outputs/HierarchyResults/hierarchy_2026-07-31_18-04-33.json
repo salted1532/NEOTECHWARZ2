@@ -1,0 +1,165 @@
+{
+  "ExportTimestamp": "2026-07-31 18:04:33",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "TestScene",
+    "nodeCount": 16,
+    "maxDepth": 0
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "TestScene",
+      "stats": {
+        "rootCount": 16,
+        "nodeCount": 16,
+        "maxDepth": 0
+      },
+      "roots": [
+        {
+          "name": "GameManager",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 0,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "StageObject",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Capture_Point",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Resource",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 3,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Ocean",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 4,
+          "tag": "Untagged",
+          "layer": 12,
+          "children": []
+        },
+        {
+          "name": "SkyLancer",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 5,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": []
+        },
+        {
+          "name": "Sharpshooter",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 6,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": []
+        },
+        {
+          "name": "Guardian Drone",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 7,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": []
+        },
+        {
+          "name": "Mission0",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 8,
+          "tag": "Untagged",
+          "layer": 7,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 9,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (1)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 10,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (2)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 11,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (3)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 12,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (4)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 13,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (5)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 14,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Strike Drone",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 15,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        }
+      ]
+    }
+  ]
+}

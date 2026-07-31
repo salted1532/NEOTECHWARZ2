@@ -11,11 +11,16 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     [SerializeField] private Button button;
     [SerializeField] private Image iconImage;
 
+    // 쿨다운 중인 스킬 버튼 위에 겹쳐서 시계처럼 줄어드는 원형 오버레이 (doc/0323 후속) - 비워두면 아무 효과도 없음.
+    // 인스펙터에서 Image Type을 Filled/Fill Method를 Radial 360으로 설정해두면 SetCooldownFill()이 fillAmount만 갱신한다.
+    [SerializeField] private Image cooldownOverlayImage;
+
     private RectTransform rectTransform;
     private Action callback;
     private UIController.CommandButtonData data;
     private bool hasData;
     private KeyCode shortcut = KeyCode.None; // 이 슬롯을 대신 "누르는" 키보드 단축키 (없으면 KeyCode.None)
+    private bool isHovered; // 호버 중엔 Update()가 매 프레임 툴팁을 새로 갱신해서 쿨다운 잔여시간처럼 계속 바뀌는 설명도 실시간으로 보이게 한다
 
     private void Awake()
     {
@@ -29,6 +34,10 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OnClick);
+
+        // 오버레이가 클릭을 가로채 버튼이 안 눌리는 사고를 막기 위한 방어 처리 (인스펙터에서 깜빡 안 꺼도 항상 안전).
+        if (cooldownOverlayImage != null)
+            cooldownOverlayImage.raycastTarget = false;
     }
 
     /// <summary>
@@ -66,6 +75,15 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         hasData = false;
         shortcut = KeyCode.None;
 
+        // 비활성화(SetActive(false))로는 OnPointerExit이 호출되지 않아 isHovered가 true로 남는다.
+        // 이 슬롯이 나중에 다른 커맨드로 재활용(SetData)되면, 마우스가 실제로 그 위에 없는데도
+        // Update()가 곧장 RefreshTooltip()을 불러 엉뚱한 내용의 툴팁이 잠깐 깜빡이는 원인이 된다.
+        if (isHovered)
+        {
+            isHovered = false;
+            TooltipUI.Instance?.Hide();
+        }
+
         if (iconImage != null)
         {
             iconImage.sprite = null;
@@ -75,7 +93,23 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (button != null)
             button.interactable = false;
 
+        SetCooldownFill(0f); // 다른 종류의 버튼으로 재사용될 때 이전 스킬의 쿨다운 표시가 남아있지 않도록
+
         gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// 쿨다운 원형 오버레이를 갱신한다. 1=방금 사용(꽉 참) → 0=사용 가능(안 보임)으로 매 프레임 호출해서 줄어든다.
+    /// cooldownOverlayImage가 연결 안 돼 있으면 조용히 무시된다(doc/0323 후속 - 스킬 슬롯 전용, 선택적 기능).
+    /// </summary>
+    public void SetCooldownFill(float normalizedRemaining)
+    {
+        if (cooldownOverlayImage == null)
+            return;
+
+        normalizedRemaining = Mathf.Clamp01(normalizedRemaining);
+        cooldownOverlayImage.fillAmount = normalizedRemaining;
+        cooldownOverlayImage.gameObject.SetActive(normalizedRemaining > 0f);
     }
 
     private void OnClick()
@@ -102,6 +136,9 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     // Update()가 아예 호출되지 않으므로, "지금 이 버튼이 안 보이면 단축키도 죽어있다"가 자동으로 성립한다.
     private void Update()
     {
+        if (isHovered)
+            RefreshTooltip(); // 쿨다운 잔여시간처럼 매 프레임 바뀌는 설명 텍스트를 호버 중에도 실시간으로 반영
+
         if (!hasData || shortcut == KeyCode.None || button == null || !button.interactable)
             return;
 
@@ -123,6 +160,20 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        isHovered = true;
+        RefreshTooltip();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        isHovered = false;
+
+        if (TooltipUI.Instance != null)
+            TooltipUI.Instance.Hide();
+    }
+
+    private void RefreshTooltip()
+    {
         if (!hasData || string.IsNullOrEmpty(data.Title) || TooltipUI.Instance == null)
             return;
 
@@ -130,11 +181,5 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             TooltipUI.Instance.Show(rectTransform, data.Title, data.Description, data.Ore, data.Gas, data.Population);
         else
             TooltipUI.Instance.Show(rectTransform, data.Title, data.Description);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (TooltipUI.Instance != null)
-            TooltipUI.Instance.Hide();
     }
 }

@@ -1188,8 +1188,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
-  sightRange: 15
+  sightRange: 25
   updateOnlyOnMove: 1
+  shrinkSightOutsideAlliedTerritory: 0
+  unclaimedSightRange: 2
 --- !u!114 &6519899686513207651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1217,8 +1219,10 @@ MonoBehaviour:
   barrageDamagePerShot: 100
   barrageShotCount: 3
   barrageShotInterval: 0.25
+  barrageShotSfx: {fileID: 8300000, guid: b591d0deff04ac54fa0448ff2b0903e2, type: 3}
   shieldBonusHealth: 150
   shieldDuration: 20
+  shieldActivateSfx: {fileID: 8300000, guid: a9444546a8c54db4aa44cf6b034a4e43, type: 3}
 --- !u!114 &7948481721665946439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1231,7 +1235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2f17070a8da82141bf0e8e27eb3a0e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileAttack
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 1915710262555087117, guid: 357a0df9f74683044ac3963f184f34ab, type: 3}
   firePoints:
   - {fileID: 8969036317305992285}
   projectileSpeed: 30

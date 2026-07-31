@@ -11,9 +11,11 @@ public class GuardianDroneSkill : MonoBehaviour, IUnitSkill
     [SerializeField] private int barrageDamagePerShot = 100;
     [SerializeField] private int barrageShotCount = 3;
     [SerializeField] private float barrageShotInterval = 0.25f;
+    [SerializeField] private AudioClip barrageShotSfx; // 3발 중 발사할 때마다 재생 - 비워두면 조용히 무시됨
 
     [SerializeField] private int shieldBonusHealth = 150;
     [SerializeField] private float shieldDuration = 20f;
+    [SerializeField] private AudioClip shieldActivateSfx; // 쉴드 전개 시작 시 재생 - 비워두면 조용히 무시됨
 
     public void Activate(UnitController unit, RTSUnitController.TraitChoice trait, UnitTraitOption traitData, SkillActivationContext context)
     {
@@ -35,6 +37,9 @@ public class GuardianDroneSkill : MonoBehaviour, IUnitSkill
             if (target.TryGetComponent(out HealthManager targetHealth))
                 projectileAttack.Fire(target.transform, targetHealth, barrageDamagePerShot, AttackEffectType.Explosive, isEnemyAttacker: false);
 
+            if (barrageShotSfx != null)
+                AudioSource.PlayClipAtPoint(barrageShotSfx, unit.transform.position);
+
             yield return new WaitForSeconds(barrageShotInterval);
         }
     }
@@ -43,6 +48,9 @@ public class GuardianDroneSkill : MonoBehaviour, IUnitSkill
     {
         int damageTaken = 0;
         void OnDamaged(int amount, Vector3 pos, AttackEffectType type, bool isEnemyAttacker) => damageTaken += amount;
+
+        if (shieldActivateSfx != null)
+            AudioSource.PlayClipAtPoint(shieldActivateSfx, healthManager.transform.position);
 
         healthManager.SetMaxHealth(healthManager.GetMaxHealth() + shieldBonusHealth);
         healthManager.Heal(shieldBonusHealth); // 최대치만 올리면 회복이 안 되므로 버프량만큼 즉시 채워줌

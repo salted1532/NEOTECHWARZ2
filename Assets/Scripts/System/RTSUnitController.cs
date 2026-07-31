@@ -23,8 +23,19 @@ public class RTSUnitController : MonoBehaviour
 
     // ===== 부대 지정(컨트롤 그룹) - Ctrl+숫자(1~9,0)로 저장, 숫자만 누르면 해당 부대를 선택 =====
     // 인덱스는 눌린 숫자와 그대로 대응(1→[0], 2→[1], ..., 9→[8], 0→[9]) - UserControl에서 이미 이렇게 매핑해 넘겨준다.
-    private readonly List<UnitController>[] controlGroupUnits = new List<UnitController>[10];
-    private readonly List<BuildingController>[] controlGroupBuildings = new List<BuildingController>[10];
+    // 필드 초기화 시점(Awake보다 먼저, 오브젝트 생성 즉시)에 각 슬롯까지 채워야 한다 - Awake()에서 채우면
+    // ControlGroupPanel처럼 다른 오브젝트가 이 컴포넌트의 Awake보다 먼저 Update를 도는 실행 순서일 때
+    // 슬롯이 아직 null이라 NullReferenceException이 난다(doc/0330).
+    private readonly List<UnitController>[] controlGroupUnits = CreateGroupSlots<UnitController>();
+    private readonly List<BuildingController>[] controlGroupBuildings = CreateGroupSlots<BuildingController>();
+
+    private static List<T>[] CreateGroupSlots<T>()
+    {
+        var slots = new List<T>[10];
+        for (int i = 0; i < slots.Length; i++)
+            slots[i] = new List<T>();
+        return slots;
+    }
 
     // 고급유닛 특성(트레이트) 선택 상태 (doc/0228). UpgradeManager(연구 보너스)와 동급의,
     // 매치 동안만 유지되는 unitID 단위 전역 상태. 유닛 개체가 아니라 "그 유닛 종류 전체"가 공유하는
@@ -134,12 +145,6 @@ public class RTSUnitController : MonoBehaviour
         UnitList = new List<UnitController>();
         BuildingList = new List<BuildingController>();
         ResourceNodeList = new List<ResourceNode>();
-
-        for (int i = 0; i < controlGroupUnits.Length; i++)
-        {
-            controlGroupUnits[i] = new List<UnitController>();
-            controlGroupBuildings[i] = new List<BuildingController>();
-        }
     }
 
     private void Update()
@@ -879,13 +884,7 @@ public class RTSUnitController : MonoBehaviour
     // 그룹이 비어있으면(저장한 적 없거나 전부 사라짐) 기존 선택을 그대로 둔다.
     public void SelectControlGroup(int groupIndex)
     {
-        if (groupIndex < 0 || groupIndex >= controlGroupUnits.Length)
-            return;
-
-        controlGroupUnits[groupIndex].RemoveAll(unit => unit == null);
-        controlGroupBuildings[groupIndex].RemoveAll(building => building == null);
-
-        if (controlGroupUnits[groupIndex].Count == 0 && controlGroupBuildings[groupIndex].Count == 0)
+        if (PurgeAndCountControlGroup(groupIndex) == 0)
             return;
 
         DeselectAll();
@@ -897,17 +896,27 @@ public class RTSUnitController : MonoBehaviour
             SelectBuilding(building);
     }
 
+    // 그룹 내 죽은/파괴된 대상을 정리하고 남은 인원수(유닛+건물)를 반환한다.
+    // ControlGroupPanel(UI)이 "전멸해서 버튼을 없애야 하는지" 매 프레임 확인하는 용도로도 쓴다.
+    public int PurgeAndCountControlGroup(int groupIndex)
+    {
+        if (groupIndex < 0 || groupIndex >= controlGroupUnits.Length)
+            return 0;
+
+        controlGroupUnits[groupIndex].RemoveAll(unit => unit == null);
+        controlGroupBuildings[groupIndex].RemoveAll(building => building == null);
+
+        return controlGroupUnits[groupIndex].Count + controlGroupBuildings[groupIndex].Count;
+    }
+
     // 더블클릭 시 카메라가 이동할 기준 좌표. 유닛이 여러 개면 리스트의 [0]번째(가장 먼저 저장/추가된) 유닛을 우선하고,
     // 유닛이 하나도 없으면(건물만 지정된 그룹) 건물 [0]번째를 대신 사용한다.
     public bool TryGetControlGroupFocusPosition(int groupIndex, out Vector3 position)
     {
         position = default;
 
-        if (groupIndex < 0 || groupIndex >= controlGroupUnits.Length)
+        if (PurgeAndCountControlGroup(groupIndex) == 0)
             return false;
-
-        controlGroupUnits[groupIndex].RemoveAll(unit => unit == null);
-        controlGroupBuildings[groupIndex].RemoveAll(building => building == null);
 
         if (controlGroupUnits[groupIndex].Count > 0)
         {
@@ -1053,6 +1062,15 @@ public class RTSUnitController : MonoBehaviour
         UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
         if (data != null)
             resourceManager.ReleasePopulation(data.population);
+    }
+
+    // 생산 큐를 거치지 않고(맵에 미리 배치된 시작 유닛 등) 존재하는 유닛의 인구수를 현재 사용량에 반영한다
+    // (unitID로 DB에서 조회) - UnitController.Start()가 자신이 생산된 유닛이 아닐 때만 호출한다.
+    public void AddPopulationForExistingUnit(int unitID)
+    {
+        UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
+        if (data != null)
+            resourceManager.AddPopulationDirect(data.population);
     }
 
     // 여러 건물이 섞여 선택됐을 때 패널/생산 대기열/리프트 버튼에 쓸 "대표 건물"을 우선순위
@@ -1493,8 +1511,12 @@ public class RTSUnitController : MonoBehaviour
         // 액티브면 클릭/단축키로 실제 사용 가능하고, 패시브면 버튼만 비활성화(클릭 불가)로 보여준다.
         UnitTraitOption trait = chosen == TraitChoice.A ? data.traitA : data.traitB;
 
+        float skillCooldownRemaining = representative.GetSkillCooldownRemaining();
+        bool onCooldown = trait.isActiveSkill && skillCooldownRemaining > 0f;
+
         string description = trait.isActiveSkill
             ? $"{trait.description} \nshortcut key [<color=yellow>{trait.shortcutKey}</color>]"
+                + (onCooldown ? $"\nRemain time: {skillCooldownRemaining:F1}" : "")
             : trait.description;
 
         uIController.ShowUnitSkillSlot(new CommandButtonData(
@@ -1504,8 +1526,12 @@ public class RTSUnitController : MonoBehaviour
                 trait.skillName,
                 description,
                 trait.isActiveSkill ? trait.shortcutKey : KeyCode.None),
-            trait.isActiveSkill), // Interactable = 액티브일 때만 true (패시브는 추가는 되지만 클릭 불가)
+            trait.isActiveSkill && !onCooldown), // Interactable = 액티브이면서 쿨다운이 끝났을 때만 true
             useFallbackSlot);
+
+        // 쿨다운 원형 오버레이 (doc/0323 후속) - 매 프레임 대표 유닛의 남은 쿨다운 비율로 갱신된다.
+        float normalizedCooldown = trait.cooldown > 0f ? Mathf.Clamp01(skillCooldownRemaining / trait.cooldown) : 0f;
+        uIController.SetUnitSkillCooldown(normalizedCooldown, useFallbackSlot);
     }
 
     #endregion

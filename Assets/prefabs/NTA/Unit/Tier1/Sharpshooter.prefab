@@ -212,6 +212,7 @@ GameObject:
   - component: {fileID: 1241889106422740378}
   - component: {fileID: -3375106225715699579}
   - component: {fileID: -7998235431267461752}
+  - component: {fileID: 9111222333444555666}
   m_Layer: 6
   m_Name: Sharpshooter
   m_TagString: AttackUnit
@@ -488,8 +489,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
-  sightRange: 15
-  updateOnlyOnMove: 1
+  sightRange: 25
+  updateOnlyOnMove: 0
+  shrinkSightOutsideAlliedTerritory: 0
+  unclaimedSightRange: 2
 --- !u!114 &1241889106422740378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,7 +535,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SharpshooterSkill
   sniperDamage: 40
   stealthDuration: 15
-  sniperShotSfx: {fileID: 0}
+  sniperShotSfx: {fileID: 8300000, guid: 50b18dd6790370448828f7ae05be637f, type: 3}
+  stealthSfx: {fileID: 8300000, guid: 21fd9dae699782b47870492dbf02c2de, type: 3}
+--- !u!114 &9111222333444555666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdceb7727ff07f348a673df84a9fe86d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StealthVisual
+  stealthMaterial: {fileID: 2100000, guid: 416a36b76ed514b4882827efeb9dc850, type: 2}
+  excludeFromStealth:
+  - {fileID: 8287700491229270693}
 --- !u!1 &8287700491229270693
 GameObject:
   m_ObjectHideFlags: 0

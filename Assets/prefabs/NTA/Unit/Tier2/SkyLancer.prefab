@@ -1028,8 +1028,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
-  sightRange: 15
+  sightRange: 25
   updateOnlyOnMove: 1
+  shrinkSightOutsideAlliedTerritory: 0
+  unclaimedSightRange: 2
 --- !u!114 &-3111987495838730594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1076,8 +1078,9 @@ MonoBehaviour:
   airBurnTickInterval: 1
   airBurnDuration: 7
   bombardDamage: 20
-  bombardEffectPrefab: {fileID: 0}
-  bombardSfx: {fileID: 0}
+  bombardEffectPrefab: {fileID: 1000011797152326, guid: ee5b5d938b0f65247ac5a2b0fc8bac00, type: 3}
+  bombardSfx: {fileID: 8300000, guid: 1176eaa7c9c37034a85129c9a3ff60e8, type: 3}
+  radiusIndicatorDuration: 2
 --- !u!1 &7947122194143956580
 GameObject:
   m_ObjectHideFlags: 0

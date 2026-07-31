@@ -94,4 +94,14 @@ public class ResourceManager : MonoBehaviour
         currentPopulation = Mathf.Max(0, currentPopulation - amount);
         OnResourceChanged?.Invoke();
     }
+
+    // ===== 생산 큐를 거치지 않고 씬에 이미 배치된 유닛의 인구수를 반영 (자원 소모/한도 검사 없이 직접 가산) =====
+    // TrySpend와 달리 CanAfford 판정을 하지 않는다 - 이미 맵에 존재하는 유닛이라 "지금 지을 수 있는지"를
+    // 물을 필요가 없고, AddMaxPopulation처럼 그냥 현재 상태에 그대로 반영만 하면 된다.
+    public void AddPopulationDirect(int amount)
+    {
+        if (amount <= 0) return;
+        currentPopulation += amount;
+        OnResourceChanged?.Invoke();
+    }
 }

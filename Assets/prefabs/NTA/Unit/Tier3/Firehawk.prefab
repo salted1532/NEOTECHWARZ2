@@ -731,6 +731,7 @@ MonoBehaviour:
   unitMarker: {fileID: 8287700491229270693}
   icon: {fileID: 21300000, guid: 06ad55446842ade4298efca8384bf7dc, type: 3}
   unitID: 8
+  heroName: 
   attackDamage: 8
   armor: 0
   attackType: 2
@@ -738,6 +739,7 @@ MonoBehaviour:
   sizeType: 1
   canAttackGround: 1
   canAttackAir: 1
+  attackDelivery: 0
   bonusVersusArmorType: 0
   bonusVersusArmorPercent: 30
   moveSpeed: 7
@@ -847,8 +849,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
-  sightRange: 15
+  sightRange: 25
   updateOnlyOnMove: 1
+  shrinkSightOutsideAlliedTerritory: 0
+  unclaimedSightRange: 2
 --- !u!114 &1471125879285909424
 MonoBehaviour:
   m_ObjectHideFlags: 0

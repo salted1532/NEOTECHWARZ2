@@ -13,6 +13,7 @@ public class SharpshooterSkill : MonoBehaviour, IUnitSkill
     [SerializeField] private int sniperDamage = 40;
     [SerializeField] private float stealthDuration = 15f;
     [SerializeField] private AudioClip sniperShotSfx;
+    [SerializeField] private AudioClip stealthSfx; // 은신 시작 시 재생 (인스펙터에서 연결)
 
     private Coroutine stealthRoutine;
 
@@ -45,6 +46,9 @@ public class SharpshooterSkill : MonoBehaviour, IUnitSkill
     {
         unit.SetStealthed(true);
         unit.GetComponent<StealthVisual>()?.EnterStealth();
+
+        if (stealthSfx != null)
+            AudioSource.PlayClipAtPoint(stealthSfx, unit.transform.position);
 
         yield return new WaitForSeconds(stealthDuration);
 

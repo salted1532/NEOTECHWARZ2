@@ -38,6 +38,10 @@ public class UserControl : MonoBehaviour
     private GameObject attackPointer;
     private GameObject movePointer;
 
+    // 범위 지정형 스킬(SkillGround) 대기 중 마우스를 따라다니는 원형 범위 미리보기 (doc/0323 후속).
+    // 지정 모드가 아니게 되면(확정/취소 등 모든 경로 공통) UpdatePointer()에서 정리된다.
+    private RadiusIndicator skillAreaIndicator;
+
     [SerializeField]
     private GameObject pointerPrefab;
     [SerializeField]
@@ -68,6 +72,10 @@ public class UserControl : MonoBehaviour
 
     private RTSUnitController rtsUnitController;
     private csFogWar fogWar;
+
+    // 완전히 밝혀진 타일(Revealed)과 완전히 가려진 타일(Hidden) 사이의 반투명 경계 구간(PreviouslyRevealed 등)에서도
+    // 화면엔 적이 보이는데 클릭/명령이 안 먹히는 문제를 막기 위한 여유 타일 수 (0=경계 여유 없이 딱 그 타일만 확인).
+    [SerializeField] private int fogVisibilityMargin = 1;
 
     private Vector2 start;
     private Vector2 end;
@@ -229,6 +237,20 @@ public class UserControl : MonoBehaviour
                     return;
                 }
 
+                // 단일 유닛 지정형 스킬(SkillUnit) 대상 확정 - 아군 유닛도 지정 가능하게 한다 (doc/0323 후속)
+                if (UsercurrentState == OrderState.SkillUnit)
+                {
+                    rtsUnitController.ConfirmSkillUnitTarget(unit.gameObject);
+                    unit.FlashMarker();
+
+                    attackPointer.transform.position = unit.transform.position;
+                    attackPointer.SetActive(true);
+
+                    UsercurrentState = OrderState.None;
+
+                    return;
+                }
+
                 if (Input.GetKey(KeyCode.LeftShift))
                     rtsUnitController.ShiftClickSelectUnit(unit);
                 else
@@ -253,7 +275,7 @@ public class UserControl : MonoBehaviour
         {
             EnemyUnitController enemy = enemyHit.transform.GetComponent<EnemyUnitController>();
 
-            if (enemy != null && IsRevealedByFog(enemyHit.point))
+            if (enemy != null && IsRevealedByFog(enemy.transform.position))
             {
                 if (UsercurrentState == OrderState.Attack)
                 {
@@ -290,7 +312,7 @@ public class UserControl : MonoBehaviour
             // 적 건물 좌클릭 = 선택 또는 지정 공격 (A 모드 중이면 해당 건물을 강제로 공격, 아니면 선택, doc/0248)
             EnemyBuildingController enemyBuilding = enemyHit.transform.GetComponent<EnemyBuildingController>();
 
-            if (enemyBuilding != null && IsRevealedByFog(enemyHit.point))
+            if (enemyBuilding != null && IsRevealedByFog(enemyBuilding.transform.position))
             {
                 if (UsercurrentState == OrderState.Attack)
                 {
@@ -448,7 +470,7 @@ public class UserControl : MonoBehaviour
         {
             ResourceNode node = OreHit.transform.GetComponent<ResourceNode>();
 
-            if (node != null && IsRevealedByFog(OreHit.point))
+            if (node != null && IsRevealedByFog(node.transform.position))
             {
                 pendingLeftClickSelect = () => { if (node != null) rtsUnitController.ClickSelectResource(node); };
 
@@ -461,7 +483,7 @@ public class UserControl : MonoBehaviour
         {
             ResourceNode node = GasHit.transform.GetComponent<ResourceNode>();
 
-            if (node != null && IsRevealedByFog(GasHit.point))
+            if (node != null && IsRevealedByFog(node.transform.position))
             {
                 pendingLeftClickSelect = () => { if (node != null) rtsUnitController.ClickSelectResource(node); };
 
@@ -530,7 +552,7 @@ public class UserControl : MonoBehaviour
             if (enemy != null)
             {
                 // 안개에 가려진 적은 추격 공격 대신 그 지점으로 이동만 시킨다 (보이지 않는 대상을 특정해서 명령할 수 없음)
-                if (IsRevealedByFog(enemyHit.point))
+                if (IsRevealedByFog(enemy.transform.position))
                 {
                     rtsUnitController.AttackSelectedUnits(enemy);
                     enemy.FlashMarker(); // 어느 적이 공격 대상인지 마커 깜빡임으로 표시
@@ -555,7 +577,7 @@ public class UserControl : MonoBehaviour
             if (enemyBuilding != null)
             {
                 // 안개에 가려진 적 건물은 공격 명령 대신 그 지점으로 이동만 시킨다 (보이지 않는 대상을 특정해서 명령할 수 없음)
-                if (IsRevealedByFog(enemyHit.point))
+                if (IsRevealedByFog(enemyBuilding.transform.position))
                 {
                     rtsUnitController.AttackEnemyBuildingSelectedUnits(enemyBuilding);
                     enemyBuilding.FlashMarker(); // 어느 건물이 공격 대상인지 마커 깜빡임으로 표시
@@ -644,7 +666,7 @@ public class UserControl : MonoBehaviour
             if (node != null)
             {
                 // 안개에 가려진 자원은 채취 명령 대신 그 지점으로 이동만 시킨다
-                if (IsRevealedByFog(OreHit.point))
+                if (IsRevealedByFog(node.transform.position))
                 {
                     rtsUnitController.GatherSelectedUnits(node);
                     node.FlashMarker(); // 어느 자원이 채취 대상인지 마커 깜빡임으로 표시
@@ -666,7 +688,7 @@ public class UserControl : MonoBehaviour
             if (node != null)
             {
                 // 안개에 가려진 자원은 채취 명령 대신 그 지점으로 이동만 시킨다
-                if (IsRevealedByFog(GasHit.point))
+                if (IsRevealedByFog(node.transform.position))
                 {
                     rtsUnitController.GatherSelectedUnits(node);
                     node.FlashMarker(); // 어느 자원이 채취 대상인지 마커 깜빡임으로 표시
@@ -886,6 +908,13 @@ public class UserControl : MonoBehaviour
     // 현재 명령 대기 상태(공격/이동/순찰/랠리)에 맞는 포인터 아이콘을 마우스가 가리키는 지면 위치에 표시한다.
     private void UpdatePointer()
     {
+        // 범위 지정 모드가 아니게 되면(확정 클릭/Escape/다른 명령으로 전환 등 모든 경로 공통) 미리보기를 정리한다.
+        if (UsercurrentState != OrderState.SkillGround && skillAreaIndicator != null)
+        {
+            Destroy(skillAreaIndicator.gameObject);
+            skillAreaIndicator = null;
+        }
+
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
         if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerGround))
@@ -897,6 +926,14 @@ public class UserControl : MonoBehaviour
             movePointer.SetActive(false);
 
             attackPointer.transform.position = hit.point;
+
+            if (UsercurrentState == OrderState.SkillGround)
+            {
+                if (skillAreaIndicator == null)
+                    skillAreaIndicator = RadiusIndicator.CreateFollowing(rtsUnitController.GetPendingSkillAreaRadius());
+
+                skillAreaIndicator.SetPosition(hit.point);
+            }
         }
         else if (UsercurrentState == OrderState.Move || UsercurrentState == OrderState.Patrol || UsercurrentState == OrderState.Rally || UsercurrentState == OrderState.BuildingMove)
         {
@@ -961,25 +998,49 @@ public class UserControl : MonoBehaviour
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out RaycastHit enemyHit, Mathf.Infinity, layerEnemy) && IsRevealedByFog(enemyHit.point))
+        if (Physics.Raycast(ray, out RaycastHit enemyHit, Mathf.Infinity, layerEnemy) && IsRevealedByFog(enemyHit.transform.position))
             return CursorTarget.Enemy;
 
         if (Physics.Raycast(ray, Mathf.Infinity, layerUnit | layerBuilding))
             return CursorTarget.Ally;
 
-        if (Physics.Raycast(ray, out RaycastHit resourceHit, Mathf.Infinity, layerOre | layerGas) && IsRevealedByFog(resourceHit.point))
+        if (Physics.Raycast(ray, out RaycastHit resourceHit, Mathf.Infinity, layerOre | layerGas) && IsRevealedByFog(resourceHit.transform.position))
             return CursorTarget.Neutral;
 
         return CursorTarget.None;
     }
 
     // 안개에 가려져(현재 시야 밖) 있는 대상은 클릭 선택/명령/호버 대상에서 제외한다. fogWar가 없는 씬에서는 항상 보이는 것으로 취급.
+    // csFogWar.CheckVisibility()는 완전히 밝혀진(Revealed) 타일만 인정하는데, 이 프로젝트는 한 번 밝혀졌던
+    // 타일(PreviouslyRevealed)도 완전히 까맣게 가리지 않고 revealedTileOpacity(기본 0.5)만큼만 반투명하게
+    // 보여주므로(csFogWar 인스펙터 값) 그 위의 적 유닛도 화면엔 보인다 - 그래서 여기서는 Shadowcaster의
+    // fogField를 직접 읽어(TerritoryFogReveal.cs와 동일한 "에셋은 안 건드리고 public API만 사용" 패턴)
+    // Revealed와 PreviouslyRevealed를 모두 "보임"으로 인정한다.
     private bool IsRevealedByFog(Vector3 worldPosition)
     {
         if (fogWar == null)
             return true;
 
-        return fogWar.CheckVisibility(worldPosition, 0);
+        Vector2Int center = fogWar.WorldToLevel(worldPosition);
+
+        for (int x = -fogVisibilityMargin; x <= fogVisibilityMargin; x++)
+        {
+            for (int y = -fogVisibilityMargin; y <= fogVisibilityMargin; y++)
+            {
+                Vector2Int cell = new Vector2Int(center.x + x, center.y + y);
+
+                if (!fogWar.CheckLevelGridRange(cell))
+                    continue;
+
+                Shadowcaster.LevelColumn.ETileVisibility visibility = fogWar.shadowcaster.fogField[cell.x][cell.y];
+
+                if (visibility == Shadowcaster.LevelColumn.ETileVisibility.Revealed ||
+                    visibility == Shadowcaster.LevelColumn.ETileVisibility.PreviouslyRevealed)
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     private void SetCursorTexture(Texture2D texture)

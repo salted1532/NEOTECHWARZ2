@@ -1,0 +1,1170 @@
+{
+  "ExportTimestamp": "2026-07-31 17:25:48",
+  "Context": {
+    "sceneType": "runtime",
+    "sceneName": "Multiple(2): TestScene, DontDestroyOnLoad",
+    "nodeCount": 112,
+    "maxDepth": 3
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "TestScene",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 112,
+        "maxDepth": 3
+      },
+      "roots": [
+        {
+          "name": "Canvas",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 5,
+          "path": "Canvas",
+          "children": [
+            {
+              "name": "StageObject",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/StageObject",
+              "children": [
+                {
+                  "name": "Label",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/StageObject/Label",
+                  "children": []
+                },
+                {
+                  "name": "Main1",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/StageObject/Main1",
+                  "children": []
+                },
+                {
+                  "name": "Main2",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/StageObject/Main2",
+                  "children": []
+                },
+                {
+                  "name": "Main3",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/StageObject/Main3",
+                  "children": []
+                },
+                {
+                  "name": "sub1",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/StageObject/sub1",
+                  "children": []
+                },
+                {
+                  "name": "sub2",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 5,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/StageObject/sub2",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "DragRectangle",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/DragRectangle",
+              "children": []
+            },
+            {
+              "name": "MiniMap",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/MiniMap",
+              "children": [
+                {
+                  "name": "MiniMap_image",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/MiniMap/MiniMap_image",
+                  "children": [
+                    {
+                      "name": "ViewSquare",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/MiniMap/MiniMap_image/ViewSquare",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "OrderButtons",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/OrderButtons",
+              "children": [
+                {
+                  "name": "Panel",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/OrderButtons/Panel",
+                  "children": [
+                    {
+                      "name": "Slot0",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OrderButtons/Panel/Slot0",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot1",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OrderButtons/Panel/Slot1",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot2",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OrderButtons/Panel/Slot2",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot3",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OrderButtons/Panel/Slot3",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot4",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OrderButtons/Panel/Slot4",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot5",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 5,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OrderButtons/Panel/Slot5",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot6",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 6,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OrderButtons/Panel/Slot6",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot7",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 7,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OrderButtons/Panel/Slot7",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot8",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 8,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OrderButtons/Panel/Slot8",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "SelectInfo",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/SelectInfo",
+              "children": [
+                {
+                  "name": "Info_panel",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/SelectInfo/Info_panel",
+                  "children": [
+                    {
+                      "name": "Icon_Image",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Info_panel/Icon_Image",
+                      "children": []
+                    },
+                    {
+                      "name": "HpText",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Info_panel/HpText",
+                      "children": []
+                    },
+                    {
+                      "name": "UnitDamage",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Info_panel/UnitDamage",
+                      "children": []
+                    },
+                    {
+                      "name": "UnitArmor",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Info_panel/UnitArmor",
+                      "children": []
+                    },
+                    {
+                      "name": "NameText",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Info_panel/NameText",
+                      "children": []
+                    },
+                    {
+                      "name": "InfoText",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 5,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Info_panel/InfoText",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "productionQueue_Panel",
+                  "isActive": false,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/SelectInfo/productionQueue_Panel",
+                  "children": [
+                    {
+                      "name": "Slider",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/productionQueue_Panel/Slider",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot0",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/productionQueue_Panel/Slot0",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot1",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/productionQueue_Panel/Slot1",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot2",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/productionQueue_Panel/Slot2",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot3",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/productionQueue_Panel/Slot3",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot4",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 5,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/productionQueue_Panel/Slot4",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Squad_panel",
+                  "isActive": false,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/SelectInfo/Squad_panel",
+                  "children": [
+                    {
+                      "name": "page1",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/page1",
+                      "children": []
+                    },
+                    {
+                      "name": "page2",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/page2",
+                      "children": []
+                    },
+                    {
+                      "name": "page3",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/page3",
+                      "children": []
+                    },
+                    {
+                      "name": "page4",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/page4",
+                      "children": []
+                    },
+                    {
+                      "name": "page5",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/page5",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot0",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 5,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot0",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot1",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 6,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot1",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot2",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 7,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot2",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot3",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 8,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot3",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot4",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 9,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot4",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot5",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 10,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot5",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot6",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 11,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot6",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot7",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 12,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot7",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot8",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 13,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot8",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot9",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 14,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot9",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot10",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 15,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot10",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot11",
+                      "isActive": false,
+                      "components": [],
+                      "siblingIndex": 16,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/SelectInfo/Squad_panel/Slot11",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "ResourceUI",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/ResourceUI",
+              "children": [
+                {
+                  "name": "OreImage",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ResourceUI/OreImage",
+                  "children": [
+                    {
+                      "name": "OreText",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/ResourceUI/OreImage/OreText",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "GasImage",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ResourceUI/GasImage",
+                  "children": [
+                    {
+                      "name": "GasText",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/ResourceUI/GasImage/GasText",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "populationImage",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ResourceUI/populationImage",
+                  "children": [
+                    {
+                      "name": "populationText",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/ResourceUI/populationImage/populationText",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "SkillSelect",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/SkillSelect",
+              "children": [
+                {
+                  "name": "Slot0",
+                  "isActive": false,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/SkillSelect/Slot0",
+                  "children": []
+                },
+                {
+                  "name": "Slot1",
+                  "isActive": false,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/SkillSelect/Slot1",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "ToolTip",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/ToolTip",
+              "children": [
+                {
+                  "name": "TitleText",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ToolTip/TitleText",
+                  "children": []
+                },
+                {
+                  "name": "DescriptionText",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ToolTip/DescriptionText",
+                  "children": []
+                },
+                {
+                  "name": "Ore_image",
+                  "isActive": false,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ToolTip/Ore_image",
+                  "children": [
+                    {
+                      "name": "OreText",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/ToolTip/Ore_image/OreText",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Gas_image",
+                  "isActive": false,
+                  "components": [],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ToolTip/Gas_image",
+                  "children": [
+                    {
+                      "name": "Gastext",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/ToolTip/Gas_image/Gastext",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "population_image",
+                  "isActive": false,
+                  "components": [],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ToolTip/population_image",
+                  "children": [
+                    {
+                      "name": "PopulationText",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/ToolTip/population_image/PopulationText",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Option",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Option",
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/Option/Text (TMP)",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "OptionPanel",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/OptionPanel",
+              "children": [
+                {
+                  "name": "Close",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/OptionPanel/Close",
+                  "children": []
+                },
+                {
+                  "name": "BackToMainMenu",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/OptionPanel/BackToMainMenu",
+                  "children": [
+                    {
+                      "name": "Text (TMP)",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/BackToMainMenu/Text (TMP)",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Master_Volume",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/OptionPanel/Master_Volume",
+                  "children": [
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/Master_Volume/Background",
+                      "children": []
+                    },
+                    {
+                      "name": "Fill Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/Master_Volume/Fill Area",
+                      "children": []
+                    },
+                    {
+                      "name": "Handle Slide Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/Master_Volume/Handle Slide Area",
+                      "children": []
+                    },
+                    {
+                      "name": "Mute",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/Master_Volume/Mute",
+                      "children": []
+                    },
+                    {
+                      "name": "MasterVolume_Input",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/Master_Volume/MasterVolume_Input",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "BGM",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/OptionPanel/BGM",
+                  "children": [
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/BGM/Background",
+                      "children": []
+                    },
+                    {
+                      "name": "Fill Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/BGM/Fill Area",
+                      "children": []
+                    },
+                    {
+                      "name": "Handle Slide Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/BGM/Handle Slide Area",
+                      "children": []
+                    },
+                    {
+                      "name": "BGM_Input",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/BGM/BGM_Input",
+                      "children": []
+                    },
+                    {
+                      "name": "Mute",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/BGM/Mute",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "SFX",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/OptionPanel/SFX",
+                  "children": [
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/SFX/Background",
+                      "children": []
+                    },
+                    {
+                      "name": "Fill Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/SFX/Fill Area",
+                      "children": []
+                    },
+                    {
+                      "name": "Handle Slide Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/SFX/Handle Slide Area",
+                      "children": []
+                    },
+                    {
+                      "name": "SFX_Input",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/SFX/SFX_Input",
+                      "children": []
+                    },
+                    {
+                      "name": "Mute",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/SFX/Mute",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "VOICE",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 5,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/OptionPanel/VOICE",
+                  "children": [
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/VOICE/Background",
+                      "children": []
+                    },
+                    {
+                      "name": "Fill Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/VOICE/Fill Area",
+                      "children": []
+                    },
+                    {
+                      "name": "Handle Slide Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/VOICE/Handle Slide Area",
+                      "children": []
+                    },
+                    {
+                      "name": "VOICE_Input",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/VOICE/VOICE_Input",
+                      "children": []
+                    },
+                    {
+                      "name": "Mute",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/OptionPanel/VOICE/Mute",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "VictoryPanel",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/VictoryPanel",
+              "children": [
+                {
+                  "name": "GoToNextStage",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/VictoryPanel/GoToNextStage",
+                  "children": [
+                    {
+                      "name": "Text (TMP)",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/VictoryPanel/GoToNextStage/Text (TMP)",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/VictoryPanel/Text (TMP)",
+                  "children": []
+                },
+                {
+                  "name": "BackToMainMenu",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/VictoryPanel/BackToMainMenu",
+                  "children": [
+                    {
+                      "name": "Text (TMP)",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "Canvas/VictoryPanel/BackToMainMenu/Text (TMP)",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "HorizontalLayoutGroup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/HorizontalLayoutGroup",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

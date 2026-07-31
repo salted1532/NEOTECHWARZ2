@@ -506,8 +506,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
-  sightRange: 15
+  sightRange: 25
   updateOnlyOnMove: 1
+  shrinkSightOutsideAlliedTerritory: 0
+  unclaimedSightRange: 2
 --- !u!114 &1790842920534273466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,7 +534,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19b88ddad9b24ce4fa3260c5873d0849, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InfantryIdleLookAround
-  idleWaitTime: 10
+  idleWaitMin: 5
+  idleWaitMax: 15
   turnDuration: 1
   turnEase: 4
 --- !u!1 &8287700491229270693

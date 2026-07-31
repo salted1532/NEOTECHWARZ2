@@ -104,6 +104,11 @@ public class UnitSpawner : MonoBehaviour
         // 스탯 적용은 이제 유닛 자신이 Start()에서 처리한다 (UnitController.ApplyUnitData 참고) - 여기선 이동만 지시.
         if (spawnunit.TryGetComponent<UnitController>(out var unitController))
         {
+            // Start()가 돌기 전(Instantiate는 동기 실행이라 Awake까지는 이미 끝났고 Start는 다음 페이즈)에
+            // 표시해둬야 한다 - 생산 큐를 거친 유닛은 이미 큐잉 시점에 인구수가 소모됐으므로 Start()에서
+            // 또 인구수를 더하면 이중 계산된다.
+            unitController.spawnedByProduction = true;
+
             unitController.MoveTo(buildingController.GetRallyPos());
         }
 

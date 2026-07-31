@@ -8,6 +8,9 @@ public class StealthVisual : MonoBehaviour
 {
     [SerializeField] private Material stealthMaterial; // 반투명 흰색 (PreviewSystem.previewMaterialPrefab과 같은 에셋 재사용 가능)
 
+    [Tooltip("머티리얼을 바꾸지 않을 자식 오브젝트(예: 선택 마커). 이 목록 아래의 Renderer는 건드리지 않는다.")]
+    [SerializeField] private GameObject[] excludeFromStealth;
+
     private readonly Dictionary<Renderer, Material[]> originalMaterials = new Dictionary<Renderer, Material[]>();
 
     public void EnterStealth()
@@ -17,6 +20,9 @@ public class StealthVisual : MonoBehaviour
 
         foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
         {
+            if (IsExcluded(renderer.transform))
+                continue;
+
             originalMaterials[renderer] = renderer.materials;
 
             Material[] ghosts = new Material[renderer.materials.Length];
@@ -25,6 +31,17 @@ public class StealthVisual : MonoBehaviour
 
             renderer.materials = ghosts;
         }
+    }
+
+    private bool IsExcluded(Transform target)
+    {
+        foreach (GameObject excluded in excludeFromStealth)
+        {
+            if (excluded != null && target.IsChildOf(excluded.transform))
+                return true;
+        }
+
+        return false;
     }
 
     public void ExitStealth()

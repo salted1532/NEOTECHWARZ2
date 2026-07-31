@@ -1,0 +1,120 @@
+{
+  "ExportTimestamp": "2026-07-31 18:07:23",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "MainScene",
+    "nodeCount": 11,
+    "maxDepth": 0
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "MainScene",
+      "stats": {
+        "rootCount": 11,
+        "nodeCount": 11,
+        "maxDepth": 0
+      },
+      "roots": [
+        {
+          "name": "Main Camera",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 0,
+          "tag": "MainCamera",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Directional Light",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Canvas",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 5,
+          "children": []
+        },
+        {
+          "name": "MainMenuController",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 3,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "EventSystem",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 4,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Mission5",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 5,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Scout Drone",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 6,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": []
+        },
+        {
+          "name": "struct_Headquarters_A_yup",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 7,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "firehawks",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 8,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "WFX_SmokeGrenade AlphaBlend Gray",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 9,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "SoundManager",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 10,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        }
+      ]
+    }
+  ]
+}

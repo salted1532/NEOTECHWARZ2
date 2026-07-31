@@ -1,0 +1,256 @@
+{
+  "ExportTimestamp": "2026-07-31 17:39:23",
+  "Context": {
+    "sceneType": "runtime",
+    "sceneName": "Multiple(2): TestScene, DontDestroyOnLoad",
+    "nodeCount": 25,
+    "maxDepth": 0
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "TestScene",
+      "stats": {
+        "rootCount": 22,
+        "nodeCount": 22,
+        "maxDepth": 0
+      },
+      "roots": [
+        {
+          "name": "GameManager",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 0,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "StageObject",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Capture_Point",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Resource",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 3,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Ocean",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 4,
+          "tag": "Untagged",
+          "layer": 12,
+          "children": []
+        },
+        {
+          "name": "SkyLancer",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 5,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": []
+        },
+        {
+          "name": "Sharpshooter",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 6,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": []
+        },
+        {
+          "name": "Guardian Drone",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 7,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": []
+        },
+        {
+          "name": "Mission0",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 8,
+          "tag": "Untagged",
+          "layer": 7,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (1)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 9,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (2)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 10,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (3)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 11,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (4)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 12,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "Nanobot Repair (5)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 13,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": []
+        },
+        {
+          "name": "AttackPointer(Clone)",
+          "isActive": false,
+          "components": [],
+          "siblingIndex": 14,
+          "tag": "Untagged",
+          "layer": 12,
+          "children": []
+        },
+        {
+          "name": "Pointer(Clone)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 15,
+          "tag": "Untagged",
+          "layer": 12,
+          "children": []
+        },
+        {
+          "name": "[RUNTIME] Fog_Plane",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 16,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "MainBase(Clone)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 17,
+          "tag": "MainBase",
+          "layer": 9,
+          "children": []
+        },
+        {
+          "name": "WFX_SmokeGrenade AlphaBlend Gray(Clone)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 18,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "WFX_SmokeGrenade AlphaBlend Gray(Clone)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 19,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "WFX_Fire Natural Circle (No Smoke)(Clone)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 20,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "WFX_Fire Natural Circle (No Smoke)(Clone)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 21,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "sceneName": "DontDestroyOnLoad",
+      "stats": {
+        "rootCount": 3,
+        "nodeCount": 3,
+        "maxDepth": 0
+      },
+      "roots": [
+        {
+          "name": "AppUIUpdater",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 0,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "[Debug Updater]",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "[DOTween]",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        }
+      ]
+    }
+  ]
+}

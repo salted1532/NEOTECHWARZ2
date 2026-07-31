@@ -994,8 +994,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
-  sightRange: 15
+  sightRange: 25
   updateOnlyOnMove: 1
+  shrinkSightOutsideAlliedTerritory: 0
+  unclaimedSightRange: 2
 --- !u!114 &9107628855448923498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1590,14 +1592,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VehicleIdleAnimation
   turretController: {fileID: 3239963744121813417}
-  idleWaitTime: 10
-  turretWanderAngle: 45
+  idleWaitMin: 5
+  idleWaitMax: 15
   turretWanderDuration: 1
   turretHoldMin: 1
   turretHoldMax: 2
   idleShakeStrength: 0.01
   idleShakeVibrato: 10
   idleShakeCycleDuration: 0.15
+  manualIdle: 0
 --- !u!1 &5003575397805006506 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4606500678799107036, guid: 14c22f8bcb5d67d42a69fa2f1da0e9a5, type: 3}
