@@ -931,6 +931,8 @@ GameObject:
   - component: {fileID: 9056132140947804330}
   - component: {fileID: 8163829703384396057}
   - component: {fileID: 6519899686513207651}
+  - component: {fileID: -2219208328443986078}
+  - component: {fileID: 7948481721665946439}
   m_Layer: 6
   m_Name: Guardian Drone
   m_TagString: AttackUnit
@@ -1067,6 +1069,7 @@ MonoBehaviour:
   unitMarker: {fileID: 8287700491229270693}
   icon: {fileID: 21300000, guid: d6e905e97221d6141ae8f9bd7256fb0a, type: 3}
   unitID: 9
+  heroName: 
   attackDamage: 25
   armor: 0
   attackType: 1
@@ -1074,6 +1077,7 @@ MonoBehaviour:
   sizeType: 2
   canAttackGround: 1
   canAttackAir: 1
+  attackDelivery: 0
   bonusVersusArmorType: 1
   bonusVersusArmorPercent: 40
   moveSpeed: 3
@@ -1198,6 +1202,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8c2ad14de2c2834da003b4d876c7eaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitAudio
+--- !u!114 &-2219208328443986078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fbf7a85a0d19144a8fce1a8eb01d422, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GuardianDroneSkill
+  barrageDamagePerShot: 100
+  barrageShotCount: 3
+  barrageShotInterval: 0.25
+  shieldBonusHealth: 150
+  shieldDuration: 20
+--- !u!114 &7948481721665946439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2f17070a8da82141bf0e8e27eb3a0e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectileAttack
+  projectilePrefab: {fileID: 0}
+  firePoints:
+  - {fileID: 8969036317305992285}
+  projectileSpeed: 30
+  hitDistance: 0.5
 --- !u!1 &8287700491229270693
 GameObject:
   m_ObjectHideFlags: 0

@@ -753,6 +753,7 @@ GameObject:
   - component: {fileID: 13976751495931889}
   - component: {fileID: -3111987495838730594}
   - component: {fileID: 6538352944816639508}
+  - component: {fileID: 1955893354517901242}
   m_Layer: 6
   m_Name: SkyLancer
   m_TagString: AttackUnit
@@ -1059,6 +1060,24 @@ MonoBehaviour:
   - {fileID: 1495329173376342796}
   projectileSpeed: 30
   hitDistance: 0.5
+--- !u!114 &1955893354517901242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 221f04b4d95d5db48b0278b56d0d673c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SkyLancerSkill
+  airBurnDamagePerTick: 2
+  airBurnTickInterval: 1
+  airBurnDuration: 7
+  bombardDamage: 20
+  bombardEffectPrefab: {fileID: 0}
+  bombardSfx: {fileID: 0}
 --- !u!1 &7947122194143956580
 GameObject:
   m_ObjectHideFlags: 0
@@ -1487,14 +1506,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VehicleIdleAnimation
   turretController: {fileID: 5944170514141848326}
-  idleWaitTime: 10
-  turretWanderAngle: 45
+  idleWaitMin: 5
+  idleWaitMax: 15
   turretWanderDuration: 1
   turretHoldMin: 1
   turretHoldMax: 2
   idleShakeStrength: 0.01
   idleShakeVibrato: 10
   idleShakeCycleDuration: 0.15
+  manualIdle: 0
 --- !u!114 &7011681889210671148
 MonoBehaviour:
   m_ObjectHideFlags: 0

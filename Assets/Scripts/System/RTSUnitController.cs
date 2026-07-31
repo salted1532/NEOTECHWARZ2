@@ -31,6 +31,11 @@ public class RTSUnitController : MonoBehaviour
     // 선택이라 UnitController가 직접 들고 있지 않고 여기서만 기록/조회한다.
     private readonly Dictionary<int, TraitChoice> chosenTraits = new Dictionary<int, TraitChoice>();
 
+    // 지정형 액티브 스킬(단일 유닛/범위) 슬롯 6 클릭 → 클릭 확정 사이의 대기 상태 (doc/0323).
+    // "A공격모드"와 동일한 패턴 - UserControl이 클릭을 확정하면 Confirm...Target()이 이 값을 읽어 각 유닛에 전달한다.
+    private int pendingSkillUnitID;
+    private UnitTraitOption pendingSkillTrait;
+
     // 맵에 존재하는 모든 유닛/건물/자원 노드
     public List<UnitController> UnitList;
     public List<BuildingController> BuildingList;
@@ -1390,6 +1395,18 @@ public class RTSUnitController : MonoBehaviour
     // 한 마리씩 자기 쿨다운을 갖고 독립적으로 발동).
     public void ActivateSkill(int unitID, UnitTraitOption trait)
     {
+        if (trait.targetType != SkillTargetType.None)
+        {
+            // 단일/범위 지정형: 쿨다운을 아직 시작하지 않는다 - "사거리까지 이동해서 실제로 스킬을 쓴 시점"부터
+            // 시작해야 하므로(doc/0323 확정 사항), 여기서는 지정 모드 진입만 하고 클릭 확정은
+            // ConfirmSkillUnitTarget/ConfirmSkillAreaTarget으로 넘긴다.
+            pendingSkillUnitID = unitID;
+            pendingSkillTrait = trait;
+            userControl.SetOrderState(trait.targetType == SkillTargetType.SingleUnit ? "SkillUnit" : "SkillGround");
+            return;
+        }
+
+        // 자기자신 논타겟 스킬(은신/쉴드 전개 등)은 이동할 필요가 없어 즉시 발동 + 즉시 쿨다운 시작
         foreach (UnitController unit in selectedUnitList)
         {
             if (unit == null || unit.GetUnitID() != unitID)
@@ -1398,10 +1415,38 @@ public class RTSUnitController : MonoBehaviour
             if (!unit.CanUseSkill())
                 continue;
 
-            unit.UseTraitSkill();
+            unit.UseTraitSkill(trait, SkillActivationContext.Self);
             unit.StartSkillCooldown(trait.cooldown);
         }
     }
+
+    // UserControl이 SkillUnit 모드에서 적 클릭을 확정하면 호출 (doc/0323). 여러 마리를 함께 선택했어도
+    // 한 마리씩 자기 쿨다운에 따라 독립적으로 이동-후-발동한다(doc/0228과 동일한 원칙).
+    public void ConfirmSkillUnitTarget(GameObject target)
+    {
+        foreach (UnitController unit in selectedUnitList)
+        {
+            if (unit == null || unit.GetUnitID() != pendingSkillUnitID || !unit.CanUseSkill())
+                continue;
+
+            unit.MoveToUseSkillOnUnit(target, pendingSkillTrait);
+        }
+    }
+
+    // UserControl이 SkillGround 모드에서 땅 클릭을 확정하면 호출.
+    public void ConfirmSkillAreaTarget(Vector3 point)
+    {
+        foreach (UnitController unit in selectedUnitList)
+        {
+            if (unit == null || unit.GetUnitID() != pendingSkillUnitID || !unit.CanUseSkill())
+                continue;
+
+            unit.MoveToUseSkillOnArea(point, pendingSkillTrait);
+        }
+    }
+
+    // 범위 지정 모드 중 마우스를 따라다니는 범위 마커(사용자 제작 예정)가 반지름을 읽어가는 용도.
+    public float GetPendingSkillAreaRadius() => pendingSkillTrait != null ? pendingSkillTrait.areaRadius : 0f;
 
     // 유닛 선택 UI가 갱신될 때마다(UpdateUI) 함께 호출되어, 선택된 유닛 종류에 따라 아래 셋 중 하나로 정리한다.
     // - 고급유닛이 아니면: 오버레이/스킬슬롯 둘 다 숨김

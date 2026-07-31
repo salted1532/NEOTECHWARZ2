@@ -10,6 +10,10 @@ public class UnitDataSO : ScriptableObject
     public List<UnitData> unitData = new List<UnitData>();
 }
 
+// 액티브 스킬의 지정 방식 (doc/0323). None=자기 자신에게 즉시 발동(은신/쉴드 전개 등),
+// SingleUnit=A공격모드처럼 적 유닛 하나를 지정(저격/집중 포화), AreaGround=땅의 한 지점을 지정해 범위 피해(지상 폭격).
+public enum SkillTargetType { None, SingleUnit, AreaGround }
+
 // 고급유닛 특성(트레이트) 하나의 정의 - 특성 선택 오버레이(SkillSelect) 카드 + (액티브인 경우) order panel
 // 버튼/단축키에 필요한 정보를 모두 담는다 (doc/0228).
 [System.Serializable]
@@ -34,6 +38,18 @@ public class UnitTraitOption
 
     [field: SerializeField]
     public float cooldown { get; private set; } // isActiveSkill=true일 때만 사용
+
+    // 지정형 액티브 스킬 전용 (doc/0323, targetType != None일 때만 의미 있음).
+    [field: SerializeField]
+    public SkillTargetType targetType { get; private set; }
+
+    // 유닛 기본 공격 사거리(AttackRange.UnitRange)와는 별개인 이 스킬 전용 사거리 - 이 안에 들어와야 실제 발동한다.
+    [field: SerializeField]
+    public float skillRange { get; private set; }
+
+    // AreaGround 전용 - 피해가 적용되는 범위 반지름.
+    [field: SerializeField]
+    public float areaRadius { get; private set; }
 }
 
 // 유닛 하나의 스펙(체력/공격력/비용/생산시간/프리팹 등)을 정의하는 데이터 항목.

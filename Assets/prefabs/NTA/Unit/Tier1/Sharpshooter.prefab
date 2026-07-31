@@ -211,6 +211,7 @@ GameObject:
   - component: {fileID: -4483001046243210033}
   - component: {fileID: 1241889106422740378}
   - component: {fileID: -3375106225715699579}
+  - component: {fileID: -7998235431267461752}
   m_Layer: 6
   m_Name: Sharpshooter
   m_TagString: AttackUnit
@@ -513,9 +514,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19b88ddad9b24ce4fa3260c5873d0849, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InfantryIdleLookAround
-  idleWaitTime: 10
+  idleWaitMin: 5
+  idleWaitMax: 15
   turnDuration: 1
   turnEase: 4
+--- !u!114 &-7998235431267461752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7069137052622472766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e93b575e9c7f7904f82e5e152532b8ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SharpshooterSkill
+  sniperDamage: 40
+  stealthDuration: 15
+  sniperShotSfx: {fileID: 0}
 --- !u!1 &8287700491229270693
 GameObject:
   m_ObjectHideFlags: 0

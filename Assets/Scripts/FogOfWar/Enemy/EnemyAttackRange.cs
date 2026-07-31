@@ -159,7 +159,12 @@ public class EnemyAttackRange : MonoBehaviour
         bool targetIsAir;
 
         if (target.TryGetComponent<UnitController>(out var playerUnit))
+        {
+            if (playerUnit.IsStealthed()) // 은신 유닛은 감지 자체를 못 한다 (doc/0323) - 포탑 조준도 GetTrackingTarget()을 거쳐 이 필터를 그대로 탄다
+                return false;
+
             targetIsAir = playerUnit.IsAirUnit();
+        }
         else if (target.TryGetComponent<BuildingController>(out var building))
             targetIsAir = building.IsLifted();
         else

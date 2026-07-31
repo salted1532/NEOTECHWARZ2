@@ -85,7 +85,9 @@ public class UserControl : MonoBehaviour
         Move,
         Patrol,
         Rally,
-        BuildingMove // 공중에 뜬 건물의 "이동" 버튼(M) 전용 - Move와 분리해야 HandleLeftClick에서 유닛용 MoveSelectedUnits와 섞이지 않는다
+        BuildingMove, // 공중에 뜬 건물의 "이동" 버튼(M) 전용 - Move와 분리해야 HandleLeftClick에서 유닛용 MoveSelectedUnits와 섞이지 않는다
+        SkillUnit,   // 지정형 액티브 스킬(단일 유닛) 대상 지정 대기 - 슬롯 6 클릭 후 진입 (doc/0323)
+        SkillGround  // 지정형 액티브 스킬(범위) 지점 지정 대기
     }
 
     [SerializeField]
@@ -266,6 +268,20 @@ public class UserControl : MonoBehaviour
                     return;
                 }
 
+                // 지정형 액티브 스킬(단일 유닛) 대상 확정 - A모드(Attack)와 동일한 자리, 동일한 패턴 (doc/0323)
+                if (UsercurrentState == OrderState.SkillUnit)
+                {
+                    rtsUnitController.ConfirmSkillUnitTarget(enemy.gameObject);
+                    enemy.FlashMarker();
+
+                    attackPointer.transform.position = enemy.transform.position;
+                    attackPointer.SetActive(true);
+
+                    UsercurrentState = OrderState.None;
+
+                    return;
+                }
+
                 pendingLeftClickSelect = () => { if (enemy != null) rtsUnitController.ClickSelectEnemy(enemy); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
@@ -351,6 +367,19 @@ public class UserControl : MonoBehaviour
         // 4. 땅 클릭 = 명령 처리
         if (clickedGround)
         {
+            // 지정형 액티브 스킬(범위) 지점 확정 (doc/0323) - 원형 범위 마커는 별도 제작 예정, 여기선 attackPointer 재사용
+            if (UsercurrentState == OrderState.SkillGround)
+            {
+                rtsUnitController.ConfirmSkillAreaTarget(groundHit.point);
+
+                attackPointer.transform.position = groundHit.point;
+                attackPointer.SetActive(true);
+
+                UsercurrentState = OrderState.None;
+
+                return;
+            }
+
             if (UsercurrentState == OrderState.Move)
             {
                 rtsUnitController.MoveSelectedUnits(groundHit.point);
@@ -725,8 +754,9 @@ public class UserControl : MonoBehaviour
                     mainCameraControl.JumpToWorldXZ(focusPosition);
                 }
 
-                // A/M/P로 들어간 "공격 위치/순찰/이동 위치 지정" 대기 모드에서만 빠져나온다 (Rally/BuildingMove는 그대로 유지)
-                if (UsercurrentState == OrderState.Attack || UsercurrentState == OrderState.Move || UsercurrentState == OrderState.Patrol)
+                // A/M/P/스킬 지정으로 들어간 "위치 지정" 대기 모드에서만 빠져나온다 (Rally/BuildingMove는 그대로 유지)
+                if (UsercurrentState == OrderState.Attack || UsercurrentState == OrderState.Move || UsercurrentState == OrderState.Patrol ||
+                    UsercurrentState == OrderState.SkillUnit || UsercurrentState == OrderState.SkillGround)
                 {
                     UsercurrentState = OrderState.None;
 
@@ -861,7 +891,7 @@ public class UserControl : MonoBehaviour
         if (!Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, layerGround))
             return;
 
-        if (UsercurrentState == OrderState.Attack)
+        if (UsercurrentState == OrderState.Attack || UsercurrentState == OrderState.SkillUnit || UsercurrentState == OrderState.SkillGround)
         {
             attackPointer.SetActive(true);
             movePointer.SetActive(false);
@@ -894,7 +924,8 @@ public class UserControl : MonoBehaviour
         bool commandPending =
             UsercurrentState == OrderState.Attack || UsercurrentState == OrderState.Move ||
             UsercurrentState == OrderState.Patrol || UsercurrentState == OrderState.Rally ||
-            UsercurrentState == OrderState.BuildingMove;
+            UsercurrentState == OrderState.BuildingMove ||
+            UsercurrentState == OrderState.SkillUnit || UsercurrentState == OrderState.SkillGround;
 
         CursorTarget target = GetHoveredTarget();
         Texture2D texture;

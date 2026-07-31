@@ -12,13 +12,30 @@ using static UnityEngine.GraphicsBuffer;
 // (UnitEffects가 이 값으로 총기/폭발형/레이저/화염 중 어떤 피격 이펙트를 재생할지 고른다).
 public enum AttackEffectType { Bullet, Explosive, Laser, Flame }
 
+// 액티브 스킬 발동 시 함께 넘어가는 대상 정보 (doc/0323). trait.targetType(None/SingleUnit/AreaGround)에 따라
+// unitTarget 또는 groundPoint 중 하나만 의미 있고, 자기 자신에게 쓰는 논타겟 스킬(None)은 Self를 그대로 쓴다.
+public readonly struct SkillActivationContext
+{
+    public readonly GameObject unitTarget;
+    public readonly Vector3 groundPoint;
+
+    public static readonly SkillActivationContext Self = new SkillActivationContext(null, default);
+
+    public SkillActivationContext(GameObject unitTarget, Vector3 groundPoint)
+    {
+        this.unitTarget = unitTarget;
+        this.groundPoint = groundPoint;
+    }
+}
+
 // 고급유닛이 특성(트레이트) 선택으로 얻은 액티브 스킬의 실제 효과를 구현하는 컴포넌트가 구현하는 인터페이스.
 // 유닛 프리팹에 이 인터페이스를 구현한 MonoBehaviour(예: GoliathSkill.cs)를 붙이기만 하면
 // UnitController.UseTraitSkill()이 자동으로 찾아서 호출한다 - UnitController/RTSUnitController를
 // 건드리지 않고도 유닛별 스킬을 새로 추가/교체할 수 있게 하기 위한 연결점 (doc/0228).
 public interface IUnitSkill
 {
-    void Activate(UnitController unit, RTSUnitController.TraitChoice trait);
+    // traitData: 지금 발동되는 스킬의 UnitTraitOption 자체(쿨다운/사거리/범위반경 등 수치를 그대로 참조할 수 있음).
+    void Activate(UnitController unit, RTSUnitController.TraitChoice trait, UnitTraitOption traitData, SkillActivationContext context);
 }
 
 // 개별 유닛(일꾼/전투유닛/공중유닛 포함)의 이동, 전투, 순찰, 자원 채취(일꾼 전용) 상태머신을 담당하는 핵심 컴포넌트.
@@ -213,6 +230,20 @@ public class UnitController : MonoBehaviour, IDestructible
     private RTSUnitController.TraitChoice currentTrait = RTSUnitController.TraitChoice.None;
     private float skillCooldownRemaining;
 
+    // 공격이 실제로 명중했을 때 발행되는 이벤트 (doc/0323) - 패시브 스킬(예: 스카이 랜서 "공중 강화")이
+    // UnitController/RTSUnitController를 건드리지 않고 이 이벤트만 구독해서 자기 효과를 붙일 수 있게 하기 위함.
+    public event System.Action<GameObject> OnAttackHit;
+
+    // ===== 은신 (doc/0323) - true면 EnemyAttackRange가 이 유닛을 감지 대상에서 제외한다 =====
+    private bool isStealthed;
+
+    // ===== 지정형 액티브 스킬(단일 유닛/범위) 이동-후-발동 대기 상태 (doc/0323) =====
+    private bool hasPendingSkillUnitOrder;
+    private GameObject pendingSkillUnitTarget;
+    private bool hasPendingSkillAreaOrder;
+    private Vector3 pendingSkillGroundTarget;
+    private UnitTraitOption pendingSkillTraitData;
+
     private void Awake()
     {
         isWorker = CompareTag("Worker");
@@ -330,6 +361,7 @@ public class UnitController : MonoBehaviour, IDestructible
         PatrolTick();
         AttackOrderTick();
         FriendlyAttackTick();
+        SkillOrderTick();
         FollowTick();
         BuildTick();
 
@@ -499,6 +531,11 @@ public class UnitController : MonoBehaviour, IDestructible
         attackMoveDestination = null;
         followTarget = null;
         hasFollowOrder = false;
+
+        // 이동/공격/스킬 등 다른 명령이 새로 들어오면 지정형 스킬(단일/범위) 이동-후-발동 대기도 함께 취소한다
+        // (doc/0323 - 새 명령마다 취소 코드를 따로 추가하지 않고 이 공용 취소 지점 하나만 고치면 전부 커버됨).
+        hasPendingSkillUnitOrder = false;
+        hasPendingSkillAreaOrder = false;
 
         GetComponent<UnitEffects>()?.StopAttackEffects(); // 이동/정지 등 다른 명령으로 공격이 취소되면 재생 중인 공격 이펙트도 즉시 정지
 
@@ -905,6 +942,10 @@ public class UnitController : MonoBehaviour, IDestructible
             GetComponent<UnitAudio>()?.PlayAttackSFX();
             GetComponent<LaserBeamAttack>()?.Fire(enemy.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0218)
             turretController?.FireRecoil(); // 포탑 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0219)
+
+            // 패시브 스킬(예: 스카이 랜서 "공중 강화" 도트)이 구독해서 쓰는 명중 이벤트 (doc/0323).
+            // 투사체 공격은 명중이 아니라 발사 시점에 발행되지만(기존 데미지 계산 시점과 동일), 실사용에 문제없다.
+            OnAttackHit?.Invoke(enemy);
         }
 
         alreadyAttacked = true;
@@ -1529,7 +1570,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // order panel 스킬 버튼(슬롯 6) 클릭/단축키로 호출되는 실제 진입점 (RTSUnitController.ActivateSkill 참고).
     // 이 유닛 프리팹에 IUnitSkill을 구현한 컴포넌트(유닛별 전용 스킬 스크립트)가 붙어있으면 그쪽에 위임하고,
     // 아직 그 유닛의 스킬이 구현되지 않았으면 로그만 남기고 아무 효과도 내지 않는다.
-    public void UseTraitSkill()
+    public void UseTraitSkill(UnitTraitOption traitData, SkillActivationContext context)
     {
         IUnitSkill skill = GetComponent<IUnitSkill>();
         if (skill == null)
@@ -1538,6 +1579,81 @@ public class UnitController : MonoBehaviour, IDestructible
             return;
         }
 
-        skill.Activate(this, currentTrait);
+        skill.Activate(this, currentTrait, traitData, context);
+    }
+
+    // ===== 은신 (doc/0323) =====
+    public bool IsStealthed() => isStealthed;
+    public void SetStealthed(bool value) => isStealthed = value;
+
+    // ===== 영구 스탯 가산 패시브 (doc/0323) - ApplyTrait()에서 유닛 타입별로 필요할 때 호출 =====
+    public void AddAttackDamageBonus(int amount) => attackDamage += amount;
+    public void AddArmorBonus(int amount) => armor += amount;
+    public void MultiplyAttackInterval(float multiplier) => timeBetweenAttacks *= multiplier; // 1보다 작으면 공격속도 증가
+
+    // ===== 지정형 액티브 스킬(단일 유닛/범위) - doc/0323 =====
+    // RTSUnitController.ConfirmSkillUnitTarget()이 호출. 대상이 스킬 전용 사거리(trait.skillRange) 안에
+    // 들어올 때까지 이동하다가, 도착하면 SkillOrderTick()이 자동으로 발동시킨다. CancelAttackOrder()를 먼저
+    // 호출해 기존 이동/공격/스킬 지시를 정리한 뒤 새로 지정한다.
+    public void MoveToUseSkillOnUnit(GameObject target, UnitTraitOption trait)
+    {
+        CancelAttackOrder();
+
+        hasPendingSkillUnitOrder = true;
+        pendingSkillUnitTarget = target;
+        pendingSkillTraitData = trait;
+
+        MoveAgentTo(target.transform.position);
+    }
+
+    // RTSUnitController.ConfirmSkillAreaTarget()이 호출. point는 이동 중 바뀌지 않는 고정 좌표(범위 지정형).
+    public void MoveToUseSkillOnArea(Vector3 point, UnitTraitOption trait)
+    {
+        CancelAttackOrder();
+
+        hasPendingSkillAreaOrder = true;
+        pendingSkillGroundTarget = point;
+        pendingSkillTraitData = trait;
+
+        MoveAgentTo(point);
+    }
+
+    // 사거리 안에 들어오면 스킬을 발동하고 그 순간 쿨다운을 시작한다(확정 사항 - 지정한 순간이 아니라
+    // 실제로 사용한 순간부터 쿨다운을 카운트해야 함).
+    private void SkillOrderTick()
+    {
+        if (hasPendingSkillUnitOrder)
+        {
+            if (pendingSkillUnitTarget == null) // 대상이 이동 중 파괴됨
+            {
+                hasPendingSkillUnitOrder = false;
+                return;
+            }
+
+            float dist = Vector3.Distance(transform.position, pendingSkillUnitTarget.transform.position);
+            if (dist > pendingSkillTraitData.skillRange)
+            {
+                MoveAgentTo(pendingSkillUnitTarget.transform.position); // 계속 추격 이동(대상이 움직이는 유닛일 수 있음)
+                return;
+            }
+
+            StopUnit();
+            UseTraitSkill(pendingSkillTraitData, new SkillActivationContext(pendingSkillUnitTarget, pendingSkillUnitTarget.transform.position));
+            StartSkillCooldown(pendingSkillTraitData.cooldown);
+            hasPendingSkillUnitOrder = false;
+            return;
+        }
+
+        if (hasPendingSkillAreaOrder)
+        {
+            float dist = Vector3.Distance(transform.position, pendingSkillGroundTarget);
+            if (dist > pendingSkillTraitData.skillRange)
+                return; // MoveAgentTo로 이미 그 지점으로 이동 중 - 도착할 때까지 대기
+
+            StopUnit();
+            UseTraitSkill(pendingSkillTraitData, new SkillActivationContext(null, pendingSkillGroundTarget));
+            StartSkillCooldown(pendingSkillTraitData.cooldown);
+            hasPendingSkillAreaOrder = false;
+        }
     }
 }
