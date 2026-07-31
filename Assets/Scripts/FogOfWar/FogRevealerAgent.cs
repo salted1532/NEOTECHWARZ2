@@ -9,8 +9,14 @@ public class FogRevealerAgent : MonoBehaviour
     [SerializeField] private int sightRange = 10;
     [SerializeField] private bool updateOnlyOnMove = true;
 
+    [Header("영토(점령지) 연동 - 건물 전용, 유닛은 기본값(꺼짐) 유지")]
+    [Tooltip("켜면 이 오브젝트가 아군 점령지 밖에 있을 때 시야가 unclaimedSightRange로 줄어든다.")]
+    [SerializeField] private bool shrinkSightOutsideAlliedTerritory = false;
+    [SerializeField] private int unclaimedSightRange = 2;
+
     private csFogWar fogWar;
     private csFogWar.FogRevealer fogRevealer;
+    private bool isInsideAlliedTerritory; // 마지막으로 등록에 반영한 영토 상태
 
     private void Start()
     {
@@ -24,8 +30,43 @@ public class FogRevealerAgent : MonoBehaviour
             return;
         }
 
-        fogRevealer = new csFogWar.FogRevealer(transform, sightRange, updateOnlyOnMove);
+        isInsideAlliedTerritory = !shrinkSightOutsideAlliedTerritory || TerritoryManager.IsInsideAlliedTerritory(transform.position);
+        RegisterRevealer(CurrentSightRange());
+    }
+
+    // 영토를 잃고/되찾을 때마다 재확인 - 건물은 제자리에 고정이라 매 프레임 검사해도 부담 없음
+    // (PlacementSystem/BaseStructure/UnitSpawner도 이미 같은 질의를 매 프레임 사용 중, doc/0142).
+    private void Update()
+    {
+        if (!shrinkSightOutsideAlliedTerritory || fogWar == null)
+            return;
+
+        bool nowInside = TerritoryManager.IsInsideAlliedTerritory(transform.position);
+        if (nowInside == isInsideAlliedTerritory)
+            return;
+
+        isInsideAlliedTerritory = nowInside;
+        ReplaceRevealer(CurrentSightRange());
+    }
+
+    private int CurrentSightRange() => isInsideAlliedTerritory ? sightRange : unclaimedSightRange;
+
+    private void RegisterRevealer(int range)
+    {
+        fogRevealer = new csFogWar.FogRevealer(transform, range, updateOnlyOnMove);
         fogWar.AddFogRevealer(fogRevealer);
+    }
+
+    // csFogWar.FogRevealer.sightRange는 setter가 없어 값을 못 바꾸므로, 기존 등록을 지우고
+    // 새 sightRange로 다시 등록하는 방식으로 우회한다 (에셋 파일은 건드리지 않음).
+    private void ReplaceRevealer(int range)
+    {
+        int currentIndex = fogWar._FogRevealers.IndexOf(fogRevealer);
+
+        if (currentIndex >= 0)
+            fogWar.RemoveFogRevealer(currentIndex);
+
+        RegisterRevealer(range);
     }
 
     private void OnDestroy()

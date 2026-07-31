@@ -45,6 +45,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -52,6 +55,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: 'Assault Trooper '
     <description>k__BackingField: 'train Assault Trooper
 
@@ -84,6 +90,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -91,6 +100,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: 'Scout Drone '
     <description>k__BackingField: 'train Scout Drone
 
@@ -123,6 +135,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -130,6 +145,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: 'Sharpshooter '
     <description>k__BackingField: 'train Sharpshooter
 
@@ -163,8 +181,11 @@ MonoBehaviour:
 '
       <icon>k__BackingField: {fileID: 69412130, guid: 3aa596ea8f3dbed42bd789652c09ec01, type: 3}
       <isActiveSkill>k__BackingField: 1
-      <shortcutKey>k__BackingField: 0
+      <shortcutKey>k__BackingField: 102
       <cooldown>k__BackingField: 5
+      <targetType>k__BackingField: 1
+      <skillRange>k__BackingField: 20
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: Cloak
       <description>k__BackingField: 'Enters stealth for 15 seconds, becoming untargetable
@@ -172,9 +193,12 @@ MonoBehaviour:
 
 '
       <icon>k__BackingField: {fileID: -1898799734, guid: 560099958e629904ea2b58c08ead564b, type: 3}
-      <isActiveSkill>k__BackingField: 0
-      <shortcutKey>k__BackingField: 0
+      <isActiveSkill>k__BackingField: 1
+      <shortcutKey>k__BackingField: 99
       <cooldown>k__BackingField: 5
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: 'Ranger IFV '
     <description>k__BackingField: 'train Ranger IFV
 
@@ -207,6 +231,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -214,6 +241,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: 'Pulasr Tank '
     <description>k__BackingField: 'train Pulasr Tank
 
@@ -246,6 +276,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -253,6 +286,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: SkyLancer
     <description>k__BackingField: 'train SkyLancer
 
@@ -285,7 +321,10 @@ MonoBehaviour:
       <icon>k__BackingField: {fileID: 69412130, guid: 3aa596ea8f3dbed42bd789652c09ec01, type: 3}
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
-      <cooldown>k__BackingField: 5
+      <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 'Ground Bombardment '
       <description>k__BackingField: 'Calls in an airstrike on a target area, dealing
@@ -294,8 +333,11 @@ MonoBehaviour:
 '
       <icon>k__BackingField: {fileID: -1898799734, guid: 560099958e629904ea2b58c08ead564b, type: 3}
       <isActiveSkill>k__BackingField: 1
-      <shortcutKey>k__BackingField: 0
+      <shortcutKey>k__BackingField: 103
       <cooldown>k__BackingField: 10
+      <targetType>k__BackingField: 2
+      <skillRange>k__BackingField: 20
+      <areaRadius>k__BackingField: 5
   - <unitName>k__BackingField: 'Firehawk '
     <description>k__BackingField: 'train Firehawk
 
@@ -328,6 +370,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -335,6 +380,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: 'Guardian Drone '
     <description>k__BackingField: 'train Guardian Drone
 
@@ -367,14 +415,20 @@ MonoBehaviour:
 
 '
       <icon>k__BackingField: {fileID: 69412130, guid: 3aa596ea8f3dbed42bd789652c09ec01, type: 3}
-      <isActiveSkill>k__BackingField: 0
-      <shortcutKey>k__BackingField: 0
+      <isActiveSkill>k__BackingField: 1
+      <shortcutKey>k__BackingField: 102
       <cooldown>k__BackingField: 5
+      <targetType>k__BackingField: 1
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 'Shield Deployment '
       <description>k__BackingField: Deploys an energy shield, granting 150 bonus
         health.
       <icon>k__BackingField: {fileID: -1898799734, guid: 560099958e629904ea2b58c08ead564b, type: 3}
-      <isActiveSkill>k__BackingField: 0
-      <shortcutKey>k__BackingField: 0
+      <isActiveSkill>k__BackingField: 1
+      <shortcutKey>k__BackingField: 98
       <cooldown>k__BackingField: 5
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0

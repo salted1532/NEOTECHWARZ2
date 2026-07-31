@@ -689,6 +689,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
   sightRange: 15
   updateOnlyOnMove: 1
+  shrinkSightOutsideAlliedTerritory: 1
+  unclaimedSightRange: 2
 --- !u!114 &3045924314032452492
 MonoBehaviour:
   m_ObjectHideFlags: 0
