@@ -149,8 +149,11 @@ public class PlacementSystem : MonoBehaviour
         if (!StructureData.CanPlaceObejctAt(gridPos, data.Size))
             return;
 
+        // 현재 선택된 일꾼은 장애물 판정에서 제외 - 일꾼이 서 있는 자리에도 건물을 지을 수 있게
+        UnitController worker = rtsController != null ? rtsController.GetSelectedWorker() : null;
+
         // ⭐ 유닛 체크 추가
-        if (IsBlocked(mousePos, data.Size))
+        if (IsBlocked(mousePos, data.Size, worker != null ? worker.gameObject : null))
             return;
 
         // ⭐ 자원(광물/가스)과 너무 가까우면 배치 불가
@@ -161,7 +164,6 @@ public class PlacementSystem : MonoBehaviour
         if (!IsInsideAlliedTerritory(gridPos, data.Size))
             return;
 
-        UnitController worker = rtsController != null ? rtsController.GetSelectedWorker() : null;
         if (worker == null)
             return; // 건설을 맡을 일꾼이 없으면 배치하지 않음
 
@@ -208,7 +210,7 @@ public class PlacementSystem : MonoBehaviour
         // 일꾼이 이동하는 동안(클릭 시점엔 비어있었지만) 그 자리에 유닛/건물/지형지물 같은 장애물이
         // 새로 생겼으면 건설 실패로 취급한다 - 그대로 겹쳐 짓지 않고 실패 음성 + 취소 + 환불 처리.
         // 담당 일꾼 자신은 지금 막 그 자리에 도착해서 서 있는 상태라, 장애물 판정에서 제외한다.
-        if (IsBlocked(groundPos, data.Size, worker.gameObject))
+        if (IsBlockedAtCenter(groundPos, data.Size, worker.gameObject))
         {
             worker.GetComponent<UnitAudio>()?.PlayBuildFailVoice();
             CancelReservedConstruction(gridPos, ghost);
@@ -382,11 +384,22 @@ public class PlacementSystem : MonoBehaviour
     // 그리드 셀 점유 체크(StructureData)와 별개로, 실제 3D 공간상의 충돌까지 추가로 막기 위한 검사다.
     // ignoreObject: 이 오브젝트(및 그 자식) 콜라이더는 장애물로 치지 않는다 - 건설 위치에 도착해서
     // 그 자리에 서 있는 담당 일꾼 자신이 장애물로 오인되지 않도록 하기 위함(doc/0268).
+    // worldPos: 아직 그리드에 스냅되지 않은 원시 좌표(마우스 위치 등) - 내부에서 셀을 역산해 중심을 구한다.
+    // 이미 GetGroundPosition() 등으로 중심정렬까지 끝낸 좌표는 여기 넣지 말고 IsBlockedAtCenter()를 써야 한다
+    // (다시 WorldToCell로 역산하면 3x3 이상 건물에서 한 칸 옆으로 오판정되는 버그가 있었음 - doc/0350).
     private bool IsBlocked(Vector3 worldPos, Vector2Int size, GameObject ignoreObject = null)
+    {
+        Vector3 center = GetPlacementWorldPosition(grid.WorldToCell(worldPos), size, worldPos.y);
+        return IsBlockedAtCenter(center, size, ignoreObject);
+    }
+
+    // groundCenter: 이미 건물 풋프린트의 기하학적 중심으로 계산된 좌표(GetGroundPosition의 반환값 등).
+    // 다시 WorldToCell로 역산하지 않고 그대로 사용한다 (doc/0350).
+    private bool IsBlockedAtCenter(Vector3 groundCenter, Vector2Int size, GameObject ignoreObject = null)
     {
         Vector3 cellSize = grid.cellSize;
 
-        Vector3 center = GetPlacementWorldPosition(grid.WorldToCell(worldPos), size, worldPos.y);
+        Vector3 center = groundCenter + Vector3.up * yOffset;
 
         // 인접 건물을 정확히 붙여 지을 때 지형 높이/그리드→월드 변환의 미세한 부동소수점 오차를 흡수할
         // 여유(예전 0.02는 이론상 계산으로는 붙여짓기가 통과해야 하는데도 실전에서 막히는 사례가 있었음).
@@ -495,8 +508,10 @@ public class PlacementSystem : MonoBehaviour
         {
             var data = database.buildingData[selectedObjectIndex];
 
+            UnitController worker = rtsController != null ? rtsController.GetSelectedWorker() : null;
+
             bool valid = StructureData.CanPlaceObejctAt(gridPos, data.Size)
-                && !IsBlocked(mousePos, data.Size)
+                && !IsBlocked(mousePos, data.Size, worker != null ? worker.gameObject : null)
                 && !IsTooCloseToResource(data.ID, gridPos, data.Size)
                 && IsInsideAlliedTerritory(gridPos, data.Size);
 
