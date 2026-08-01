@@ -193,7 +193,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4698038001367890631}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -330,6 +330,7 @@ MonoBehaviour:
   sizeType: 2
   canAttackGround: 1
   canAttackAir: 0
+  attackDelivery: 0
   bonusVersusArmorType: 0
   bonusVersusArmorPercent: 0
   flashInterval: 0.3

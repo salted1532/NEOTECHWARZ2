@@ -492,6 +492,14 @@ public class BuildingController : MonoBehaviour, IDestructible
     {
         CancelPendingLandingFlight(); // 착륙 위치로 비행 중(또는 착륙 직전)에 파괴되면 예약해둔 그리드 셀/고스트를 정리
 
+        // 지상에 서 있던 채로 파괴된 경우(리프트 중이 아니었던 경우) 자신이 점유하던 그리드 셀도 비워줘야 한다 -
+        // 안 그러면 파괴된 자리가 영원히 "점유됨"으로 남아 그 자리에 다시 건물을 지을 수 없게 된다.
+        if (hasGridPosition)
+        {
+            placementSystem?.ReleaseBuildingGrid(gridPosition);
+            hasGridPosition = false;
+        }
+
         rtsController?.RefundProductionQueue(ClearProductionQueue()); // 대기열에 남아있던 유닛들 환불
         rtsController?.RefundResearchQueue(this, ClearResearchQueue()); // 대기열에 남아있던 연구들 환불
         rtsController?.BuildingList.Remove(this);

@@ -164,9 +164,9 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         PointerEventData eventData = new PointerEventData(EventSystem.current);
 
         ExecuteEvents.Execute(gameObject, eventData, ExecuteEvents.pointerDownHandler);
+        ExecuteEvents.Execute(gameObject, eventData, ExecuteEvents.pointerClickHandler); // 콜백은 즉시 실행 - 눌림 비주얼만 지연시킨다
         yield return new WaitForSeconds(0.08f);
         ExecuteEvents.Execute(gameObject, eventData, ExecuteEvents.pointerUpHandler);
-        ExecuteEvents.Execute(gameObject, eventData, ExecuteEvents.pointerClickHandler);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

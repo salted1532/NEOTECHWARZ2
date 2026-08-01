@@ -39,6 +39,13 @@ public class UserControl : MonoBehaviour
     private GameObject attackPointer;
     private GameObject movePointer;
 
+    // 마커가 마지막으로 갱신된 뒤 이 시간(초)이 지나면 자동으로 사라진다. 조준 중(UpdatePointer가 매 프레임
+    // 마우스를 따라 갱신하는 동안)에는 매 프레임 같이 갱신되므로 타이머가 만료되지 않고, 명령이 확정된 뒤
+    // 더 이상 아무도 갱신하지 않는 시점부터 3초가 지나면 사라진다.
+    private const float PointerAutoHideDuration = 3f;
+    private float movePointerHideTime = float.NegativeInfinity;
+    private float attackPointerHideTime = float.NegativeInfinity;
+
     // 범위 지정형 스킬(SkillGround) 대기 중 마우스를 따라다니는 원형 범위 미리보기 (doc/0323 후속).
     // 지정 모드가 아니게 되면(확정/취소 등 모든 경로 공통) UpdatePointer()에서 정리된다.
     private RadiusIndicator skillAreaIndicator;
@@ -143,6 +150,34 @@ public class UserControl : MonoBehaviour
         DrawDragRectangle();
     }
 
+    // 명령 확정 시점(클릭)에 마커 하나를 켤 때 항상 반대쪽 마커를 함께 끈다 - 이동 명령 직후 바로
+    // 공격 명령을 내리는 등 빠르게 명령을 바꿔도 이전 마커가 꺼지지 않아 2개가 동시에 남는 버그를 막는다.
+    private void ShowMovePointer(Vector3 position)
+    {
+        movePointer.transform.position = position;
+        movePointer.SetActive(true);
+        attackPointer.SetActive(false);
+        movePointerHideTime = Time.time + PointerAutoHideDuration;
+    }
+
+    private void ShowAttackPointer(Vector3 position)
+    {
+        attackPointer.transform.position = position;
+        attackPointer.SetActive(true);
+        movePointer.SetActive(false);
+        attackPointerHideTime = Time.time + PointerAutoHideDuration;
+    }
+
+    // 마지막 갱신으로부터 PointerAutoHideDuration이 지난 마커를 자동으로 끈다.
+    private void UpdatePointerAutoHide()
+    {
+        if (movePointer.activeSelf && Time.time >= movePointerHideTime)
+            movePointer.SetActive(false);
+
+        if (attackPointer.activeSelf && Time.time >= attackPointerHideTime)
+            attackPointer.SetActive(false);
+    }
+
     private void Update()
     {
         //마우스 입력 관리
@@ -152,6 +187,9 @@ public class UserControl : MonoBehaviour
 
         // 입력 상황에 따라 포인터 생성
         UpdatePointer();
+
+        // 명령 확정 후 일정 시간이 지난 마커를 자동으로 숨김
+        UpdatePointerAutoHide();
 
         // 입력 상황에 따라 마우스 커서 아이콘 갱신
         UpdateCursor();
@@ -233,8 +271,7 @@ public class UserControl : MonoBehaviour
                     rtsUnitController.AttackFriendlySelectedUnits(unit);
                     unit.FlashMarker(); // 어느 아군이 공격 대상인지 마커 깜빡임으로 표시
 
-                    attackPointer.transform.position = unit.transform.position;
-                    attackPointer.SetActive(true);
+                    ShowAttackPointer(unit.transform.position);
 
                     UsercurrentState = OrderState.None;
 
@@ -247,8 +284,7 @@ public class UserControl : MonoBehaviour
                     rtsUnitController.ConfirmSkillUnitTarget(unit.gameObject);
                     unit.FlashMarker();
 
-                    attackPointer.transform.position = unit.transform.position;
-                    attackPointer.SetActive(true);
+                    ShowAttackPointer(unit.transform.position);
 
                     UsercurrentState = OrderState.None;
 
@@ -286,8 +322,7 @@ public class UserControl : MonoBehaviour
                     rtsUnitController.AttackSelectedUnits(enemy);
                     enemy.FlashMarker(); // 어느 적이 공격 대상인지 마커 깜빡임으로 표시
 
-                    attackPointer.transform.position = enemy.transform.position;
-                    attackPointer.SetActive(true);
+                    ShowAttackPointer(enemy.transform.position);
 
                     UsercurrentState = OrderState.None;
 
@@ -300,8 +335,7 @@ public class UserControl : MonoBehaviour
                     rtsUnitController.ConfirmSkillUnitTarget(enemy.gameObject);
                     enemy.FlashMarker();
 
-                    attackPointer.transform.position = enemy.transform.position;
-                    attackPointer.SetActive(true);
+                    ShowAttackPointer(enemy.transform.position);
 
                     UsercurrentState = OrderState.None;
 
@@ -323,8 +357,7 @@ public class UserControl : MonoBehaviour
                     rtsUnitController.AttackEnemyBuildingSelectedUnits(enemyBuilding);
                     enemyBuilding.FlashMarker(); // 어느 건물이 공격 대상인지 마커 깜빡임으로 표시
 
-                    attackPointer.transform.position = enemyBuilding.transform.position;
-                    attackPointer.SetActive(true);
+                    ShowAttackPointer(enemyBuilding.transform.position);
 
                     UsercurrentState = OrderState.None;
 
@@ -351,8 +384,7 @@ public class UserControl : MonoBehaviour
                     rtsUnitController.AttackFriendlyBuildingSelectedUnits(building);
                     building.FlashMarker(); // 어느 건물이 공격 대상인지 마커 깜빡임으로 표시
 
-                    attackPointer.transform.position = building.transform.position;
-                    attackPointer.SetActive(true);
+                    ShowAttackPointer(building.transform.position);
 
                     UsercurrentState = OrderState.None;
 
@@ -376,8 +408,7 @@ public class UserControl : MonoBehaviour
                     rtsUnitController.AttackFriendlyStructureSelectedUnits(baseStructure);
                     baseStructure.FlashMarker(); // 어느 구조체가 공격 대상인지 마커 깜빡임으로 표시
 
-                    attackPointer.transform.position = baseStructure.transform.position;
-                    attackPointer.SetActive(true);
+                    ShowAttackPointer(baseStructure.transform.position);
 
                     UsercurrentState = OrderState.None;
 
@@ -398,8 +429,7 @@ public class UserControl : MonoBehaviour
             {
                 rtsUnitController.ConfirmSkillAreaTarget(groundHit.point);
 
-                attackPointer.transform.position = groundHit.point;
-                attackPointer.SetActive(true);
+                ShowAttackPointer(groundHit.point);
 
                 UsercurrentState = OrderState.None;
 
@@ -412,8 +442,7 @@ public class UserControl : MonoBehaviour
 
                 UsercurrentState = OrderState.Move;
                 UpdatePointer();
-                movePointer.transform.position = groundHit.point;
-                movePointer.SetActive(true);
+                ShowMovePointer(groundHit.point);
 
                 UsercurrentState = OrderState.None;
 
@@ -424,8 +453,7 @@ public class UserControl : MonoBehaviour
             {
                 rtsUnitController.AttackGroundSelectedUnits(groundHit.point);
 
-                attackPointer.transform.position = groundHit.point;
-                attackPointer.SetActive(true);
+                ShowAttackPointer(groundHit.point);
 
                 UsercurrentState = OrderState.None;
 
@@ -436,8 +464,7 @@ public class UserControl : MonoBehaviour
             {
                 rtsUnitController.PatrolSelectedUnits(groundHit.point);
 
-                movePointer.transform.position = groundHit.point;
-                movePointer.SetActive(true);
+                ShowMovePointer(groundHit.point);
 
                 UsercurrentState = OrderState.None;
 
@@ -448,8 +475,7 @@ public class UserControl : MonoBehaviour
             {
                 rtsUnitController.SetRallySelectBuilding(groundHit.point);
 
-                movePointer.transform.position = groundHit.point;
-                movePointer.SetActive(true);
+                ShowMovePointer(groundHit.point);
 
                 UsercurrentState = OrderState.None;
 
@@ -460,8 +486,7 @@ public class UserControl : MonoBehaviour
             {
                 rtsUnitController.MoveSelectedLiftedBuilding(groundHit.point);
 
-                movePointer.transform.position = groundHit.point;
-                movePointer.SetActive(true);
+                ShowMovePointer(groundHit.point);
 
                 UsercurrentState = OrderState.None;
 
@@ -539,8 +564,7 @@ public class UserControl : MonoBehaviour
                 rtsUnitController.FollowSelectedUnits(unit);
                 unit.FlashMarker(); // 어느 아군을 따라갈지 마커 깜빡임으로 표시
 
-                movePointer.transform.position = unit.transform.position;
-                movePointer.SetActive(true);
+                ShowMovePointer(unit.transform.position);
 
                 return;
             }
@@ -561,15 +585,13 @@ public class UserControl : MonoBehaviour
                     rtsUnitController.AttackSelectedUnits(enemy);
                     enemy.FlashMarker(); // 어느 적이 공격 대상인지 마커 깜빡임으로 표시
 
-                    attackPointer.transform.position = enemy.transform.position;
-                    attackPointer.SetActive(true);
+                    ShowAttackPointer(enemy.transform.position);
                 }
                 else
                 {
                     rtsUnitController.MoveSelectedUnits(enemyHit.point);
 
-                    movePointer.transform.position = enemyHit.point;
-                    movePointer.SetActive(true);
+                    ShowMovePointer(enemyHit.point);
                 }
 
                 return;
@@ -586,15 +608,13 @@ public class UserControl : MonoBehaviour
                     rtsUnitController.AttackEnemyBuildingSelectedUnits(enemyBuilding);
                     enemyBuilding.FlashMarker(); // 어느 건물이 공격 대상인지 마커 깜빡임으로 표시
 
-                    attackPointer.transform.position = enemyBuilding.transform.position;
-                    attackPointer.SetActive(true);
+                    ShowAttackPointer(enemyBuilding.transform.position);
                 }
                 else
                 {
                     rtsUnitController.MoveSelectedUnits(enemyHit.point);
 
-                    movePointer.transform.position = enemyHit.point;
-                    movePointer.SetActive(true);
+                    ShowMovePointer(enemyHit.point);
                 }
 
                 return;
@@ -610,8 +630,7 @@ public class UserControl : MonoBehaviour
 
                 UsercurrentState = OrderState.Move;
                 UpdatePointer();
-                movePointer.transform.position = groundHit.point;
-                movePointer.SetActive(true);
+                ShowMovePointer(groundHit.point);
 
                 UsercurrentState = OrderState.None;
             }
@@ -626,8 +645,7 @@ public class UserControl : MonoBehaviour
 
                 UsercurrentState = OrderState.Rally;
                 UpdatePointer();
-                movePointer.transform.position = groundHit.point;
-                movePointer.SetActive(true);
+                ShowMovePointer(groundHit.point);
 
                 UsercurrentState = OrderState.None;
 
@@ -642,11 +660,11 @@ public class UserControl : MonoBehaviour
             if (building != null && rtsUnitController.IsUnitSelect())
             {
                 rtsUnitController.MoveToBuildingSelectedUnits(building);
+                building.FlashMarker(); // 어느 건물을 따라갈지/반납할지 마커 깜빡임으로 표시
 
                 UsercurrentState = OrderState.Move;
                 UpdatePointer();
-                movePointer.transform.position = building.transform.position;
-                movePointer.SetActive(true);
+                ShowMovePointer(building.transform.position);
 
                 UsercurrentState = OrderState.None;
             }
@@ -658,8 +676,7 @@ public class UserControl : MonoBehaviour
                 rtsUnitController.AssignBuilderToStructure(baseStructure);
                 baseStructure.FlashMarker();
 
-                movePointer.transform.position = baseStructure.transform.position;
-                movePointer.SetActive(true);
+                ShowMovePointer(baseStructure.transform.position);
             }
         }
 
@@ -679,8 +696,7 @@ public class UserControl : MonoBehaviour
                 {
                     rtsUnitController.MoveSelectedUnits(OreHit.point);
 
-                    movePointer.transform.position = OreHit.point;
-                    movePointer.SetActive(true);
+                    ShowMovePointer(OreHit.point);
                 }
             }
         }
@@ -701,8 +717,7 @@ public class UserControl : MonoBehaviour
                 {
                     rtsUnitController.MoveSelectedUnits(GasHit.point);
 
-                    movePointer.transform.position = GasHit.point;
-                    movePointer.SetActive(true);
+                    ShowMovePointer(GasHit.point);
                 }
             }
         }
@@ -936,6 +951,7 @@ public class UserControl : MonoBehaviour
             movePointer.SetActive(false);
 
             attackPointer.transform.position = hit.point;
+            attackPointerHideTime = Time.time + PointerAutoHideDuration; // 조준 중엔 매 프레임 갱신되어 타이머가 만료되지 않음
 
             if (UsercurrentState == OrderState.SkillGround)
             {
@@ -951,6 +967,7 @@ public class UserControl : MonoBehaviour
             attackPointer.SetActive(false);
 
             movePointer.transform.position = hit.point;
+            movePointerHideTime = Time.time + PointerAutoHideDuration; // 조준 중엔 매 프레임 갱신되어 타이머가 만료되지 않음
         }
         else
         {

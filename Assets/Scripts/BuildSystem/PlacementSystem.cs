@@ -388,7 +388,11 @@ public class PlacementSystem : MonoBehaviour
 
         Vector3 center = GetPlacementWorldPosition(grid.WorldToCell(worldPos), size, worldPos.y);
 
-        const float margin = 0.02f;
+        // 인접 건물을 정확히 붙여 지을 때 지형 높이/그리드→월드 변환의 미세한 부동소수점 오차를 흡수할
+        // 여유(예전 0.02는 이론상 계산으로는 붙여짓기가 통과해야 하는데도 실전에서 막히는 사례가 있었음).
+        // 그리드 셀 점유 체크(StructureData)가 실제 겹침은 이미 정확히 막으므로, 이 여유를 넉넉히 키워도
+        // 진짜 겹치는 배치가 통과할 위험은 없다.
+        const float margin = 0.1f;
 
         Vector3 halfExtents = new Vector3(
             size.x * cellSize.x * 0.5f - margin,

@@ -215,6 +215,11 @@ public class UnitController : MonoBehaviour, IDestructible
     // 움직이는 등) 정지→재이동을 반복하며 튕겨 들어가는 현상을 줄이기 위한 여유값이기도 하다.
     [SerializeField] private float airFollowStopMargin = 1f;
 
+    // ===== 건물 우클릭 = 계속 따라다니기 (건물이 리프트로 이동할 수 있으므로 한 번만 이동하지 않고 매 프레임
+    // 최신 위치를 쫓아간다 - FollowUnit/FollowTick과 동일한 패턴). =====
+    private BuildingController followBuildingTarget;
+    private bool hasFollowBuildingOrder;
+
     // ===== 건설 이동 (건설모드에서 위치 클릭 시 일꾼이 그 자리로 이동 후 완공) =====
     [SerializeField] private float buildInteractRange = 2f; // 건설 위치 도착 판정 거리 (gatherInteractRange와 동일한 이유)
     private Vector3 buildDestination;
@@ -295,6 +300,72 @@ public class UnitController : MonoBehaviour, IDestructible
         RTSUnitController.TraitChoice chosenTrait = rtsController.GetChosenTrait(unitID);
         if (chosenTrait != RTSUnitController.TraitChoice.None)
             ApplyTrait(chosenTrait);
+
+        // doc/0345 "헤비탱크/브루트메크/스카이랜서가 땅속에 박힌 것 같다" 조사용 진단 로그.
+        // EnemyUnitController에 이미 있는 것과 동일한 로직 - 원인이 확정되면 삭제해도 되는 임시 코드.
+        LogSpawnDiagnostics();
+    }
+
+    // 진단용: 유닛이 스폰될 때 위치(땅속에 박혔는지/떠있는지)와 렌더러/메쉬/셰이더가 실제로 로드됐는지를
+    // 한 번 로그로 남긴다. 빌드의 Debug.Log는 Player.log에 쌓인다
+    // (Windows: %USERPROFILE%\AppData\LocalLow\<회사명>\<제품명>\Player.log).
+    private void LogSpawnDiagnostics()
+    {
+        Vector3 pos = transform.position;
+        string groundInfo = "raycast-no-hit";
+
+        if (Physics.Raycast(new Vector3(pos.x, pos.y + 1000f, pos.z), Vector3.down, out RaycastHit hit, 2000f,
+            Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            groundInfo = $"groundY={hit.point.y:F2} deltaY(unit-ground)={pos.y - hit.point.y:F2} hitObject={hit.collider.name}";
+
+        Debug.Log($"[UnitDiag] {gameObject.name}(unitID={unitID}) pos={pos} {groundInfo}", this);
+
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        if (renderers.Length == 0)
+        {
+            Debug.LogWarning($"[UnitDiag] {gameObject.name}: 렌더러를 하나도 찾지 못함 (모델이 안 붙어있을 수 있음)", this);
+            return;
+        }
+
+        foreach (Renderer r in renderers)
+        {
+            string meshInfo = "mesh=(none)";
+            if (r is SkinnedMeshRenderer smr)
+                meshInfo = smr.sharedMesh != null ? $"mesh={smr.sharedMesh.name} verts={smr.sharedMesh.vertexCount}" : "mesh=NULL";
+            else if (r.TryGetComponent(out MeshFilter mf))
+                meshInfo = mf.sharedMesh != null ? $"mesh={mf.sharedMesh.name} verts={mf.sharedMesh.vertexCount}" : "mesh=NULL";
+
+            string materialInfo = "";
+            Material[] mats = r.sharedMaterials;
+            for (int i = 0; i < mats.Length; i++)
+            {
+                Material m = mats[i];
+                materialInfo += m == null ? $"[mat{i}=NULL] " : $"[mat{i} {DescribeMaterial(m)}] ";
+            }
+
+            Debug.Log(
+                $"[UnitDiag] {gameObject.name} renderer={r.gameObject.name} enabled={r.enabled} " +
+                $"bounds.center={r.bounds.center} bounds.size={r.bounds.size} {meshInfo} {materialInfo}",
+                r);
+        }
+    }
+
+    // 셰이더 이름/지원 여부뿐 아니라, 투명화의 실제 원인일 수 있는 URP Lit 서페이스 타입(_Surface: 0=Opaque,
+    // 1=Transparent)/알파클립/베이스컬러 알파값/활성 키워드까지 빌드 런타임에서 직접 확인한다 (doc/0344는
+    // 에디터에서 .mat 파일을 정적으로 읽어 이 값들이 정상임을 확인했는데, 빌드 런타임 인스턴스도 동일한지는
+    // 아직 확인 못 했음 - PropertyBlock이나 빌드 전용 경로로 달라질 가능성을 배제하기 위함).
+    private static string DescribeMaterial(Material m)
+    {
+        string shaderName = m.shader != null ? m.shader.name : "NULL";
+        bool isSupported = m.shader != null && m.shader.isSupported;
+
+        string surface = m.HasProperty("_Surface") ? m.GetFloat("_Surface").ToString() : "N/A";
+        string alphaClip = m.HasProperty("_AlphaClip") ? m.GetFloat("_AlphaClip").ToString() : "N/A";
+        string baseColorA = m.HasProperty("_BaseColor") ? m.GetColor("_BaseColor").a.ToString("F2") : "N/A";
+        string keywords = m.shaderKeywords.Length > 0 ? string.Join("|", m.shaderKeywords) : "(none)";
+
+        return $"shader={shaderName} isSupported={isSupported} renderQueue={m.renderQueue} " +
+            $"_Surface={surface} _AlphaClip={alphaClip} _BaseColor.a={baseColorA} keywords={keywords}";
     }
 
     // Update is called once per frame
@@ -373,6 +444,7 @@ public class UnitController : MonoBehaviour, IDestructible
         FriendlyAttackTick();
         SkillOrderTick();
         FollowTick();
+        FollowBuildingTick();
         BuildTick();
 
         if (isAirUnit)
@@ -403,10 +475,14 @@ public class UnitController : MonoBehaviour, IDestructible
             // 필요한 분리 거리 = 두 유닛 각자의 반경 합 (큰 유닛이 낀 페어일수록 더 멀리 떨어짐)
             float requiredDist = airUnitRadius + other.airUnitRadius;
 
-            if (dist > 0.001f && dist < requiredDist)
+            if (dist < requiredDist)
             {
                 float overlap = requiredDist - dist;
-                push += diff.normalized * overlap;
+                // 같은 건물을 따라가다 완전히 같은 좌표(dist≈0)에 겹친 경우 diff.normalized가 0벡터라
+                // 미는 힘도 영원히 0이 되어 절대 안 풀리는 문제가 있었다 - 이럴 땐 유닛 고유의(항상 같은)
+                // 방향으로라도 밀어서 겹침을 깨야 한다.
+                Vector3 pushDir = dist > 0.001f ? diff.normalized : StackedNudgeDirection();
+                push += pushDir * overlap;
             }
         }
 
@@ -415,6 +491,12 @@ public class UnitController : MonoBehaviour, IDestructible
             Vector3 step = push.normalized * Mathf.Min(push.magnitude, airSeparationSpeed * Time.deltaTime);
             transform.position += step;
         }
+    }
+
+    // 완전히 같은 좌표에 겹친 상대에게서 밀려날 때 쓸, 이 유닛 고유의 고정 방향 (인스턴스ID 기반이라 매 프레임 동일).
+    private Vector3 StackedNudgeDirection()
+    {
+        return Quaternion.Euler(0f, GetHashCode() % 360, 0f) * Vector3.forward;
     }
 
     public void SelectUnit()
@@ -517,17 +599,22 @@ public class UnitController : MonoBehaviour, IDestructible
 
     // 지상/공중 유닛 이동 로직을 한 곳으로 모은 헬퍼 (공격 명령 추적/재개 로직에서 반복 사용하기 위함).
     // destinationIsAirborne: destination이 이미 공중에 뜬 대상의 좌표인지 (공중 유닛에만 의미 있음).
-    private void MoveAgentTo(Vector3 destination, bool destinationIsAirborne = false)
+    // 반환값: 지상 유닛이 목적지로 실제 길을 잡는 데 성공했는지 (NavMeshAgent.SetDestination의 결과 그대로 - 목적지가
+    // NavMesh로 연결되지 않은 영역(맵이 끊긴 다른 구역 등)이면 조용히 false를 반환한다). 대부분의 호출부는 이 값을
+    // 무시해도 되지만, 실패를 감지 못하면 매 프레임 똑같이 실패하는 SetDestination만 반복하며 겉보기엔 그냥
+    // 멈춰있는 것처럼 보이는 경우가 있어(예: GatherTick의 반납 이동), 그런 곳에서는 반드시 확인해야 한다.
+    private bool MoveAgentTo(Vector3 destination, bool destinationIsAirborne = false)
     {
         if (!isAirUnit)
         {
             navMeshAgent.isStopped = false;
-            navMeshAgent.SetDestination(destination);
+            return navMeshAgent.SetDestination(destination);
         }
         else
         {
             targetPosition = AirTargetPosition(destination, destinationIsAirborne);
             isMovingAirUnit = true;
+            return true;
         }
     }
 
@@ -541,6 +628,8 @@ public class UnitController : MonoBehaviour, IDestructible
         attackMoveDestination = null;
         followTarget = null;
         hasFollowOrder = false;
+        followBuildingTarget = null;
+        hasFollowBuildingOrder = false;
 
         // 이동/공격/스킬 등 다른 명령이 새로 들어오면 지정형 스킬(단일/범위) 이동-후-발동 대기도 함께 취소한다
         // (doc/0323 - 새 명령마다 취소 코드를 따로 추가하지 않고 이 공용 취소 지점 하나만 고치면 전부 커버됨).
@@ -726,6 +815,63 @@ public class UnitController : MonoBehaviour, IDestructible
         }
 
         MoveAgentTo(followTarget.transform.position, followTarget.isAirUnit);
+    }
+
+    // ===== 건물 우클릭 = 계속 따라다니기 =====
+    // 건물은 리프트로 위치가 바뀔 수 있어서(일반 이동과 달리) 한 번만 이동시키지 않고 FollowUnit/FollowTick과
+    // 동일한 패턴으로 매 프레임 최신 위치를 쫓아간다. 자원을 든 일꾼의 반납 리다이렉트(MoveToBuilding 참고)는
+    // 이 메서드를 거치지 않는다 - 이건 "그냥 건물을 우클릭"했을 때(자원이 없거나 워커가 아닌 경우)만 쓰인다.
+    public void FollowBuilding(BuildingController building)
+    {
+        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+
+        CancelGatheringForNewCommand();
+        CancelAttackOrder();
+
+        followBuildingTarget = building;
+        hasFollowBuildingOrder = true;
+
+        arrived = false;
+        UnitcurrentState = UnitState.Idle; // Idle 유지 - AttackRange가 사거리 내 적을 자동으로 교전하게 함
+
+        MoveAgentTo(GetClosestSurfacePoint(building.transform));
+    }
+
+    // 건물 따라다니기를 매 프레임 갱신한다: 건물이 파괴되면 그 자리에 멈추고, 교전 중이면 이동 명령을 덮어쓰지
+    // 않으며, 건물 표면과 가까워지면 정지한다. 건물이 리프트로 움직이면 매 프레임 최신 위치로 계속 쫓아간다.
+    private void FollowBuildingTick()
+    {
+        if (!hasFollowBuildingOrder)
+            return;
+
+        if (followBuildingTarget == null)
+        {
+            hasFollowBuildingOrder = false;
+
+            arrived = true;
+            if (!isAirUnit)
+                navMeshAgent.ResetPath();
+            else
+                isMovingAirUnit = false;
+            return;
+        }
+
+        if (attackRange != null && attackRange.HasEnemyInRange)
+            return; // 교전 중이면 그대로 둔다 (AttackRange가 정지시킨 상태 유지)
+
+        Vector3 approachPoint = GetClosestSurfacePoint(followBuildingTarget.transform);
+        float sqrDist = (transform.position - approachPoint).sqrMagnitude;
+
+        if (sqrDist <= followStopMargin * followStopMargin)
+        {
+            if (!isAirUnit)
+                navMeshAgent.isStopped = true;
+            else
+                isMovingAirUnit = false;
+            return;
+        }
+
+        MoveAgentTo(approachPoint);
     }
 
     // 건설모드에서 건물 위치를 클릭했을 때 PlacementSystem이 호출한다.
@@ -1070,6 +1216,23 @@ public class UnitController : MonoBehaviour, IDestructible
         CancelGatheringForNewCommand();
         CancelAttackOrder();
 
+        // 자원을 든 채로 정지 명령을 받으면 그 자리에 멈춰 화물을 방치하는 대신 반납을 이어간다
+        // (Move/Attack처럼 플레이어가 명시적인 목적지를 지정한 명령과 달리, 정지는 목적지가 없으므로 충돌하지 않는다).
+        if (isWorker && IsCarryingResource())
+        {
+            ReturnCargo();
+            return;
+        }
+
+        HaltInPlace();
+    }
+
+    // 그 자리에 멈춰 Idle로 전환하는 실제 동작만 (StopUnit의 "화물 있으면 반납 재개" 판단 없이).
+    // CancelGathering()이 StopUnit()을 직접 부르면, "반납할 건물을 못 찾음"(CancelGathering 진입 조건) →
+    // StopUnit의 화물 재반납 리다이렉트 → ReturnCargo가 또 반납할 건물을 못 찾음 → CancelGathering() →
+    // StopUnit() → ... 무한 재귀(스택 오버플로우)에 빠지므로, 그 경로는 이 저수준 헬퍼만 사용해야 한다.
+    private void HaltInPlace()
+    {
         UnitcurrentState = UnitState.Idle;
 
         if (!isAirUnit)
@@ -1081,8 +1244,6 @@ public class UnitController : MonoBehaviour, IDestructible
             targetPosition = AirTargetPosition(transform.position, true); // 제자리 정지 - 현재 고도를 그대로 유지
             isMovingAirUnit = false;
         }
-
-
     }
     public void PatrolUnit(Vector3 end)
     {
@@ -1163,6 +1324,13 @@ public class UnitController : MonoBehaviour, IDestructible
         CancelGatheringForNewCommand();
         CancelAttackOrder();
 
+        // 자원을 든 채로 홀드 명령을 받으면 그 자리에 멈춰 화물을 방치하는 대신 반납을 이어간다 (StopUnit과 동일한 이유).
+        if (isWorker && IsCarryingResource())
+        {
+            ReturnCargo();
+            return;
+        }
+
         UnitcurrentState = UnitState.Attack;
 
         if (!isAirUnit)
@@ -1206,17 +1374,22 @@ public class UnitController : MonoBehaviour, IDestructible
             }
 
             patrolling = false;
-            MoveTo(depositTargetTransform.position);
-            gatherState = GatherState.MovingToBase;
+            MoveToDepositTargetOrWait();
             return;
         }
 
         // 대기열 확인은 도착한 뒤에 한다 (일단 이동부터 시작)
         patrolling = false;
         gatherTargetNode = node;
-        MoveTo(node.transform.position);
+        MoveTo(GetApproachPoint(node));
         gatherState = GatherState.MovingToResource;
     }
+
+    // 노드 "중심"이 아니라 지금 위치에서 가장 가까운 콜라이더 표면 지점을 목적지로 삼는다
+    // (SqrDistanceToTarget/AssignBuilderToStructure와 동일한 패턴). 자원 노드 여러 개가 가까이 붙어있을 때
+    // 전부 중심으로 몰리면 노드 사이 좁은 틈에 여러 일꾼이 겹쳐 멈추는 문제가 있었다 - 표면 접근점을 쓰면
+    // 각자 접근한 방향(바깥쪽)에서 자연히 멈추게 된다.
+    private Vector3 GetApproachPoint(ResourceNode node) => GetClosestSurfacePoint(node.transform);
 
     // 목표 노드에 도착했지만 대기열이 꽉 찼거나(혹은 목표 노드 자체가 사라졌을) 때,
     // 자신 기준 alternateResourceSearchRadius 이내에서 대기열 여유가 있는 다른 자원 노드를 찾아 그쪽으로 재이동한다.
@@ -1228,7 +1401,7 @@ public class UnitController : MonoBehaviour, IDestructible
             return false;
 
         gatherTargetNode = alt;
-        MoveTo(alt.transform.position);
+        MoveTo(GetApproachPoint(alt));
         gatherState = GatherState.MovingToResource;
         return true;
     }
@@ -1257,6 +1430,40 @@ public class UnitController : MonoBehaviour, IDestructible
 
     private bool IsCarryingResource() => DepositOre.activeSelf || DepositGas.activeSelf;
 
+    // depositTargetTransform(FindNearestDepositBuilding으로 이미 정해진 반납 대상)으로 이동을 시작한다.
+    // 대상 건물이 지금 리프트 중이면(공중에 떠 있어 NavMesh 위 점이 아님) 그 위치로 SetDestination을 걸지
+    // 않는다 - 공중의 한 점으로 길찾기를 시도하면 NavMeshAgent가 목적지를 못 찾고 그대로 멈춰버려서,
+    // 이후 다른 명령(자원 우클릭/건물 우클릭 등)을 내려도 다시 같은 방식으로 실패해 계속 안 움직이는
+    // 버그가 있었다. 리프트 중엔 그 자리에서 대기만 하고, GatherTick의 MovingToBase 케이스가 착륙을
+    // 감지하면 그때 실제 위치로 길을 잡는다.
+    private void MoveToDepositTargetOrWait()
+    {
+        BuildingController depositBuilding = depositTargetTransform.GetComponent<BuildingController>();
+        bool lifted = depositBuilding != null && depositBuilding.IsLifted();
+
+        // 진단용(doc/0345 "일꾼이 쌓이면 리턴을 아예 안 함" 조사) - 반납 시도 시점마다 대상/상태를 기록.
+        // 원인이 확정되면 삭제해도 되는 임시 코드.
+        Debug.Log($"[GatherDiag] {gameObject.name}: 반납 시작 target={depositBuilding?.name ?? depositTargetTransform.name} " +
+            $"lifted={lifted} targetPos={depositTargetTransform.position} myPos={transform.position}", this);
+
+        if (lifted)
+        {
+            if (!isAirUnit)
+                navMeshAgent.isStopped = true;
+        }
+        else
+        {
+            MoveTo(GetDepositApproachPoint());
+        }
+
+        gatherState = GatherState.MovingToBase;
+    }
+
+    // 반납 대상 건물의 "중심(피벗)"이 아니라 표면에서 가장 가까운 지점을 목적지로 삼는다 - GetApproachPoint()와
+    // 동일한 이유(doc/0345). 건물엔 대개 NavMeshObstacle이 붙어있어서 피벗 지점 자체가 그 장애물 구멍 안(NavMesh가
+    // 없는 영역)인 경우가 흔한데, 표면 지점은 항상 장애물 경계 바로 바깥이라 NavMesh 길찾기가 훨씬 안정적이다.
+    private Vector3 GetDepositApproachPoint() => GetClosestSurfacePoint(depositTargetTransform);
+
     // ===== Return Cargo 진입점 (UI "반환" 버튼) =====
     public void ReturnCargo()
     {
@@ -1274,31 +1481,52 @@ public class UnitController : MonoBehaviour, IDestructible
 
         patrolling = false;
         gatherTargetNode = null; // 고정 목적지 없음 신호 → Deposit()이 최근접 노드를 새로 찾게 함
-        MoveTo(depositTargetTransform.position);
-        gatherState = GatherState.MovingToBase;
+        MoveToDepositTargetOrWait();
     }
 
     // ===== 건물 우클릭 명령 =====
     // 일꾼이 자원을 들고 있으면 ReturnCargo()(반환 후 최근접 자원 채취)로 처리하고,
-    // 그 외(자원 없는 일꾼, 전투 유닛 등)에는 그냥 건물 위치로 이동만 한다.
+    // 그 외(자원 없는 일꾼, 전투 유닛 등)에는 건물을 계속 따라다닌다(FollowBuilding, doc/0345).
     public void MoveToBuilding(BuildingController building)
     {
         if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
 
         if (isWorker && IsCarryingResource())
         {
-            ReturnCargo();
+            // 클릭한 건물이 메인기지면 "가장 가까운 기지"를 다시 찾지 않고 그 건물로 직접 반납하러 간다 -
+            // 다른 메인기지가 더 가까이 있어도 사용자가 명시적으로 지정한 곳으로 보내기 위함.
+            if (building.CompareTag("MainBase"))
+                ReturnCargoTo(building);
+            else
+                ReturnCargo();
             return;
         }
 
-        MoveTo(building.transform.position);
+        FollowBuilding(building);
     }
 
-    // 채취 중단 + 그 자리에 멈춰서 Idle로 (반납 건물이 없거나, 채취 중이던 노드가 파괴된 경우 등)
+    // ReturnCargo()와 동일하지만 "가장 가까운 기지"를 다시 찾지 않고 인자로 받은 특정 건물을 그대로
+    // 반납 대상으로 삼는다 (메인기지 우클릭으로 명시적으로 지정한 경우 전용).
+    private void ReturnCargoTo(BuildingController building)
+    {
+        depositTargetTransform = building.transform;
+        patrolling = false;
+        gatherTargetNode = null;
+        MoveToDepositTargetOrWait();
+    }
+
+    // 채취 중단 + 그 자리에 멈춰서 Idle로 (반납 건물이 없거나, 채취 중이던 노드가 파괴된 경우 등).
+    // StopUnit()이 아니라 HaltInPlace()를 직접 호출한다 - 이유는 HaltInPlace() 주석 참고(무한 재귀 방지).
     private void CancelGathering()
     {
         gatherState = GatherState.None;
-        StopUnit();
+        CancelAttackOrder();
+        HaltInPlace();
+
+        // 반납할 메인기지를 아예 못 찾은 경우(전부 파괴됐거나 하나도 없음) - 화물을 든 채 멈췄다는 뜻이라
+        // 재현/원인 파악용으로 남겨둔다.
+        if (isWorker && IsCarryingResource())
+            Debug.LogWarning($"[GatherDiag] {gameObject.name}: 반납할 메인기지를 찾지 못해 화물을 든 채 정지함", this);
     }
 
     // 이동/공격/정지 등 다른 명령이 들어와서 채취를 중단시킬 때 호출 (반경만 원상복구, Idle 전환은 각 명령이 알아서 함)
@@ -1403,12 +1631,39 @@ public class UnitController : MonoBehaviour, IDestructible
                         return;
                     }
 
-                    MoveTo(depositTargetTransform.position);
-                    gatherState = GatherState.MovingToBase;
+                    MoveToDepositTargetOrWait();
                 }
                 break;
 
             case GatherState.MovingToBase:
+                BuildingController depositBuilding = depositTargetTransform.GetComponent<BuildingController>();
+                if (depositBuilding != null && depositBuilding.IsLifted())
+                {
+                    // 반납 대상 건물이 공중에 뜬 동안은 도달할 수 없으므로 제자리에서 착륙을 기다린다.
+                    if (!isAirUnit)
+                        navMeshAgent.isStopped = true;
+                    break;
+                }
+
+                // 건물이 착륙/재배치 등으로 움직였을 수 있으니, 목적지가 바뀌었을 때만 다시 길을 잡는다.
+                // (표면 접근점 기준 - GetDepositApproachPoint() 참고, 건물 피벗은 NavMeshObstacle 구멍 안일 수 있음)
+                Vector3 depositApproachPoint = GetDepositApproachPoint();
+                if (isAirUnit || (navMeshAgent.destination - depositApproachPoint).sqrMagnitude > 0.01f)
+                {
+                    if (!MoveAgentTo(depositApproachPoint) && !isAirUnit)
+                    {
+                        // 표면 접근점으로도 실패하면 진짜로 NavMesh가 끊긴 영역(맵이 끊긴 다른 구역으로 건물이
+                        // 재배치된 경우 등)이라는 뜻 - SetDestination이 조용히 실패하고 navMeshAgent.destination이
+                        // 자기 위치 근처로 되돌아가버려서, 위의 "목적지가 바뀌었을 때만" 조건이 매 프레임 다시
+                        // 참이 되어 똑같이 실패하는 시도를 영원히 반복하며 겉보기엔 그냥 멈춰있는 것처럼 보이는
+                        // 버그가 있었다. 실패를 감지하면 무한 재시도 대신 화물을 든 채로 그 자리에 멈춘다
+                        // (반납 대상을 아예 못 찾은 경우와 동일 처리).
+                        Debug.LogWarning($"[GatherDiag] {gameObject.name}: 반납 목적지에 길을 못 찾음(NavMesh 미연결 추정) target={depositApproachPoint}", this);
+                        CancelGathering();
+                        return;
+                    }
+                }
+
                 if (SqrDistanceToTarget(depositTargetTransform) <= gatherInteractRange * gatherInteractRange)
                 {
                     if (!isAirUnit)
@@ -1426,6 +1681,9 @@ public class UnitController : MonoBehaviour, IDestructible
 
     private void Deposit()
     {
+        // 진단용(doc/0345) - 반납이 실제로 완료되는지 확인. 원인이 확정되면 삭제해도 되는 임시 코드.
+        Debug.Log($"[GatherDiag] {gameObject.name}: 반납 완료 amount={carryingAmount} type={carryingType}", this);
+
         // gatherTargetNode는 채취 도중(또는 자신의 채취로) 이미 파괴됐을 수 있어서
         // 타입 판정은 여기서 다시 gatherTargetNode를 참조하지 않고 미리 캐싱해둔 carryingType을 사용
         if (carryingType == ResourceType.Ore)
@@ -1459,13 +1717,33 @@ public class UnitController : MonoBehaviour, IDestructible
     // 건물처럼 콜라이더가 큰 대상은 피벗(중심)이 아니라 표면(가장 가까운 지점) 기준으로 거리 판정 (제곱 거리로 반환)
     private float SqrDistanceToTarget(Transform target)
     {
-        if (target.TryGetComponent<Collider>(out var col))
-            return (transform.position - col.ClosestPoint(transform.position)).sqrMagnitude;
-
-        return (transform.position - target.position).sqrMagnitude;
+        return (transform.position - GetClosestSurfacePoint(target)).sqrMagnitude;
     }
 
+    // 콜라이더가 있는 대상은 "중심(피벗)"이 아니라 표면에서 가장 가까운 지점을 돌려준다 - 건물처럼 콜라이더가
+    // 큰 대상(및 NavMeshObstacle이 붙어있어 피벗 자체가 장애물 구멍 안일 수 있는 대상)에 대한 이동 목적지/거리
+    // 판정을 전부 이 헬퍼 하나로 통일한다 (자원 채취 접근, 반납 이동, 건물 따라다니기 공용).
+    private Vector3 GetClosestSurfacePoint(Transform target)
+    {
+        if (target.TryGetComponent<Collider>(out var col))
+            return col.ClosestPoint(transform.position);
+
+        return target.position;
+    }
+
+    // 착륙해서 실제로 도달 가능한 메인기지를 우선한다. 전부 공중에 떠 있으면(착륙한 곳이 하나도 없으면)
+    // 그중 가장 가까운 곳을 그대로 목표로 잡아, GatherTick의 MovingToBase가 착륙할 때까지 대기하다가
+    // 착륙하면 자동으로 반납을 재개하게 한다 (메인기지가 리프트 중이라 반납 자체가 막혀버리는 것 방지).
     private Transform FindNearestDepositBuilding()
+    {
+        BuildingController nearest = FindNearestMainBase(requireLanded: true);
+        if (nearest == null)
+            nearest = FindNearestMainBase(requireLanded: false);
+
+        return nearest != null ? nearest.transform : null;
+    }
+
+    private BuildingController FindNearestMainBase(bool requireLanded)
     {
         BuildingController nearest = null;
         float nearestSqrDist = float.MaxValue;
@@ -1474,6 +1752,7 @@ public class UnitController : MonoBehaviour, IDestructible
         {
             if (building == null) continue;
             if (!building.CompareTag("MainBase")) continue; // 메인기지에만 반납
+            if (requireLanded && building.IsLifted()) continue;
 
             float sqrDist = (building.transform.position - transform.position).sqrMagnitude;
             if (sqrDist < nearestSqrDist)
@@ -1483,7 +1762,7 @@ public class UnitController : MonoBehaviour, IDestructible
             }
         }
 
-        return nearest != null ? nearest.transform : null;
+        return nearest;
     }
 
     public void Die()

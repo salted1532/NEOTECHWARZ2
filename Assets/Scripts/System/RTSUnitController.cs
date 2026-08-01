@@ -276,11 +276,12 @@ public class RTSUnitController : MonoBehaviour
     // (SelectUnit()이 IsBuildMode() 중엔 새 선택을 막으므로, 건설모드에 있는 한 selectedUnitList는 그대로 유지된다)
     public UnitController GetSelectedWorker()
     {
-        if (selectedUnitList.Count == 0)
-            return null;
-
-        UnitController unit = selectedUnitList[0];
-        return unit != null && unit.CompareTag("Worker") && !unit.IsConstructing() ? unit : null;
+        foreach (UnitController unit in selectedUnitList)
+        {
+            if (unit != null && unit.CompareTag("Worker") && !unit.IsConstructing())
+                return unit;
+        }
+        return null;
     }
 
     // BaseStructure(건설 중단된 건물 기반) 우클릭: 선택된 일꾼을 보내 붙여서 건설을 재개시킨다.

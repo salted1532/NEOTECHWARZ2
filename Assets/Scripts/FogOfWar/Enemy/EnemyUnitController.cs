@@ -137,6 +137,76 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         // 씬에 직접 배치됐든 나중에 스포너를 거쳐 생성됐든, 항상 자기 enemyUnitID로 OC Unit Data SO를
         // 조회해서 스스로 스탯(체력/공격력/이름 등)을 적용한다 (UnitController.Start()와 동일한 패턴).
         ApplyUnitData(rtsController != null ? rtsController.GetEnemyUnitData(enemyUnitID) : null);
+
+        // doc/0344/0345 "빌드에서만 헤비탱크/브루트 메크가 투명하게 보임" 조사용 진단 로그.
+        // 원인이 확정되면 이 호출과 아래 LogSpawnDiagnostics()는 삭제해도 된다.
+        LogSpawnDiagnostics();
+    }
+
+    // 진단용: 유닛이 스폰될 때 위치(땅속에 박혔는지)와 렌더러/메쉬/셰이더가 실제로 로드됐는지를 한 번 로그로 남긴다.
+    // 빌드에서만 재현되는 문제라 에디터에서는 값이 전부 정상으로 보였으므로(doc/0344), 실제 빌드에서 이
+    // 로그를 확인해야 한다 - 빌드의 Debug.Log는 Player.log에 쌓인다
+    // (Windows: %USERPROFILE%\AppData\LocalLow\<회사명>\<제품명>\Player.log).
+    private void LogSpawnDiagnostics()
+    {
+        Vector3 pos = transform.position;
+        string groundInfo = "raycast-no-hit";
+
+        // QueryTriggerInteraction.Ignore가 필요하다 - EnemyAttackRange의 감지용 CapsuleCollider(트리거)가
+        // 유닛 자신을 감싸고 있어서, 이걸 무시하지 않으면 실제 지형이 아니라 자기 자신의 감지 범위 콜라이더에
+        // 먼저 맞아 완전히 엉뚱한(터무니없이 먼) 높이값이 나온다.
+        if (Physics.Raycast(new Vector3(pos.x, pos.y + 1000f, pos.z), Vector3.down, out RaycastHit hit, 2000f,
+            Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            groundInfo = $"groundY={hit.point.y:F2} deltaY(unit-ground)={pos.y - hit.point.y:F2} hitObject={hit.collider.name}";
+
+        Debug.Log($"[UnitDiag] {enemyName}(enemyUnitID={enemyUnitID}) pos={pos} {groundInfo}", this);
+
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        if (renderers.Length == 0)
+        {
+            Debug.LogWarning($"[UnitDiag] {enemyName}: 렌더러를 하나도 찾지 못함 (모델이 안 붙어있을 수 있음)", this);
+            return;
+        }
+
+        foreach (Renderer r in renderers)
+        {
+            string meshInfo = "mesh=(none)";
+            if (r is SkinnedMeshRenderer smr)
+                meshInfo = smr.sharedMesh != null ? $"mesh={smr.sharedMesh.name} verts={smr.sharedMesh.vertexCount}" : "mesh=NULL";
+            else if (r.TryGetComponent(out MeshFilter mf))
+                meshInfo = mf.sharedMesh != null ? $"mesh={mf.sharedMesh.name} verts={mf.sharedMesh.vertexCount}" : "mesh=NULL";
+
+            string materialInfo = "";
+            Material[] mats = r.sharedMaterials;
+            for (int i = 0; i < mats.Length; i++)
+            {
+                Material m = mats[i];
+                materialInfo += m == null ? $"[mat{i}=NULL] " : $"[mat{i} {DescribeMaterial(m)}] ";
+            }
+
+            Debug.Log(
+                $"[UnitDiag] {enemyName} renderer={r.gameObject.name} enabled={r.enabled} " +
+                $"bounds.center={r.bounds.center} bounds.size={r.bounds.size} {meshInfo} {materialInfo}",
+                r);
+        }
+    }
+
+    // 셰이더 이름/지원 여부뿐 아니라, 투명화의 실제 원인일 수 있는 URP Lit 서페이스 타입(_Surface: 0=Opaque,
+    // 1=Transparent)/알파클립/베이스컬러 알파값/활성 키워드까지 빌드 런타임에서 직접 확인한다 (doc/0344는
+    // 에디터에서 .mat 파일을 정적으로 읽어 이 값들이 정상임을 확인했는데, 빌드 런타임 인스턴스도 동일한지는
+    // 아직 확인 못 했음 - PropertyBlock이나 빌드 전용 경로로 달라질 가능성을 배제하기 위함).
+    private static string DescribeMaterial(Material m)
+    {
+        string shaderName = m.shader != null ? m.shader.name : "NULL";
+        bool isSupported = m.shader != null && m.shader.isSupported;
+
+        string surface = m.HasProperty("_Surface") ? m.GetFloat("_Surface").ToString() : "N/A";
+        string alphaClip = m.HasProperty("_AlphaClip") ? m.GetFloat("_AlphaClip").ToString() : "N/A";
+        string baseColorA = m.HasProperty("_BaseColor") ? m.GetColor("_BaseColor").a.ToString("F2") : "N/A";
+        string keywords = m.shaderKeywords.Length > 0 ? string.Join("|", m.shaderKeywords) : "(none)";
+
+        return $"shader={shaderName} isSupported={isSupported} renderQueue={m.renderQueue} " +
+            $"_Surface={surface} _AlphaClip={alphaClip} _BaseColor.a={baseColorA} keywords={keywords}";
     }
 
     private void Update()

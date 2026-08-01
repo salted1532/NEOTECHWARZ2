@@ -68,7 +68,13 @@ public class ResourceManager : MonoBehaviour
     {
         if (currentOre < oreCost) return false;
         if (currentGas < gasCost) return false;
-        if (currentPopulation + populationCost > GetMaxPopulation()) return false;
+
+        // populationCost가 0인 요청(건물 건설 등 인구수를 아예 쓰지 않는 항목)은 인구수 여유와 무관하게
+        // 항상 허용한다 - 이 체크가 populationCost와 무관하게 "현재 인구수(currentPopulation)가 이미
+        // 한도를 넘었는지"만 봐서, 인구수가 초과된 상태(예: 유닛을 많이 잃어서 22/10)에서는 인구수를
+        // 전혀 쓰지 않는 건물 건설까지 "자원 부족"으로 막혀버리는 버그가 있었다.
+        if (populationCost > 0 && currentPopulation + populationCost > GetMaxPopulation())
+            return false;
 
         return true;
     }
