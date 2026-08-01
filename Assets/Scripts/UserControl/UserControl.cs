@@ -421,77 +421,11 @@ public class UserControl : MonoBehaviour
             }
         }
 
-        // 4. 땅 클릭 = 명령 처리
-        if (clickedGround)
+        // 4. 땅 클릭 = 명령 처리 (미니맵 클릭에서도 재사용 - ConfirmPendingOrderAt 참고, doc/0349)
+        if (clickedGround && HasPendingGroundOrder())
         {
-            // 지정형 액티브 스킬(범위) 지점 확정 (doc/0323) - 원형 범위 마커는 별도 제작 예정, 여기선 attackPointer 재사용
-            if (UsercurrentState == OrderState.SkillGround)
-            {
-                rtsUnitController.ConfirmSkillAreaTarget(groundHit.point);
-
-                ShowAttackPointer(groundHit.point);
-
-                UsercurrentState = OrderState.None;
-
-                return;
-            }
-
-            if (UsercurrentState == OrderState.Move)
-            {
-                rtsUnitController.MoveSelectedUnits(groundHit.point);
-
-                UsercurrentState = OrderState.Move;
-                UpdatePointer();
-                ShowMovePointer(groundHit.point);
-
-                UsercurrentState = OrderState.None;
-
-                return;
-            }
-
-            if (UsercurrentState == OrderState.Attack)
-            {
-                rtsUnitController.AttackGroundSelectedUnits(groundHit.point);
-
-                ShowAttackPointer(groundHit.point);
-
-                UsercurrentState = OrderState.None;
-
-                return;
-            }
-
-            if (UsercurrentState == OrderState.Patrol)
-            {
-                rtsUnitController.PatrolSelectedUnits(groundHit.point);
-
-                ShowMovePointer(groundHit.point);
-
-                UsercurrentState = OrderState.None;
-
-                return;
-            }
-
-            if (UsercurrentState == OrderState.Rally)
-            {
-                rtsUnitController.SetRallySelectBuilding(groundHit.point);
-
-                ShowMovePointer(groundHit.point);
-
-                UsercurrentState = OrderState.None;
-
-                return;
-            }
-
-            if (UsercurrentState == OrderState.BuildingMove)
-            {
-                rtsUnitController.MoveSelectedLiftedBuilding(groundHit.point);
-
-                ShowMovePointer(groundHit.point);
-
-                UsercurrentState = OrderState.None;
-
-                return;
-            }
+            ConfirmPendingOrderAt(groundHit.point);
+            return;
         }
 
         // 5. 광물 클릭 = 선택 처리
@@ -621,35 +555,10 @@ public class UserControl : MonoBehaviour
             }
         }
 
-        // 2. 땅 클릭 = 명령 처리
+        // 2. 땅 클릭 = 명령 처리 (미니맵 클릭에서도 재사용 - IssueRightClickMoveAt 참고, doc/0349)
         if (clickedGround)
         {
-            if (rtsUnitController.IsUnitSelect())
-            {
-                rtsUnitController.MoveSelectedUnits(groundHit.point);
-
-                UsercurrentState = OrderState.Move;
-                UpdatePointer();
-                ShowMovePointer(groundHit.point);
-
-                UsercurrentState = OrderState.None;
-            }
-
-            if (rtsUnitController.IsBuildingSelect())
-            {
-                // 선택된 건물이 공중에 떠 있으면 공중유닛처럼 그 지점으로 이동시키고, 지상 건물이면 기존처럼 랠리 포인트를 지정한다.
-                if (rtsUnitController.IsSelectedBuildingLifted())
-                    rtsUnitController.MoveSelectedLiftedBuilding(groundHit.point);
-                else
-                    rtsUnitController.SetRallySelectBuilding(groundHit.point);
-
-                UsercurrentState = OrderState.Rally;
-                UpdatePointer();
-                ShowMovePointer(groundHit.point);
-
-                UsercurrentState = OrderState.None;
-
-            }
+            IssueRightClickMoveAt(groundHit.point);
         }
 
         // 건물 우클릭
@@ -720,6 +629,98 @@ public class UserControl : MonoBehaviour
                     ShowMovePointer(GasHit.point);
                 }
             }
+        }
+    }
+
+    // ===== 미니맵 명령용 공용 진입점 (doc/0349) =====
+    // MinimapController가 미니맵 클릭에서 계산한 지면 좌표를 넘겨 호출한다 - 메인 화면의 땅 클릭 처리와
+    // 완전히 같은 로직을 타므로, 여기서 되는 모든 명령(이동/A공격-이동/순찰/랠리/건물이동)이 미니맵에서도
+    // 자동으로 똑같이 동작하고 마커도 동일하게 표시된다.
+
+    // 지금 "위치 지정 대기 중"(A/M/P/Y 등으로 커맨드를 누르고 땅 클릭을 기다리는 상태)인지.
+    // 미니맵 좌클릭이 카메라 이동 대신 이 대기 중인 명령을 확정할지 판단하는 데 쓰인다.
+    public bool HasPendingGroundOrder()
+    {
+        return UsercurrentState == OrderState.Move
+            || UsercurrentState == OrderState.Attack
+            || UsercurrentState == OrderState.Patrol
+            || UsercurrentState == OrderState.Rally
+            || UsercurrentState == OrderState.BuildingMove
+            || UsercurrentState == OrderState.SkillGround;
+    }
+
+    // 대기 중인 명령(이동/A공격-이동/순찰/랠리/건물이동/지정형 범위 스킬)을 groundPoint에 확정한다.
+    // HandleLeftClick()의 "4. 땅 클릭 = 명령 처리"와 동일한 내용 - 메인 화면 땅 클릭과 미니맵 클릭이 공유한다.
+    public void ConfirmPendingOrderAt(Vector3 groundPoint)
+    {
+        if (UsercurrentState == OrderState.SkillGround)
+        {
+            rtsUnitController.ConfirmSkillAreaTarget(groundPoint);
+            ShowAttackPointer(groundPoint);
+            UsercurrentState = OrderState.None;
+            return;
+        }
+
+        if (UsercurrentState == OrderState.Move)
+        {
+            rtsUnitController.MoveSelectedUnits(groundPoint);
+            ShowMovePointer(groundPoint);
+            UsercurrentState = OrderState.None;
+            return;
+        }
+
+        if (UsercurrentState == OrderState.Attack)
+        {
+            rtsUnitController.AttackGroundSelectedUnits(groundPoint);
+            ShowAttackPointer(groundPoint);
+            UsercurrentState = OrderState.None;
+            return;
+        }
+
+        if (UsercurrentState == OrderState.Patrol)
+        {
+            rtsUnitController.PatrolSelectedUnits(groundPoint);
+            ShowMovePointer(groundPoint);
+            UsercurrentState = OrderState.None;
+            return;
+        }
+
+        if (UsercurrentState == OrderState.Rally)
+        {
+            rtsUnitController.SetRallySelectBuilding(groundPoint);
+            ShowMovePointer(groundPoint);
+            UsercurrentState = OrderState.None;
+            return;
+        }
+
+        if (UsercurrentState == OrderState.BuildingMove)
+        {
+            rtsUnitController.MoveSelectedLiftedBuilding(groundPoint);
+            ShowMovePointer(groundPoint);
+            UsercurrentState = OrderState.None;
+            return;
+        }
+    }
+
+    // 대기 중인 명령이 없을 때의 "그냥 우클릭 = 이동/랠리" 처리. HandleRightClick()의
+    // "2. 땅 클릭 = 명령 처리"와 동일한 내용 - 메인 화면 우클릭과 미니맵 우클릭이 공유한다.
+    public void IssueRightClickMoveAt(Vector3 groundPoint)
+    {
+        if (rtsUnitController.IsUnitSelect())
+        {
+            rtsUnitController.MoveSelectedUnits(groundPoint);
+            ShowMovePointer(groundPoint);
+        }
+
+        if (rtsUnitController.IsBuildingSelect())
+        {
+            // 선택된 건물이 공중에 떠 있으면 공중유닛처럼 그 지점으로 이동시키고, 지상 건물이면 기존처럼 랠리 포인트를 지정한다.
+            if (rtsUnitController.IsSelectedBuildingLifted())
+                rtsUnitController.MoveSelectedLiftedBuilding(groundPoint);
+            else
+                rtsUnitController.SetRallySelectBuilding(groundPoint);
+
+            ShowMovePointer(groundPoint);
         }
     }
 
