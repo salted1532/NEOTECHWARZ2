@@ -14,6 +14,9 @@ public class UserControl : MonoBehaviour
     private LayerMask layerUnit;
     [SerializeField]
     private LayerMask layerGround;
+
+    public LayerMask GroundLayerMask => layerGround; // 미니맵 클릭의 지형 레이캐스트에서 재사용 (doc/0355)
+
     [SerializeField]
     private LayerMask layerEnemy;
     [SerializeField]
@@ -235,6 +238,9 @@ public class UserControl : MonoBehaviour
         // 우클릭 시
         if (Input.GetMouseButtonDown(1))
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
+
             HandleRightClick();
         }
     }

@@ -64,6 +64,15 @@ public class MinimapController : MonoBehaviour, IPointerClickHandler, IDragHandl
         float v = (localPoint.y - rect.yMin) / rect.height;
 
         Ray ray = minimapCamera.ViewportPointToRay(new Vector3(u, v, 0f));
+
+        // 실제 지형 콜라이더에 레이캐스트해서 진짜 지면 높이를 구한다 - 메인 화면 클릭(UserControl)과 동일한 방식 (doc/0355).
+        if (userControl != null && Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, userControl.GroundLayerMask))
+        {
+            groundPoint = hit.point;
+            return true;
+        }
+
+        // 지형 콜라이더를 못 맞춘 경우(맵 밖 등)에 대한 안전망
         Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
 
         if (!groundPlane.Raycast(ray, out float distance))
