@@ -191,9 +191,24 @@ public class CameraControl : MonoBehaviour
         if (groundLayer == 0)
             return 0;
 
-        Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-        if (!Physics.Raycast(ray, out RaycastHit hit, 2000f, groundLayer))
-            return 0;
+        // 화면 중앙을 향한 원근 레이 대신 카메라 XZ 바로 위에서 수직으로 쏜다.
+        // 원근 레이는 카메라 Y가 바뀌면 착지 지점도 같이 밀리기 때문에, 언덕 경계에서
+        // "Y가 판정을 바꾸고 판정이 다시 Y를 바꾸는" 루프가 생겨 -5/+5가 반복되어 버렸다.
+        // 수직 레이는 판정 지점이 카메라 XZ에만 묶여 있어 Y가 바뀌어도 결과가 그대로다.
+        //
+        // X/Z는 맵 경계로 클램프한다: HandleRotate()의 Q/E 궤도 회전은 targetPosition을
+        // minX/maxX/minZ/maxZ로 재클램프하지 않아 화면 가장자리에서 회전하면 카메라가 잠깐
+        // 맵 밖으로 나갈 수 있는데, 수직 레이는 그 상태에서 허공을 가리켜 판정에 실패한다.
+        // 맵 안쪽 가장 가까운 지점으로 클램프해서 이 경우에도 항상 지형을 맞히게 한다.
+        float sampleX = Mathf.Clamp(targetPosition.x, minX, maxX);
+        float sampleZ = Mathf.Clamp(targetPosition.z, minZ, maxZ);
+        Vector3 origin = new Vector3(sampleX, 1000f, sampleZ);
+
+        // 레이가 지형을 못 맞히면(맵 밖 등 지형이 없는 지점) 0단(지상)으로 되돌리지 않고
+        // 직전까지 확정돼 있던 단을 그대로 유지한다 - 지형이 없다고 갑자기 지상 취급해서
+        // Y가 튀는 것을 막기 위함.
+        if (!Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 2000f, groundLayer))
+            return currentTerrainTier;
 
         for (Transform t = hit.transform; t != null; t = t.parent)
         {
