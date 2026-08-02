@@ -23,11 +23,11 @@ Assets/
 │  ├─ Audio/            # 사운드 전담 싱글턴(SoundManager), 유닛/건물 사운드 재생 컴포넌트(UnitAudio/BuildingAudio), 랜덤 재생 클립 묶음(SoundClipSet)
 │  ├─ Building/        # 건물 컨트롤러, 건설 중 건물 기반(BaseStructure)
 │  ├─ BuildSystem/      # 건물 배치 시스템 (그리드, 미리보기, 입력)
-│  ├─ Camera/           # RTS 카메라/미니맵 이동·조작, 지형 티어별 줌 범위 보정, 미니맵 시야 사각형 표시
-│  ├─ CaptureSystem/    # 거점 점령(밀당식 Ally↔Neutral↔Enemy 순환) + 다각형 영토 판정(TerritoryZone/TerritoryManager)
-│  ├─ Effects/          # 공격/이동/피격/사망/건물 이착륙/건설 이펙트 재생 시스템(EffectPlayer 등)
-│  ├─ Enemy/            # 적 유닛 컨트롤러 (마커/스탯 데이터만, AI 로직은 미구현)
-│  ├─ FogOfWar/         # 전장의 안개(csFogWar) 연동 어댑터 — 유닛/건물 시야 소스 등록(FogRevealerAgent), 점령 영토 강제 시야 확보(TerritoryFogReveal)
+│  ├─ Camera/           # RTS 카메라/미니맵 이동·조작(명령까지 확장), 지형 티어별 줌 범위 보정, 미니맵 시야 사각형 표시, 공격받은 위치 미니맵 마커(MinimapAlertController)
+│  ├─ CaptureSystem/    # 거점 점령(밀당식 Ally↔Neutral↔Enemy 순환, 완전 점령 되돌리기/재점령 2배속/방치 시 감쇠) + 다각형 영토 판정(TerritoryZone/TerritoryManager)
+│  ├─ Effects/          # 공격/이동/피격/사망/건물 이착륙/건설 이펙트 재생 시스템(EffectPlayer 등), 안개에 가려진 위치면 스폰 자체를 건너뜀
+│  ├─ FogOfWar/         # 전장의 안개(csFogWar) 연동 어댑터 — 유닛/건물 시야 소스 등록(FogRevealerAgent), 점령 영토 강제 시야 확보(TerritoryFogReveal), 안개 상태 조회 공용 헬퍼(FogVisibility)
+│  │  └─ Enemy/         # 적 유닛/건물 컨트롤러(EnemyUnitController/EnemyBuildingController) — 마커·미니맵 아이콘·체력 데이터 + 기초 AI(자동 교전/이동/공격-이동), 안개에 가려지면 미니맵 마커 숨김·선택 자동 해제
 │  ├─ Resource/         # 자원 노드 및 자원 관리 (`ResourceController.cs`는 미사용 빈 스텁)
 │  ├─ ScriptableObject/ # 유닛/건물 데이터 정의(SO)
 │  ├─ System/           # RTS 유닛 통합 컨트롤 시스템
@@ -74,10 +74,13 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `LaserBeamAttack` | 레이저 공격 유닛 전용 옵셔널 컴포넌트 — firePoint~대상을 매 프레임 월드 좌표로 잇는 재사용 빔(순수 시각효과, 데미지는 이미 적용된 뒤) | [doc](Docs/LaserBeamAttack.md) |
 | `ProjectileAttack` | 투사체 공격 유닛 전용 옵셔널 컴포넌트 — 발사마다 투사체를 생성해 대상을 추적, 명중 시점에 데미지 적용, 여러 firePoints 동시발사 지원 | [doc](Docs/ProjectileAttack.md) |
 | `CameraControl` | RTS 시점 카메라 이동/줌 — 지형 티어(`Layer1`/`Layer2` 태그) 감지로 언덕마다 줌 범위·현재 높이 자동 보정 | [doc](Docs/CameraControl.md) |
-| `MinimapController` | 미니맵 표시 및 클릭 시 카메라 이동 | [doc](Docs/MinimapController.md) |
+| `MinimapController` | 미니맵 표시, 클릭/드래그 시 카메라 이동, 대기 중인 명령이 있으면 미니맵 클릭으로 확정, 우클릭 시 선택된 유닛/건물에 명령(이동/랠리) | [doc](Docs/MinimapController.md) |
 | `MinimapViewIndicator` | 메인 카메라 시야를 미니맵 위에 반투명 사각형으로 표시, 줌/회전에 따라 매 프레임 크기·위치 자동 갱신(미니맵 밖으로 안 나가게 클리핑) | [doc](Docs/MinimapViewIndicator.md) |
-| `EnemyController` | 적 유닛 선택/마커/스탯 데이터 (AI 로직은 미구현) | [doc](Docs/EnemyController.md) |
-| `CaptureSystem` | 거점 점령 — 트리거 범위 내 아군/적 유닛 수에 따라 부호 있는 점령치를 밀당, 양쪽 다 있으면 교착, Ally↔Neutral↔Enemy 3단계 순환 전환(항상 Neutral 경유), 진행 중일 때만 점령바 노출 | [doc](doc/0146-tug-of-war-capture-cycle-implementation.md) |
+| `MinimapAlertController` | 아군 유닛/건물이 적에게 공격받아 경고음이 실제로 재생되는 순간(10초 쿨다운 통과 시)에만, 공격받은 위치 Y=40에 3D 마커(`Attacked_MiniMapPointer`)를 스폰하고 3초 뒤 자동 파괴 | [doc](Docs/MinimapAlertController.md) |
+| `FogVisibility` | 월드 좌표가 지금 안개에 가려져 있는지(Revealed/PreviouslyRevealed면 보임) 조회하는 공용 정적 헬퍼 — 미니맵 마커/체력바/점령 타이머/이펙트 스폰이 전부 이걸 통해 안개 속에서 숨겨짐 | [doc](Docs/FogVisibility.md) |
+| `EnemyUnitController` | 적 유닛 컨트롤러(구 `EnemyController`, doc/0231에서 개명) — 선택/마커/스탯뿐 아니라 자동 교전·이동·공격-이동까지 담당하는 단순 AI, 미니맵 마커/체력바가 안개 속에서 자동으로 숨겨지고 안개에 가려지면 선택도 자동 해제됨 | [doc](Docs/EnemyUnitController.md) |
+| `EnemyBuildingController` | 적 건물 "껍데기" — 체력/선택/미니맵 마커만 있고 실제 생산 큐는 없음(캠페인 전용 배치형), 안개에 가려지면 미니맵 마커가 숨겨지고 선택도 자동 해제 | [doc](Docs/EnemyBuildingController.md) |
+| `CaptureSystem` | 거점 점령 — 트리거 범위 내 아군/적 유닛 수에 따라 부호 있는 점령치를 밀당, 양쪽 다 있으면 교착, 완전 점령을 되돌리려면 1배속으로 30초+30초, 한 번도 완전 점령된 적 없는 상태에서 반대 진영 진행치를 지우는 중이면 2배속, 방치 시 완전 점령이면 원래 소유자 쪽으로 회복·중립 진행중이면 0으로 감쇠(3초 후 바 자동 숨김), 점령 타이머가 안개에 가려진 위치면 숨겨짐 | [doc](Docs/CaptureSystem.md) |
 | `TerritoryZone` | 인스펙터에서 핀(꼭짓점) 개수만 늘리면 자동 생성되는 다각형 영토 범위(오목 다각형도 판정 가능), 소유자에 따라 외곽선 색이 흰색/초록/빨강으로 자동 전환 | [doc](doc/0133-territoryzone-implementation.md) |
 | `TerritoryManager` | 씬의 모든 `TerritoryZone`을 등록해 특정 좌표가 아군 영토 안인지 한 번에 질의(여러 영토가 겹치면 합집합) | [doc](doc/0141-territory-restriction-implementation-design.md) |
 | `FogRevealerAgent` | 유닛/건물에 부착해 `csFogWar`에 자신을 시야 소스로 등록/해제하는 어댑터(기존 컨트롤러는 건드리지 않음) | [doc](doc/0166-fogofwar-folder-and-eye-script-design.md) |
@@ -104,7 +107,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `GlobalVoiceBankSO` | 유닛/건물에 안 묶이는 전역 나레이션(자원/인구 부족, 피격 경고, 업그레이드 완료) 에셋 | [doc](Docs/GlobalVoiceBankSO.md) |
 | `SoundSettingsPanel` | 볼륨 슬라이더/뮤트 토글 UI 로직 (SoundManager API 연결, 실제 Canvas 배치는 미완료) | [doc](Docs/SoundSettingsPanel.md) |
 
-> 문서 칸이 `doc/NNNN-...` 형식인 스크립트(`DamageMultiplierTableSO`, `CaptureSystem`~`TerritoryFogReveal`, `EffectPlayer`~`AutoRotate` 등)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
+> 문서 칸이 `doc/NNNN-...` 형식인 스크립트(`DamageMultiplierTableSO`, `TerritoryZone`~`TerritoryFogReveal`, `EffectPlayer`~`AutoRotate` 등)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
 
 ### 유닛/건물 수치 문서
 
@@ -141,7 +144,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 
 1. [Unity Hub](https://unity.com/download)에서 **Unity 6000.4.8f1** 버전을 설치합니다.
 2. 저장소를 클론한 뒤 Unity Hub에서 프로젝트 폴더를 엽니다.
-3. `Assets/Scenes/SampleScene`을 실행하여 플레이합니다.
+3. `Assets/Scenes/MainScene`(Play/Option/Exit 메인 메뉴)에서 시작하거나, `Assets/Scenes/SampleScene`을 바로 실행하여 플레이합니다.
 
 ## 구현 완료 기능
 
@@ -184,7 +187,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 유닛 생산 대기열(최대 5개, 순차 진행) + 진행률 표시
 - [x] 생산 대기열 UI(슬롯 5개, 클릭 시 해당 인덱스 취소 후 재출력)
 - [x] 대기열 항목 취소 + 취소 시 자원 환불
-- [x] 생산 렐리 포인트(집결지) 설정
+- [x] 생산 렐리 포인트(집결지) 설정 — 생산 건물 패널 고정 슬롯(6번)에 랠리 버튼(단축키 Y), 누르면 M(이동)처럼 위치 지정 대기 모드로 들어가고 클릭한 위치가 집결지로 확정(건물 우클릭과 동일 동작). 생산 건물을 선택하는 순간 자기 랠리 포인트 위치에 기존 이동 명령 포인터가 잠깐(3초) 표시됨
 - [x] 건설 중 건물 기반(`BaseStructure`) — 건설시간에 비례해 체력이 차오르고, 담당 일꾼이 없으면(사망 등) 자동 일시정지, 다른 일꾼을 우클릭으로 투입하면 재개. 건설 중 입은 피해는 완공된 건물의 체력으로 그대로 이어짐
 - [x] 건설 취소(전액 환불) — `BaseStructure` 선택 시 Info Panel의 취소 버튼/단축키(T)
 - [x] 건설 현장으로 이동 중(아직 `BaseStructure` 생성 전) 다른 명령으로 취소되거나 담당 일꾼이 사망해도 건물 가격 전액 환불
@@ -215,6 +218,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 
 ### 점령 / 영토
 - [x] 거점 점령 시스템(`CaptureSystem`) — 트리거 범위 내 아군/적 유닛 수에 따라 점령치 밀당, 양쪽 다 있으면 교착, Ally↔Neutral↔Enemy 3단계 순환(항상 Neutral 경유), 진행 중일 때만 점령바 노출, 인스펙터 `debugOwner`로 테스트 가능
+- [x] 점령 진행치 감쇠/재점령 시스템 — 완전 점령된 거점을 되돌리려면 1배속으로 30초(중립까지)+30초(내 것까지), 그 30초 동안은 계속 이전 소유자 색으로 보이다가 정확히 중립을 지나는 순간에만 전환(`Owner`가 경계 통과 시에만 sticky하게 바뀜). 한 번도 완전 점령된 적 없는 상태(중립 진행중)에서 반대 진영 진행치를 지우는 중이면 자연 감쇠+미는 힘이 겹쳐 2배속. 방치 시 완전 점령 거점은 원래 소유자 쪽으로 서서히 회복, 중립 진행중이던 거점은 0으로 줄어들며 바가 자동으로 사라짐 — 슬라이더 값은 절댓값 하나로 통일해 "꽉 참→줄어듦→반대쪽으로 다시 차오름"이 끊김없이 이어짐
+- [x] 점령 타이머 슬라이더도 안개에 가려진 위치면 표시 안 함(`FogVisibility`)
 - [x] 다각형 영토(`TerritoryZone`) — 인스펙터 핀 개수 조절만으로 자동 생성/정리, 오목 다각형 판정 가능, 소유자별 외곽선 색 자동 전환(흰/초록/빨강), 여러 영토 등록/질의(`TerritoryManager`, 겹치면 합집합)
 - [x] 영토 기반 게임플레이 제한 — 건물 배치는 그리드 칸 전부가 아군 영토 안일 때만 가능(프리뷰 자동 빨간색), 자원 채취는 영토 밖 노드 신규 채취 불가 + 채취 중 영토 상실 시 즉시 중단, 유닛 생산은 영토 밖이면 대기열 유지한 채 타이머만 정지, 건설 진행(`BaseStructure`)도 영토 밖이면 일시정지
 
@@ -238,8 +243,14 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 커맨드/생산 버튼 호버 툴팁(`TooltipUI`), 제목만 있을 때 배경 크기 자동 축소(컴팩트 모드)
 - [x] 미니맵 + 미니맵 클릭 시 카메라 이동
 - [x] 미니맵 시야 사각형 표시(`MinimapViewIndicator`) — 메인 카메라가 보고 있는 지면 영역을 반투명 사각형으로 표시, 줌/회전에 따라 매 프레임 자동 갱신 + 미니맵 밖으로 안 나가게 클리핑
+- [x] 미니맵으로 유닛/건물에 명령 — 대기 중인 명령(A공격 등)이 있으면 미니맵 클릭으로 그 자리에 확정, 우클릭 시 선택된 유닛/건물에 일반 우클릭과 동일한 명령(이동/랠리) 실행. 미니맵 클릭은 실제 지형 콜라이더에 레이캐스트해서 지면 높이를 구함(메인 화면 클릭과 동일 방식)
+- [x] 미니맵 색상 마커 — 아군 유닛(초록 원)/적 유닛(빨간 원)/아군 건물(초록 사각형)/적 건물(빨간 사각형) 전용 스프라이트를 유닛/건물 머리 위(Y40~50대)에 배치, 안개(`csFogWar`)가 실제 3D Plane(Y≈1)이라 이렇게 높이 뜬 오브젝트는 깊이 테스트로 안 가려지는 문제가 있어 `FogVisibility`로 안개 상태를 직접 조회해 켜고 끔(적 유닛/건물만 해당 — 아군은 자기 시야로 항상 보임)
+- [x] 공격받으면 미니맵에 표시 — 아군 유닛/건물이 적에게 공격받아 경고음이 실제로 재생되는 순간(10초 쿨다운을 통과했을 때)에만 공격받은 위치 Y=40에 3D 마커(`Attacked_MiniMapPointer`)가 뜨고 3초 뒤 자동 사라짐(`MinimapAlertController`)
+- [x] 선택한 적이 안개 속으로 들어가면 선택 자동 해제(유닛/건물 모두) — 마커 토글과 같은 안개 조회 결과를 공유해서 매 프레임 중복 조회 안 함
+- [x] UI가 인게임 마우스 클릭을 관통하도록 — Unity 내장 `Graphic.raycastTarget`을 끄면 되는 기능(새 코드 불필요), 0스테이지 미션 목표 텍스트(`StageObject`)에 적용해서 그 위를 클릭해도 게임 월드 클릭이 그대로 통과
 - [x] 카메라 이동/확대 — 지형 티어(태그 기반) 감지로 언덕마다 줌 범위·현재 높이 자동 보정
 - [x] 상단 자원 UI(광물/가스/인구수 실시간 표시)
+- [x] 메인 화면(`MainScene`) — Play/Option/Exit 메인 메뉴, Option 패널에 사운드 설정 연결(`MainMenuController`)
 - [x] 커맨드 패널 버튼별 키보드 단축키 + 눌림 시각 효과(아래 "키보드 단축키" 참고)
 - [x] 유닛/건물별 체력바 UI — `HealthManager`의 `Slider` 필드가 체력 변화에 맞춰 자동 갱신, `HealthBarBillboard`로 카메라의 X(피치)만 따라 회전(Y/Z 고정)
 - [x] 부대지정 단축키(컨트롤 그룹) — `Ctrl+숫자` 저장, `Shift+숫자` 병합 추가, 숫자만 눌러 선택
@@ -252,19 +263,19 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 명령/선택 확인음 전용 단일 채널 — 재생 중이면 새 요청을 버리고 끝난 뒤부터 재생(연속 명령 시 소리가 겹치지 않음)
 - [x] 동시다발 SFX/Voice 스팸 방지 — 같은 사운드가 짧은 시간 내 재요청되면 무시(최소 재생 간격), 동시 재생 개수 상한 초과 시 무시(여러 유닛이 한 프레임에 공격/사망해도 소리가 무제한으로 안 겹침)
 - [x] "적에게 공격받음" 경고음이 아군사격(오인사격)에는 울리지 않음 — 공격자 진영 정보(`isEnemyAttacker`)가 데미지 이벤트를 타고 끝까지 전달됨
-- [x] 볼륨 슬라이더/뮤트 토글 UI 로직(`SoundSettingsPanel`) — `SoundManager` API 연결까지 완료, 실제 Canvas/슬라이더/토글 배치는 아직 미완료(그동안 `SoundManager` 인스펙터에서 직접 조절)
+- [x] 볼륨 슬라이더/뮤트 토글 UI(`SoundSettingsPanel`) — `SoundManager` API 연결 + `MainScene`의 "Option" 패널에 실제 배치 완료
 
 ## 로드맵 (미구현)
 
 - [ ] 사망 시 래그돌/사망 애니메이션 — 현재는 사망 즉시 `Destroy(gameObject)` + 파티클 스폰만 지원(옵션 A), 오브젝트를 유지한 채 애니메이션 재생 후 지연 파괴하는 구조(옵션 B, doc/0105 3.5절)는 미구현
-- [ ] Enemy AI 구현 — `EnemyUnitController`는 현재 마커/아이콘/공격력·방어력 데이터만 갖고 있고, 실제로 공격하거나 이동하는 AI 로직은 없음(플레이어 유닛이 일방적으로 공격하는 대상), 1대1 AI도 별도 구상 필요
+- [ ] Enemy AI 고도화 — `EnemyUnitController`에 기초적인 AI(사거리 내 자동 교전, 이동, 공격-이동)는 이미 구현돼 있지만, 건물 배치/유닛 생산/다중 유닛 조율 같은 전략적 판단을 내리는 AI 디렉터는 아직 없음(현재 적 유닛/건물은 씬에 미리 배치되는 방식). 1대1(플레이어 vs AI 진영) 대전용 AI도 별도 구상 필요
 - [ ] 건물 고유 스킬 추가 — 유닛 고급 특성(스킬 선택)처럼 건물 전용 고유 스킬은 아직 기획/구현 전
-- [ ] 메인 화면, 설정창 UI — 현재 씬은 `SampleScene`/`TestScene`뿐, 별도 메뉴 씬 없음. 볼륨 설정 로직(`SoundSettingsPanel`)은 준비돼 있지만 실제 화면 레이아웃은 미구현
-- [ ] 볼륨 설정 UI 실제 배치 — `SoundSettingsPanel`의 슬라이더 4개/토글 3개를 담을 Canvas를 아직 씬에 만들지 않음
 - [ ] UI 버튼 하단 이미지 등 비주얼 개선
 - [ ] `AttackRange`의 자동 사거리 탐지가 `BaseStructure`(건설 중인 건물)를 대상으로 삼는 경로 — 현재는 A 모드 강제 공격(오인사격 포함)으로만 공격 가능하고, 자동 교전 대상에는 포함되지 않음
-- [ ] 캠페인 맵/스테이지 구성 — 0~5 메인 스테이지 + 서브 스테이지 약 4개 기획 예정, `Mission2~5` 프리팹은 존재하지만 아직 어느 씬에서도 사용되지 않음(1스테이지 `Mission1`만 분위기 확인용 프로토타입으로 사용 중)
+- [ ] 캠페인 맵/스테이지 구성 — 0~5 메인 스테이지 + 서브 스테이지 약 4개 기획 예정, `Mission2~5` 프리팹은 존재하지만 아직 어느 씬에서도 사용되지 않음(1스테이지 `Mission1`만 분위기 확인용 프로토타입으로 사용 중), 스테이지 사이 브리핑룸도 미구현
 - [ ] 지원기(Support Ship) 유닛 — 공격 없이 주변 아군 버프를 주는 티어3 유닛으로 구상 중, 프리팹/SO 데이터/버프 시스템 전부 미착수
+- [ ] 점령지(거점) 미니맵 마커 — 유닛/건물은 미니맵에 원/사각형으로 표시되지만, 거점(`CaptureSystem`)은 아직 전용 미니맵 마커(노란 원 예정)가 없음
+- [ ] 사운드 콘텐츠 보강 — 유닛별 사망 사운드, 건물 선택/이착륙/파괴 사운드(재생 코드 자체는 `UnitAudio`/`BuildingAudio`에 이미 있으나 일부 종류는 실제 오디오 클립이 아직 안 채워짐)
 
 ## UI 설계 노트 (기획 원문 정리)
 
@@ -322,6 +333,21 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - 부대를 숫자로 다시 선택하면, 대기 중이던 공격/이동/순찰(A/M/P) 명령 모드는 자동으로 취소되고 마우스를 따라다니던 포인터 마커도 함께 사라집니다(랠리/건물 이동 대기 모드는 영향받지 않음).
 - 적/자원/건설 중인 구조체(`BaseStructure`)는 부대 지정 대상에서 제외됩니다.
 
+## 미니맵 범례
+
+| 대상 | 표시 |
+| --- | --- |
+| 아군 유닛 | 초록색 원 |
+| 적 유닛 | 빨간색 원 |
+| 아군 건물 | 초록색 사각형 |
+| 적 건물 | 빨간색 사각형 |
+| 공격받은 위치 | 3초간 표시되는 마커(경고음이 실제로 재생될 때만, 10초 쿨다운) |
+| 점령지(거점) | 미구현 — 노란색 원으로 표시할 계획(로드맵 참고) |
+
+유닛/건물 머리 위 Y40~50대에 전용 스프라이트(레이어 `Unit`/`Enemy`)를 배치하는 방식. 안개(`csFogWar`)가
+실제 3D Plane(Y≈1)이라 이렇게 높이 뜬 오브젝트는 깊이 테스트로는 안 가려져서, `FogVisibility` 헬퍼로
+안개 상태를 직접 조회해 렌더러를 켜고 끈다(적 유닛/건물만 - 아군은 자기 시야로 항상 보임).
+
 ## 키보드 단축키
 
 버튼(`ProductionSlot`)이 자기 단축키를 직접 감지해서(`Update()`) 눌리면 실제 마우스 클릭과 동일한 `PointerDown/Up/Click` 이벤트를 재현합니다 — 명령 실행과 버튼 눌림 시각 효과(기존 Transition 색상/스프라이트)가 동시에 처리됩니다. 슬롯이 비활성 상태(해당 패널이 안 떠 있음)면 `Update()` 자체가 호출되지 않아 단축키도 자동으로 죽어있습니다.
@@ -336,6 +362,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | 생산(공장) | 레인저 IFV I · 펄스탱크 P · SkyLancer S |
 | 생산(공항) | 파이어호크 F · 가디언 드론 D |
 | `BaseStructure` 선택 시 | 건설 취소(환불) T |
+| 생산 건물 선택(MainBase/Tier1/Tier2/Tier3) | 랠리(집결지 지정) Y — 슬롯 6, 클릭 후 위치 클릭 시 확정(건물 우클릭과 동일 동작) |
 | 건물 선택(지상) | 리프트(이륙) L |
 | 건물 선택(공중) | 착륙 L · 이동(자유 비행) M |
 | 유닛/건물 선택 시(공통) | 부대 지정 저장 Ctrl+숫자(1~9,0) · 병합 추가 Shift+숫자(1~9,0) · 부대 선택 숫자만 |

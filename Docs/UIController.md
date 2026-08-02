@@ -29,6 +29,8 @@
 | `infoBoundHealth` | Info_panel이 현재 구독 중인 `HealthManager` (대상이 바뀌면 이전 구독 해제 후 갈아끼움) |
 | `infoAttackDamage`, `infoArmor`, `infoAttackType`, `infoArmorType`, `infoSizeType`, `infoShotCount` | 현재 선택된 유닛의 전투 스탯 캐시 — 공격/방어 아이콘 호버 툴팁에 그대로 표시됨(doc/0293) |
 | `squadPanel`, `squadSlots[]`, `squadPageButtons[]` | 다중 유닛 선택 시 Squad_panel(최대 60마리, 12마리×5페이지) |
+| `BuildingMoveSlotIndex`(0) / `BuildingLiftSlotIndex`(8) / `BuildingRallySlotIndex`(6) | 건물 선택 컨텍스트에서 매 프레임 독립적으로 갱신되는 고정 슬롯 — 생산 패널의 일반 `SetCommands` 루프가 이 슬롯들을 절대 `Clear()`하지 않도록 보호(`LiftSlotOnlyProtected`/`LiftAndRallySlotsProtected`), 안 그러면 실행 중이던 단축키 클릭 코루틴이 끊김 |
+| `rallyIcon` | `Sprite` (SerializeField) | 생산 건물 랠리 버튼(슬롯 6) 아이콘 |
 
 ## 메소드
 
@@ -91,7 +93,13 @@
 | `ShowMainBasePanel(onTrainWorker)` | 본진(커맨드센터) 선택 패널 (일꾼 생산 버튼) |
 | `ShowBarracksPanel(onMarine, onFirebat)` | 병영(Tier1 건물) 선택 패널 (마린/벌처 생산 버튼) |
 | `ShowFactoryPanel(onGoliath, onTank)` | 공장(Tier2 건물) 선택 패널 (골리앗/탱크 생산 버튼) |
-| `ShowAirportPanel(onWraith, onGuardian)` | 우주공항(Tier3 건물) 선택 패널 (레이스/가디언 생산 버튼) |
+| `ShowAirportPanel(onWraith, onGuardian)` | 우주공항(Tier3 건물) 선택 패널 (레이스/가디언 생산 버튼) — ⚠ 이후 `UnitDataSO.tier` 기반 동적 생산 패널(`RTSUnitController.ShowUnitTierPanel`/`ShowUnitProductionPanel`, doc/0200)로 대체되어 실제로는 이 4개 메서드 대신 통합 경로가 쓰이고 있을 수 있음 — 최신 상태 재확인 필요 |
+| `ShowLabPanel(onAttackResearch, attackInteractable, onArmorResearch, armorInteractable)` | 연구소 선택 패널(공격력/방어력 업그레이드 버튼) |
+| `ShowBuildingLiftCommand(isLifted, onLiftOrLand)` / `ShowBuildingMoveCommand(onMove)` | 고정 슬롯(8/0)에 리프트·착륙/이동 버튼 표시 |
+| `ShowBuildingRallyCommand(onRally)` | 생산 건물(MainBase/Tier1/Tier2/Tier3) 전용 고정 슬롯(6)에 랠리 버튼 표시 — `ShowUnitProductionPanel` 호출 직후 별도로 호출됨 |
+| `ClearBuildingPanelExceptLiftSlots(protectMoveSlot)` / `ClearBuildingLiftSlots()` | 생산 패널이 없는 건물(SupplyDepot/Lab/공중 상태) 선택 시 리프트/이동 슬롯만 보호하고 나머지 정리 |
+| `ShowUnitSkillSlot(data, useFallbackSlot)` / `ClearUnitSkillSlot(useFallbackSlot)` / `SetUnitSkillCooldown(normalizedRemaining, useFallbackSlot)` | 고급유닛 액티브 스킬 버튼(슬롯 6, Worker는 슬롯 7)의 표시/정리/쿨다운 오버레이 — `RTSUnitController.UpdateUnitSkillUI()`가 매 프레임 호출 |
+| `ShowSkillSelectPanel(traitA, traitB)` / `HideSkillSelectPanel()` | 고급유닛 특성(2택1) 선택 오버레이(커맨드 패널과 별개 독립 UI) |
 
 ## 연관 컴포넌트
 

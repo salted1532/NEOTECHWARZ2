@@ -62,15 +62,18 @@ RTS 게임 전체를 총괄하는 중앙 상태 관리자. 유닛/건물/적/자
 | 메소드 | 설명 |
 |---|---|
 | `ClickSelectBuilding` / `ShiftClickSelectBuilding` | 유닛 선택과 동일한 패턴의 좌클릭/Shift+클릭 |
-| `SelectBuilding(building)` | 태그로 `BuildingState`(MainBase/Tier1~3/SupplyDepot/Lab) 판정 후 선택 처리 |
+| `SelectBuilding(building)` | 태그로 `BuildingState`(MainBase/Tier1~3/SupplyDepot/Lab) 판정 후 선택 처리. 생산 건물(MainBase/Tier1/2/3)이면 선택하는 순간 자기 랠리 포인트 위치에 이동 포인터를 3초간 표시(`userControl.ShowMovePointerAt`) |
 | `Deselectbuilding(building)` (private) | 특정 건물 선택 해제 |
-| `SetRallySelectBuilding(position)` | 선택된 건물들의 랠리 포인트 설정 |
+| `SetRallySelectBuilding(position)` | 선택된 건물들의 랠리 포인트 설정 — 랠리 버튼(슬롯 6, 단축키 Y, `RallyButtonAction()`)이나 건물 우클릭으로 호출됨 |
+| `RallyButtonAction()` (private) | 생산 건물 패널의 랠리 버튼 데이터(`EnterRallyMode`, 단축키 Y) — `UpdateUI()`가 MainBase/Tier1/2/3 케이스마다 `uIController.ShowBuildingRallyCommand()`에 넘김 |
+| `ClearSelectedEnemyBuildingIfMatches(building)` | 적 건물이 파괴되거나(`Die()`) 안개에 가려져서(`EnemyBuildingController.Update()`) 선택 상태가 유령 참조로 남지 않도록 정리 — 매칭되면 `building.DeselectEnemyBuilding()`도 호출 |
 
 ### 적 선택 관련
 | 메소드 | 설명 |
 |---|---|
 | `ClickSelectEnemy(enemy)` | 좌클릭 선택 (적은 항상 단일 선택) |
 | `SelectEnemy(enemy)` (private) | 건설모드 중이 아니면 `EnemySelect` 상태로 전환 후 선택 |
+| `ClearSelectedEnemyIfMatches(enemy)` | 안개에 가려지는 등 외부 이벤트로 특정 적 유닛의 선택을 해제해야 할 때 호출(`EnemyUnitController.UpdateFogVisibility()`) — `enemy.DeselectEnemy()` 호출 후 목록에서 제거 |
 
 ### 자원(Ore/Gas) 선택 관련
 | 메소드 | 설명 |
@@ -121,7 +124,9 @@ RTS 게임 전체를 총괄하는 중앙 상태 관리자. 유닛/건물/적/자
 ### UI 관련
 | 메소드 | 설명 |
 |---|---|
-| `UpdateUI()` (private) | `RTScurrentSate`/`BuildingSelectState`/`UnitSelectState`에 따라 `UIController`의 알맞은 `ShowXXXPanel`을 호출해 커맨드 패널·Info_panel·생산 대기열 UI를 갱신. `BaseStructureSelect`일 땐 `ShowBaseStructureInfoPanel` + `ShowBaseStructureCommandPanel`(Cancel 버튼, 단축키 T)을 함께 호출 |
+| `UpdateUI()` (private) | `RTScurrentSate`/`BuildingSelectState`/`UnitSelectState`에 따라 `UIController`의 알맞은 `ShowXXXPanel`을 호출해 커맨드 패널·Info_panel·생산 대기열 UI를 갱신. `BaseStructureSelect`일 땐 `ShowBaseStructureInfoPanel` + `ShowBaseStructureCommandPanel`(Cancel 버튼, 단축키 T)을 함께 호출. `UpdateUnitSkillUI()`를 switch보다 먼저 매 프레임 호출 |
+| `UpdateUnitSkillUI()` (private) | 고급유닛 특성 선택 오버레이/스킬 버튼(슬롯 6, Worker는 슬롯 7)을 매 프레임 갱신. `ClearSkillSlotIfShown()`으로 감싸서, 스킬 슬롯에 실제로 뭔가 표시됐던 경우에만 표시가 끝나는 시점에 딱 한 번 정리한다 — 예전엔 유닛이 하나도 선택 안 돼 있으면 매 프레임 무조건 `ClearUnitSkillSlot(useFallbackSlot)`을 호출했는데, `useFallbackSlot`(=`UnitSelectState == Worker`)이 "마지막으로 선택했던 유닛" 기준의 낡은 값이라 건물 등 다른 컨텍스트가 겸용 중인 슬롯을 매 프레임 잘못 지워버리는 버그가 있었다(예: 생산 건물 랠리 버튼이 슬롯 6과 겹치면서 반투명하게 보이거나 눌림 색상 전환이 씹히는 증상) |
+| `ClearSkillSlotIfShown()` / `skillSlotShown` / `skillSlotUsedFallback` (private) | 스킬 슬롯이 마지막으로 표시됐을 때 어느 슬롯(폴백 여부)이었는지 기억해뒀다가, 그 슬롯만 딱 한 번 정리 |
 
 ### 상태 전환 / 조회
 | 메소드 | 설명 |

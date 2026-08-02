@@ -29,7 +29,7 @@
 | `PlayOrderSFX()` | 이동/공격/순찰/정지/홀드/따라가기/채취/자원반환/건물이동 등 명령 시 확인음 — `SoundManager.PlayOrderSFX`(전용 단일 채널) 재생, 2D(doc/0279, 0285). `RTSUnitController.StopSelectedUnits`/`HoldSelectedUnits`에서는 호출되지 않음(doc/0289) |
 | `PlayBuildCompleteVoice()` / `PlayBuildFailVoice()` | 워커 전용 — `BaseStructure`(건설 완료)/`PlacementSystem`(건설 실패)이 담당 일꾼을 통해 호출 |
 | `HandleDeath()` (private) | `OnDeath` 콜백 — `bank.deathSFX`(3D) + `bank.deathVoice`(2D) 재생 |
-| `HandleDamaged(amount, attackerPosition, attackType, isEnemyAttacker)` (private) | `OnDamaged` 콜백 — 화면 밖에서 공격받았고 `isEnemyAttacker`가 true(적에게 공격받음, 아군사격 아님)일 때만 `PlayUnitUnderAttackWarning()` 호출(doc/0292) |
+| `HandleDamaged(amount, attackerPosition, attackType, isEnemyAttacker)` (private) | `OnDamaged` 콜백 — 화면 밖에서 공격받았고 `isEnemyAttacker`가 true(적에게 공격받음, 아군사격 아님)일 때만 `PlayUnitUnderAttackWarning()` 호출(doc/0292). 이 호출이 쿨다운을 통과해서 **실제로 새로 재생됐을 때만**(`bool` 반환값 확인) `MinimapAlertController.Instance.SpawnAttackedPointer(transform.position)`도 함께 호출(doc/0362) |
 
 ## 연관 컴포넌트
 

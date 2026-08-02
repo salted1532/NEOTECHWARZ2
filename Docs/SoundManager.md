@@ -44,8 +44,8 @@
 | `PlaySelectSFX(set)` / `PlayOrderSFX(set)` | 선택/명령 확인음 — 전용 단일 채널(`PlaySingleChannel`)로 재생, 재생 중이면 새 요청 무시(doc/0285) |
 | `PlayVoice(set)` | 유닛/건물 음성(스폰/사망 대사 등) — 항상 2D, 스팸 방지 적용 |
 | `PlayOrderVoice(set, unitType, category)` | 선택/이동/공격명령 음성 전용 — 다른 종류의 유닛을 새로 선택했을 때만 재생 중인 대사를 끊고 교체, 그 외엔 재생 중이면 요청을 버림(doc/0262~0264) |
-| `PlayGlobalVoice(set, minInterval=0)` | 전역 나레이션 — 같은 카테고리가 재생 중이면 겹쳐 재생하지 않음, `minInterval`을 주면 추가로 최소 재재생 간격 적용(doc/0271, 0273) |
-| `PlayInsufficientResourcesWarning()` / `PlayInsufficientPopulationWarning()` / `PlayUnitUnderAttackWarning()` / `PlayBuildingUnderAttackWarning()` / `PlayUpgradeCompleteVoice()` | 자주 쓰는 나레이션 카테고리 래퍼 — 호출부가 `globalVoiceBank` null 체크를 안 해도 됨 |
+| `PlayGlobalVoice(set, minInterval=0)` → `bool` | 전역 나레이션 — 같은 카테고리가 재생 중이면 겹쳐 재생하지 않음, `minInterval`을 주면 추가로 최소 재재생 간격 적용(doc/0271, 0273). 겹침/쿨다운으로 조용히 씹혔으면 `false`, 실제로 새로 재생을 시작했으면 `true` 반환 — 호출부가 "진짜 재생된 순간에만" 다른 연출(미니맵 공격받음 마커 등)을 같이 트리거할 수 있음(doc/0362) |
+| `PlayInsufficientResourcesWarning()` / `PlayInsufficientPopulationWarning()` / `PlayUnitUnderAttackWarning()` / `PlayBuildingUnderAttackWarning()` → `bool` / `PlayUpgradeCompleteVoice()` | 자주 쓰는 나레이션 카테고리 래퍼 — 호출부가 `globalVoiceBank` null 체크를 안 해도 됨. `PlayUnitUnderAttackWarning`/`PlayBuildingUnderAttackWarning`은 `underAttackWarningCooldown`(기본 10초)이 유닛/건물 각각 독립적으로 적용되며, `PlayGlobalVoice`의 반환값을 그대로 돌려줌 |
 | `PlayFromPool(pool, set, categoryVolume, muted, spatialBlend, worldPos, limitSpam=false)` (private) | 실제 풀 재생 로직 — `limitSpam=true`면 최소 재생 간격 + 동시 재생 개수 제한을 모두 적용(doc/0284) |
 
 ### BGM

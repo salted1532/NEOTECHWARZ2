@@ -15,8 +15,10 @@
 | 필드 | 타입 | 설명 |
 |---|---|---|
 | `maxHealth` | `int` (SerializeField) | 최대 체력 |
+| `healthSlider` | `Slider` (SerializeField) | 체력바 UI — 체력 변화에 맞춰 값 자동 갱신, 풀피면 숨김, 안개에 가려진 위치면 숨김(`FogVisibility`) |
 | `currentHp` | `int` | 현재 체력 |
 | `isDead` | `bool` | 사망 여부 (중복 사망 처리 방지) |
+| `fogWar` | `csFogWar` (private) | 체력바 안개 가림 판정용 |
 | `OnHealthChanged` | `event Action<int,int>` | 체력 변화 시 발생 (currentHp, maxHealth) — UI(체력바 등) 갱신용 |
 | `OnDeath` | `event Action` | 사망 시 발생 |
 | `OnDamaged` | `event Action<int, Vector3, AttackEffectType, bool>` | 데미지 적용 시 발생 (damage, attackerPosition, attackType, isEnemyAttacker). `attackerPosition`은 피격 이펙트 방향 계산용, `attackType`은 피격 이펙트 종류 선택용, `isEnemyAttacker`는 공격자가 적 진영인지(true)/아군사격인지(false) — "적에게 공격받음" 경고음이 아군사격에는 울리지 않도록 `UnitAudio`/`BuildingAudio`가 이 값으로 판별한다(doc/0292) |
@@ -25,7 +27,10 @@
 
 | 메소드 | 설명 |
 |---|---|
-| `Awake()` | `currentHp`를 `maxHealth`로 초기화 |
+| `Awake()` | `currentHp`를 `maxHealth`로 초기화, `fogWar` 캐싱, `OnHealthChanged`에 `UpdateHealthSlider` 구독 |
+| `Update()` (private) | `healthSlider`가 있고 풀피가 아닐 때만, 매 프레임 안개 상태를 재확인해서 표시 여부 갱신(체력 변화가 없어도 유닛이 이동하며 안개 상태는 계속 바뀌므로) |
+| `UpdateHealthSlider(current, max)` (private) | `OnHealthChanged` 콜백 — 슬라이더 값 갱신, 풀피면 숨김·아니면 표시 |
+| `SetHealthBarVisible(visible)` | 체력바 UI를 강제로 켜고 끔 — 건설 프리뷰/고스트처럼 체력 표시가 필요 없는 경우 `PreviewSystem`이 호출 |
 | `GetHealth()` / `GetMaxHealth()` / `IsDead()` | 상태 조회 |
 | `GetDamage(damage, attackerPosition, attackType, isEnemyAttacker)` | 데미지를 적용. 이미 죽었거나 데미지가 0 이하면 무시. 체력이 0 이하가 되면 `Die()` 호출. `isEnemyAttacker`는 호출부(`UnitController`=false, `EnemyUnitController`=true, `ProjectileAttack`은 발사자 쪽 값을 그대로 전달)가 결정해서 넘김(doc/0292) |
 | `Heal(amount)` | 체력을 회복 (최대 체력을 넘지 않도록 제한) |

@@ -42,7 +42,7 @@
 ### 키보드 입력
 | 메소드 | 설명 |
 |---|---|
-| `HandlekeyBoard()` (private) | 이제 대부분의 단축키(공격/이동/정지/순찰/홀드/반환/건설, 건물 건설, 유닛 생산)는 각 커맨드 버튼의 `ProductionSlot`이 자기 `Shortcut`을 직접 감지해 스스로 클릭되므로 여기서 처리하지 않는다. 여기 남아있는 건 대응하는 버튼이 없는 순수 키보드 전용 상태 전환뿐: 유닛 선택 중 `Y`=랠리모드 대기, 건설 모드 중 `Escape`=상태 복귀(`ReturnState`) |
+| `HandlekeyBoard()` (private) | 유닛 명령(공격/이동/정지/순찰/홀드/반환/건설), 건물 건설, 유닛 생산, 생산 건물 랠리(Y)까지 이제 전부 각 커맨드 버튼의 `ProductionSlot`이 자기 `Shortcut`을 직접 감지해 스스로 클릭되므로 여기서 처리하지 않는다(doc/0363 — 예전엔 Y 랠리만 대응 버튼이 없어 여기 남아있었지만, 랠리 버튼이 생기면서 제거됨). 여기 남아있는 건: 건설 모드 중 `Escape`=상태 복귀(`ReturnState`), 생산 건물 선택 중 `Escape`=대기열 맨 뒤부터 취소, 명령 대기 상태(`UsercurrentState != None`) 중 `Escape`=대기 취소 + 포인터 끔 |
 
 ### 드래그 박스 / 선택
 | 메소드 | 설명 |
@@ -56,6 +56,11 @@
 |---|---|
 | `UpdatePointer()` (private) | 현재 명령 대기 상태(공격/이동/순찰/랠리)에 맞는 포인터 아이콘을 마우스가 가리키는 지면 위치에 표시 |
 | `SetOrderState(string state)` | 외부(`RTSUnitController.EnterXMode`)에서 문자열로 명령 대기 상태를 전환할 때 사용 (예: `"Move"`, `"Attack"`, `"Patrol"`, `"Rally"`) |
+| `ShowMovePointer(position)` (private) / `ShowMovePointerAt(position)` | 이동 포인터 마커를 표시(3초 후 자동 사라짐). `ShowMovePointerAt`은 외부(`RTSUnitController.SelectBuilding` — 생산 건물 선택 시 자기 랠리 포인트 표시용)에서 부를 수 있는 공개 진입점, 동작은 완전히 동일 |
+| `IsRevealedByFog(worldPosition)` (private) | 안개에 가려진(Hidden) 대상은 클릭 선택/명령/호버 대상에서 제외 — `csFogWar`의 `Revealed`뿐 아니라 `PreviouslyRevealed`(한 번 밝혀졌던, 반투명 표시)도 "보임"으로 인정. 안개가 없는 씬에서는 항상 보이는 것으로 취급 |
+| `HasPendingGroundOrder()` / `ConfirmPendingOrderAt(groundPoint)` | `MinimapController` 좌클릭이 재사용 — 대기 중인 땅 명령(A공격 등)이 있는지 확인 후 그 지점에 확정 |
+| `IssueRightClickMoveAt(groundPoint)` | `MinimapController` 우클릭이 재사용 — "그냥 우클릭"과 동일하게 선택된 유닛 이동 또는 건물 랠리 설정(공중에 뜬 건물이면 자유 이동) |
+| `GroundLayerMask` (get) | `layerGround`를 외부에 노출하는 프로퍼티 — `MinimapController`가 미니맵 클릭의 지형 레이캐스트에 재사용(doc/0355) |
 
 ## 연관 컴포넌트
 
