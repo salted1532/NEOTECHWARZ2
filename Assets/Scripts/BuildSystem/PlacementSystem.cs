@@ -164,6 +164,14 @@ public class PlacementSystem : MonoBehaviour
         if (!IsInsideAlliedTerritory(gridPos, data.Size))
             return;
 
+        // ⭐ 절벽/벽면에 걸쳐 있으면 배치 불가 (doc/0376)
+        if (!IsFootprintTerrainFlat(gridPos, data.Size))
+            return;
+
+        // ⭐ 맵 가장자리 1칸 여백 검사 (doc/0380)
+        if (!HasTerrainMargin(gridPos, data.Size))
+            return;
+
         if (worker == null)
             return; // 건설을 맡을 일꾼이 없으면 배치하지 않음
 
@@ -290,6 +298,8 @@ public class PlacementSystem : MonoBehaviour
         if (IsBlocked(mousePos, data.Size)) return;
         if (IsTooCloseToResource(data.ID, gridPos, data.Size)) return;
         if (!IsInsideAlliedTerritory(gridPos, data.Size)) return;
+        if (!IsFootprintTerrainFlat(gridPos, data.Size)) return; // 절벽/벽면에 걸쳐 있으면 배치 불가 (doc/0376)
+        if (!HasTerrainMargin(gridPos, data.Size)) return; // 맵 가장자리 1칸 여백 검사 (doc/0380)
 
         Vector3 groundPos = GetGroundPosition(gridPos, data.Size, mousePos.y);
         Vector3 landingPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab); // 착륙 완료 시 최종 정착 위치
@@ -480,6 +490,78 @@ public class PlacementSystem : MonoBehaviour
         return true;
     }
 
+    [Header("지형 평탄도 검사 (절벽/벽면 건설 방지)")]
+    [Tooltip("건물이 차지하는 풋프린트 전체를 이 간격(미터)으로 촘촘히 스캔해 지면 높이 최고-최저 차이를 " +
+             "구한다. 값이 작을수록 절벽이 살짝만 걸쳐도 놓치지 않지만 레이캐스트 횟수가 늘어난다.")]
+    [SerializeField] private float terrainSampleStep = 0.5f;
+
+    [Tooltip("풋프린트 안에서 잰 지면 높이 중 최고-최저 차이가 이 값(미터)을 넘으면 배치 불가 처리한다. " +
+             "영토 판정은 X/Z 평면만 보기 때문에(TerritoryZone.Contains), 영토가 지상과 언덕을 모두 포함해도 " +
+             "이 검사가 절벽에 걸친 배치를 따로 막아준다.")]
+    [SerializeField] private float maxFootprintHeightVariance = 1.5f;
+
+    // 건물 풋프린트 전체를 terrainSampleStep 간격의 격자로 촘촘히 스캔해(칸 경계와 무관), 지면 높이
+    // 최고-최저 차이가 maxFootprintHeightVariance를 넘거나(절벽/벽면) 표본 지점에 지형 자체가 없으면
+    // (맵 바깥 등, doc/0378) 배치를 막는다. 칸 중앙 1점만 재던 이전 방식(doc/0376)은 절벽이 칸 중앙을
+    // 피해가면 놓치는 문제가 있어 (doc/0377) 교체.
+    private bool IsFootprintTerrainFlat(Vector3Int gridPosition, Vector2Int size)
+    {
+        Vector3 footprintOrigin = grid.CellToWorld(gridPosition);
+        float footprintWidth = size.x * grid.cellSize.x;
+        float footprintDepth = size.y * grid.cellSize.z;
+
+        int stepsX = Mathf.Max(1, Mathf.CeilToInt(footprintWidth / terrainSampleStep));
+        int stepsZ = Mathf.Max(1, Mathf.CeilToInt(footprintDepth / terrainSampleStep));
+
+        float min = float.MaxValue;
+        float max = float.MinValue;
+
+        for (int ix = 0; ix <= stepsX; ix++)
+        {
+            float sampleX = Mathf.Min(ix * terrainSampleStep, footprintWidth);
+            for (int iz = 0; iz <= stepsZ; iz++)
+            {
+                float sampleZ = Mathf.Min(iz * terrainSampleStep, footprintDepth);
+                Vector3 rayOrigin = footprintOrigin + new Vector3(sampleX, 1000f, sampleZ);
+
+                if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 2000f, inputManager.PlacementLayerMask))
+                    return false; // 풋프린트 안에 지형이 없는 지점(맵 바깥으로 걸침 등)이 있으면 그 자체로 배치 불가 (doc/0378)
+
+                min = Mathf.Min(min, hit.point.y);
+                max = Mathf.Max(max, hit.point.y);
+            }
+        }
+
+        return (max - min) <= maxFootprintHeightVariance;
+    }
+
+    [Header("경계 여백 검사 (맵 바깥 돌출 방지)")]
+    [Tooltip("건물 풋프린트를 사방으로 이 칸 수만큼 넓힌 범위 전체에 지형이 있어야 배치 가능하다. " +
+             "그 여백 안에 지형이 없는 칸이 하나라도 있으면(맵 바깥에 가깝다는 뜻) 배치를 막는다. " +
+             "풋프린트 내부만 스캔하는 IsFootprintTerrainFlat과 달리 표본 간격에 기대지 않고 항상 " +
+             "1칸만큼의 여유를 보장한다.")]
+    [SerializeField] private int edgeMarginCells = 1;
+
+    // 풋프린트를 사방으로 edgeMarginCells칸만큼 넓힌 범위의 모든 칸 중심을 레이캐스트로 확인해서,
+    // 지형이 없는 칸이 하나라도 있으면 배치를 막는다 (doc/0380). IsFootprintTerrainFlat의 촘촘한
+    // 표본은 풋프린트 "안쪽"만 훑어서 표본 간격보다 얇은 돌출은 놓칠 수 있는데, 이 검사는 풋프린트보다
+    // 한 칸 넓게 "테두리 전체에 지형이 있어야 한다"는 더 강한 조건이라 표본 해상도와 무관하게 걸러진다.
+    private bool HasTerrainMargin(Vector3Int gridPosition, Vector2Int size)
+    {
+        for (int x = -edgeMarginCells; x < size.x + edgeMarginCells; x++)
+        {
+            for (int z = -edgeMarginCells; z < size.y + edgeMarginCells; z++)
+            {
+                Vector3Int cell = gridPosition + new Vector3Int(x, 0, z);
+                Vector3 cellCenter = grid.CellToWorld(cell) + new Vector3(grid.cellSize.x, 0, grid.cellSize.z) * 0.5f;
+
+                if (!Physics.Raycast(cellCenter + Vector3.up * 1000f, Vector3.down, out _, 2000f, inputManager.PlacementLayerMask))
+                    return false;
+            }
+        }
+        return true;
+    }
+
     // 배치 모드를 종료하고 프리뷰/이벤트 구독을 정리한다. (취소 또는 배치 완료 후 재진입 대비)
     public void StopPlacement()
     {
@@ -513,7 +595,9 @@ public class PlacementSystem : MonoBehaviour
             bool valid = StructureData.CanPlaceObejctAt(gridPos, data.Size)
                 && !IsBlocked(mousePos, data.Size, worker != null ? worker.gameObject : null)
                 && !IsTooCloseToResource(data.ID, gridPos, data.Size)
-                && IsInsideAlliedTerritory(gridPos, data.Size);
+                && IsInsideAlliedTerritory(gridPos, data.Size)
+                && IsFootprintTerrainFlat(gridPos, data.Size)
+                && HasTerrainMargin(gridPos, data.Size);
 
             Vector3 groundPos = GetGroundPosition(gridPos, data.Size, mousePos.y);
             Vector3 previewPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab);

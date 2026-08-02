@@ -17,6 +17,9 @@ public class InputManager : MonoBehaviour
     [SerializeField]
     private LayerMask placementLayermask;
 
+    // PlacementSystem이 건물 풋프린트의 칸별 지면 높이를 잴 때 동일한 지형 레이어를 재사용하기 위한 접근자.
+    public LayerMask PlacementLayerMask => placementLayermask;
+
     // OnClicked: 좌클릭 시 발생 (건물 배치 확정용)
     // OnExit: ESC 입력 시 발생 (배치 모드 취소용)
     public event Action OnClicked, OnExit;
