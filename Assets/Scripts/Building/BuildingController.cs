@@ -89,6 +89,11 @@ public class BuildingController : MonoBehaviour, IDestructible
         // 이 보정으로 값이 거의 안 바뀐다 (doc/0246).
         SnapToGround();
 
+        // RegisterToGridIfPossible()가 hasGridPosition을 true로 바꿔버리기 전에, "정상 건설을 거쳤는지"를
+        // 미리 기억해둔다 - 정상 건설된 건물은 BaseStructure.CompleteConstruction()이 Instantiate() 직후
+        // (이 Start()가 돌기 전) SetGridInfo()를 호출해 hasGridPosition을 이미 true로 세팅해둔 상태.
+        bool builtByConstruction = hasGridPosition;
+
         // 씬에 직접 배치해둔 건물(정상 건설 흐름을 안 거쳐서 hasGridPosition이 아직 false인 건물)은
         // 자기 크기(BuildingData.Size)에 맞춰 그리드 셀 중앙으로 위치를 맞추고, PlacementSystem의 그리드
         // 점유 정보에도 스스로 등록한다 (doc/0247). 정상 건설 흐름을 거친 건물은 이미 hasGridPosition이
@@ -97,6 +102,16 @@ public class BuildingController : MonoBehaviour, IDestructible
             RegisterToGridIfPossible();
 
         rtsController.BuildingList.Add(this);
+
+        // 씬에 직접 배치해둔 건물(정상 건설 흐름을 안 거친 건물)은 CompleteConstruction()을 거치지 않아
+        // 인구수 최대치가 반영된 적이 없으므로, 여기서 한 번만 반영해준다 (doc/0366, 유닛의
+        // AddPopulationForExistingUnit과 동일한 패턴 - doc/0333).
+        if (!builtByConstruction)
+        {
+            BuildingData data = rtsController.GetBuildingData(buildingID);
+            if (data != null)
+                rtsController.AddMaxPopulation(data.maxpopulationamount);
+        }
 
         navMeshObstacle = GetComponent<NavMeshObstacle>();
 

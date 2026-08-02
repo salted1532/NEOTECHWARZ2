@@ -10,9 +10,11 @@ public class TestSceneMenuController : MonoBehaviour
     [SerializeField] private Button optionButton;       // 옵션 패널 열기
     [SerializeField] private Button optionCloseButton;   // 옵션 패널의 X(닫기) 버튼
     [SerializeField] private Button mainMenuButton;      // "메인화면으로 나가기"
+    [SerializeField] private Button nextStageButton;     // "다음 스테이지로 이동"
 
     [Header("씬 이동")]
     [SerializeField] private string mainSceneName = "MainScene";
+    [SerializeField] private string nextStageSceneName = "SampleScene";
 
     [Header("옵션 패널 (레이아웃/사운드 슬라이더는 직접 제작 후 연결)")]
     [SerializeField] private GameObject optionsPanel;
@@ -22,6 +24,7 @@ public class TestSceneMenuController : MonoBehaviour
         optionButton?.onClick.AddListener(OpenOptionsPanel);
         optionCloseButton?.onClick.AddListener(CloseOptionsPanel);
         mainMenuButton?.onClick.AddListener(OnMainMenuClicked);
+        nextStageButton?.onClick.AddListener(OnNextStageClicked);
 
         optionsPanel?.SetActive(false);
     }
@@ -31,4 +34,6 @@ public class TestSceneMenuController : MonoBehaviour
     public void CloseOptionsPanel() => optionsPanel?.SetActive(false);
 
     private void OnMainMenuClicked() => SceneManager.LoadScene(mainSceneName);
+
+    private void OnNextStageClicked() => SceneManager.LoadScene(nextStageSceneName);
 }
