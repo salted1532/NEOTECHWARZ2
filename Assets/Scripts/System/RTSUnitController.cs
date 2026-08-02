@@ -1548,6 +1548,26 @@ public class RTSUnitController : MonoBehaviour
     // - 고급유닛이 아니면: 오버레이/스킬슬롯 둘 다 숨김
     // - 아직 특성을 안 골랐으면: SkillSelect 오버레이 표시 (order panel의 기존 명령은 그대로 사용 가능 - 비모달)
     // - 이미 골랐으면: 오버레이는 숨기고, 액티브 스킬이면 order panel 슬롯 6에 스킬 버튼 표시(패시브면 버튼 없음)
+    // 스킬 슬롯(6 또는 7)에 실제로 뭔가 표시된 적이 있는지, 있었다면 어느 슬롯(폴백 여부)이었는지 기억해둔다.
+    // UpdateUnitSkillUI()는 선택 종류와 무관하게 매 프레임 호출되는데, 예전엔 "지금 선택된 유닛이 없으면
+    // ClearUnitSkillSlot(useFallbackSlot)"을 매번 실행했다 - useFallbackSlot은 "마지막으로 선택했던
+    // 유닛이 Worker였는지"라는 낡은 값(UnitSelectState)이라, 건물 등 유닛이 아닌 걸 선택 중일 때도 매
+    // 프레임 그 낡은 값 기준으로 아무 슬롯이나 계속 Clear()해버렸다. 마침 그 슬롯을 다른 용도(건물 랠리
+    // 버튼 등)로 겸용하고 있으면, 그 다른 용도의 SetData()와 매 프레임 Clear()가 서로 싸우면서 반투명하게
+    // 보이거나 눌림 색상 전환이 씹히는 버그가 생겼다(doc/0363). 이제는 스킬 슬롯이 "실제로 표시됐던 경우"
+    // 딱 그 슬롯만, 표시가 끝나는 시점에 한 번만 정리한다 - 스킬을 보여준 적 없는 컨텍스트는 아예 건드리지 않는다.
+    private bool skillSlotShown;
+    private bool skillSlotUsedFallback;
+
+    private void ClearSkillSlotIfShown()
+    {
+        if (!skillSlotShown)
+            return;
+
+        uIController.ClearUnitSkillSlot(skillSlotUsedFallback);
+        skillSlotShown = false;
+    }
+
     private void UpdateUnitSkillUI()
     {
         // Worker는 슬롯 6을 Build 버튼이 이미 쓰고 있으므로(doc/0251), 스킬은 그 다음 슬롯(7)으로 넘긴다.
@@ -1556,7 +1576,7 @@ public class RTSUnitController : MonoBehaviour
         if (selectedUnitList.Count == 0)
         {
             uIController.HideSkillSelectPanel();
-            uIController.ClearUnitSkillSlot(useFallbackSlot);
+            ClearSkillSlotIfShown();
             return;
         }
 
@@ -1566,7 +1586,7 @@ public class RTSUnitController : MonoBehaviour
         if (data == null || !data.hasTraitChoice)
         {
             uIController.HideSkillSelectPanel();
-            uIController.ClearUnitSkillSlot(useFallbackSlot);
+            ClearSkillSlotIfShown();
             return;
         }
 
@@ -1574,7 +1594,7 @@ public class RTSUnitController : MonoBehaviour
 
         if (chosen == TraitChoice.None)
         {
-            uIController.ClearUnitSkillSlot(useFallbackSlot);
+            ClearSkillSlotIfShown();
             uIController.ShowSkillSelectPanel(
                 new CommandButtonData(data.traitA.icon, ButtonAction.Simple(
                     () => ChooseTrait(data.ID, TraitChoice.A), data.traitA.skillName, data.traitA.description)),
@@ -1606,6 +1626,8 @@ public class RTSUnitController : MonoBehaviour
                 trait.isActiveSkill ? trait.shortcutKey : KeyCode.None),
             trait.isActiveSkill && !onCooldown), // Interactable = 액티브이면서 쿨다운이 끝났을 때만 true
             useFallbackSlot);
+        skillSlotShown = true;
+        skillSlotUsedFallback = useFallbackSlot;
 
         // 쿨다운 원형 오버레이 (doc/0323 후속) - 매 프레임 대표 유닛의 남은 쿨다운 비율로 갱신된다.
         float normalizedCooldown = trait.cooldown > 0f ? Mathf.Clamp01(skillCooldownRemaining / trait.cooldown) : 0f;

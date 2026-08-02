@@ -165,6 +165,9 @@ public class UIController : MonoBehaviour
     // 생산 건물(MainBase/Tier1/Tier2/Tier3) 전용 랠리 버튼 고정 슬롯. 위 리프트/이동 슬롯과 동일한 이유로
     // 보호가 필요함 - ShowUnitProductionPanel이 매 프레임 호출되므로 보호 안 하면 이 슬롯도 같이 Clear()된다.
     // 슬롯 6은 tier당 유닛 수(현재 최대 3개)로는 절대 안 채워지는 여유 슬롯이라 실제 생산 버튼과 안 겹친다.
+    // (유닛 스킬 슬롯(UnitSkillSlotIndex)과 물리적으로 같은 슬롯을 겸용하는데, 예전엔
+    // RTSUnitController.UpdateUnitSkillUI()가 매 프레임 이 슬롯을 잘못 Clear()해버리는 버그가 있었음 -
+    // 그 버그를 고친 뒤(doc/0363) 슬롯 6으로 되돌림.)
     private const int BuildingRallySlotIndex = 6;
     private static readonly HashSet<int> LiftAndRallySlotsProtected = new HashSet<int> { BuildingLiftSlotIndex, BuildingRallySlotIndex };
 
