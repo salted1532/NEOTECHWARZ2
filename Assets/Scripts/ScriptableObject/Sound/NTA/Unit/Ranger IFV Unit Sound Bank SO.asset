@@ -22,7 +22,8 @@ MonoBehaviour:
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <deathSFX>k__BackingField:
-    <clips>k__BackingField: []
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: a37dbc955945ca24581cb375bdad7377, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <skillSFX>k__BackingField:
@@ -51,7 +52,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 1f79d60640f2d4e418c44ea52cfe508e, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
-  <moveVoice>k__BackingField:
+  <orderVoice>k__BackingField:
     <clips>k__BackingField:
     - {fileID: 8300000, guid: 9206d50ee3e276d4bb475b15b1314ecc, type: 3}
     - {fileID: 8300000, guid: 75405c11674356a48877889769ebdbe3, type: 3}

@@ -21,7 +21,18 @@ MonoBehaviour:
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <destroySFX>k__BackingField:
-    <clips>k__BackingField: []
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 8d1b46f94f4dcca40b7ceb1b13808bfa, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <takeoffSFX>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: a6b2283e3151b804ba6c4e037ba0c2ac, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  <landingSFX>k__BackingField:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 4043c6cf57f3ef64eac69cb2ab006356, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   <selectVoice>k__BackingField:

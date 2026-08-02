@@ -71,6 +71,22 @@ public class BuildingAudio : MonoBehaviour
             SoundManager.Instance?.PlaySFX(bank.constructCompleteSFX, transform.position);
     }
 
+    // BuildingController.LiftOff()에서 BuildingEffects.PlayTakeoff()와 나란히 호출된다.
+    public void PlayTakeoff()
+    {
+        BuildingSoundBankSO bank = GetBank();
+        if (bank != null)
+            SoundManager.Instance?.PlaySFX(bank.takeoffSFX, transform.position);
+    }
+
+    // BuildingController.Land()에서 BuildingEffects.PlayLanding()와 나란히 호출된다.
+    public void PlayLanding()
+    {
+        BuildingSoundBankSO bank = GetBank();
+        if (bank != null)
+            SoundManager.Instance?.PlaySFX(bank.landingSFX, transform.position);
+    }
+
     // RTSUnitController.SelectBuilding()에서 호출된다 ("건물 음성").
     public void PlaySelectVoice()
     {

@@ -289,6 +289,7 @@ public class BuildingController : MonoBehaviour, IDestructible
         verticalTarget = transform.position + Vector3.up * liftHeight;
 
         GetComponent<BuildingEffects>()?.PlayTakeoff();
+        GetComponent<BuildingAudio>()?.PlayTakeoff();
     }
 
     // "착륙" 버튼: 완전히 떠 있는 상태(상승/이동/하강 중이 아님)에서만 착륙 위치 선택 모드로 진입한다.
@@ -377,6 +378,7 @@ public class BuildingController : MonoBehaviour, IDestructible
         landed?.Invoke();
 
         GetComponent<BuildingEffects>()?.PlayLanding();
+        GetComponent<BuildingAudio>()?.PlayLanding();
     }
 
     // 건물 선택 시 마커(테두리 등 표시)를 활성화한다.

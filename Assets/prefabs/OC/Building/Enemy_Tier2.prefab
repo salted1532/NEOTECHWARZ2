@@ -670,8 +670,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 0.3, z: 1}
+  m_Center: {x: 0, y: -0.35, z: 0}
 --- !u!114 &3566054540396190834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -685,9 +685,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBuildingController
   buildingMarker: {fileID: 7296833267826986796}
-  minimapIcon: {fileID: 2204765114495745439}
   buildingName: 
   icon: {fileID: 21300000, guid: 0807f6fe106d72e4a97f1751f3d7ff1d, type: 3}
+  minimapIcon: {fileID: 2204765114495745439}
   flashInterval: 0.3
   flashCount: 3
   enemyBuildingID: 4
