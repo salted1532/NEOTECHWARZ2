@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using FischlWorks_FogWar;
 
 // 적 유닛 컨트롤러. 예전엔 EnemyController(선택 표시/스탯/사망 처리만 담당, AI 없음)였던 것을
 // 이동/전투 AI까지 합쳐서 이름을 바꿨다 (doc/0231) - 플레이어의 UnitController에 대응하는 적 진영 버전이지만
@@ -13,6 +14,17 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
 
     [SerializeField]
     private Sprite icon; // Info_panel에 표시할 아이콘
+
+    // 미니맵에 표시하는 y40대 스프라이트 마커(자식 오브젝트, 인스펙터에서 연결). 이 프로젝트의 안개(csFogWar)는
+    // 실제 3D Plane(Y≈1)으로 구현돼 있어 이렇게 Y가 높은 오브젝트는 깊이 테스트로 가려지지 않는다 - 그래서
+    // Update()에서 안개 상태를 직접 조회해 이 렌더러를 켜고 끈다 (doc/0356).
+    [SerializeField]
+    private SpriteRenderer minimapIcon;
+
+    [SerializeField]
+    private int minimapFogVisibilityMargin = 1; // UserControl.fogVisibilityMargin과 동일한 목적
+
+    private csFogWar fogWar;
 
     [SerializeField]
     private string enemyName; // Info_panel에 표시할 이름
@@ -133,6 +145,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
             enemyMarker.SetActive(false);
 
         rtsController = FindFirstObjectByType<RTSUnitController>();
+        fogWar = FindFirstObjectByType<csFogWar>(); // 안개가 없는 씬(테스트 씬 등)에서는 null - Update()에서 그 경우 마커를 항상 켜둠
 
         // 씬에 직접 배치됐든 나중에 스포너를 거쳐 생성됐든, 항상 자기 enemyUnitID로 OC Unit Data SO를
         // 조회해서 스스로 스탯(체력/공격력/이름 등)을 적용한다 (UnitController.Start()와 동일한 패턴).
@@ -256,6 +269,48 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         }
 
         AttackMoveTick();
+        UpdateMinimapIconVisibility();
+    }
+
+    // 미니맵 마커를 안개 상태에 맞춰 켜고 끈다 - UserControl.IsRevealedByFog()와 동일한 로직(Revealed와
+    // PreviouslyRevealed 둘 다 "보임"으로 인정, 안개가 없는 씬에서는 항상 보임)이지만, 여기서는 유닛 자신의
+    // fogWar 참조로 물어본다 (doc/0356 - 마커가 Y40대라 안개 Plane 깊이 테스트로는 안 가려지는 문제의 대안).
+    private void UpdateMinimapIconVisibility()
+    {
+        if (minimapIcon == null)
+            return;
+
+        if (fogWar == null)
+        {
+            minimapIcon.enabled = true;
+            return;
+        }
+
+        minimapIcon.enabled = IsRevealedByFog();
+    }
+
+    private bool IsRevealedByFog()
+    {
+        Vector2Int center = fogWar.WorldToLevel(transform.position);
+
+        for (int x = -minimapFogVisibilityMargin; x <= minimapFogVisibilityMargin; x++)
+        {
+            for (int y = -minimapFogVisibilityMargin; y <= minimapFogVisibilityMargin; y++)
+            {
+                Vector2Int cell = new Vector2Int(center.x + x, center.y + y);
+
+                if (!fogWar.CheckLevelGridRange(cell))
+                    continue;
+
+                Shadowcaster.LevelColumn.ETileVisibility visibility = fogWar.shadowcaster.fogField[cell.x][cell.y];
+
+                if (visibility == Shadowcaster.LevelColumn.ETileVisibility.Revealed ||
+                    visibility == Shadowcaster.LevelColumn.ETileVisibility.PreviouslyRevealed)
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     // ======================
