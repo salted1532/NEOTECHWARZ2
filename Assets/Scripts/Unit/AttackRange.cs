@@ -11,6 +11,11 @@ public class AttackRange : MonoBehaviour
     // 깜빡 안 맞추는 실수를 방지하기 위한 보험). 절대 줄이지는 않고(Mathf.Max) 부족할 때만 넓힌다.
     private const float DetectionRangeMargin = 5f;
 
+    // EnemyAttackRange와 동일한 완충 구간(doc/0388) - 순수 자동교전(명시 지정 명령 없음) 중에만
+    // 적용된다. orderedTarget/friendlyTarget이 있는 명시 명령 경로는 이미 자체 로직(doc/0384)이 있음.
+    private const float EngagedTargetLoseSightMargin = 3f;
+    private GameObject engagedEnemy;
+
     private UnitController unitController;
     private CapsuleCollider detectionCollider;
     // 트리거 범위 안에 들어와 있는 "Enemy" 태그 오브젝트 목록
@@ -107,7 +112,7 @@ public class AttackRange : MonoBehaviour
         if (ordered != null)
             return ordered.gameObject;
 
-        return GetClosestEnemy();
+        return GetEngagedOrClosestEnemy();
     }
 
     // 명시적으로 지정된 추격 대상(우클릭/A 모드)이 있으면 다른 적은 전부 무시하고 오직 그 대상만 선택한다
@@ -123,7 +128,23 @@ public class AttackRange : MonoBehaviour
         if (ordered != null)
             return enemiesInRange.Contains(ordered.gameObject) ? ordered.gameObject : null;
 
-        return GetClosestEnemy();
+        return GetEngagedOrClosestEnemy();
+    }
+
+    // targetsInRange(enemiesInRange) 멤버십(트리거 콜라이더 기준)만으로 매 프레임 새로 뽑으면, 도달
+    // 불가능한 적 근처에서 정착할 때 경계를 들락날락하며 대상을 놓쳤다 다시 잡았다 반복하게 된다 -
+    // 이미 물고 있던 대상은 완전히 멀어지기 전까지는 그대로 우선시한다(doc/0388).
+    private GameObject GetEngagedOrClosestEnemy()
+    {
+        if (engagedEnemy != null && CanEngage(engagedEnemy))
+        {
+            float loseSightRange = UnitRange + DetectionRangeMargin + EngagedTargetLoseSightMargin;
+            float sqrDist = (transform.position - engagedEnemy.transform.position).sqrMagnitude;
+            if (sqrDist <= loseSightRange * loseSightRange)
+                return engagedEnemy;
+        }
+
+        return engagedEnemy = GetClosestEnemy();
     }
 
     // 감지된 적들 중 자신과의 거리(제곱 거리)가 가장 짧은 적을 찾아 반환한다. 이 유닛이 공격할 수 없는

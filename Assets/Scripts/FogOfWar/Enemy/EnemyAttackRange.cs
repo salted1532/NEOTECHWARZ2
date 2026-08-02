@@ -13,6 +13,14 @@ public class EnemyAttackRange : MonoBehaviour
     // 깜빡 안 맞추는 실수를 방지하기 위한 보험). 절대 줄이지는 않고(Mathf.Max) 부족할 때만 넓힌다.
     private const float DetectionRangeMargin = 5f;
 
+    // 한 번 교전(추격/공격)을 시작한 대상은, 이 여유 거리(감지 반경 + 추가 완충) 밖으로 완전히
+    // 벗어나기 전까지는 계속 우선시한다. 도달 불가능한 대상 근처에 정착할 때 유닛 자신의 미세한 위치
+    // 흔들림만으로 감지 트리거 콜라이더 경계를 들락날락하면서, 매 프레임 "지금 이 순간의 최근접
+    // 대상"만 다시 뽑아 추격/공격이 계속 처음부터 다시 시작되는 것처럼 멈칫거리는 문제가 있었다
+    // (doc/0388).
+    private const float EngagedTargetLoseSightMargin = 3f;
+    private GameObject engagedTarget;
+
     private EnemyUnitController enemyUnit;
     private CapsuleCollider detectionCollider;
 
@@ -100,7 +108,7 @@ public class EnemyAttackRange : MonoBehaviour
     {
         targetsInRange.RemoveAll(target => target == null);
 
-        GameObject target = GetClosestTarget();
+        GameObject target = GetEngagedOrClosestTarget();
         if (target == null)
             return;
 
@@ -122,7 +130,23 @@ public class EnemyAttackRange : MonoBehaviour
     // 포탑(TurretController)이 조준 대상을 물어볼 때 쓴다. 플레이어 쪽 AttackRange.GetTrackingTarget()과
     // 달리 지정 대상/아군 강제공격 개념이 없어서, 그냥 GetClosestTarget()과 동일하게 사거리 내 가장 가까운
     // (도메인이 맞는) 대상을 그대로 돌려준다.
-    public GameObject GetTrackingTarget() => GetClosestTarget();
+    public GameObject GetTrackingTarget() => GetEngagedOrClosestTarget();
+
+    // targetsInRange 멤버십(트리거 콜라이더 기준)만으로 매 프레임 새로 뽑으면, 도달 불가능한 대상
+    // 근처에서 정착할 때 경계를 들락날락하며 대상을 놓쳤다 다시 잡았다 반복하게 된다 - 이미 물고
+    // 있던 대상은 완전히 멀어지기 전까지는 그대로 우선시한다(doc/0388).
+    private GameObject GetEngagedOrClosestTarget()
+    {
+        if (engagedTarget != null && CanEngage(engagedTarget))
+        {
+            float loseSightRange = UnitRange + DetectionRangeMargin + EngagedTargetLoseSightMargin;
+            float sqrDist = (transform.position - engagedTarget.transform.position).sqrMagnitude;
+            if (sqrDist <= loseSightRange * loseSightRange)
+                return engagedTarget;
+        }
+
+        return engagedTarget = GetClosestTarget();
+    }
 
     // 감지된 대상 중 자신과의 거리(제곱 거리)가 가장 짧은 대상을 찾아 반환한다. 이 유닛이 공격할 수 없는
     // 도메인(지상 전용 유닛에게 공중 대상, 혹은 그 반대)의 대상은 아예 후보에서 제외한다 - 그래야 공격-이동

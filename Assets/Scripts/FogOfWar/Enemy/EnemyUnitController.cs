@@ -262,7 +262,12 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
             if (!arrived && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= arriveDistance)
             {
                 arrived = true;
-                navMeshAgent.ResetPath();
+                // ResetPath()는 호출하지 않는다 - NavMeshAgent는 도착하면(또는 도달 불가능한 대상이라
+                // 갈 수 있는 데까지만 간 채) 스스로 정지하므로 불필요하고, 오히려 hasPath를 false로
+                // 만들어서 MoveAgentTo의 목적지 캐시(doc/0386)를 매 프레임 무효화시킨다 - 자동교전
+                // (EnemyAttackRange → ChaseTarget)이 매 프레임 다시 호출되는 동안 도착 판정이 계속
+                // ResetPath()를 부르면 이미 도착한 뒤에도 매 프레임 경로가 재계산되어 미세하게 계속
+                // 흔들리는 문제가 있었다 (doc/0387).
                 currentState = EnemyState.Idle;
                 attackMoveDestination = null;
             }
@@ -324,16 +329,37 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     // SetDestination이 실패하면 더 넓은 반경으로 가장 가까운 NavMesh 지점을 찾아 재시도한다.
     private const float UnreachableDestinationSampleRadius = 20f;
 
+    // UnitController.MoveAgentTo와 동일한 캐싱(doc/0386) - 목적지가 직전과 사실상 같으면 재요청하지 않는다.
+    private const float RedundantDestinationEpsilon = 0.5f;
+    private Vector3? lastMoveAgentToDestination;
+
     private void MoveAgentTo(Vector3 destination)
     {
         if (!isAirUnit)
         {
             navMeshAgent.isStopped = false;
-            if (!navMeshAgent.SetDestination(destination) &&
-                NavMesh.SamplePosition(destination, out NavMeshHit hit, UnreachableDestinationSampleRadius, NavMesh.AllAreas))
+
+            if (navMeshAgent.hasPath &&
+                lastMoveAgentToDestination.HasValue &&
+                (lastMoveAgentToDestination.Value - destination).sqrMagnitude < RedundantDestinationEpsilon * RedundantDestinationEpsilon)
             {
-                navMeshAgent.SetDestination(hit.position);
+                return;
             }
+
+            if (navMeshAgent.SetDestination(destination))
+            {
+                lastMoveAgentToDestination = destination;
+                return;
+            }
+
+            if (NavMesh.SamplePosition(destination, out NavMeshHit hit, UnreachableDestinationSampleRadius, NavMesh.AllAreas) &&
+                navMeshAgent.SetDestination(hit.position))
+            {
+                lastMoveAgentToDestination = destination;
+                return;
+            }
+
+            lastMoveAgentToDestination = null;
         }
         else
         {

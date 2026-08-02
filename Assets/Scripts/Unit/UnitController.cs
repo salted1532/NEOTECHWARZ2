@@ -429,7 +429,9 @@ public class UnitController : MonoBehaviour, IDestructible
                 navMeshAgent.remainingDistance <= arriveDistance)
             {
                 arrived = true;
-                navMeshAgent.ResetPath();
+                // ResetPath() 미호출 이유는 EnemyUnitController와 동일 (doc/0387) - AttackRange의
+                // 순수 자동교전(ChaseTarget, 지정 명령 아님) 경로에서 매 프레임 재호출되는 동안 이
+                // 도착 판정이 계속 ResetPath()를 부르면 doc/0386 목적지 캐시가 무효화된다.
                 UnitcurrentState = UnitState.Idle;
                 attackMoveDestination = null;
             }
@@ -609,17 +611,41 @@ public class UnitController : MonoBehaviour, IDestructible
     // PathPartial로 갈 수 있는 데까지만 이동하므로 이 fallback을 타지 않는다 (doc/0375).
     private const float UnreachableDestinationSampleRadius = 20f;
 
+    // AttackOrderTick/FriendlyAttackTick/ChaseTarget처럼 매 프레임 MoveAgentTo를 다시 호출하는 곳에서,
+    // 목적지가 사실상 그대로인데도 매번 SetDestination(+실패 시 SamplePosition 재탐색)을 반복하면
+    // NavMeshAgent가 경로를 다 계산하기도 전에 매 프레임 다시 리셋되어, 실제로는 목적지 방향으로
+    // 계속 재조준(회전)만 하고 거의 전진하지 못하는 문제가 있었다(doc/0386). 직전과 사실상 같은
+    // 목적지면 이미 잡혀있는 경로를 그대로 유지하고 재요청하지 않는다.
+    private const float RedundantDestinationEpsilon = 0.5f;
+    private Vector3? lastMoveAgentToDestination;
+
     private bool MoveAgentTo(Vector3 destination, bool destinationIsAirborne = false)
     {
         if (!isAirUnit)
         {
             navMeshAgent.isStopped = false;
+
+            if (navMeshAgent.hasPath &&
+                lastMoveAgentToDestination.HasValue &&
+                (lastMoveAgentToDestination.Value - destination).sqrMagnitude < RedundantDestinationEpsilon * RedundantDestinationEpsilon)
+            {
+                return true; // 목적지 변화 없음 - 진행 중인 경로 그대로 유지
+            }
+
             if (navMeshAgent.SetDestination(destination))
+            {
+                lastMoveAgentToDestination = destination;
                 return true;
+            }
 
-            if (NavMesh.SamplePosition(destination, out NavMeshHit hit, UnreachableDestinationSampleRadius, NavMesh.AllAreas))
-                return navMeshAgent.SetDestination(hit.position);
+            if (NavMesh.SamplePosition(destination, out NavMeshHit hit, UnreachableDestinationSampleRadius, NavMesh.AllAreas) &&
+                navMeshAgent.SetDestination(hit.position))
+            {
+                lastMoveAgentToDestination = destination;
+                return true;
+            }
 
+            lastMoveAgentToDestination = null;
             return false;
         }
         else
@@ -757,6 +783,13 @@ public class UnitController : MonoBehaviour, IDestructible
         if (attackRange != null && sqrDistance <= attackRange.UnitRange * attackRange.UnitRange)
         {
             Attack(friendlyTarget.transform.position, friendlyTarget.gameObject); // 내부에서 정지 처리까지 함께 해준다
+        }
+        else if (!isAirUnit && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+        {
+            // 갈 수 있는 데까지 다 가서 멈췄는데도 사거리 밖(경사로 없는 언덕 위 등 도달 불가능한 대상) -
+            // 공격 명령을 취소한다 (doc/0384).
+            CancelAttackOrder();
+            HaltInPlace();
         }
         else
         {
@@ -1009,7 +1042,19 @@ public class UnitController : MonoBehaviour, IDestructible
                 // 다른 적이 근처에 있어도 그건 무시하고, 오직 "지정한 대상"과의 거리로만 교전 여부를 판단한다
                 // (attackRange.HasEnemyInRange를 쓰면 무관한 다른 적 때문에 추격이 멈춰버릴 수 있음).
                 if (!inAttackRange)
+                {
+                    // 갈 수 있는 데까지 다 가서 멈췄는데도 사거리 밖(경사로 없는 언덕 위 등 도달 불가능한
+                    // 대상, doc/0375 fallback으로 가장 가까운 지점까지만 이동한 경우 포함) - 공격 명령을
+                    // 취소한다 (doc/0384).
+                    if (!isAirUnit && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+                    {
+                        CancelAttackOrder();
+                        HaltInPlace();
+                        return;
+                    }
+
                     MoveAgentTo(attackMoveDestination.Value); // 사거리 밖: 계속 추격 이동
+                }
 
                 return;
             }
@@ -1052,16 +1097,7 @@ public class UnitController : MonoBehaviour, IDestructible
 
         arrived = false;
         UnitcurrentState = UnitState.Idle;
-        if (!isAirUnit)
-        {
-            navMeshAgent.isStopped = false;
-            navMeshAgent.SetDestination(pos);
-        }
-        else
-        {
-            targetPosition = AirTargetPosition(pos);
-            isMovingAirUnit = true;
-        }
+        MoveAgentTo(pos); // NavMesh fallback(doc/0375) 재사용 - 도달 불가능한 대상도 가장 가까운 지점까지는 이동한다
     }
 
     public void Attack(Vector3 end, GameObject enemy)
