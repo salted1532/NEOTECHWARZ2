@@ -1451,8 +1451,8 @@ MonoBehaviour:
   LevelDataToLoad: {fileID: 0}
   saveDataOnScan: 1
   levelNameToSave: Default
-  levelDimensionX: 64
-  levelDimensionY: 64
+  levelDimensionX: 96
+  levelDimensionY: 96
   unitScale: 4
   scanSpacingPerUnit: 0.25
   rayStartHeight: 3
@@ -10363,7 +10363,7 @@ MonoBehaviour:
   maxZ: 75
   zoomSpeed: 25
   minZoom: 4
-  maxZoom: 20
+  maxZoom: 30
   groundLayer:
     serializedVersion: 2
     m_Bits: 128
