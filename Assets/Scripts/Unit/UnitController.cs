@@ -1879,6 +1879,10 @@ public class UnitController : MonoBehaviour, IDestructible
         currentTrait = choice;
     }
 
+    // 대기 중인 지정형 스킬 명령(단일 유닛/범위)이 있는지. AttackRange.Update()가 이 값을 확인해서
+    // 스킬 사용 명령 중엔 사거리 밖 적 자동교전으로 이동을 가로채지 않게 하는 데 쓴다 (doc/0383).
+    public bool HasPendingSkillOrder => hasPendingSkillUnitOrder || hasPendingSkillAreaOrder;
+
     public bool CanUseSkill() => skillCooldownRemaining <= 0f;
     public void StartSkillCooldown(float cooldown) => skillCooldownRemaining = cooldown;
     public float GetSkillCooldownRemaining() => skillCooldownRemaining; // 스킬 슬롯 쿨다운 원형 이펙트 표시용 (doc/0323 후속)

@@ -72,6 +72,9 @@ public class AttackRange : MonoBehaviour
     {
         enemiesInRange.RemoveAll(enemy => enemy == null); // 이미 죽어서 destroy된 대상 정리
 
+        if (unitController.HasPendingSkillOrder)
+            return; // 스킬 사용 명령이 우선 - 사거리 밖 적 자동교전으로 이동을 가로채지 않는다 (doc/0383)
+
         GameObject target = GetPreferredTarget();
         if (target == null)
             return;
