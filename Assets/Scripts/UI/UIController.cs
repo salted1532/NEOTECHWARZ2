@@ -162,6 +162,12 @@ public class UIController : MonoBehaviour
     private const int BuildingLiftSlotIndex = 8;
     private static readonly HashSet<int> LiftSlotOnlyProtected = new HashSet<int> { BuildingLiftSlotIndex };
 
+    // 생산 건물(MainBase/Tier1/Tier2/Tier3) 전용 랠리 버튼 고정 슬롯. 위 리프트/이동 슬롯과 동일한 이유로
+    // 보호가 필요함 - ShowUnitProductionPanel이 매 프레임 호출되므로 보호 안 하면 이 슬롯도 같이 Clear()된다.
+    // 슬롯 6은 tier당 유닛 수(현재 최대 3개)로는 절대 안 채워지는 여유 슬롯이라 실제 생산 버튼과 안 겹친다.
+    private const int BuildingRallySlotIndex = 6;
+    private static readonly HashSet<int> LiftAndRallySlotsProtected = new HashSet<int> { BuildingLiftSlotIndex, BuildingRallySlotIndex };
+
     // 고급유닛 특성(트레이트) 선택으로 얻은 액티브 스킬 버튼의 고정 슬롯(doc/0228). BuildingLiftSlotIndex와
     // 동일한 이유로 보호가 필요함 - RTSUnitController.UpdateUnitSkillUI()가 ShowAttackUnitPanel과는 별도로
     // 매 프레임 독립적으로 이 슬롯만 갱신하므로, ShowAttackUnitPanel의 SetCommands가 이 슬롯을 건드리면
@@ -209,6 +215,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private Sprite cancelIcon;
     [SerializeField] private Sprite liftOffIcon; // 리프트 버튼(지상 상태일 때)
     [SerializeField] private Sprite landIcon;    // 착륙 버튼(공중 상태일 때)
+    [SerializeField] private Sprite rallyIcon;   // 생산 건물 랠리 버튼(고정 슬롯 6)
 
     [Header("Queue Empty Icons")]
     [SerializeField] private Sprite[] emptyQueueIcons; // 0=1, 1=2, 2=3, 3=4, 4=5
@@ -1149,8 +1156,9 @@ public class UIController : MonoBehaviour
     {
         CurrentState = state;
 
-        // 리프트 슬롯(8)은 여기 포함되지 않아도 건드리지 않는다 - RTSUnitController가 바로 뒤이어 독립적으로 채운다.
-        SetCommands(commands, LiftSlotOnlyProtected);
+        // 리프트 슬롯(8)/랠리 슬롯(6)은 여기 포함되지 않아도 건드리지 않는다 - RTSUnitController가
+        // 바로 뒤이어 독립적으로 채운다.
+        SetCommands(commands, LiftAndRallySlotsProtected);
     }
 
     // Lab
@@ -1256,6 +1264,19 @@ public class UIController : MonoBehaviour
             panelRoot.SetActive(true);
 
         slots[BuildingMoveSlotIndex].SetData(new CommandButtonData(moveIcon, onMove));
+    }
+
+    // 생산 건물(MainBase/Tier1/Tier2/Tier3) 전용 "랠리" 버튼 (고정 슬롯 BuildingRallySlotIndex).
+    // ShowUnitProductionPanel 호출 "이후"에, 그 tier의 유닛 생산 버튼과 나란히 표시된다.
+    public void ShowBuildingRallyCommand(ButtonAction onRally)
+    {
+        if (BuildingRallySlotIndex >= slots.Length || slots[BuildingRallySlotIndex] == null)
+            return;
+
+        if (panelRoot != null)
+            panelRoot.SetActive(true);
+
+        slots[BuildingRallySlotIndex].SetData(new CommandButtonData(rallyIcon, onRally));
     }
 
     // 건물 선택 컨텍스트에서 생산 패널이 없을 때(SupplyDepot/Lab/None, 또는 공중 상태) 사용.

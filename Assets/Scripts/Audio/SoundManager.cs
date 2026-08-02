@@ -260,26 +260,30 @@ public class SoundManager : MonoBehaviour
     // 그 안에 자원부족을 다시 겪어도 조용히 씹혔음).
     // minInterval(초) > 0이면 추가로 "마지막 재생 시작 시각으로부터 이 시간이 지나야" 다시 재생한다 -
     // 피격 경고음처럼 재생이 짧게 끝나도 계속 얻어맞으면 스팸되는 경우를 막기 위함(doc/0273).
-    public void PlayGlobalVoice(SoundClipSet set, float minInterval = 0f)
+    // 반환값: 실제로 이번 호출에서 재생을 새로 시작했는지(true) - 겹침 방지/쿨다운으로 조용히
+    // 씹혔으면(false) 호출부가 "진짜 재생된 순간에만" 다른 연출(미니맵 마커 등)을 같이 트리거할 수 있게 함
+    // (doc/0362).
+    public bool PlayGlobalVoice(SoundClipSet set, float minInterval = 0f)
     {
         if (set == null || !set.HasClips)
-            return;
+            return false;
 
         if (activeGlobalVoiceSources.TryGetValue(set, out AudioSource activeSource)
             && activeSource != null && activeSource.isPlaying)
-            return;
+            return false;
 
         if (minInterval > 0f
             && lastGlobalVoiceStartTime.TryGetValue(set, out float lastStart)
             && Time.time - lastStart < minInterval)
-            return;
+            return false;
 
         AudioSource source = PlayFromPool(voicePool, set, voiceVolume, voiceMuted, spatialBlend: 0f, transform.position); // 이미 위에서 자체 겹침/간격 방지를 했으므로 limitSpam 불필요
-        if (source != null)
-        {
-            activeGlobalVoiceSources[set] = source;
-            lastGlobalVoiceStartTime[set] = Time.time;
-        }
+        if (source == null)
+            return false;
+
+        activeGlobalVoiceSources[set] = source;
+        lastGlobalVoiceStartTime[set] = Time.time;
+        return true;
     }
 
     // 자주 쓰는 나레이션 카테고리는 호출부가 globalVoiceBank를 직접 null 체크하지 않도록 래핑해둔다.
@@ -294,14 +298,15 @@ public class SoundManager : MonoBehaviour
     }
 
     // 피격 경고음은 유닛/건물 각각 독립적으로 underAttackWarningCooldown(기본 10초) 간격을 둔다.
-    public void PlayUnitUnderAttackWarning()
+    // 반환값: 이번 호출에서 실제로 경고음이 새로 재생됐는지 (doc/0362 - 미니맵 마커를 이 타이밍에만 맞추기 위함).
+    public bool PlayUnitUnderAttackWarning()
     {
-        if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.unitUnderAttackWarning, underAttackWarningCooldown);
+        return globalVoiceBank != null && PlayGlobalVoice(globalVoiceBank.unitUnderAttackWarning, underAttackWarningCooldown);
     }
 
-    public void PlayBuildingUnderAttackWarning()
+    public bool PlayBuildingUnderAttackWarning()
     {
-        if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.buildingUnderAttackWarning, underAttackWarningCooldown);
+        return globalVoiceBank != null && PlayGlobalVoice(globalVoiceBank.buildingUnderAttackWarning, underAttackWarningCooldown);
     }
 
     public void PlayUpgradeCompleteVoice()

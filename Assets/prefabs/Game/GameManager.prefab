@@ -6131,6 +6131,7 @@ GameObject:
   - component: {fileID: 1650047212472993053}
   - component: {fileID: 2650186437095838884}
   - component: {fileID: 6075268313315998894}
+  - component: {fileID: 2500757778953674289}
   m_Layer: 5
   m_Name: MiniMap_image
   m_TagString: Untagged
@@ -6209,6 +6210,26 @@ MonoBehaviour:
   minimapCamera: {fileID: 6085927633455968969}
   mainCameraControl: {fileID: 1298732187011494947}
   userControl: {fileID: 961756826390763593}
+--- !u!114 &2500757778953674289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5569437337629231928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d02d80aa352d8f4993f067aa1335c5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MinimapAlertController
+  minimapRect: {fileID: 6942796277551406468}
+  minimapCamera: {fileID: 6085927633455968969}
+  pingColor: {r: 1, g: 0, b: 0, a: 1}
+  pingSize: 18
+  pingDuration: 2.5
+  attackedPointerPrefab: {fileID: 2934299905608118493, guid: d93965cfebc31fa489b64a8135ea2985, type: 3}
+  attackedPointerHeight: 40
+  attackedPointerLifetime: 3
 --- !u!1 &5585977652459386039
 GameObject:
   m_ObjectHideFlags: 0

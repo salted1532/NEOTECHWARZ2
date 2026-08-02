@@ -595,7 +595,16 @@ public class RTSUnitController : MonoBehaviour
         building.SelectBuilding();
         selectedBuildingList.Add(building);
         building.GetComponent<BuildingAudio>()?.PlaySelectVoice();
+
+        // 생산 건물이면 선택하는 순간 자기 랠리 포인트 위치에 이동 포인터를 잠깐 보여준다(3초 후 자동
+        // 사라짐 - UserControl의 기존 이동/랠리 확정 포인터를 그대로 재사용).
+        if (IsProductionBuildingState(BuildingSelectState))
+            userControl.ShowMovePointerAt(building.GetRallyPos());
     }
+
+    private static bool IsProductionBuildingState(BuildingState state) =>
+        state == BuildingState.MainBaseSelect || state == BuildingState.Tier1Select ||
+        state == BuildingState.Tier2Select || state == BuildingState.Tier3Select;
 
     /// <summary>
     /// 특정 건물 선택 해제
@@ -964,6 +973,17 @@ public class RTSUnitController : MonoBehaviour
     public void EnterRallyMode()
     {
         userControl.SetOrderState("Rally");
+    }
+
+    // 생산 건물 패널의 랠리 버튼(고정 슬롯 6) 데이터. M(이동)/A(공격)처럼 위치 지정 대기 모드로 들어간다 -
+    // 그 다음 클릭한 지점이 새로 생산된 유닛의 집결지가 된다(건물 우클릭과 동일한 동작).
+    private ButtonAction RallyButtonAction()
+    {
+        return ButtonAction.Simple(
+            EnterRallyMode,
+            "Rally",
+            "Set the rally point for newly produced units. \nshortcut key [<color=yellow>Y</color>]",
+            KeyCode.Y);
     }
 
     // 공중에 뜬 건물의 "이동" 버튼(M)용
@@ -1703,6 +1723,7 @@ public class RTSUnitController : MonoBehaviour
                             uIController.ShowProductionUI(
                                 GetProductionQueue(),
                                 CancelProduction);
+                            uIController.ShowBuildingRallyCommand(RallyButtonAction());
                             break;
 
                         case BuildingState.Tier1Select:
@@ -1710,6 +1731,7 @@ public class RTSUnitController : MonoBehaviour
                             uIController.ShowProductionUI(
                                 GetProductionQueue(),
                                 CancelProduction);
+                            uIController.ShowBuildingRallyCommand(RallyButtonAction());
                             break;
 
                         case BuildingState.Tier2Select:
@@ -1717,6 +1739,7 @@ public class RTSUnitController : MonoBehaviour
                             uIController.ShowProductionUI(
                                 GetProductionQueue(),
                                 CancelProduction);
+                            uIController.ShowBuildingRallyCommand(RallyButtonAction());
                             break;
 
                         case BuildingState.Tier3Select:
@@ -1724,6 +1747,7 @@ public class RTSUnitController : MonoBehaviour
                             uIController.ShowProductionUI(
                                 GetProductionQueue(),
                                 CancelProduction);
+                            uIController.ShowBuildingRallyCommand(RallyButtonAction());
                             break;
 
                         case BuildingState.Lab:

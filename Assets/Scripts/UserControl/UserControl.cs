@@ -153,6 +153,10 @@ public class UserControl : MonoBehaviour
         DrawDragRectangle();
     }
 
+    // 생산 건물을 선택했을 때 자기 랠리 포인트 위치를 보여주는 용도(RTSUnitController.SelectBuilding) 등,
+    // 외부에서 이동 포인터를 띄워야 할 때 쓰는 공개 진입점. 동작은 ShowMovePointer와 완전히 동일(3초 후 자동 사라짐).
+    public void ShowMovePointerAt(Vector3 position) => ShowMovePointer(position);
+
     // 명령 확정 시점(클릭)에 마커 하나를 켤 때 항상 반대쪽 마커를 함께 끈다 - 이동 명령 직후 바로
     // 공격 명령을 내리는 등 빠르게 명령을 바꿔도 이전 마커가 꺼지지 않아 2개가 동시에 남는 버그를 막는다.
     private void ShowMovePointer(Vector3 position)
@@ -732,17 +736,9 @@ public class UserControl : MonoBehaviour
 
     private void HandlekeyBoard()
     {
-        // 유닛 명령(Attack/Move/Stop/Patrol/Hold/Return/Build)과 건물 건설/유닛 생산 단축키는
-        // 이제 각 버튼(ProductionSlot)이 자기 단축키를 직접 감지해서 스스로 클릭되므로 여기서 따로 처리하지 않는다.
-        // (Rally는 대응하는 버튼이 없는 순수 키보드 전용 모드 전환이라 그대로 남겨둠)
-        if (rtsUnitController.IsUnitSelect())
-        {
-            //건물 랠리 설정
-            if (Input.GetKeyDown(KeyCode.Y))
-            {
-                UsercurrentState = OrderState.Rally;
-            }
-        }
+        // 유닛 명령(Attack/Move/Stop/Patrol/Hold/Return/Build)과 건물 건설/유닛 생산 단축키, 그리고
+        // 이제 생산 건물의 랠리(Y) 단축키까지 각 버튼(ProductionSlot)이 자기 단축키를 직접 감지해서
+        // 스스로 클릭되므로 여기서 따로 처리하지 않는다 (doc/0363).
 
         if (rtsUnitController.IsBuildMode())
         {

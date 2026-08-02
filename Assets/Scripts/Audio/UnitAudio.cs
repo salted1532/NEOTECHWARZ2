@@ -156,8 +156,10 @@ public class UnitAudio : MonoBehaviour
     {
         if (isEnemyAttacker && !SoundManager.IsWorldPositionOnScreen(transform.position))
         {
-            SoundManager.Instance?.PlayUnitUnderAttackWarning();
-            MinimapAlertController.Instance?.ShowAttackPing(transform); // doc/0349
+            // 쿨다운에 안 걸리고 실제로 경고음이 새로 재생된 순간에만 미니맵 마커도 같이 띄운다 -
+            // 계속 얻어맞아도 경고음처럼 10초 간격으로만 나오게 (doc/0362).
+            if (SoundManager.Instance != null && SoundManager.Instance.PlayUnitUnderAttackWarning())
+                MinimapAlertController.Instance?.SpawnAttackedPointer(transform.position);
         }
     }
 }
