@@ -1568,6 +1568,19 @@ public class RTSUnitController : MonoBehaviour
         skillSlotShown = false;
     }
 
+    // 유닛이 선택된 상태(건물/선택없음 아님)에서 슬롯 6을 비운다. 일꾼(useFallbackSlot=true)은
+    // ShowWorkerPanel이 슬롯 6을 매 프레임 직접 채우므로 예외로 두고 건드리지 않는다 - 그 외(일꾼이 아닌
+    // 유닛 선택 중)엔 슬롯 6이 스킬 전용 컨텍스트라, 직전까지 뭐가 있었든(예: 일꾼 Build/취소 버튼 잔상,
+    // doc/0368) skillSlotShown 여부와 무관하게 무조건 비운다.
+    private void ClearUnitContextSkillSlot(bool useFallbackSlot)
+    {
+        if (useFallbackSlot)
+            return;
+
+        uIController.ClearUnitSkillSlot(false);
+        skillSlotShown = false;
+    }
+
     private void UpdateUnitSkillUI()
     {
         // Worker는 슬롯 6을 Build 버튼이 이미 쓰고 있으므로(doc/0251), 스킬은 그 다음 슬롯(7)으로 넘긴다.
@@ -1575,6 +1588,8 @@ public class RTSUnitController : MonoBehaviour
 
         if (selectedUnitList.Count == 0)
         {
+            // 건물 선택/선택 없음 - 슬롯 6은 랠리 버튼이 쓸 수도 있으므로(doc/0363) 스킬이 실제로
+            // 그렸을 때만 조심스럽게 지운다.
             uIController.HideSkillSelectPanel();
             ClearSkillSlotIfShown();
             return;
@@ -1586,7 +1601,7 @@ public class RTSUnitController : MonoBehaviour
         if (data == null || !data.hasTraitChoice)
         {
             uIController.HideSkillSelectPanel();
-            ClearSkillSlotIfShown();
+            ClearUnitContextSkillSlot(useFallbackSlot);
             return;
         }
 
@@ -1594,7 +1609,7 @@ public class RTSUnitController : MonoBehaviour
 
         if (chosen == TraitChoice.None)
         {
-            ClearSkillSlotIfShown();
+            ClearUnitContextSkillSlot(useFallbackSlot);
             uIController.ShowSkillSelectPanel(
                 new CommandButtonData(data.traitA.icon, ButtonAction.Simple(
                     () => ChooseTrait(data.ID, TraitChoice.A), data.traitA.skillName, data.traitA.description)),
@@ -1616,6 +1631,15 @@ public class RTSUnitController : MonoBehaviour
             ? $"{trait.description} \nshortcut key [<color=yellow>{trait.shortcutKey}</color>]"
                 + (onCooldown ? $"\nRemain time: {skillCooldownRemaining:F1}" : "")
             : trait.description;
+
+        // 진단용(doc/0368): 스킬이 이 슬롯을 처음 차지하는 순간인데 이미 다른 버튼이 남아있으면
+        // 정상 흐름이 아니다(위 ClearUnitContextSkillSlot이 미리 비웠어야 함) - 그래도 스킬 표시는
+        // 항상 보장하기 위해 덮어쓰기는 그대로 진행하고 로그만 남긴다.
+        if (!skillSlotShown && uIController.IsSkillSlotOccupied(useFallbackSlot))
+        {
+            Debug.LogWarning($"[RTSUnitController] Unit skill slot(fallback={useFallbackSlot}) already had a button " +
+                "before the skill claimed it - check other slot 6/7 writers (Worker Build / Rally / Cancel).");
+        }
 
         uIController.ShowUnitSkillSlot(new CommandButtonData(
             trait.icon,

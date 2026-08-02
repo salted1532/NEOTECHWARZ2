@@ -20,6 +20,10 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private UIController.CommandButtonData data;
     private bool hasData;
     private KeyCode shortcut = KeyCode.None; // 이 슬롯을 대신 "누르는" 키보드 단축키 (없으면 KeyCode.None)
+
+    // 슬롯 6/7처럼 여러 시스템(스킬/일꾼 Build/랠리)이 겸용하는 슬롯에서, 새 데이터를 쓰기 전에
+    // 이미 다른 버튼이 남아있는지 확인하는 진단용 (doc/0368).
+    public bool HasData => hasData;
     private bool isHovered; // 호버 중엔 Update()가 매 프레임 툴팁을 새로 갱신해서 쿨다운 잔여시간처럼 계속 바뀌는 설명도 실시간으로 보이게 한다
 
     // 마지막으로 TooltipUI에 실제로 표시한 내용. 호버 중엔 매 프레임 확인하되, 내용이 지난 프레임과 완전히

@@ -1116,6 +1116,15 @@ public class UIController : MonoBehaviour
             slots[index]?.Clear();
     }
 
+    // 스킬이 슬롯 6/7을 처음 차지하려는 순간 이미 다른 버튼(일꾼 Build/취소 등 잔상)이 남아있는지 확인하는
+    // 진단용 (doc/0368). 정상 흐름이면 RTSUnitController.UpdateUnitSkillUI가 미리 비워두므로 항상 false다 -
+    // true가 찍히면 슬롯 6을 공유하는 다른 경로에서 새로운 잔상 버그가 생겼다는 신호.
+    public bool IsSkillSlotOccupied(bool useFallbackSlot)
+    {
+        int index = useFallbackSlot ? UnitSkillFallbackSlotIndex : UnitSkillSlotIndex;
+        return index < slots.Length && slots[index] != null && slots[index].HasData;
+    }
+
     // 스킬 슬롯 위에 쿨다운 원형 오버레이를 갱신한다 (doc/0323 후속). normalizedRemaining: 1=방금 사용(꽉 참) ~ 0=사용 가능.
     public void SetUnitSkillCooldown(float normalizedRemaining, bool useFallbackSlot = false)
     {
