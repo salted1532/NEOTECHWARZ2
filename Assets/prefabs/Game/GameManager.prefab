@@ -7438,7 +7438,7 @@ Transform:
   m_GameObject: {fileID: 6289116950414759840}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -2.9, y: 322, z: -2.15}
+  m_LocalPosition: {x: -2.9, y: 100, z: -2.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9984,7 +9984,9 @@ MonoBehaviour:
   optionButton: {fileID: 6863807036989037254}
   optionCloseButton: {fileID: 5399114222627177539}
   mainMenuButton: {fileID: 1512184961735174700}
+  nextStageButton: {fileID: 0}
   mainSceneName: MainScene
+  nextStageSceneName: SampleScene
   optionsPanel: {fileID: 4031049816906540173}
 --- !u!1 &7480063997942121291
 GameObject:

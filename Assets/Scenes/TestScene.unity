@@ -779,7 +779,7 @@ PrefabInstance:
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 1333850740}
+      objectReference: {fileID: 1196259923}
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Positions.Array.data[0].x
       value: 97.0116
@@ -1231,7 +1231,7 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1963905551}
   m_SourcePrefab: {fileID: 100100000, guid: 08df6203da07583408740dd9b8344101, type: 3}
---- !u!21 &1333850740
+--- !u!21 &1196259923
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
@@ -2295,7 +2295,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4031049816906540173, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4034625510596933221, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: m_RaycastTarget
