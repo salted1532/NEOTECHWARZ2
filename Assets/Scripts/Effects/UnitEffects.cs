@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using FischlWorks_FogWar;
 
 // 유닛 프리팹에 UnitController(아군) 또는 EnemyUnitController(적)/HealthManager와 같이 부착하는 이펙트 전담
 // 컴포넌트. 공격/이동/피격/사망 이펙트를 담당하며, 상태머신(UnitController/EnemyUnitController)이나 체력
@@ -39,12 +40,17 @@ public class UnitEffects : MonoBehaviour
     private HealthManager healthManager;
     private Collider bodyCollider; // 피격 이펙트 위치 계산용 (AttackRange의 트리거 콜라이더가 아니라 유닛 본체 콜라이더)
 
+    // 이동 트레일은 지속형이라 스폰 시점 한 번만으로는 부족함 - Update()에서 매 프레임 다시 확인해서
+    // 이동 중이던 유닛이 안개 속으로 들어가면 끄고, 나오면 다시 켠다 (doc/0359).
+    private csFogWar fogWar;
+
     private void Awake()
     {
         unitController = GetComponent<UnitController>();
         enemyUnitController = GetComponent<EnemyUnitController>();
         healthManager = GetComponent<HealthManager>();
         bodyCollider = GetComponent<Collider>(); // 클릭 판정(UserControl의 layerUnit 레이캐스트)에 쓰는 것과 동일한 콜라이더
+        fogWar = FindFirstObjectByType<csFogWar>();
     }
 
     private void OnEnable()
@@ -70,7 +76,7 @@ public class UnitEffects : MonoBehaviour
     {
         bool moving = (unitController != null && unitController.IsCurrentlyMoving())
             || (enemyUnitController != null && enemyUnitController.IsCurrentlyMoving());
-        SetMoveTrail(moving);
+        SetMoveTrail(moving && FogVisibility.IsRevealed(fogWar, transform.position));
     }
 
     private void SetMoveTrail(bool moving)

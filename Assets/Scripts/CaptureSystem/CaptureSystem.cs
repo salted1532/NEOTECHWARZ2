@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using FischlWorks_FogWar;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,6 +15,11 @@ public enum CaptureOwner { Neutral, Ally, Enemy }
 public class CaptureSystem : MonoBehaviour
 {
     [SerializeField] private float captureDuration = 30f;
+
+    // 아무도 없을 때(방치) 원래 상태로 되돌아가는 속도, 그리고 아직 한 번도 완전히 점령된 적 없는(Neutral)
+    // 상태에서 상대 진행치를 지울 때 점령 속도(1/sec)에 더해지는 보너스 속도. 기본값을 점령 속도와 같은
+    // 1로 둬서 "지우는 중엔 2배속"이 정확히 2배가 되도록 함 (doc/0357).
+    [SerializeField] private float decayRate = 1f;
 
     [Header("상태별 이펙트 (흰색/초록/빨강)")]
     [SerializeField] private GameObject neutralEffect;
@@ -42,9 +48,15 @@ public class CaptureSystem : MonoBehaviour
     // 반대 진영으로 넘어갈 수 있다 (Ally <-> Neutral <-> Enemy 순환).
     private float controlValue;
 
+    // 점령 타이머 슬라이더가 안개(Y≈1의 물리적 Plane)보다 훨씬 높이 떠 있어서 깊이 테스트로는 절대
+    // 안 가려지는 문제의 대안 - 안개 상태를 직접 조회해서 UpdateCaptureBar()에서 표시 여부에 반영한다
+    // (doc/0358).
+    private csFogWar fogWar;
+
     private void Awake()
     {
         if (territoryZone == null) territoryZone = GetComponentInChildren<TerritoryZone>(true);
+        fogWar = FindFirstObjectByType<csFogWar>();
 
         // 씬에 미리 설정해둔 시작 소유 상태(debugOwner)를 게임 시작 시점(Play 모드/빌드 모두)에 반영한다.
         // 기존엔 OnValidate()가 에디터에서만 이 값을 CurrentOwner/territoryZone에 동기화했기 때문에,
@@ -95,24 +107,44 @@ public class CaptureSystem : MonoBehaviour
         if (!contested)
         {
             if (alliesPresent)
-                controlValue = Mathf.Min(controlValue + Time.deltaTime, captureDuration);
+                controlValue = Mathf.Min(controlValue + AllyRate() * Time.deltaTime, captureDuration);
             else if (enemiesPresent)
-                controlValue = Mathf.Max(controlValue - Time.deltaTime, -captureDuration);
-            // 둘 다 없으면 그 자리에서 멈춘다 (리셋하지 않음) - 기존과 동일
+                controlValue = Mathf.Max(controlValue - EnemyRate() * Time.deltaTime, -captureDuration);
+            else
+                controlValue = Mathf.MoveTowards(controlValue, RestPoint(), decayRate * Time.deltaTime);
         }
 
         UpdateCaptureBar(alliesPresent, enemiesPresent, contested);
         UpdateOwnerFromControlValue();
     }
 
-    // controlValue가 양 끝(±captureDuration)에 도달했을 때만 소유자가 바뀐다. 그 사이(0 포함)는 전부
-    // Neutral 취급 - 기존 "Neutral->Ally"도 원래 이 규칙(완료 전엔 전부 Neutral)이었으므로 대칭 확장일 뿐이다.
+    // 아군이 밀 때의 초당 변화량. 한 번도 완전히 점령된 적 없는(Neutral) 상태에서 적이 채워둔 진행치를
+    // 지우는 중(controlValue < 0)이면 자연 감쇠(decayRate)와 미는 힘(1)이 겹쳐 2배속. 이미 한쪽으로
+    // 완전히 점령된 적 있는 상태(Owner == Ally/Enemy)를 되돌리는 중이거나, 자기 진영 진행치를 늘리는
+    // 중이면 보너스 없이 1배속 (doc/0357).
+    private float AllyRate() => CurrentOwner == CaptureOwner.Neutral && controlValue < 0f ? 1f + decayRate : 1f;
+
+    private float EnemyRate() => CurrentOwner == CaptureOwner.Neutral && controlValue > 0f ? 1f + decayRate : 1f;
+
+    // 아무도 없을 때 서서히 되돌아갈 지점. 이미 완전히 점령된 적 있는 상태(Owner == Ally/Enemy)면 그
+    // 소유자의 극값(원래 상태로 회복), 한 번도 완전히 점령된 적 없으면(Neutral) 중립(0)으로 줄어든다.
+    private float RestPoint() =>
+        CurrentOwner == CaptureOwner.Ally ? captureDuration :
+        CurrentOwner == CaptureOwner.Enemy ? -captureDuration :
+        0f;
+
+    // controlValue가 ±captureDuration(완전 점령) 또는 정확히 0(중립)을 "실제로 통과"했을 때만 소유자가
+    // 바뀐다. 그 사이를 지나가는 동안은 이전 소유자를 그대로 유지한다(sticky) - 완전 점령된 거점을
+    // 되돌리는 30초 동안은 여전히 이전 소유자로 표시되다가, 정확히 중립을 통과하는 순간에만 Neutral로
+    // 바뀌고 거기서 다시 반대쪽 극값까지 가야 그 진영 소유가 된다 (doc/0357).
     private void UpdateOwnerFromControlValue()
     {
-        CaptureOwner newOwner =
-            controlValue >= captureDuration ? CaptureOwner.Ally :
-            controlValue <= -captureDuration ? CaptureOwner.Enemy :
-            CaptureOwner.Neutral;
+        CaptureOwner newOwner = CurrentOwner;
+
+        if (controlValue >= captureDuration) newOwner = CaptureOwner.Ally;
+        else if (controlValue <= -captureDuration) newOwner = CaptureOwner.Enemy;
+        else if (CurrentOwner == CaptureOwner.Ally && controlValue <= 0f) newOwner = CaptureOwner.Neutral;
+        else if (CurrentOwner == CaptureOwner.Enemy && controlValue >= 0f) newOwner = CaptureOwner.Neutral;
 
         if (newOwner == CurrentOwner) return;
 
@@ -122,21 +154,24 @@ public class CaptureSystem : MonoBehaviour
         Debug.Log($"점령 상태 변경: {newOwner}");
     }
 
-    // 진행 중인 방향(아군/적) 기준으로 점령 바를 표시한다. 이미 그 방향으로 완전히 점령됐거나,
-    // 교착 상태이거나, 아무도 없으면 숨긴다.
+    // 진행 중이거나(아군/적이 밀고 있음) 방치 상태로 되돌아가는 중(RestPoint에 아직 안 도달)이면 바를
+    // 보여준다. 이미 그 방향으로 완전히 점령 완료됐거나 교착 상태면 숨긴다. 값은 절댓값 하나로 통일해서
+    // "완전 점령 상태(꽉 참)에서 밀려나 0으로 줄어들다, 반대쪽으로 다시 차오르는" 과정이 끊김없이 하나의
+    // 슬라이더 애니메이션으로 보이게 한다 (doc/0357).
     private void UpdateCaptureBar(bool alliesPresent, bool enemiesPresent, bool contested)
     {
-        bool progressing = !contested && (alliesPresent || enemiesPresent)
+        bool returningToRest = !alliesPresent && !enemiesPresent && !Mathf.Approximately(controlValue, RestPoint());
+
+        bool progressing = !contested && (alliesPresent || enemiesPresent || returningToRest)
             && !(alliesPresent && controlValue >= captureDuration)
-            && !(enemiesPresent && controlValue <= -captureDuration);
+            && !(enemiesPresent && controlValue <= -captureDuration)
+            && FogVisibility.IsRevealed(fogWar, transform.position);
 
         SetCaptureBarVisible(progressing);
 
         if (!progressing || captureBar == null) return;
 
-        captureBar.value = alliesPresent
-            ? Mathf.Clamp(controlValue, 0f, captureDuration)
-            : Mathf.Clamp(-controlValue, 0f, captureDuration);
+        captureBar.value = Mathf.Clamp(Mathf.Abs(controlValue), 0f, captureDuration);
     }
 
     private void SetCaptureBarVisible(bool visible)

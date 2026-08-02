@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using FischlWorks_FogWar;
 
 // 이펙트 프리팹(파티클/사운드)을 스폰하고 정리하는 공용 정적 헬퍼.
 // 단일 지점(Spawn), 다중 지점 발사 후 잊기(SpawnAtPoints), 다중 지점 지속형(SpawnPersistentAtPoints)을 제공한다.
@@ -7,6 +8,20 @@ using UnityEngine;
 // 지점을 아직 안 채운 프리팹도 기존과 동일하게 동작하고, 나중에 인스펙터에서 지점을 늘리기만 하면 된다.
 public static class EffectPlayer
 {
+    // 씬당 한 번만 찾으면 되므로 정적으로 캐싱한다 (씬 전환 시 재조회되도록 fogWarChecked도 함께 둠).
+    private static csFogWar fogWar;
+    private static bool fogWarChecked;
+
+    private static csFogWar GetFogWar()
+    {
+        if (!fogWarChecked)
+        {
+            fogWar = Object.FindFirstObjectByType<csFogWar>();
+            fogWarChecked = true;
+        }
+        return fogWar;
+    }
+
     // 이펙트 프리팹을 pos/rot에 스폰하고, ParticleSystem의 재생시간(main.duration + startLifetime.constantMax)
     // 을 기준으로 자동 파괴한다. AudioSource가 붙어있으면 같이 재생된다(프리팹에 미리 세팅).
     // 루트뿐 아니라 모든 자식까지 뒤져서(GetComponentsInChildren) 그중 가장 긴 지속시간을 기준으로 삼는다 -
@@ -16,6 +31,11 @@ public static class EffectPlayer
     public static GameObject Spawn(GameObject effectPrefab, Vector3 pos, Quaternion rot, Transform parent = null)
     {
         if (effectPrefab == null)
+            return null;
+
+        // 안개에 가려진 위치에서는 이펙트를 아예 스폰하지 않는다 - 모든 발사 후 잊기 이펙트(SpawnAtPoints/
+        // PlayHit 경유)가 결국 이 메서드로 모이므로 여기 한 곳만 고치면 전부 적용된다 (doc/0359).
+        if (!FogVisibility.IsRevealed(GetFogWar(), pos))
             return null;
 
         GameObject instance = Object.Instantiate(effectPrefab, pos, rot, parent);

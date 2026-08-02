@@ -692,6 +692,18 @@ public class RTSUnitController : MonoBehaviour
         selectedEnemyList.Add(enemy);
     }
 
+    // 안개에 가려지는 등, 외부 이벤트로 특정 적 유닛의 선택을 해제해야 할 때 호출한다
+    // (ClearSelectedEnemyBuildingIfMatches와 동일한 패턴, doc/0360).
+    public void ClearSelectedEnemyIfMatches(EnemyUnitController enemy)
+    {
+        if (!selectedEnemyList.Contains(enemy))
+            return;
+
+        enemy.DeselectEnemy();
+        selectedEnemyList.Remove(enemy);
+        RTScurrentSate = SelectState.None;
+    }
+
     #endregion
 
     #region EnemyBuilding선택 관련
@@ -716,12 +728,13 @@ public class RTSUnitController : MonoBehaviour
         selectedEnemyBuilding = building;
     }
 
-    // 적 건물이 파괴되어 사라질 때 선택 상태가 유령 참조로 남지 않도록 정리한다.
+    // 적 건물이 파괴되거나(Die) 안개에 가려져서(doc/0360) 선택 상태가 유령 참조로 남지 않도록 정리한다.
     public void ClearSelectedEnemyBuildingIfMatches(EnemyBuildingController building)
     {
         if (selectedEnemyBuilding != building)
             return;
 
+        building.DeselectEnemyBuilding();
         selectedEnemyBuilding = null;
         RTScurrentSate = SelectState.None;
     }

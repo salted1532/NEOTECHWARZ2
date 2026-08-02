@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using FischlWorks_FogWar;
 
 // 적 건물 "껍데기". 캠페인은 정해진 스크립트/트리거로 적 유닛을 직접 배치·스폰할 예정이라, 적 건물이
 // 실제로 생산 큐/자원 소모/건설 그리드 같은 걸 가질 필요가 없다 - 지금은 체력만 갖고 있다가 파괴되면
@@ -14,6 +15,11 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
     [SerializeField] private GameObject buildingMarker; // 선택 표시 (EnemyUnitController.enemyMarker와 동일한 패턴)
     [SerializeField] private string buildingName; // Info_panel에 표시할 이름
     [SerializeField] private Sprite icon;          // Info_panel에 표시할 아이콘
+
+    // 미니맵에 표시하는 y20대 스프라이트 마커(자식 오브젝트, 인스펙터에서 연결). EnemyUnitController.minimapIcon과
+    // 동일한 이유(안개가 실제 3D Plane이라 Y가 높은 오브젝트는 깊이 테스트로 안 가려짐)로 Update()에서
+    // 안개 상태를 직접 조회해 켜고 끈다 (doc/0356/0361).
+    [SerializeField] private SpriteRenderer minimapIcon;
 
     // 공격 명령(우클릭/A 모드) 피드백 마커 깜빡임 (EnemyUnitController.flashInterval/flashCount와 동일한 패턴, doc/0248)
     [SerializeField] private float flashInterval = 0.3f;
@@ -31,6 +37,9 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
     private PlacementSystem placementSystem;
     private float groundOffset; // 이 건물의 메쉬 피벗이 지면에서 얼마나 떨어져 있는지 (PlacementSystem.GetGroundOffsetY와 동일한 계산)
 
+    // 선택 중인 건물이 안개 속으로 들어가면 선택을 풀어준다 (EnemyUnitController.fogWar와 동일한 패턴, doc/0360).
+    private csFogWar fogWar;
+
     private void Start()
     {
         if (buildingMarker != null)
@@ -38,6 +47,7 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
 
         rtsController = FindFirstObjectByType<RTSUnitController>();
         placementSystem = FindFirstObjectByType<PlacementSystem>();
+        fogWar = FindFirstObjectByType<csFogWar>();
 
         // 씬에 직접 배치해둔 적 건물(캠페인은 전부 이 방식 - 정상 건설 흐름 자체가 없음)도 시작하자마자
         // 정확히 지면에 붙도록 위치를 보정한다 (BuildingController와 동일한 패턴, doc/0246).
@@ -51,6 +61,19 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
         // 씬에 직접 배치됐든 나중에 스크립트로 생성됐든, 항상 자기 enemyBuildingID로 OC Building Data SO를
         // 조회해서 스스로 이름/체력을 적용한다 (EnemyUnitController.Start()와 동일한 패턴).
         ApplyBuildingData(rtsController != null ? rtsController.GetEnemyBuildingData(enemyBuildingID) : null);
+    }
+
+    // 건물은 안 움직이지만 플레이어 유닛이 이동하면서 안개가 계속 바뀌므로 매 프레임 다시 확인한다.
+    // 미니맵 마커 토글(doc/0361)과 선택 해제(doc/0360)가 같은 안개 조회 결과를 공유한다.
+    private void Update()
+    {
+        bool revealed = FogVisibility.IsRevealed(fogWar, transform.position);
+
+        if (minimapIcon != null)
+            minimapIcon.enabled = revealed;
+
+        if (!revealed)
+            rtsController?.ClearSelectedEnemyBuildingIfMatches(this);
     }
 
     // 그리드 셀 좌표를 역산해 자기 크기에 맞춰 위치를 정렬하고, PlacementSystem의 그리드 점유 정보에

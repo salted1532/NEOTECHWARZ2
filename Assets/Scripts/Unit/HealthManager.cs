@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using FischlWorks_FogWar;
 
 // 유닛/건물마다 다른 사망 처리(Destroy 방식, 이펙트 등)를 구현하기 위한 인터페이스.
 public interface IDestructible
@@ -20,6 +21,10 @@ public class HealthManager : MonoBehaviour
     private int currentHp;
     private bool isDead;
 
+    // 체력바가 안개(Y≈1의 물리적 Plane)보다 훨씬 높이 떠 있어서 깊이 테스트로는 절대 안 가려지는 문제의
+    // 대안 - 안개 상태를 직접 조회해서 Update()에서 렌더러를 켜고 끈다 (doc/0358).
+    private csFogWar fogWar;
+
     // 체력 변화 시 UI(체력바 등)가 갱신될 수 있도록 이벤트로 알림
     public event System.Action<int, int> OnHealthChanged; // (currentHp, maxHealth)
     public event System.Action OnDeath;
@@ -33,9 +38,20 @@ public class HealthManager : MonoBehaviour
     private void Awake()
     {
         currentHp = maxHealth;
+        fogWar = FindFirstObjectByType<csFogWar>();
 
         OnHealthChanged += UpdateHealthSlider;
         UpdateHealthSlider(currentHp, maxHealth);
+    }
+
+    // 체력 변화가 없어도 안개 상태는 계속 바뀌므로(유닛이 안 움직여도 다른 유닛이 시야를 뺏어가는 등)
+    // 매 프레임 다시 확인한다 - 풀피면 애초에 숨김 조건이라 안개 체크할 필요도 없음 (doc/0358).
+    private void Update()
+    {
+        if (healthSlider == null || currentHp >= maxHealth)
+            return;
+
+        healthSlider.gameObject.SetActive(FogVisibility.IsRevealed(fogWar, transform.position));
     }
 
     // 체력이 바뀔 때마다(OnHealthChanged) 체력바 슬라이더 값을 함께 갱신한다. 슬라이더가 연결 안 돼 있으면 아무 것도 안 함.

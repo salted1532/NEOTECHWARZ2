@@ -269,48 +269,21 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         }
 
         AttackMoveTick();
-        UpdateMinimapIconVisibility();
+        UpdateFogVisibility();
     }
 
-    // 미니맵 마커를 안개 상태에 맞춰 켜고 끈다 - UserControl.IsRevealedByFog()와 동일한 로직(Revealed와
-    // PreviouslyRevealed 둘 다 "보임"으로 인정, 안개가 없는 씬에서는 항상 보임)이지만, 여기서는 유닛 자신의
-    // fogWar 참조로 물어본다 (doc/0356 - 마커가 Y40대라 안개 Plane 깊이 테스트로는 안 가려지는 문제의 대안).
-    private void UpdateMinimapIconVisibility()
+    // 미니맵 마커 토글(doc/0356, 마커가 Y40대라 안개 Plane 깊이 테스트로는 안 가려지는 문제의 대안)과
+    // 선택 해제(doc/0360, 선택 중인 적이 안개 속으로 들어가면 선택을 풀어줌)가 같은 안개 조회 결과를
+    // 공유한다 - 매 프레임 두 번 물어볼 필요 없음. 안개 조회 로직 자체는 공용 헬퍼로 뽑음 (doc/0358).
+    private void UpdateFogVisibility()
     {
-        if (minimapIcon == null)
-            return;
+        bool revealed = FogVisibility.IsRevealed(fogWar, transform.position, minimapFogVisibilityMargin);
 
-        if (fogWar == null)
-        {
-            minimapIcon.enabled = true;
-            return;
-        }
+        if (minimapIcon != null)
+            minimapIcon.enabled = revealed;
 
-        minimapIcon.enabled = IsRevealedByFog();
-    }
-
-    private bool IsRevealedByFog()
-    {
-        Vector2Int center = fogWar.WorldToLevel(transform.position);
-
-        for (int x = -minimapFogVisibilityMargin; x <= minimapFogVisibilityMargin; x++)
-        {
-            for (int y = -minimapFogVisibilityMargin; y <= minimapFogVisibilityMargin; y++)
-            {
-                Vector2Int cell = new Vector2Int(center.x + x, center.y + y);
-
-                if (!fogWar.CheckLevelGridRange(cell))
-                    continue;
-
-                Shadowcaster.LevelColumn.ETileVisibility visibility = fogWar.shadowcaster.fogField[cell.x][cell.y];
-
-                if (visibility == Shadowcaster.LevelColumn.ETileVisibility.Revealed ||
-                    visibility == Shadowcaster.LevelColumn.ETileVisibility.PreviouslyRevealed)
-                    return true;
-            }
-        }
-
-        return false;
+        if (!revealed)
+            rtsController?.ClearSelectedEnemyIfMatches(this);
     }
 
     // ======================
