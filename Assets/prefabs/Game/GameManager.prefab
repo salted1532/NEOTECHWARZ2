@@ -905,7 +905,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1109,7 +1109,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1656,8 +1656,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bad1b75ec2169c47ad0f6e47b7ebd47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceManager
-  startOre: 200
-  startGas: 0
+  startOre: 1000
+  startGas: 1000
   startMaxPopulation: 0
   maxPopulationCap: 200
 --- !u!1 &1358523840484361597
@@ -4469,7 +4469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -7397,7 +7397,7 @@ MonoBehaviour:
   cursorCommandAllyTexture: {fileID: 2800000, guid: b234e2a6d7dfd9842ba395cd27b31a46, type: 3}
   cursorCommandNeutralTexture: {fileID: 2800000, guid: e835a1ea21ea81e41b8505c9d4bf16b2, type: 3}
   cursorHotspot: {x: 0, y: 0}
-  fogVisibilityMargin: 1
+  fogVisibilityMargin: 3
   UsercurrentState: 0
 --- !u!114 &1626399243388647200
 MonoBehaviour:
@@ -9923,7 +9923,7 @@ MonoBehaviour:
   cancelIcon: {fileID: 21300000, guid: 9b8fb65b9bedc2041b19bd5262a50e27, type: 3}
   liftOffIcon: {fileID: 745742914, guid: 682a794f8b5984a45b402ecbeb4bec09, type: 3}
   landIcon: {fileID: -1933040633, guid: 61f67457f46044841a6d201b9bab260b, type: 3}
-  rallyIcon: {fileID: 0}
+  rallyIcon: {fileID: -526108130, guid: 2748a8f65b7ae13458139b789deae01f, type: 3}
   emptyQueueIcons:
   - {fileID: 69412130, guid: 3aa596ea8f3dbed42bd789652c09ec01, type: 3}
   - {fileID: -1898799734, guid: 560099958e629904ea2b58c08ead564b, type: 3}
@@ -10045,7 +10045,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -10430,7 +10430,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -11379,7 +11379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
