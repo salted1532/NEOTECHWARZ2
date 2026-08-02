@@ -1184,7 +1184,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1534,7 +1534,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -3191,7 +3191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -6041,7 +6041,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -6222,11 +6222,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d02d80aa352d8f4993f067aa1335c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinimapAlertController
-  minimapRect: {fileID: 6942796277551406468}
-  minimapCamera: {fileID: 6085927633455968969}
-  pingColor: {r: 1, g: 0, b: 0, a: 1}
-  pingSize: 18
-  pingDuration: 2.5
   attackedPointerPrefab: {fileID: 2934299905608118493, guid: d93965cfebc31fa489b64a8135ea2985, type: 3}
   attackedPointerHeight: 40
   attackedPointerLifetime: 3
@@ -7603,7 +7598,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -9928,6 +9923,7 @@ MonoBehaviour:
   cancelIcon: {fileID: 21300000, guid: 9b8fb65b9bedc2041b19bd5262a50e27, type: 3}
   liftOffIcon: {fileID: 745742914, guid: 682a794f8b5984a45b402ecbeb4bec09, type: 3}
   landIcon: {fileID: -1933040633, guid: 61f67457f46044841a6d201b9bab260b, type: 3}
+  rallyIcon: {fileID: 0}
   emptyQueueIcons:
   - {fileID: 69412130, guid: 3aa596ea8f3dbed42bd789652c09ec01, type: 3}
   - {fileID: -1898799734, guid: 560099958e629904ea2b58c08ead564b, type: 3}
@@ -10558,7 +10554,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
