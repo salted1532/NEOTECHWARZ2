@@ -320,12 +320,20 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
         MoveAgentTo(pos);
     }
 
+    // UnitController.MoveAgentTo와 동일한 fallback (doc/0375) - 경사로 없이 끊긴 언덕 등으로
+    // SetDestination이 실패하면 더 넓은 반경으로 가장 가까운 NavMesh 지점을 찾아 재시도한다.
+    private const float UnreachableDestinationSampleRadius = 20f;
+
     private void MoveAgentTo(Vector3 destination)
     {
         if (!isAirUnit)
         {
             navMeshAgent.isStopped = false;
-            navMeshAgent.SetDestination(destination);
+            if (!navMeshAgent.SetDestination(destination) &&
+                NavMesh.SamplePosition(destination, out NavMeshHit hit, UnreachableDestinationSampleRadius, NavMesh.AllAreas))
+            {
+                navMeshAgent.SetDestination(hit.position);
+            }
         }
         else
         {

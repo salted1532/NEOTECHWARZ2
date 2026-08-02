@@ -603,12 +603,24 @@ public class UnitController : MonoBehaviour, IDestructible
     // NavMesh로 연결되지 않은 영역(맵이 끊긴 다른 구역 등)이면 조용히 false를 반환한다). 대부분의 호출부는 이 값을
     // 무시해도 되지만, 실패를 감지 못하면 매 프레임 똑같이 실패하는 SetDestination만 반복하며 겉보기엔 그냥
     // 멈춰있는 것처럼 보이는 경우가 있어(예: GatherTick의 반납 이동), 그런 곳에서는 반드시 확인해야 한다.
+    // 목적지 지점 근처에 NavMesh 샘플이 아예 안 잡히는 경우(경사로 없이 끊긴 언덕 위 등)
+    // SetDestination이 실패하며 유닛이 조용히 멈춰버리므로, 더 넓은 반경으로 가장 가까운 NavMesh 지점을
+    // 찾아 재시도한다. 경사로로 실제 연결된 언덕은 SetDestination이 바로 성공하고 Unity가 알아서
+    // PathPartial로 갈 수 있는 데까지만 이동하므로 이 fallback을 타지 않는다 (doc/0375).
+    private const float UnreachableDestinationSampleRadius = 20f;
+
     private bool MoveAgentTo(Vector3 destination, bool destinationIsAirborne = false)
     {
         if (!isAirUnit)
         {
             navMeshAgent.isStopped = false;
-            return navMeshAgent.SetDestination(destination);
+            if (navMeshAgent.SetDestination(destination))
+                return true;
+
+            if (NavMesh.SamplePosition(destination, out NavMeshHit hit, UnreachableDestinationSampleRadius, NavMesh.AllAreas))
+                return navMeshAgent.SetDestination(hit.position);
+
+            return false;
         }
         else
         {
