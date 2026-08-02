@@ -926,7 +926,18 @@ public class UnitController : MonoBehaviour, IDestructible
             return;
 
         if ((transform.position - buildDestination).sqrMagnitude > buildInteractRange * buildInteractRange)
+        {
+            // 목적지에 아직 못 왔는데 NavMeshAgent가 갈 수 있는 데까지 다 가서 멈춘 경우
+            // (경사로 없는 언덕 위 등 도달 불가능한 위치, doc/0375 fallback으로 가장 가까운 지점까지만
+            // 이동한 경우 포함) - 건설 명령을 취소하고 실패 음성을 재생한다 (doc/0382).
+            if (!isAirUnit && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+            {
+                unitAudio?.PlayBuildFailVoice();
+                HaltInPlace();
+                CancelBuildOrder();
+            }
             return;
+        }
 
         hasBuildOrder = false;
 
