@@ -318,11 +318,39 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     }
 
     // Idle 상태에서 사거리 밖의 감지된 상대에게 다가갈 때 EnemyAttackRange가 호출한다.
-    public void ChaseTarget(Vector3 pos)
+    // 반환값 true면 "도착했는데 대상이 그 자리 그대로 있어서 더는 다가갈 수 없다"는 뜻 - 호출자가
+    // 이 대상을 포기하고 다른 대상을 찾아야 한다 (doc/0398, UnitController.UpdateUnreachableChase와
+    // 동일한 판단 구조 - doc/0397).
+    public bool ChaseTarget(Vector3 pos)
     {
         arrived = false;
         currentState = EnemyState.Idle;
-        MoveAgentTo(pos);
+
+        if (isAirUnit)
+        {
+            MoveAgentTo(pos);
+            return false;
+        }
+
+        if (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+        {
+            // 아직 이동 중 - 도착 전까지는 매 프레임 재탐색하지 않는다 (멈칫거림 방지, doc/0391 재적용)
+            if (!navMeshAgent.hasPath)
+                MoveAgentTo(pos); // 아직 이동을 시작 안 했으면 최초 탐색
+            return false;
+        }
+
+        // 도착(또는 더 갈 수 없어 멈춤) - 그 사이 대상이 움직였는지 확인
+        bool targetMoved = !lastMoveAgentToDestination.HasValue ||
+            (lastMoveAgentToDestination.Value - pos).sqrMagnitude > RedundantDestinationEpsilon * RedundantDestinationEpsilon;
+
+        if (targetMoved)
+        {
+            MoveAgentTo(pos); // 새 위치로 재탐색하고 계속 추격
+            return false;
+        }
+
+        return true; // 도착했고 대상도 그 사이 안 움직였다 - 도달 불가로 최종 판정, 포기
     }
 
     // UnitController.MoveAgentTo와 동일한 fallback (doc/0375) - 경사로 없이 끊긴 언덕 등으로

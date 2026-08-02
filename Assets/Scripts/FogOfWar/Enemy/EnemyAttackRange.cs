@@ -21,6 +21,11 @@ public class EnemyAttackRange : MonoBehaviour
     private const float EngagedTargetLoseSightMargin = 3f;
     private GameObject engagedTarget;
 
+    // ChaseTarget()이 "도달 불가"로 판정해 포기한 대상. 감지 범위를 완전히 벗어나기(OnTriggerExit) 전까지는
+    // GetClosestTarget() 후보에서 제외해서, 매번 같은 도달 불가 대상을 다시 골랐다가 다시 포기하는 것을
+    // 반복하지 않는다 - 그래야 다른(도달 가능한) 대상이 있으면 그쪽으로 넘어간다 (doc/0398).
+    private GameObject unreachableTarget;
+
     private EnemyUnitController enemyUnit;
     private CapsuleCollider detectionCollider;
 
@@ -37,7 +42,10 @@ public class EnemyAttackRange : MonoBehaviour
         {
             foreach (GameObject target in targetsInRange)
             {
-                if (target != null)
+                // 도달 불가로 이미 포기한 대상은 "교전 중"으로 치지 않는다 - 안 그러면 그 대상이 넓은
+                // 감지 콜라이더 안에 계속 머무는 동안 AttackMoveTick()이 교전 중으로 착각해서 공격-이동
+                // 재개를 영원히 막는다 (doc/0398).
+                if (target != null && target != unreachableTarget)
                     return true;
             }
 
@@ -90,6 +98,9 @@ public class EnemyAttackRange : MonoBehaviour
             return;
 
         targetsInRange.Remove(other.gameObject);
+
+        if (unreachableTarget == other.gameObject)
+            unreachableTarget = null; // 감지 범위를 완전히 벗어났다 다시 들어오면 다시 시도해볼 기회를 준다
     }
 
     private static bool IsValidTarget(Collider other)
@@ -122,7 +133,13 @@ public class EnemyAttackRange : MonoBehaviour
             }
             else if (enemyUnit.IsIdle())
             {
-                enemyUnit.ChaseTarget(target.transform.position);
+                if (enemyUnit.ChaseTarget(target.transform.position))
+                {
+                    // 도달 불가로 최종 판정 - 이 대상은 포기하고 다음 프레임부터 다른 대상을 찾는다 (doc/0398)
+                    unreachableTarget = target;
+                    if (engagedTarget == target)
+                        engagedTarget = null;
+                }
             }
         }
     }
@@ -159,6 +176,9 @@ public class EnemyAttackRange : MonoBehaviour
         foreach (GameObject target in targetsInRange)
         {
             if (target == null)
+                continue;
+
+            if (target == unreachableTarget) // 도달 불가로 이미 포기한 대상은 다시 뽑지 않는다 (doc/0398)
                 continue;
 
             if (!CanEngage(target))

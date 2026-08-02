@@ -619,6 +619,55 @@ public class UnitController : MonoBehaviour, IDestructible
     private const float RedundantDestinationEpsilon = 0.5f;
     private Vector3? lastMoveAgentToDestination;
 
+    // 도달 불가능할 수 있는 대상(친구 강제공격/명시 추격)을 사거리 밖에서 계속 쫓을 때 쓰는 상태.
+    // 매 프레임 실시간 위치로 재탐색하면 [[0391]]처럼 멈칫거리므로, 도착(또는 더 갈 수 없어 멈춤)
+    // 이벤트에서만 재확인한다. 도착 시점에 대상이 그 자리 그대로면(안 움직였는데 이 유닛도 더 못 감)
+    // 도달 불가로 최종 판정하고 공격 명령을 취소한다. 대상이 그 사이 움직였으면 새 위치로 재탐색하고
+    // 계속 쫓는다 - 대상이 계속 움직이는 한 명시 공격 명령은 취소되지 않는다(여러 판정 방식을 검토한
+    // 끝에 이 방식이 가장 자연스럽다고 확정, doc/0397). 방금 사거리 안에서 밖으로 벗어난 프레임
+    // (공격 중이던 대상이 도망감)은 즉시 재탐색한다.
+    private bool chaseWasInAttackRange;
+
+    // 사거리 밖에서 대상을 계속 쫓을 때 FriendlyAttackTick/AttackOrderTick이 공용으로 쓰는 이동 갱신.
+    // 반환값 true면 호출자가 도달 불가로 최종 판정된 것 - CancelAttackOrder() + HaltInPlace()로
+    // 마무리해야 한다.
+    private bool UpdateUnreachableChase(Vector3 targetPos, bool destinationIsAirborne, bool justLeftAttackRange)
+    {
+        if (isAirUnit)
+        {
+            MoveAgentTo(targetPos, destinationIsAirborne);
+            return false;
+        }
+
+        if (justLeftAttackRange)
+        {
+            // 방금까지 사거리 안(공격 중)이었는데 대상이 도망가서 벗어남 - 즉시 재탐색
+            MoveAgentTo(targetPos, false);
+            return false;
+        }
+
+        if (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+        {
+            // 아직 이동 중 - 도착 전까지는 대상의 실시간 위치로 매 프레임 재탐색하지 않는다 (doc/0391)
+            if (!navMeshAgent.hasPath)
+                MoveAgentTo(targetPos, false); // 아직 이동을 시작 안 했으면 최초 탐색
+            return false;
+        }
+
+        // 도착(또는 더 갈 수 없어 멈춤) - 그 사이 대상이 움직였는지 확인
+        bool targetMoved = !lastMoveAgentToDestination.HasValue ||
+            (lastMoveAgentToDestination.Value - targetPos).sqrMagnitude > RedundantDestinationEpsilon * RedundantDestinationEpsilon;
+
+        if (targetMoved)
+        {
+            MoveAgentTo(targetPos, false); // 새 위치로 재탐색하고 계속 추격
+            return false;
+        }
+
+        // 도착했고 대상도 그 사이 안 움직였다 - 진짜 도달 불가로 최종 판정
+        return true;
+    }
+
     private bool MoveAgentTo(Vector3 destination, bool destinationIsAirborne = false)
     {
         if (!isAirUnit)
@@ -669,6 +718,8 @@ public class UnitController : MonoBehaviour, IDestructible
         followBuildingTarget = null;
         hasFollowBuildingOrder = false;
 
+        chaseWasInAttackRange = false; // 이전 명령의 상태가 다음 명령으로 새 나가지 않도록 초기화
+
         // 이동/공격/스킬 등 다른 명령이 새로 들어오면 지정형 스킬(단일/범위) 이동-후-발동 대기도 함께 취소한다
         // (doc/0323 - 새 명령마다 취소 코드를 따로 추가하지 않고 이 공용 취소 지점 하나만 고치면 전부 커버됨).
         hasPendingSkillUnitOrder = false;
@@ -699,6 +750,8 @@ public class UnitController : MonoBehaviour, IDestructible
         followTarget = null;
         hasFollowOrder = false;
         CancelBuildOrder();
+
+        chaseWasInAttackRange = false; // 새 추격 명령 - 이전 명령의 상태 초기화
 
         arrived = false;
         UnitcurrentState = UnitState.Attack;
@@ -751,6 +804,8 @@ public class UnitController : MonoBehaviour, IDestructible
         hasFollowOrder = false;
         CancelBuildOrder();
 
+        chaseWasInAttackRange = false; // 새 강제공격 명령 - 이전 명령의 상태 초기화
+
         arrived = false;
         UnitcurrentState = UnitState.Attack;
 
@@ -778,22 +833,25 @@ public class UnitController : MonoBehaviour, IDestructible
             return;
         }
 
-        float sqrDistance = (transform.position - friendlyTarget.transform.position).sqrMagnitude;
+        Vector3 targetPos = friendlyTarget.transform.position;
+        float sqrDistance = (transform.position - targetPos).sqrMagnitude;
 
         if (attackRange != null && sqrDistance <= attackRange.UnitRange * attackRange.UnitRange)
         {
-            Attack(friendlyTarget.transform.position, friendlyTarget.gameObject); // 내부에서 정지 처리까지 함께 해준다
+            Attack(targetPos, friendlyTarget.gameObject); // 내부에서 정지 처리까지 함께 해준다
+            chaseWasInAttackRange = true;
+            return;
         }
-        else if (!isAirUnit && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+
+        bool justLeftAttackRange = chaseWasInAttackRange;
+        chaseWasInAttackRange = false;
+
+        if (UpdateUnreachableChase(targetPos, IsAirborne(friendlyTarget), justLeftAttackRange))
         {
-            // 갈 수 있는 데까지 다 가서 멈췄는데도 사거리 밖(경사로 없는 언덕 위 등 도달 불가능한 대상) -
-            // 공격 명령을 취소한다 (doc/0384).
+            // 재탐색을 몇 번 더 해봐도 대상이 계속 그 자리 + 이 유닛도 더 못 감 - 진짜 도달 불가로
+            // 판정하고 공격 명령을 취소한다 (doc/0384/0392).
             CancelAttackOrder();
             HaltInPlace();
-        }
-        else
-        {
-            MoveAgentTo(friendlyTarget.transform.position, IsAirborne(friendlyTarget)); // 사거리 밖: 거리 상관없이 끝까지 추격
         }
     }
 
@@ -1041,19 +1099,25 @@ public class UnitController : MonoBehaviour, IDestructible
 
                 // 다른 적이 근처에 있어도 그건 무시하고, 오직 "지정한 대상"과의 거리로만 교전 여부를 판단한다
                 // (attackRange.HasEnemyInRange를 쓰면 무관한 다른 적 때문에 추격이 멈춰버릴 수 있음).
-                if (!inAttackRange)
+                // 사거리 안일 때의 실제 공격은 AttackRange.cs가 별도로 Attack()을 호출하므로 여기선
+                // "방금 사거리 안이었는지" 상태만 갱신한다.
+                if (inAttackRange)
                 {
-                    // 갈 수 있는 데까지 다 가서 멈췄는데도 사거리 밖(경사로 없는 언덕 위 등 도달 불가능한
-                    // 대상, doc/0375 fallback으로 가장 가까운 지점까지만 이동한 경우 포함) - 공격 명령을
-                    // 취소한다 (doc/0384).
-                    if (!isAirUnit && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
+                    chaseWasInAttackRange = true;
+                }
+                else
+                {
+                    bool justLeftAttackRange = chaseWasInAttackRange;
+                    chaseWasInAttackRange = false;
+
+                    if (UpdateUnreachableChase(attackMoveDestination.Value, false, justLeftAttackRange))
                     {
+                        // 재탐색을 몇 번 더 해봐도 대상이 계속 그 자리 + 이 유닛도 더 못 감 - 진짜 도달
+                        // 불가로 판정 (doc/0384/0392).
                         CancelAttackOrder();
                         HaltInPlace();
                         return;
                     }
-
-                    MoveAgentTo(attackMoveDestination.Value); // 사거리 밖: 계속 추격 이동
                 }
 
                 return;
