@@ -432,6 +432,10 @@ public class UnitController : MonoBehaviour, IDestructible
                 // ResetPath() 미호출 이유는 EnemyUnitController와 동일 (doc/0387) - AttackRange의
                 // 순수 자동교전(ChaseTarget, 지정 명령 아님) 경로에서 매 프레임 재호출되는 동안 이
                 // 도착 판정이 계속 ResetPath()를 부르면 doc/0386 목적지 캐시가 무효화된다.
+                // isStopped는 true로 건다 - 안 그러면 destination이 여전히 이 지점을 가리키는 채로
+                // 남아서, 도착 후 다른 유닛에게 밀려나면 NavMeshAgent가 스스로 원래 자리로 되돌아가려
+                // 한다(doc/0399). MoveAgentTo가 다음 명령 때 항상 isStopped = false로 풀어준다.
+                navMeshAgent.isStopped = true;
                 UnitcurrentState = UnitState.Idle;
                 attackMoveDestination = null;
             }

@@ -268,6 +268,10 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
                 // (EnemyAttackRange → ChaseTarget)이 매 프레임 다시 호출되는 동안 도착 판정이 계속
                 // ResetPath()를 부르면 이미 도착한 뒤에도 매 프레임 경로가 재계산되어 미세하게 계속
                 // 흔들리는 문제가 있었다 (doc/0387).
+                // isStopped는 true로 건다 - 안 그러면 destination이 여전히 이 지점을 가리키는 채로
+                // 남아서, 도착 후 다른 유닛에게 밀려나면 NavMeshAgent가 스스로 원래 자리로 되돌아가려
+                // 한다(doc/0399). MoveAgentTo가 다음 명령 때 항상 isStopped = false로 풀어준다.
+                navMeshAgent.isStopped = true;
                 currentState = EnemyState.Idle;
                 attackMoveDestination = null;
             }
