@@ -966,9 +966,14 @@ public class UnitController : MonoBehaviour, IDestructible
         }
 
         // 대상이 도달 불가 지형에 있어도(가장 가까운 위치로 이동 후 도착 시에만 재확인) 처리되도록
-        // 강제공격과 같은 도달 가능/불가 로직을 재사용한다. 따라가기는 끝까지 포기하지 않으므로
-        // 반환값(최종 도달 불가 판정)은 무시한다 (doc/0417).
-        UpdateUnreachableChase(followTarget.transform.position, followTarget.isAirUnit, false);
+        // 강제공격과 같은 도달 가능/불가 로직을 재사용한다. 강제공격과 동일하게, 재탐색을 거듭해도
+        // 계속 도달 불가로 판정되면 따라가기 명령도 포기한다 (doc/0422 - doc/0417의 "끝까지 포기하지
+        // 않는다" 설계를 뒤집음).
+        if (UpdateUnreachableChase(followTarget.transform.position, followTarget.isAirUnit, false))
+        {
+            CancelAttackOrder();
+            HaltInPlace();
+        }
     }
 
     // ===== 건물 우클릭 = 계속 따라다니기 =====

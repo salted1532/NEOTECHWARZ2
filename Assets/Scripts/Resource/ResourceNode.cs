@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FischlWorks_FogWar;
 
 public enum ResourceType { Ore, Gas }
 
@@ -23,6 +24,15 @@ public class ResourceNode : MonoBehaviour
     // 대기열이 이 인원 이상이면 "혼잡"으로 보고, 새로 오는 일꾼은 우선 다른 자원을 찾아보게 한다.
     // 하드 캡이 아니라 임계값일 뿐이므로, 대체 자원이 없으면 이 값을 넘겨서도 계속 줄을 설 수 있다.
     [SerializeField] private int waitWorkerCount = 2;
+
+    // 미니맵에 표시하는 스프라이트 마커(자식 오브젝트, 인스펙터에서 연결). 안개(csFogWar)가 실제
+    // 3D Plane(Y≈1)으로 구현돼 있어 Y가 높은 오브젝트는 깊이 테스트로 가려지지 않는다 - 그래서
+    // Update()에서 안개 상태를 직접 조회해 이 렌더러를 켜고 끈다 (EnemyUnitController와 동일한
+    // 패턴, doc/0356/0421).
+    [SerializeField] private SpriteRenderer minimapIcon;
+    [SerializeField] private int minimapFogVisibilityMargin = 1; // UserControl.fogVisibilityMargin과 동일한 목적
+
+    private csFogWar fogWar;
 
     private const float ShrinkStepPerQuarter = 0.2f;
     private const float MinScale = 0.1f; // 스케일이 0 이하로 내려가 메시가 뒤집히는 것 방지
@@ -83,6 +93,14 @@ public class ResourceNode : MonoBehaviour
 
         rtsController = FindFirstObjectByType<RTSUnitController>();
         rtsController?.ResourceNodeList.Add(this);
+
+        fogWar = FindFirstObjectByType<csFogWar>(); // 안개가 없는 씬(테스트 씬 등)에서는 null - Update()에서 그 경우 마커를 항상 켜둠
+    }
+
+    private void Update()
+    {
+        if (minimapIcon != null)
+            minimapIcon.enabled = FogVisibility.IsRevealed(fogWar, transform.position, minimapFogVisibilityMargin);
     }
 
     // 자원 노드 선택 시 마커(테두리 등 표시)를 활성화한다.
