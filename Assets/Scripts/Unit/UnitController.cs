@@ -1554,6 +1554,7 @@ public class UnitController : MonoBehaviour, IDestructible
             }
 
             patrolling = false;
+            gatherTargetNode = node; // 새로 지정한 자원으로 기억을 갱신 - 반납 후 이 자원으로 캐러 감 (doc/0418)
             MoveToDepositTargetOrWait();
             return;
         }
@@ -1660,25 +1661,21 @@ public class UnitController : MonoBehaviour, IDestructible
         }
 
         patrolling = false;
-        gatherTargetNode = null; // 고정 목적지 없음 신호 → Deposit()이 최근접 노드를 새로 찾게 함
+        // gatherTargetNode는 그대로 둔다 - 반납이 끝나면 Deposit()이 원래 캐던 자원으로 돌아간다 (doc/0418)
         MoveToDepositTargetOrWait();
     }
 
     // ===== 건물 우클릭 명령 =====
-    // 일꾼이 자원을 들고 있으면 ReturnCargo()(반환 후 최근접 자원 채취)로 처리하고,
-    // 그 외(자원 없는 일꾼, 전투 유닛 등)에는 건물을 계속 따라다닌다(FollowBuilding, doc/0345).
+    // 메인기지를 우클릭했고 자원을 들고 있으면 그 기지로 직접 반납(후 캐던 자원으로 복귀). 그 외
+    // (다른 건물, 또는 메인기지라도 자원이 없음)에는 기존 그대로 건물을 계속 따라다닌다
+    // (FollowBuilding, doc/0345, doc/0419).
     public void MoveToBuilding(BuildingController building)
     {
         if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
 
-        if (isWorker && IsCarryingResource())
+        if (building.CompareTag("MainBase") && isWorker && IsCarryingResource())
         {
-            // 클릭한 건물이 메인기지면 "가장 가까운 기지"를 다시 찾지 않고 그 건물로 직접 반납하러 간다 -
-            // 다른 메인기지가 더 가까이 있어도 사용자가 명시적으로 지정한 곳으로 보내기 위함.
-            if (building.CompareTag("MainBase"))
-                ReturnCargoTo(building);
-            else
-                ReturnCargo();
+            ReturnCargoTo(building);
             return;
         }
 
@@ -1691,7 +1688,7 @@ public class UnitController : MonoBehaviour, IDestructible
     {
         depositTargetTransform = building.transform;
         patrolling = false;
-        gatherTargetNode = null;
+        // gatherTargetNode는 그대로 둔다 - 반납이 끝나면 Deposit()이 원래 캐던 자원으로 돌아간다 (doc/0418)
         MoveToDepositTargetOrWait();
     }
 
@@ -1819,7 +1816,16 @@ public class UnitController : MonoBehaviour, IDestructible
                 BuildingController depositBuilding = depositTargetTransform.GetComponent<BuildingController>();
                 if (depositBuilding != null && depositBuilding.IsLifted())
                 {
-                    // 반납 대상 건물이 공중에 뜬 동안은 도달할 수 없으므로 제자리에서 착륙을 기다린다.
+                    // 반납 대상 건물이 이륙했다 - 착륙해 있는 다른 메인기지가 있으면 그쪽으로 갈아탄다.
+                    // 착륙한 곳이 하나도 없으면(전부 이륙 중) 기존처럼 제자리에서 대기한다 (doc/0420).
+                    Transform alt = FindNearestDepositBuilding();
+                    if (alt != null && alt != depositTargetTransform)
+                    {
+                        depositTargetTransform = alt;
+                        MoveToDepositTargetOrWait();
+                        break;
+                    }
+
                     if (!isAirUnit)
                         navMeshAgent.isStopped = true;
                     break;

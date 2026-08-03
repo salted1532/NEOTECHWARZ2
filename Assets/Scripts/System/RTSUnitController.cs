@@ -140,6 +140,26 @@ public class RTSUnitController : MonoBehaviour
         UnitList = new List<UnitController>();
         BuildingList = new List<BuildingController>();
         ResourceNodeList = new List<ResourceNode>();
+
+        BuildingController.OnLanded += HandleMainBaseLanded;
+    }
+
+    private void OnDestroy()
+    {
+        BuildingController.OnLanded -= HandleMainBaseLanded;
+    }
+
+    // 메인기지가 착륙할 때마다 자원을 든 모든 일꾼의 반납 목적지를 다시 계산시킨다 (doc/0420).
+    private void HandleMainBaseLanded(BuildingController building)
+    {
+        if (!building.CompareTag("MainBase"))
+            return;
+
+        foreach (UnitController unit in UnitList)
+        {
+            if (unit != null)
+                unit.ReturnCargo(); // 내부에서 isWorker/자원 소지 여부를 스스로 확인하므로 안전하게 전체 호출
+        }
     }
 
     private void Update()

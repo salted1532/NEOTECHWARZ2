@@ -66,6 +66,10 @@ public class BuildingController : MonoBehaviour, IDestructible
 
     private bool pendingLanding; // true면 현재 수평이동이 "공식 착륙 비행"(도착 시 하강→착륙까지 이어짐), false면 우클릭/Move버튼 자유이동(도착 시 그 자리에서 계속 공중 대기)
 
+    // 이 건물이 착륙을 완료할 때마다 발행 (doc/0420) - 메인기지 착륙 시 자원 든 일꾼들의 반납
+    // 목적지를 다시 계산시키기 위한 용도. 정적 이벤트라 개별 건물 참조 없이 어디서든 구독 가능.
+    public static event System.Action<BuildingController> OnLanded;
+
     // 이 건물의 메쉬 피벗이 바닥(지면)에서 얼마나 떨어져 있는지(PlacementSystem.GetGroundOffsetY와 동일한 계산).
     // 건물이 지면에 서 있을 때의 transform.position.y = (그 지점 지면 높이) + groundOffset이다.
     // SampleGroundHeight()는 순수 지면 높이(레이캐스트로 잰 지형 표면)만 돌려주므로, 비행 중 고도를 계산할 때
@@ -376,6 +380,7 @@ public class BuildingController : MonoBehaviour, IDestructible
         onRelocationCancelled = null;
 
         landed?.Invoke();
+        OnLanded?.Invoke(this);
 
         GetComponent<BuildingEffects>()?.PlayLanding();
         GetComponent<BuildingAudio>()?.PlayLanding();
