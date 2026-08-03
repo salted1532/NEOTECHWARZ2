@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,33 +14,59 @@ public class VictoryPanelController : MonoBehaviour
     [Header("버튼 연결")]
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private Button nextStageButton;
+    [SerializeField] private Button returnToGameButton;
 
     [Header("씬 이동")]
     [SerializeField] private string mainSceneName = "MainScene";
     [SerializeField] private string nextStageSceneName = "SampleScene"; // 다음 스테이지 씬이 아직 없어 일단 SampleScene으로 연결
 
+    [Header("연출")]
+    [SerializeField] private float victoryDelay = 3f;
+
     private void Awake()
     {
         mainMenuButton?.onClick.AddListener(OnMainMenuClicked);
         nextStageButton?.onClick.AddListener(OnNextStageClicked);
+        returnToGameButton?.onClick.AddListener(OnReturnToGameClicked);
         victoryPanel?.SetActive(false);
     }
 
     private void Start()
     {
         if (StageManager.Instance != null)
-            StageManager.Instance.OnVictory += ShowVictoryPanel;
+            StageManager.Instance.OnVictory += HandleVictory;
     }
 
     private void OnDestroy()
     {
         if (StageManager.Instance != null)
-            StageManager.Instance.OnVictory -= ShowVictoryPanel;
+            StageManager.Instance.OnVictory -= HandleVictory;
     }
 
-    private void ShowVictoryPanel() => victoryPanel?.SetActive(true);
+    private void HandleVictory() => StartCoroutine(ShowVictoryPanelAfterDelay());
 
-    private void OnMainMenuClicked() => SceneManager.LoadScene(mainSceneName);
+    private IEnumerator ShowVictoryPanelAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(victoryDelay);
+        victoryPanel?.SetActive(true);
+        Time.timeScale = 0f;
+    }
 
-    private void OnNextStageClicked() => SceneManager.LoadScene(nextStageSceneName);
+    private void OnMainMenuClicked()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(mainSceneName);
+    }
+
+    private void OnNextStageClicked()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(nextStageSceneName);
+    }
+
+    private void OnReturnToGameClicked()
+    {
+        victoryPanel?.SetActive(false);
+        Time.timeScale = 1f;
+    }
 }
