@@ -325,6 +325,11 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
     // 반환값 true면 "도착했는데 대상이 그 자리 그대로 있어서 더는 다가갈 수 없다"는 뜻 - 호출자가
     // 이 대상을 포기하고 다른 대상을 찾아야 한다 (doc/0398, UnitController.UpdateUnreachableChase와
     // 동일한 판단 구조 - doc/0397).
+    // 마지막 재탐색에서 도달 불가로 판정됐는지 - 이 값에 따라 ChaseTarget()이 두 모드로 나뉜다
+    // (doc/0415): 도달 가능 모드는 게이트 없이 매 프레임 실시간 추적, 도달 불가 모드는 가장 가까운
+    // 위치로 이동하는 동안 재탐색을 쉬었다가 도착 시에만 재확인한다.
+    private bool chaseIsUnreachable;
+
     public bool ChaseTarget(Vector3 pos)
     {
         arrived = false;
@@ -336,25 +341,56 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
             return false;
         }
 
-        if (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+        if (chaseIsUnreachable)
         {
-            // 아직 이동 중 - 도착 전까지는 매 프레임 재탐색하지 않는다 (멈칫거림 방지, doc/0391 재적용)
-            if (!navMeshAgent.hasPath)
-                MoveAgentTo(pos); // 아직 이동을 시작 안 했으면 최초 탐색
+            // 도달 불가 모드: 가장 가까운 위치로 이동하는 동안은(아직 도착 전) 재탐색하지 않는다 (doc/0391).
+            if (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+            {
+                if (!navMeshAgent.hasPath)
+                    MoveAgentTo(pos); // 아직 이동을 시작 안 했으면 최초 탐색
+                return false;
+            }
+
+            // 도착(또는 더 갈 수 없어 멈춤) - 여기서만 재탐색(도달 가능 여부 재확인)한다.
+            bool reachableOnArrival = IsPositionReachable(pos);
+            Debug.Log($"{name}: [도달 불가 추격] 재탐색 결과 - {(reachableOnArrival ? "도달 가능" : "도달 불가")}");
+            if (reachableOnArrival)
+            {
+                chaseIsUnreachable = false;
+                MoveAgentTo(pos);
+                return false;
+            }
+
+            bool targetMoved = !lastMoveAgentToDestination.HasValue ||
+                (lastMoveAgentToDestination.Value - pos).sqrMagnitude > RedundantDestinationEpsilon * RedundantDestinationEpsilon;
+
+            if (!targetMoved)
+                return true; // 대상도 그 자리 그대로 - 도달 불가로 최종 판정, 포기
+
+            MoveAgentTo(pos); // 새 위치 기준으로 가장 가까운 위치로 다시 이동
             return false;
         }
 
-        // 도착(또는 더 갈 수 없어 멈춤) - 그 사이 대상이 움직였는지 확인
-        bool targetMoved = !lastMoveAgentToDestination.HasValue ||
-            (lastMoveAgentToDestination.Value - pos).sqrMagnitude > RedundantDestinationEpsilon * RedundantDestinationEpsilon;
-
-        if (targetMoved)
+        // 도달 가능 모드: 게이트 없이 매 프레임 실시간으로 계속 추적/재확인한다 (doc/0415).
+        bool reachableNow = IsPositionReachable(pos);
+        Debug.Log($"{name}: [추격] 재탐색 결과 - {(reachableNow ? "도달 가능" : "도달 불가")}");
+        if (!reachableNow)
         {
-            MoveAgentTo(pos); // 새 위치로 재탐색하고 계속 추격
-            return false;
+            chaseIsUnreachable = true; // 방금 도달 불가로 전환
         }
 
-        return true; // 도착했고 대상도 그 사이 안 움직였다 - 도달 불가로 최종 판정, 포기
+        MoveAgentTo(pos);
+        return false;
+    }
+
+    // MoveAgentTo와 달리 에이전트의 실제 경로/이동 상태를 전혀 건드리지 않는 순수 조회 - 그 지점이
+    // 지금 이 유닛 기준으로 완전히 도달 가능한지만 확인한다 (doc/0403).
+    private NavMeshPath reachabilityProbePath;
+    private bool IsPositionReachable(Vector3 pos)
+    {
+        reachabilityProbePath ??= new NavMeshPath();
+        return NavMesh.CalculatePath(transform.position, pos, NavMesh.AllAreas, reachabilityProbePath) &&
+            reachabilityProbePath.status == NavMeshPathStatus.PathComplete;
     }
 
     // UnitController.MoveAgentTo와 동일한 fallback (doc/0375) - 경사로 없이 끊긴 언덕 등으로
@@ -391,7 +427,10 @@ public class EnemyUnitController : MonoBehaviour, IDestructible
                 return;
             }
 
-            lastMoveAgentToDestination = null;
+            // 실패했더라도 "이 위치로 시도했다"는 기록은 남긴다 - 안 그러면 다음 판정에서 대상이
+            // 실제로는 안 움직였는데도 "직전 기록이 없으니 움직인 것"으로 잘못 판정해서 완전히
+            // 도달 불가능한 대상에게 매 프레임 재시도를 반복하게 된다 (doc/0415).
+            lastMoveAgentToDestination = destination;
         }
         else
         {

@@ -632,6 +632,11 @@ public class UnitController : MonoBehaviour, IDestructible
     // (공격 중이던 대상이 도망감)은 즉시 재탐색한다.
     private bool chaseWasInAttackRange;
 
+    // 마지막 재탐색에서 도달 불가로 판정됐는지 - 이 값에 따라 UpdateUnreachableChase()가 두 모드로
+    // 나뉜다 (doc/0415): 도달 가능 모드는 게이트 없이 매 프레임 실시간 추적, 도달 불가 모드는
+    // 가장 가까운 위치로 이동하는 동안 재탐색을 쉬었다가 도착 시에만 재확인한다.
+    private bool chaseIsUnreachable;
+
     // 사거리 밖에서 대상을 계속 쫓을 때 FriendlyAttackTick/AttackOrderTick이 공용으로 쓰는 이동 갱신.
     // 반환값 true면 호출자가 도달 불가로 최종 판정된 것 - CancelAttackOrder() + HaltInPlace()로
     // 마무리해야 한다.
@@ -646,30 +651,63 @@ public class UnitController : MonoBehaviour, IDestructible
         if (justLeftAttackRange)
         {
             // 방금까지 사거리 안(공격 중)이었는데 대상이 도망가서 벗어남 - 즉시 재탐색
+            chaseIsUnreachable = false;
             MoveAgentTo(targetPos, false);
             return false;
         }
 
-        if (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+        if (chaseIsUnreachable)
         {
-            // 아직 이동 중 - 도착 전까지는 대상의 실시간 위치로 매 프레임 재탐색하지 않는다 (doc/0391)
-            if (!navMeshAgent.hasPath)
-                MoveAgentTo(targetPos, false); // 아직 이동을 시작 안 했으면 최초 탐색
+            // 도달 불가 모드: 가장 가까운 위치로 이동하는 동안은(아직 도착 전) 재탐색하지 않는다 (doc/0391).
+            if (navMeshAgent.pathPending || navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
+            {
+                if (!navMeshAgent.hasPath)
+                    MoveAgentTo(targetPos, false); // 아직 이동을 시작 안 했으면 최초 탐색
+                return false;
+            }
+
+            // 도착(또는 더 갈 수 없어 멈춤) - 여기서만 재탐색(도달 가능 여부 재확인)한다.
+            bool reachableOnArrival = IsPositionReachable(targetPos);
+            Debug.Log($"{name}: [도달 불가 추격] 재탐색 결과 - {(reachableOnArrival ? "도달 가능" : "도달 불가")}");
+            if (reachableOnArrival)
+            {
+                chaseIsUnreachable = false;
+                MoveAgentTo(targetPos, false);
+                return false;
+            }
+
+            bool targetMoved = !lastMoveAgentToDestination.HasValue ||
+                (lastMoveAgentToDestination.Value - targetPos).sqrMagnitude > RedundantDestinationEpsilon * RedundantDestinationEpsilon;
+
+            if (!targetMoved)
+                return true; // 대상도 그 자리 그대로 - 진짜 도달 불가로 최종 판정
+
+            MoveAgentTo(targetPos, false); // 새 위치 기준으로 가장 가까운 위치로 다시 이동
             return false;
         }
 
-        // 도착(또는 더 갈 수 없어 멈춤) - 그 사이 대상이 움직였는지 확인
-        bool targetMoved = !lastMoveAgentToDestination.HasValue ||
-            (lastMoveAgentToDestination.Value - targetPos).sqrMagnitude > RedundantDestinationEpsilon * RedundantDestinationEpsilon;
-
-        if (targetMoved)
+        // 도달 가능 모드: 게이트 없이 매 프레임 실시간으로 계속 추적/재확인한다. MoveAgentTo의
+        // 0.5m 캐시([[0386]])가 있어서 대상이 거의 안 움직이면 사실상 공짜 - FollowTick()이 이미
+        // 쓰고 있는 것과 같은 패턴 (doc/0415).
+        bool reachableNow = IsPositionReachable(targetPos);
+        Debug.Log($"{name}: [추격] 재탐색 결과 - {(reachableNow ? "도달 가능" : "도달 불가")}");
+        if (!reachableNow)
         {
-            MoveAgentTo(targetPos, false); // 새 위치로 재탐색하고 계속 추격
-            return false;
+            chaseIsUnreachable = true; // 방금 도달 불가로 전환
         }
 
-        // 도착했고 대상도 그 사이 안 움직였다 - 진짜 도달 불가로 최종 판정
-        return true;
+        MoveAgentTo(targetPos, false);
+        return false;
+    }
+
+    // MoveAgentTo와 달리 에이전트의 실제 경로/이동 상태를 전혀 건드리지 않는 순수 조회 - 그 지점이
+    // 지금 이 유닛 기준으로 완전히 도달 가능한지만 확인한다 (doc/0403).
+    private NavMeshPath reachabilityProbePath;
+    private bool IsPositionReachable(Vector3 pos)
+    {
+        reachabilityProbePath ??= new NavMeshPath();
+        return NavMesh.CalculatePath(transform.position, pos, NavMesh.AllAreas, reachabilityProbePath) &&
+            reachabilityProbePath.status == NavMeshPathStatus.PathComplete;
     }
 
     private bool MoveAgentTo(Vector3 destination, bool destinationIsAirborne = false)
@@ -698,7 +736,10 @@ public class UnitController : MonoBehaviour, IDestructible
                 return true;
             }
 
-            lastMoveAgentToDestination = null;
+            // 실패했더라도 "이 위치로 시도했다"는 기록은 남긴다 - 안 그러면 다음 판정에서 대상이
+            // 실제로는 안 움직였는데도 "직전 기록이 없으니 움직인 것"으로 잘못 판정해서 완전히
+            // 도달 불가능한 대상에게 매 프레임 재시도를 반복하게 된다 (doc/0415).
+            lastMoveAgentToDestination = destination;
             return false;
         }
         else
@@ -723,6 +764,7 @@ public class UnitController : MonoBehaviour, IDestructible
         hasFollowBuildingOrder = false;
 
         chaseWasInAttackRange = false; // 이전 명령의 상태가 다음 명령으로 새 나가지 않도록 초기화
+        chaseIsUnreachable = false; // doc/0415 - 도달 불가 상태도 함께 초기화
 
         // 이동/공격/스킬 등 다른 명령이 새로 들어오면 지정형 스킬(단일/범위) 이동-후-발동 대기도 함께 취소한다
         // (doc/0323 - 새 명령마다 취소 코드를 따로 추가하지 않고 이 공용 취소 지점 하나만 고치면 전부 커버됨).
@@ -756,6 +798,7 @@ public class UnitController : MonoBehaviour, IDestructible
         CancelBuildOrder();
 
         chaseWasInAttackRange = false; // 새 추격 명령 - 이전 명령의 상태 초기화
+        chaseIsUnreachable = false; // doc/0415
 
         arrived = false;
         UnitcurrentState = UnitState.Attack;
@@ -809,6 +852,7 @@ public class UnitController : MonoBehaviour, IDestructible
         CancelBuildOrder();
 
         chaseWasInAttackRange = false; // 새 강제공격 명령 - 이전 명령의 상태 초기화
+        chaseIsUnreachable = false; // doc/0415
 
         arrived = false;
         UnitcurrentState = UnitState.Attack;
@@ -921,7 +965,10 @@ public class UnitController : MonoBehaviour, IDestructible
             return;
         }
 
-        MoveAgentTo(followTarget.transform.position, followTarget.isAirUnit);
+        // 대상이 도달 불가 지형에 있어도(가장 가까운 위치로 이동 후 도착 시에만 재확인) 처리되도록
+        // 강제공격과 같은 도달 가능/불가 로직을 재사용한다. 따라가기는 끝까지 포기하지 않으므로
+        // 반환값(최종 도달 불가 판정)은 무시한다 (doc/0417).
+        UpdateUnreachableChase(followTarget.transform.position, followTarget.isAirUnit, false);
     }
 
     // ===== 건물 우클릭 = 계속 따라다니기 =====
@@ -1429,7 +1476,10 @@ public class UnitController : MonoBehaviour, IDestructible
             goingToEnd = false;
 
             if (!isAirUnit)
+            {
+                navMeshAgent.isStopped = false; // 0399로 도착 시 걸린 정지를 다음 구간 이동 전에 풀어준다 (doc/0402)
                 navMeshAgent.SetDestination(startPoint);
+            }
             else
                 targetPosition = AirTargetPosition(startPoint, true); // startPoint는 순찰 시작 시 현재(이미 공중) 위치를 그대로 캡처한 값
         }
@@ -1438,7 +1488,10 @@ public class UnitController : MonoBehaviour, IDestructible
             goingToEnd = true;
 
             if (!isAirUnit)
+            {
+                navMeshAgent.isStopped = false;
                 navMeshAgent.SetDestination(endPoint);
+            }
             else
                 targetPosition = AirTargetPosition(endPoint);
         }
