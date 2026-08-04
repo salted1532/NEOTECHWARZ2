@@ -50,17 +50,20 @@ public class VictoryPanelController : MonoBehaviour
         yield return new WaitForSecondsRealtime(victoryDelay);
         victoryPanel?.SetActive(true);
         Time.timeScale = 0f;
+        UserControl.IsPaused = true;
     }
 
     private void OnMainMenuClicked()
     {
         Time.timeScale = 1f;
+        UserControl.IsPaused = false;
         SceneManager.LoadScene(mainSceneName);
     }
 
     private void OnNextStageClicked()
     {
         Time.timeScale = 1f;
+        UserControl.IsPaused = false;
         SceneManager.LoadScene(nextStageSceneName);
     }
 
@@ -68,5 +71,6 @@ public class VictoryPanelController : MonoBehaviour
     {
         victoryPanel?.SetActive(false);
         Time.timeScale = 1f;
+        UserControl.IsPaused = false;
     }
 }

@@ -84,6 +84,11 @@ public class UserControl : MonoBehaviour
     private RTSUnitController rtsUnitController;
     private csFogWar fogWar;
 
+    // 옵션 패널/승리 화면이 떠서 게임이 퍼즈된 동안 true. TestSceneMenuController/VictoryPanelController가
+    // 패널을 열고 닫을 때 같이 갱신한다. 마우스는 화면을 덮는 UI 패널로 이미 막혀 있으므로, 여기서는
+    // Input.GetKey류를 쓰는 키보드 단축키 처리만 막는다.
+    public static bool IsPaused;
+
     // 완전히 밝혀진 타일(Revealed)과 완전히 가려진 타일(Hidden) 사이의 반투명 경계 구간(PreviouslyRevealed 등)에서도
     // 화면엔 적이 보이는데 클릭/명령이 안 먹히는 문제를 막기 위한 여유 타일 수 (0=경계 여유 없이 딱 그 타일만 확인).
     [SerializeField] private int fogVisibilityMargin = 1;
@@ -92,6 +97,9 @@ public class UserControl : MonoBehaviour
     private Vector2 end;
     private Rect dragRect;
     private Vector3 mousePos;
+
+    // 이번 좌클릭(눌림~뗌)이 UI 위에서 시작됐는지. true면 드래그박스도 그리지 않고 드래그 선택도 실행하지 않는다.
+    private bool dragStartedOverUI;
 
     // (Shift 없이) 클릭으로 확정하려던 단일 선택 동작. 실제 선택은 즉시 하지 않고 마우스를 놓을 때 실행한다.
     // 마우스 업 시 드래그 범위 안에 유닛이 하나라도 걸리면 이 값은 버려지고 드래그 유닛 선택이 우선한다.
@@ -209,18 +217,21 @@ public class UserControl : MonoBehaviour
         // 드래그 시작
         if (Input.GetMouseButtonDown(0))
         {
+            // 누른 시점에 UI 위였으면 이번 좌클릭 자체를 완전히 무시한다 - 선택/드래그박스 모두 시작하지 않음.
+            dragStartedOverUI = EventSystem.current.IsPointerOverGameObject();
+
+            if (dragStartedOverUI)
+                return;
+
             start = Input.mousePosition;
             dragRect = new Rect();
             pendingLeftClickSelect = null;
-
-            if (EventSystem.current.IsPointerOverGameObject())
-                return;
 
             HandleLeftClick();
         }
 
         // 드래그 중
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && !dragStartedOverUI)
         {
             end = Input.mousePosition;
             DrawDragRectangle();
@@ -229,13 +240,18 @@ public class UserControl : MonoBehaviour
         // 드래그 종료
         if (Input.GetMouseButtonUp(0))
         {
-            CalculateDragRect();
-            SelectObject();
+            if (!dragStartedOverUI)
+            {
+                CalculateDragRect();
+                SelectObject();
 
-            start = Vector2.zero;
-            end = Vector2.zero;
+                start = Vector2.zero;
+                end = Vector2.zero;
 
-            DrawDragRectangle();
+                DrawDragRectangle();
+            }
+
+            dragStartedOverUI = false;
         }
 
 
@@ -739,6 +755,9 @@ public class UserControl : MonoBehaviour
         // 유닛 명령(Attack/Move/Stop/Patrol/Hold/Return/Build)과 건물 건설/유닛 생산 단축키, 그리고
         // 이제 생산 건물의 랠리(Y) 단축키까지 각 버튼(ProductionSlot)이 자기 단축키를 직접 감지해서
         // 스스로 클릭되므로 여기서 따로 처리하지 않는다 (doc/0363).
+
+        if (IsPaused)
+            return; // 퍼즈 중엔 Esc 취소/부대 지정·선택(1~0) 등 키보드 명령을 처리하지 않는다
 
         if (rtsUnitController.IsBuildMode())
         {

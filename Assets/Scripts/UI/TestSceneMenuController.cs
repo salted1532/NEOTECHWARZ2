@@ -29,11 +29,31 @@ public class TestSceneMenuController : MonoBehaviour
         optionsPanel?.SetActive(false);
     }
 
-    public void OpenOptionsPanel() => optionsPanel?.SetActive(true);
+    public void OpenOptionsPanel()
+    {
+        optionsPanel?.SetActive(true);
+        Time.timeScale = 0f;
+        UserControl.IsPaused = true;
+    }
 
-    public void CloseOptionsPanel() => optionsPanel?.SetActive(false);
+    public void CloseOptionsPanel()
+    {
+        optionsPanel?.SetActive(false);
+        Time.timeScale = 1f;
+        UserControl.IsPaused = false;
+    }
 
-    private void OnMainMenuClicked() => SceneManager.LoadScene(mainSceneName);
+    private void OnMainMenuClicked()
+    {
+        Time.timeScale = 1f; // 옵션(퍼즈) 상태로 나가면 다음 씬까지 멈춰있지 않도록 안전하게 복구
+        UserControl.IsPaused = false;
+        SceneManager.LoadScene(mainSceneName);
+    }
 
-    private void OnNextStageClicked() => SceneManager.LoadScene(nextStageSceneName);
+    private void OnNextStageClicked()
+    {
+        Time.timeScale = 1f;
+        UserControl.IsPaused = false;
+        SceneManager.LoadScene(nextStageSceneName);
+    }
 }

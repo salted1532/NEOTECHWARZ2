@@ -154,7 +154,7 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         if (isHovered)
             RefreshTooltip(); // 쿨다운 잔여시간처럼 매 프레임 바뀌는 설명 텍스트를 호버 중에도 실시간으로 반영
 
-        if (!hasData || shortcut == KeyCode.None || button == null || !button.interactable)
+        if (UserControl.IsPaused || !hasData || shortcut == KeyCode.None || button == null || !button.interactable)
             return;
 
         if (Input.GetKeyDown(shortcut))

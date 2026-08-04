@@ -27,12 +27,12 @@ public class InputManager : MonoBehaviour
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
-            OnClicked?.Invoke();
-        if (Input.GetKeyDown(KeyCode.Escape))
+            OnClicked?.Invoke(); // 마우스는 화면을 덮는 UI 패널로 이미 막혀 있어 여기선 그대로 둠
+
+        if (!UserControl.IsPaused && Input.GetKeyDown(KeyCode.Escape))
         {
             OnExit?.Invoke();
         }
-
     }
 
     // 마우스 포인터가 UI 위에 있는지 여부 (UI 클릭 시 배치가 발생하지 않도록 방지)
