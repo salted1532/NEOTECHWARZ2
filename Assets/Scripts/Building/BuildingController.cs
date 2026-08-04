@@ -31,6 +31,7 @@ public class BuildingController : MonoBehaviour, IDestructible
 
     private RTSUnitController rtsController;
     private Coroutine markerFlashRoutine;
+    private HealthManager healthManager; // Info_panel 표시용 - Start에서 한 번만 캐싱
 
     // ===== 건물 이동(리프트) =====
     [Header("건물 이동(리프트)")]
@@ -81,6 +82,7 @@ public class BuildingController : MonoBehaviour, IDestructible
     void Start()
     {
         buildingMarker.SetActive(false);
+        healthManager = GetComponent<HealthManager>();
 
         // 전역 RTSUnitController에 자신을 등록해 선택/관리 대상이 되게 한다.
         rtsController = FindFirstObjectByType<RTSUnitController>();
@@ -389,14 +391,12 @@ public class BuildingController : MonoBehaviour, IDestructible
     // 건물 선택 시 마커(테두리 등 표시)를 활성화한다.
     public void SelectBuilding()
     {
-        //Debug.Log(name + " ????");
         buildingMarker.SetActive(true);
     }
 
     // 건물 선택 해제 시 마커를 비활성화한다.
     public void DeselecBuilding()
     {
-        //Debug.Log(name + " ???? ????");
         buildingMarker.SetActive(false);
     }
 
@@ -450,6 +450,7 @@ public class BuildingController : MonoBehaviour, IDestructible
 
     public Sprite GetIcon() => icon;
     public int GetBuildingID() => buildingID;
+    public HealthManager GetHealthManager() => healthManager;
 
     // 프리뷰/고스트용: PreviewSystem이 이 컴포넌트를 비활성화(Start() 자체가 안 돎)하기 직전에 호출해,
     // 마커(및 그 자식의 상시 재생 파티클인 Circle Select 등)가 켜진 채로 노출되지 않도록 미리 숨긴다.

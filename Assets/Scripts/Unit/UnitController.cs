@@ -178,6 +178,7 @@ public class UnitController : MonoBehaviour, IDestructible
     private AttackRange attackRange;         // 사거리 내 교전 대상 존재 여부 조회용 (자식 컴포넌트)
     private UnitEffects unitEffects;         // 공격/피격 이펙트 재생용 (없을 수 있는 옵셔널 컴포넌트)
     private UnitAudio unitAudio;             // 공격/채취 SFX 재생용 (없을 수 있는 옵셔널 컴포넌트)
+    private HealthManager healthManager;     // Info_panel 표시용 - Awake에서 한 번만 캐싱
     private LaserBeamAttack laserBeamAttack; // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (doc/0218)
     private ProjectileAttack projectileAttack; // 투사체 발사 유닛만 붙어있는 옵셔널 컴포넌트
     // 지정 추격 대상과 한 번이라도 사거리 안에서 접촉했는지. 접촉 전(예: 맵 반대편의 먼 적을 지정한 직후)에는
@@ -258,6 +259,7 @@ public class UnitController : MonoBehaviour, IDestructible
         unitEffects = GetComponent<UnitEffects>();
         unitAudio = GetComponent<UnitAudio>();
         laserBeamAttack = GetComponent<LaserBeamAttack>();
+        healthManager = GetComponent<HealthManager>();
         TryGetComponent(out projectileAttack);
 
         if (!isAirUnit)
@@ -300,72 +302,6 @@ public class UnitController : MonoBehaviour, IDestructible
         RTSUnitController.TraitChoice chosenTrait = rtsController.GetChosenTrait(unitID);
         if (chosenTrait != RTSUnitController.TraitChoice.None)
             ApplyTrait(chosenTrait);
-
-        // doc/0345 "헤비탱크/브루트메크/스카이랜서가 땅속에 박힌 것 같다" 조사용 진단 로그.
-        // EnemyUnitController에 이미 있는 것과 동일한 로직 - 원인이 확정되면 삭제해도 되는 임시 코드.
-        LogSpawnDiagnostics();
-    }
-
-    // 진단용: 유닛이 스폰될 때 위치(땅속에 박혔는지/떠있는지)와 렌더러/메쉬/셰이더가 실제로 로드됐는지를
-    // 한 번 로그로 남긴다. 빌드의 Debug.Log는 Player.log에 쌓인다
-    // (Windows: %USERPROFILE%\AppData\LocalLow\<회사명>\<제품명>\Player.log).
-    private void LogSpawnDiagnostics()
-    {
-        Vector3 pos = transform.position;
-        string groundInfo = "raycast-no-hit";
-
-        if (Physics.Raycast(new Vector3(pos.x, pos.y + 1000f, pos.z), Vector3.down, out RaycastHit hit, 2000f,
-            Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
-            groundInfo = $"groundY={hit.point.y:F2} deltaY(unit-ground)={pos.y - hit.point.y:F2} hitObject={hit.collider.name}";
-
-        Debug.Log($"[UnitDiag] {gameObject.name}(unitID={unitID}) pos={pos} {groundInfo}", this);
-
-        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
-        if (renderers.Length == 0)
-        {
-            Debug.LogWarning($"[UnitDiag] {gameObject.name}: 렌더러를 하나도 찾지 못함 (모델이 안 붙어있을 수 있음)", this);
-            return;
-        }
-
-        foreach (Renderer r in renderers)
-        {
-            string meshInfo = "mesh=(none)";
-            if (r is SkinnedMeshRenderer smr)
-                meshInfo = smr.sharedMesh != null ? $"mesh={smr.sharedMesh.name} verts={smr.sharedMesh.vertexCount}" : "mesh=NULL";
-            else if (r.TryGetComponent(out MeshFilter mf))
-                meshInfo = mf.sharedMesh != null ? $"mesh={mf.sharedMesh.name} verts={mf.sharedMesh.vertexCount}" : "mesh=NULL";
-
-            string materialInfo = "";
-            Material[] mats = r.sharedMaterials;
-            for (int i = 0; i < mats.Length; i++)
-            {
-                Material m = mats[i];
-                materialInfo += m == null ? $"[mat{i}=NULL] " : $"[mat{i} {DescribeMaterial(m)}] ";
-            }
-
-            Debug.Log(
-                $"[UnitDiag] {gameObject.name} renderer={r.gameObject.name} enabled={r.enabled} " +
-                $"bounds.center={r.bounds.center} bounds.size={r.bounds.size} {meshInfo} {materialInfo}",
-                r);
-        }
-    }
-
-    // 셰이더 이름/지원 여부뿐 아니라, 투명화의 실제 원인일 수 있는 URP Lit 서페이스 타입(_Surface: 0=Opaque,
-    // 1=Transparent)/알파클립/베이스컬러 알파값/활성 키워드까지 빌드 런타임에서 직접 확인한다 (doc/0344는
-    // 에디터에서 .mat 파일을 정적으로 읽어 이 값들이 정상임을 확인했는데, 빌드 런타임 인스턴스도 동일한지는
-    // 아직 확인 못 했음 - PropertyBlock이나 빌드 전용 경로로 달라질 가능성을 배제하기 위함).
-    private static string DescribeMaterial(Material m)
-    {
-        string shaderName = m.shader != null ? m.shader.name : "NULL";
-        bool isSupported = m.shader != null && m.shader.isSupported;
-
-        string surface = m.HasProperty("_Surface") ? m.GetFloat("_Surface").ToString() : "N/A";
-        string alphaClip = m.HasProperty("_AlphaClip") ? m.GetFloat("_AlphaClip").ToString() : "N/A";
-        string baseColorA = m.HasProperty("_BaseColor") ? m.GetColor("_BaseColor").a.ToString("F2") : "N/A";
-        string keywords = m.shaderKeywords.Length > 0 ? string.Join("|", m.shaderKeywords) : "(none)";
-
-        return $"shader={shaderName} isSupported={isSupported} renderQueue={m.renderQueue} " +
-            $"_Surface={surface} _AlphaClip={alphaClip} _BaseColor.a={baseColorA} keywords={keywords}";
     }
 
     // Update is called once per frame
@@ -414,8 +350,6 @@ public class UnitController : MonoBehaviour, IDestructible
                     UnitcurrentState = UnitState.Idle;
                     attackMoveDestination = null;
                 }
-
-                Debug.Log("공중유닛 도착 !");
             }
         }
         //지상 유닛 일 경우
@@ -668,7 +602,6 @@ public class UnitController : MonoBehaviour, IDestructible
 
             // 도착(또는 더 갈 수 없어 멈춤) - 여기서만 재탐색(도달 가능 여부 재확인)한다.
             bool reachableOnArrival = IsPositionReachable(targetPos);
-            Debug.Log($"{name}: [도달 불가 추격] 재탐색 결과 - {(reachableOnArrival ? "도달 가능" : "도달 불가")}");
             if (reachableOnArrival)
             {
                 chaseIsUnreachable = false;
@@ -690,7 +623,6 @@ public class UnitController : MonoBehaviour, IDestructible
         // 0.5m 캐시([[0386]])가 있어서 대상이 거의 안 움직이면 사실상 공짜 - FollowTick()이 이미
         // 쓰고 있는 것과 같은 패턴 (doc/0415).
         bool reachableNow = IsPositionReachable(targetPos);
-        Debug.Log($"{name}: [추격] 재탐색 결과 - {(reachableNow ? "도달 가능" : "도달 불가")}");
         if (!reachableNow)
         {
             chaseIsUnreachable = true; // 방금 도달 불가로 전환
@@ -1627,11 +1559,6 @@ public class UnitController : MonoBehaviour, IDestructible
         BuildingController depositBuilding = depositTargetTransform.GetComponent<BuildingController>();
         bool lifted = depositBuilding != null && depositBuilding.IsLifted();
 
-        // 진단용(doc/0345 "일꾼이 쌓이면 리턴을 아예 안 함" 조사) - 반납 시도 시점마다 대상/상태를 기록.
-        // 원인이 확정되면 삭제해도 되는 임시 코드.
-        Debug.Log($"[GatherDiag] {gameObject.name}: 반납 시작 target={depositBuilding?.name ?? depositTargetTransform.name} " +
-            $"lifted={lifted} targetPos={depositTargetTransform.position} myPos={transform.position}", this);
-
         if (lifted)
         {
             if (!isAirUnit)
@@ -1872,9 +1799,6 @@ public class UnitController : MonoBehaviour, IDestructible
 
     private void Deposit()
     {
-        // 진단용(doc/0345) - 반납이 실제로 완료되는지 확인. 원인이 확정되면 삭제해도 되는 임시 코드.
-        Debug.Log($"[GatherDiag] {gameObject.name}: 반납 완료 amount={carryingAmount} type={carryingType}", this);
-
         // gatherTargetNode는 채취 도중(또는 자신의 채취로) 이미 파괴됐을 수 있어서
         // 타입 판정은 여기서 다시 gatherTargetNode를 참조하지 않고 미리 캐싱해둔 carryingType을 사용
         if (carryingType == ResourceType.Ore)
@@ -2031,8 +1955,10 @@ public class UnitController : MonoBehaviour, IDestructible
             attackRange.EnsureDetectionRadius(); // 감지 반경이 새 사거리보다 좁아지지 않도록 보장 (doc/0239 안전장치)
         }
 
-        GetComponent<HealthManager>()?.InitializeHealth(data.hp);
+        healthManager?.InitializeHealth(data.hp);
     }
+
+    public HealthManager GetHealthManager() => healthManager;
 
     // ======================
     // 특성(트레이트) 스킬 (doc/0228) - 실제 효과는 유닛별 IUnitSkill 구현체에 위임

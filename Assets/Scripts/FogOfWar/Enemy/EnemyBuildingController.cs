@@ -36,6 +36,7 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
     private RTSUnitController rtsController;
     private PlacementSystem placementSystem;
     private float groundOffset; // 이 건물의 메쉬 피벗이 지면에서 얼마나 떨어져 있는지 (PlacementSystem.GetGroundOffsetY와 동일한 계산)
+    private HealthManager healthManager; // Info_panel 표시용 - Start에서 한 번만 캐싱
 
     // 선택 중인 건물이 안개 속으로 들어가면 선택을 풀어준다 (EnemyUnitController.fogWar와 동일한 패턴, doc/0360).
     private csFogWar fogWar;
@@ -45,6 +46,7 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
         if (buildingMarker != null)
             buildingMarker.SetActive(false);
 
+        healthManager = GetComponent<HealthManager>();
         rtsController = FindFirstObjectByType<RTSUnitController>();
         placementSystem = FindFirstObjectByType<PlacementSystem>();
         fogWar = FindFirstObjectByType<csFogWar>();
@@ -125,8 +127,10 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
         icon = data.Icon;
         buildingName = data.Name;
 
-        GetComponent<HealthManager>()?.InitializeHealth(data.hp);
+        healthManager?.InitializeHealth(data.hp);
     }
+
+    public HealthManager GetHealthManager() => healthManager;
 
     public void SelectEnemyBuilding()
     {

@@ -124,6 +124,7 @@ public class BaseStructure : MonoBehaviour, IDestructible
 
     public int GetBuildingID() => buildingID;
     public Sprite GetIcon() => icon;
+    public HealthManager GetHealthManager() => healthManager;
 
     // 좌클릭 선택 시(RTSUnitController) 마커를 켠다. 우클릭 피드백 깜빡임(FlashMarker)과 같은 마커를 공유한다.
     public void SelectStructure()

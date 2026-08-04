@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 // 생산 대기열 한 항목의 상태(어떤 유닛을, 얼마나 더 기다려야 하는지)
@@ -46,8 +45,6 @@ public class UnitSpawner : MonoBehaviour
     // (자원 소모는 호출측인 RTSUnitController.TryProduceUnit에서 먼저 처리된 뒤 호출됨)
     public void Enqueue(int unitID)
     {
-        Debug.Log($"database : {database}");
-
         if (database == null)
         {
             Debug.LogError("UnitDataSO is not assigned.");

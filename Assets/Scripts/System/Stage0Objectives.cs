@@ -25,6 +25,10 @@ public class Stage0Objectives : MonoBehaviour
 
     private RTSUnitController rtsController;
 
+    // 서브목표(승리 조건과 무관한 체크리스트 표시용)라 초당 갱신이 필요 없음 - 0.5초마다만 다시 스캔.
+    private float enemyScanTimer;
+    private bool enemiesCleared;
+
     private void Start()
     {
         rtsController = FindFirstObjectByType<RTSUnitController>();
@@ -41,7 +45,14 @@ public class Stage0Objectives : MonoBehaviour
         bool zoneCaptured = targetZone != null && targetZone.Owner == CaptureOwner.Ally;
         bool troopersReady = trooperCount >= RequiredTrooperCount;
         bool barracksBuilt = rtsController != null && rtsController.HasCompletedBuilding(BarracksBuildingID);
-        bool enemiesCleared = FindObjectsByType<EnemyUnitController>(FindObjectsSortMode.None).Length == 0;
+
+        enemyScanTimer -= Time.deltaTime;
+        if (enemyScanTimer <= 0f)
+        {
+            enemyScanTimer = 0.5f;
+            enemiesCleared = FindObjectsByType<EnemyUnitController>(FindObjectsSortMode.None).Length == 0;
+        }
+
         bool oreSecured = oreAmount >= RequiredOre;
 
         SetObjectiveText(captureZoneText, "거점 1개 점령하기", zoneCaptured);

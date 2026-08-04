@@ -1746,7 +1746,7 @@ public class RTSUnitController : MonoBehaviour
                     UnitController unit = selectedUnitList[0];
                     // 영웅 유닛(heroName이 채워진 unitID=0 유닛)은 이름을 데이터베이스 대신 자기 자신에게서 가져온다 (doc/0304).
                     string displayName = string.IsNullOrEmpty(unit.GetHeroName()) ? GetUnitName(unit.GetUnitID()) : unit.GetHeroName();
-                    uIController.ShowInfoPanel(unit.GetIcon(), displayName, unit.GetComponent<HealthManager>(), unit.GetAttackDamage(), unit.GetArmor(),
+                    uIController.ShowInfoPanel(unit.GetIcon(), displayName, unit.GetHealthManager(), unit.GetAttackDamage(), unit.GetArmor(),
                         unit.GetAttackType(), unit.GetArmorType(), unit.GetSizeType(), unit.GetShotCount());
                 }
                 else
@@ -1767,7 +1767,7 @@ public class RTSUnitController : MonoBehaviour
                 else if (selectedBuildingList.Count == 1)
                 {
                     BuildingController building = selectedBuildingList[0];
-                    uIController.ShowInfoPanel(building.GetIcon(), GetBuildingName(building.GetBuildingID()), building.GetComponent<HealthManager>());
+                    uIController.ShowInfoPanel(building.GetIcon(), GetBuildingName(building.GetBuildingID()), building.GetHealthManager());
                 }
                 else
                 {
@@ -1870,7 +1870,7 @@ public class RTSUnitController : MonoBehaviour
                 if (selectedEnemyList.Count > 0)
                 {
                     EnemyUnitController enemy = selectedEnemyList[0];
-                    uIController.ShowInfoPanel(enemy.GetIcon(), enemy.GetEnemyName(), enemy.GetComponent<HealthManager>(), enemy.GetAttackDamage(), enemy.GetArmor(),
+                    uIController.ShowInfoPanel(enemy.GetIcon(), enemy.GetEnemyName(), enemy.GetHealthManager(), enemy.GetAttackDamage(), enemy.GetArmor(),
                         enemy.GetAttackType(), enemy.GetArmorType(), enemy.GetSizeType(), enemy.GetShotCount());
                 }
                 else
@@ -1889,7 +1889,7 @@ public class RTSUnitController : MonoBehaviour
                 {
                     // 건물은 공격을 하지 않으므로 공격력/방어력 없이 아이콘/이름/체력만 표시 (3-인자 오버로드,
                     // 아군 건물 Info_panel과 동일한 패턴).
-                    uIController.ShowInfoPanel(selectedEnemyBuilding.GetIcon(), selectedEnemyBuilding.GetBuildingName(), selectedEnemyBuilding.GetComponent<HealthManager>());
+                    uIController.ShowInfoPanel(selectedEnemyBuilding.GetIcon(), selectedEnemyBuilding.GetBuildingName(), selectedEnemyBuilding.GetHealthManager());
                 }
                 else
                 {
@@ -1927,7 +1927,7 @@ public class RTSUnitController : MonoBehaviour
                     uIController.ShowBaseStructureInfoPanel(
                         selectedBaseStructure.GetIcon(),
                         GetBuildingName(selectedBaseStructure.GetBuildingID()),
-                        selectedBaseStructure.GetComponent<HealthManager>());
+                        selectedBaseStructure.GetHealthManager());
 
                     uIController.ShowBaseStructureCommandPanel(
                         ButtonAction.Simple(
@@ -2038,19 +2038,6 @@ public class RTSUnitController : MonoBehaviour
     {
         upgradeManager.AddBonus(type, amount);
         SoundManager.Instance?.PlayUpgradeCompleteVoice();
-    }
-
-    #endregion
-
-    #region Test용
-
-    /// <summary>
-    /// 테스트용
-    /// </summary>
-    //UI 버튼 연결 테스트용
-    public void TestMethod()
-    {
-
     }
 
     #endregion
