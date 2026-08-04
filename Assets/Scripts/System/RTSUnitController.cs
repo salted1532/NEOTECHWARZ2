@@ -922,8 +922,13 @@ public class RTSUnitController : MonoBehaviour
     // 그룹이 비어있으면(저장한 적 없거나 전부 사라짐) 기존 선택을 그대로 둔다.
     public void SelectControlGroup(int groupIndex)
     {
-        if (PurgeAndCountControlGroup(groupIndex) == 0)
+        int memberCount = PurgeAndCountControlGroup(groupIndex);
+
+        if (memberCount == 0)
+        {
+            Debug.Log($"[SelectControlGroup] 그룹 {groupIndex}: 인원 0명이라 선택 취소");
             return;
+        }
 
         DeselectAll();
 
@@ -932,6 +937,9 @@ public class RTSUnitController : MonoBehaviour
 
         foreach (BuildingController building in controlGroupBuildings[groupIndex])
             SelectBuilding(building);
+
+        Debug.Log($"[SelectControlGroup] 그룹 {groupIndex}: 저장된 인원 {memberCount}명, IsBuildMode={IsBuildMode()}, " +
+            $"실제 선택된 유닛 {selectedUnitList.Count}개 / 건물 {selectedBuildingList.Count}개");
     }
 
     // 그룹 내 죽은/파괴된 대상을 정리하고 남은 인원수(유닛+건물)를 반환한다.

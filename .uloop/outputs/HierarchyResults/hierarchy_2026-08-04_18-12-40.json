@@ -1,0 +1,1647 @@
+{
+  "ExportTimestamp": "2026-08-04 18:12:40",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "SampleScene",
+    "nodeCount": 117,
+    "maxDepth": 3
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "SampleScene",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 117,
+        "maxDepth": 3
+      },
+      "componentsLut": [
+        "RectTransform",
+        "Canvas",
+        "CanvasScaler",
+        "GraphicRaycaster",
+        "HorizontalLayoutGroup",
+        "ControlGroupPanel",
+        "StageManager",
+        "CanvasRenderer",
+        "TextMeshProUGUI",
+        "Image",
+        "RawImage",
+        "MinimapController",
+        "MinimapAlertController",
+        "MinimapViewIndicator",
+        "Button",
+        "ProductionSlot",
+        "Slider",
+        "TooltipUI",
+        "SoundSettingsPanel",
+        "Toggle",
+        "TMP_InputField"
+      ],
+      "roots": [
+        {
+          "name": "Canvas",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 5,
+          "children": [
+            {
+              "name": "HorizontalLayoutGroup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "StageObject",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                6
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Label",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "Main1",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "Main2",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "Main3",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "sub1",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "sub2",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 5,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "DragRectangle",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                7,
+                9
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "MiniMap",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                7,
+                9
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "MiniMap_image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    10,
+                    11,
+                    12
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "ViewSquare",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        13
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "OrderButtons",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                7,
+                9
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Panel",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Slot0",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot1",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot2",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot3",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot4",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot5",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 5,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot6",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 6,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot7",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 7,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot8",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 8,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "SelectInfo",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                7,
+                9
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Info_panel",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Icon_Image",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "HpText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "UnitDamage",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "UnitArmor",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "NameText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "InfoText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 5,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "productionQueue_Panel",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Slider",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        16
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot0",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot1",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot2",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot3",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot4",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 5,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Squad_panel",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "page1",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "page2",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "page3",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "page4",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "page5",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot0",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 5,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot1",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 6,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot2",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 7,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot3",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 8,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot4",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 9,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot5",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 10,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot6",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 11,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot7",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 12,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot8",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 13,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot9",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 14,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot10",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 15,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Slot11",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 16,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "ResourceUI",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "OreImage",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "OreText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "GasImage",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "GasText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "populationImage",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "populationText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "SkillSelect",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                7,
+                9
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Slot0",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9,
+                    14,
+                    15
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "Slot1",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9,
+                    14,
+                    15
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "ToolTip",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                7,
+                9,
+                17
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "TitleText",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "DescriptionText",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "Ore_image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "OreText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Gas_image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Gastext",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "population_image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9
+                  ],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "PopulationText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Option",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                7,
+                9,
+                14
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "OptionPanel",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                7,
+                9,
+                18
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Close",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9,
+                    14
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "BackToMainMenu",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9,
+                    14
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Text (TMP)",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Master_Volume",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    16
+                  ],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Mute",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        19
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Fill Area",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Handle Slide Area",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "MasterVolume_Input",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        20
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "BGM",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    16
+                  ],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Mute",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        19
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Fill Area",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Handle Slide Area",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "BGM_Input",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        20
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "SFX",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    16
+                  ],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Mute",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        19
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Fill Area",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Handle Slide Area",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "SFX_Input",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        20
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "VOICE",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    16
+                  ],
+                  "siblingIndex": 5,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Mute",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        19
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Fill Area",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "Handle Slide Area",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    },
+                    {
+                      "name": "VOICE_Input",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        9,
+                        20
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "GoToPreviousStage",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9,
+                    14
+                  ],
+                  "siblingIndex": 6,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Text (TMP)",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "VictoryPanel",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                7,
+                9,
+                18
+              ],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "ReturnToGame",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9,
+                    14
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Text (TMP)",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "GoToNextStage",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9,
+                    14
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Text (TMP)",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    8
+                  ],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                },
+                {
+                  "name": "BackToMainMenu",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    7,
+                    9,
+                    14
+                  ],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": [
+                    {
+                      "name": "Text (TMP)",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        7,
+                        8
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Text (TMP)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                7,
+                8
+              ],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
