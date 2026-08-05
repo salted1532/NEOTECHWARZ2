@@ -84,7 +84,7 @@ public class UserControl : MonoBehaviour
     private RTSUnitController rtsUnitController;
     private csFogWar fogWar;
 
-    // 옵션 패널/승리 화면이 떠서 게임이 퍼즈된 동안 true. TestSceneMenuController/VictoryPanelController가
+    // 옵션 패널/승리 화면이 떠서 게임이 퍼즈된 동안 true. SceneMenuController/VictoryPanelController가
     // 패널을 열고 닫을 때 같이 갱신한다. 마우스는 화면을 덮는 UI 패널로 이미 막혀 있으므로, 여기서는
     // Input.GetKey류를 쓰는 키보드 단축키 처리만 막는다.
     public static bool IsPaused;

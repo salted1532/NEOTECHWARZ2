@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 // StageManager.OnVictory를 구독해서 승리 패널을 띄우고, 패널 안의 "메인화면으로" 버튼을 처리한다.
 // 패널 레이아웃(배경/문구/연출)은 유니티 에디터에서 직접 만들고 이 스크립트에는 그 패널 GameObject와
-// 버튼만 연결하면 된다 - TestSceneMenuController와 동일한 컨벤션(패널 표시/씬 전환만 담당).
+// 버튼만 연결하면 된다 - SceneMenuController와 동일한 컨벤션(패널 표시/씬 전환만 담당).
 public class VictoryPanelController : MonoBehaviour
 {
     [Header("승리 패널 (레이아웃은 직접 제작 후 연결)")]

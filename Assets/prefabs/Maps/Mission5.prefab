@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1002269795109951286}
+  - component: {fileID: -3184614966244202128}
   m_Layer: 7
   m_Name: Mission5
   m_TagString: Untagged
@@ -33,6 +34,38 @@ Transform:
   - {fileID: 1002269795135397834}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-3184614966244202128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002269795109951287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 1
+  m_VoxelSize: 0.0312
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 276284a9c3e355e4eb1ab3a1490d5a94, type: 2}
+  m_BuildHeightMesh: 1
 --- !u!1 &1002269795135397835
 GameObject:
   m_ObjectHideFlags: 0
@@ -45,6 +78,7 @@ GameObject:
   - component: {fileID: 3102649611017541572}
   - component: {fileID: 6140782768679320263}
   - component: {fileID: 5489930013256958583}
+  - component: {fileID: 668134076980542095}
   m_Layer: 7
   m_Name: layer2
   m_TagString: Layer2
@@ -147,6 +181,28 @@ MonoBehaviour:
   destroyCombinedChildren: 0
   folderPath: Prefabs/CombinedMeshes
   meshFiltersToSkip: []
+--- !u!64 &668134076980542095
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002269795135397835}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300000, guid: da66f8a2f7d00de46a2c61eb1ce4cec6, type: 2}
 --- !u!1 &1002269796094203638
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,6 +215,7 @@ GameObject:
   - component: {fileID: 7922251029479570249}
   - component: {fileID: 7692220922244711013}
   - component: {fileID: 1316346838310497035}
+  - component: {fileID: 9216254833961353815}
   m_Layer: 7
   m_Name: layer1
   m_TagString: Layer1
@@ -260,3 +317,25 @@ MonoBehaviour:
   destroyCombinedChildren: 0
   folderPath: Prefabs/CombinedMeshes
   meshFiltersToSkip: []
+--- !u!64 &9216254833961353815
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002269796094203638}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300000, guid: 394d70c4676b12146a8c4bb07836b826, type: 2}

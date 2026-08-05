@@ -323,10 +323,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1002269795109951287, guid: 155ff694de80c1e49ad0bc0d8fa244b8, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1557606237}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 155ff694de80c1e49ad0bc0d8fa244b8, type: 3}
 --- !u!1 &577969883
 GameObject:
@@ -2000,43 +1997,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1692707858}
   m_SourcePrefab: {fileID: 100100000, guid: 74906eae36698e545b9a007d28105b21, type: 3}
---- !u!1 &1557606236 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1002269795109951287, guid: 155ff694de80c1e49ad0bc0d8fa244b8, type: 3}
-  m_PrefabInstance: {fileID: 500354157}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1557606237
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1557606236}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
-  m_SerializedVersion: 0
-  m_AgentTypeID: 0
-  m_CollectObjects: 0
-  m_Size: {x: 10, y: 10, z: 10}
-  m_Center: {x: 0, y: 2, z: 0}
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_UseGeometry: 0
-  m_DefaultArea: 0
-  m_GenerateLinks: 0
-  m_IgnoreNavMeshAgent: 1
-  m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
-  m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
-  m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 0}
-  m_BuildHeightMesh: 0
 --- !u!1 &1678526699
 GameObject:
   m_ObjectHideFlags: 0
