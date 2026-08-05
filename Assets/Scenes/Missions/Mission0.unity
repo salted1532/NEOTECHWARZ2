@@ -119,17 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &34281380 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2728042409530267414, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
-  m_PrefabInstance: {fileID: 6470719151466223722}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!21 &179910034
 Material:
   serializedVersion: 8
@@ -184,17 +173,6 @@ Material:
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &213944022 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1023259158883811535, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
-  m_PrefabInstance: {fileID: 6470719151466223722}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &226907906
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -476,60 +454,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6750151632037487397, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
   m_PrefabInstance: {fileID: 6470719151466223722}
   m_PrefabAsset: {fileID: 0}
---- !u!21 &548118974
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Universal Render Pipeline/Unlit
-  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
-    - _AlphaToMask: 0
-    - _Blend: 0
-    - _BlendOp: 0
-    - _Cull: 2
-    - _Cutoff: 0.5
-    - _DstBlend: 0
-    - _DstBlendAlpha: 0
-    - _QueueOffset: 0
-    - _SampleGI: 0
-    - _SrcBlend: 1
-    - _SrcBlendAlpha: 1
-    - _Surface: 0
-    - _XRMotionVectorsPass: 1
-    - _ZWrite: 1
-    m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!115 &654505677
 MonoScript:
   m_ObjectHideFlags: 0
@@ -545,17 +469,6 @@ MonoScript:
   m_ClassName: TerritoryZonePin
   m_Namespace: 
   m_AssemblyName: Assembly-CSharp
---- !u!114 &715380532 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6211463753792936418, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
-  m_PrefabInstance: {fileID: 6470719151466223722}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &782570192
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -732,7 +645,7 @@ PrefabInstance:
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 548118974}
+      objectReference: {fileID: 1138880955}
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Positions.Array.data[0].x
       value: 97.0116
@@ -982,17 +895,6 @@ MonoBehaviour:
   m_Script: {fileID: 654505677}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerritoryZonePin
---- !u!114 &1034316904 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3473158893106804701, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
-  m_PrefabInstance: {fileID: 6470719151466223722}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &1066543903
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1073,6 +975,60 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a9d479cb2961de48b5700ee6f252238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerritoryZone
+--- !u!21 &1138880955
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Universal Render Pipeline/Unlit
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddPrecomputedVelocity: 0
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _BlendOp: 0
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
+    - _QueueOffset: 0
+    - _SampleGI: 0
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _Surface: 0
+    - _XRMotionVectorsPass: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1001 &1145629224
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1530,17 +1486,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
---- !u!114 &1467933756 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1728995819445572501, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
-  m_PrefabInstance: {fileID: 6470719151466223722}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &1592815639
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1730,7 +1675,7 @@ GameObject:
   - component: {fileID: 1793613074}
   - component: {fileID: 1793613076}
   m_Layer: 0
-  m_Name: StageObject
+  m_Name: Stage0Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1749,11 +1694,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Stage0Objectives
   targetZone: {fileID: 1128801866}
-  captureZoneText: {fileID: 213944022}
-  produceTroopersText: {fileID: 34281380}
-  buildBarracksText: {fileID: 715380532}
-  clearEnemiesText: {fileID: 1467933756}
-  secureOreText: {fileID: 1034316904}
+  captureZoneText: {fileID: 0}
+  produceTroopersText: {fileID: 0}
+  buildBarracksText: {fileID: 0}
+  clearEnemiesText: {fileID: 0}
+  secureOreText: {fileID: 0}
 --- !u!4 &1793613075
 Transform:
   m_ObjectHideFlags: 0
@@ -1762,7 +1707,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1793613073}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1786,7 +1731,7 @@ MonoBehaviour:
   nextStageButton: {fileID: 1439433032}
   returnToGameButton: {fileID: 6470719151466223723}
   mainSceneName: MainScene
-  nextStageSceneName: SampleScene
+  nextStageSceneName: Mission1
   victoryDelay: 3
 --- !u!1001 &1862272325
 PrefabInstance:
@@ -1942,6 +1887,10 @@ PrefabInstance:
       propertyPath: m_RaycastTarget
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 738279485843924745, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: objectiveRowPrefab
+      value: 
+      objectReference: {fileID: 8900635618308312133, guid: 2a4c40df7b97f65499fcec71b59a25dd, type: 3}
     - target: {fileID: 961756826390763593, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: fogVisibilityMargin
       value: 3
@@ -2137,6 +2086,14 @@ PrefabInstance:
     - target: {fileID: 6222306635635131285, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: m_RaycastTarget
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6336438050494505111, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: nextStageSceneName
+      value: Mission1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6336438050494505111, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: previousStageSceneName
+      value: Mission5
       objectReference: {fileID: 0}
     - target: {fileID: 6750151632037487397, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: m_IsActive

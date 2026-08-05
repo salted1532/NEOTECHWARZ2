@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+using TMPro;
 using UnityEngine;
 
 // 스테이지(미션)의 승리/패배 "결과"만 담당하는 최소 골격.
@@ -16,6 +18,9 @@ public class StageManager : MonoBehaviour
     public event Action OnVictory;
     public event Action OnDefeat;
 
+    [Header("목표 체크리스트 UI")]
+    [SerializeField] private TextMeshProUGUI objectiveRowPrefab; // 목표 텍스트 한 줄 프리팹 연결
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -24,6 +29,33 @@ public class StageManager : MonoBehaviour
             return;
         }
         Instance = this;
+    }
+
+    // 이 오브젝트(StageObject, VerticalLayoutGroup 있음) 밑에 objectiveRowPrefab을 복제해서
+    // 자식으로 붙인다. VerticalLayoutGroup이 생성 순서대로 수직 나열해준다.
+    public TextMeshProUGUI CreateObjectiveRow()
+    {
+        return Instantiate(objectiveRowPrefab, transform);
+    }
+
+    // stageObjectives(Stage0~5Objectives 등)가 가진 TextMeshProUGUI 필드를 리플렉션으로 전부
+    // 찾아서, 아직 비어있는(인스펙터에서 연결 안 했거나 참조가 끊어진) 필드마다 행을 새로 만들어
+    // 채워준다. 이미 값이 있는 필드는 그대로 둔다 - 직접 배치하고 싶은 텍스트가 있으면 수동으로
+    // 연결해도 덮어쓰지 않는다. 각 스테이지 스크립트는 Start() 맨 앞에서 이거 한 줄만 호출하면 됨.
+    public void WireObjectiveTexts(MonoBehaviour stageObjectives)
+    {
+        FieldInfo[] fields = stageObjectives.GetType()
+            .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        foreach (FieldInfo field in fields)
+        {
+            if (field.FieldType != typeof(TextMeshProUGUI))
+                continue;
+
+            var current = (TextMeshProUGUI)field.GetValue(stageObjectives);
+            if (current == null) // Unity의 파괴된/끊어진 참조 판정 포함(캐스팅 후 비교)
+                field.SetValue(stageObjectives, CreateObjectiveRow());
+        }
     }
 
     // 임무 목표 달성 시 호출 (예: 적 기지 파괴 등 - 조건 판단은 호출부 책임).

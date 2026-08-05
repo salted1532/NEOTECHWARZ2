@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using FischlWorks_FogWar;
 
@@ -12,6 +13,12 @@ using FischlWorks_FogWar;
 // 나중에 갈아엎지 않아도 되게 함.
 public class EnemyBuildingController : MonoBehaviour, IDestructible
 {
+    // 씬에 존재하는 모든 적 건물 목록. 등록/해제(=파괴) 시에만 갱신되고 이벤트로 알리므로, "적 건물
+    // 모두 파괴" 같은 스테이지 목표는 매 프레임 스캔하지 않고 이 이벤트를 구독해서 필요할 때만
+    // 다시 계산하면 된다.
+    public static readonly List<EnemyBuildingController> ActiveBuildings = new List<EnemyBuildingController>();
+    public static event System.Action OnActiveBuildingsChanged;
+
     [SerializeField] private GameObject buildingMarker; // 선택 표시 (EnemyUnitController.enemyMarker와 동일한 패턴)
     [SerializeField] private string buildingName; // Info_panel에 표시할 이름
     [SerializeField] private Sprite icon;          // Info_panel에 표시할 아이콘
@@ -63,6 +70,15 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
         // 씬에 직접 배치됐든 나중에 스크립트로 생성됐든, 항상 자기 enemyBuildingID로 OC Building Data SO를
         // 조회해서 스스로 이름/체력을 적용한다 (EnemyUnitController.Start()와 동일한 패턴).
         ApplyBuildingData(rtsController != null ? rtsController.GetEnemyBuildingData(enemyBuildingID) : null);
+
+        ActiveBuildings.Add(this);
+        OnActiveBuildingsChanged?.Invoke();
+    }
+
+    private void OnDestroy()
+    {
+        ActiveBuildings.Remove(this);
+        OnActiveBuildingsChanged?.Invoke();
     }
 
     // 건물은 안 움직이지만 플레이어 유닛이 이동하면서 안개가 계속 바뀌므로 매 프레임 다시 확인한다.

@@ -31,6 +31,7 @@ public class Stage0Objectives : MonoBehaviour
 
     private void Start()
     {
+        StageManager.Instance.WireObjectiveTexts(this);
         rtsController = FindFirstObjectByType<RTSUnitController>();
     }
 
@@ -55,11 +56,11 @@ public class Stage0Objectives : MonoBehaviour
 
         bool oreSecured = oreAmount >= RequiredOre;
 
-        SetObjectiveText(captureZoneText, "거점 1개 점령하기", zoneCaptured);
-        SetObjectiveText(produceTroopersText, "어썰트 트루퍼 생산하기", trooperCount, RequiredTrooperCount);
-        SetObjectiveText(buildBarracksText, "병영 건설하기", barracksBuilt);
-        SetObjectiveText(clearEnemiesText, "(서브) 주변 적 유닛 모두 제거", enemiesCleared);
-        SetObjectiveText(secureOreText, "(서브) 광물 확보", oreAmount, RequiredOre);
+        ObjectiveTextUtil.SetObjectiveText(captureZoneText, "(주목표) 거점 1개 점령하기", zoneCaptured);
+        ObjectiveTextUtil.SetObjectiveText(produceTroopersText, "(주목표) 어썰트 트루퍼 생산하기", trooperCount, RequiredTrooperCount);
+        ObjectiveTextUtil.SetObjectiveText(buildBarracksText, "(주목표) 병영 건설하기", barracksBuilt);
+        ObjectiveTextUtil.SetObjectiveText(clearEnemiesText, "(서브) 주변 적 유닛 모두 제거", enemiesCleared);
+        ObjectiveTextUtil.SetObjectiveText(secureOreText, "(서브) 광물 확보", oreAmount, RequiredOre);
 
         if (zoneCaptured && troopersReady && barracksBuilt)
             StageManager.Instance?.ReportVictory();
@@ -75,23 +76,5 @@ public class Stage0Objectives : MonoBehaviour
                 count++;
 
         return count;
-    }
-
-    // 완료 시 텍스트를 <s>(취소선)로 감싸고, 미완료면 그대로 표시 - 매 프레임 다시 호출되므로
-    // 조건이 다시 깨지면 취소선도 자동으로 사라진다.
-    private static void SetObjectiveText(TextMeshProUGUI text, string description, bool complete)
-    {
-        if (text == null) return;
-        text.text = complete ? $"<s>{description}</s>" : description;
-    }
-
-    // 개수 비교형 목표용 오버로드 - "설명 (현재/목표)" 형식으로 표시(요청사항: 9/10 형식).
-    // 현재값이 목표를 넘어도 표시는 목표치에서 고정(예: 1050/1000이 아니라 1000/1000으로 표시).
-    private static void SetObjectiveText(TextMeshProUGUI text, string description, int current, int target)
-    {
-        if (text == null) return;
-        bool complete = current >= target;
-        string content = $"{description} ({Mathf.Min(current, target)}/{target})";
-        text.text = complete ? $"<s>{content}</s>" : content;
     }
 }
