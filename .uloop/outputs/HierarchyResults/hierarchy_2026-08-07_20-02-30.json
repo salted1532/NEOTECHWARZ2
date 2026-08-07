@@ -1,0 +1,112 @@
+{
+  "ExportTimestamp": "2026-08-07 20:02:30",
+  "Context": {
+    "sceneType": "prefab",
+    "sceneName": "Assets/prefabs/OC/Ally/Unit/Brute Mech (Ally).prefab",
+    "nodeCount": 10,
+    "maxDepth": 1
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "Brute Mech (Ally)",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 10,
+        "maxDepth": 1
+      },
+      "roots": [
+        {
+          "name": "Brute Mech (Ally)",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 0,
+          "tag": "Untagged",
+          "layer": 13,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos (1)",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "unit_Quad_B_yup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

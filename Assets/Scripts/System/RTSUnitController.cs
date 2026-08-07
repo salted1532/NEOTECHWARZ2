@@ -66,6 +66,12 @@ public class RTSUnitController : MonoBehaviour
     // 조회할 때 사용 (doc/0245).
     [SerializeField]
     private EnemyBuildingDataSO enemyBuildingDatabase;
+    // 스포어 브루드(외계종족) 유닛/건물 데이터베이스 - OC와는 별개 진영이라 SO 에셋도 분리(doc/0444).
+    // enemyUnitID/enemyBuildingID는 OC 쪽과 겹치지 않게 배정돼 있으므로, OC 쪽에서 못 찾으면 이쪽에서 조회한다.
+    [SerializeField]
+    private EnemyUnitDataSO sporeBroodUnitDatabase;
+    [SerializeField]
+    private EnemyBuildingDataSO sporeBroodBuildingDatabase;
     [SerializeField]
     private UpgradeManager upgradeManager;
     [SerializeField]
@@ -449,6 +455,26 @@ public class RTSUnitController : MonoBehaviour
     /// AttackFriendlyTarget(거리 상관없이 파괴될 때까지 계속 추격/공격)을 그대로 재사용한다 (doc/0248).
     /// </summary>
     public void AttackEnemyBuildingSelectedUnits(EnemyBuildingController target)
+    {
+        for (int i = 0; i < selectedUnitList.Count; ++i)
+        {
+            selectedUnitList[i].AttackFriendlyTarget(target);
+        }
+
+        PlayRepresentativeUnitVoice(audio =>
+        {
+            audio.PlayAttackOrderVoice();
+            audio.PlayOrderSFX();
+        });
+    }
+
+    /// <summary>
+    /// 아군 OC 유닛 지정 공격 (A 모드에서 아군 OC 클릭, doc/0450): Tag가 "Enemy"가 아니라서
+    /// AttackRange(자동/지정 추격 공용 트리거)가 감지하지 못하므로, AttackSelectedUnits(orderedTarget
+    /// 경로)가 아니라 AttackFriendlyTarget(거리 상관없이 파괴될 때까지 계속 추격/공격, Tag와 무관하게
+    /// 직접 거리 판정)을 재사용한다 - 플레이어 자신의 유닛/건물을 강제공격할 때와 동일한 경로.
+    /// </summary>
+    public void AttackAllyUnitSelectedUnits(EnemyUnitController target)
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
         {
@@ -2024,14 +2050,17 @@ public class RTSUnitController : MonoBehaviour
     public BuildingData GetBuildingData(int buildingID) => buildingDatabase.buildingData.Find(d => d.ID == buildingID);
 
     // enemyUnitID로 OC Unit Data SO(EnemyUnitDataSO)에서 UnitData를 조회한다 (EnemyUnitController가
-    // 자기 자신의 스탯을 SO에서 가져올 때 사용, doc/0232).
+    // 자기 자신의 스탯을 SO에서 가져올 때 사용, doc/0232). OC 쪽에 없으면 스포어 브루드 쪽에서 조회한다(doc/0444).
     public UnitData GetEnemyUnitData(int enemyUnitID) =>
-        enemyUnitDatabase != null ? enemyUnitDatabase.unitData.Find(d => d.ID == enemyUnitID) : null;
+        enemyUnitDatabase?.unitData.Find(d => d.ID == enemyUnitID) ??
+        sporeBroodUnitDatabase?.unitData.Find(d => d.ID == enemyUnitID);
 
     // enemyBuildingID로 OC Building Data SO(EnemyBuildingDataSO)에서 BuildingData를 조회한다
-    // (EnemyBuildingController가 자기 자신의 이름/체력을 SO에서 가져올 때 사용, doc/0245).
+    // (EnemyBuildingController가 자기 자신의 이름/체력을 SO에서 가져올 때 사용, doc/0245). OC 쪽에 없으면
+    // 스포어 브루드 쪽에서 조회한다(doc/0444).
     public BuildingData GetEnemyBuildingData(int enemyBuildingID) =>
-        enemyBuildingDatabase != null ? enemyBuildingDatabase.buildingData.Find(d => d.ID == enemyBuildingID) : null;
+        enemyBuildingDatabase?.buildingData.Find(d => d.ID == enemyBuildingID) ??
+        sporeBroodBuildingDatabase?.buildingData.Find(d => d.ID == enemyBuildingID);
 
     // ResearchQueue가 연구 완료 시 호출 (UpgradeManager를 직접 모른 채로 보너스를 반영)
     public void AddGlobalBonus(ResearchType type, int amount)

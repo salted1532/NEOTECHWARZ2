@@ -509,14 +509,17 @@ public class UnitController : MonoBehaviour, IDestructible
         return new Vector3(destination.x, destination.y + airCruiseAltitude, destination.z);
     }
 
-    // friendlyTarget(아군 강제공격 대상)은 UnitController 또는 BuildingController 둘 다 될 수 있어서,
-    // 실제로 지금 공중에 떠 있는 상태인지 타입별로 확인해야 AirTargetPosition에 정확히 알려줄 수 있다.
+    // friendlyTarget(아군 강제공격 대상)은 UnitController/BuildingController 외에 아군 OC 유닛
+    // (EnemyUnitController, doc/0450)도 될 수 있어서, 실제로 지금 공중에 떠 있는 상태인지 타입별로
+    // 확인해야 AirTargetPosition에 정확히 알려줄 수 있다.
     private static bool IsAirborne(MonoBehaviour target)
     {
         if (target is UnitController unit)
             return unit.isAirUnit;
         if (target is BuildingController building)
             return building.IsLifted();
+        if (target is EnemyUnitController enemyUnit)
+            return enemyUnit.IsAirUnit();
         return false;
     }
 

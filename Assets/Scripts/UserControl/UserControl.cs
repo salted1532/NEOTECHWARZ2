@@ -25,6 +25,10 @@ public class UserControl : MonoBehaviour
     private LayerMask layerOre;
     [SerializeField]
     private LayerMask layerGas;
+    // 아군 OC(4스테이지 등) 전용 레이어 - Tag는 "Enemy"가 아니라서 AttackRange의 자동교전 대상에서는
+    // 빠지지만, 이 레이어로 클릭은 감지되어 강제공격/선택이 가능하다 (doc/0447).
+    [SerializeField]
+    private LayerMask layerAllyOC;
 
     [SerializeField]
     private Camera mainCamera;
@@ -277,6 +281,7 @@ public class UserControl : MonoBehaviour
         RaycastHit BuildingHit;
         RaycastHit OreHit;
         RaycastHit GasHit;
+        RaycastHit allyOcHit;
 
         bool clickedUnit = Physics.Raycast(ray, out unitHit, Mathf.Infinity, layerUnit);
         bool clickedGround = Physics.Raycast(ray, out groundHit, Mathf.Infinity, layerGround);
@@ -284,6 +289,7 @@ public class UserControl : MonoBehaviour
         bool clickedBuilding = Physics.Raycast(ray, out BuildingHit, Mathf.Infinity, layerBuilding);
         bool clickedOre = Physics.Raycast(ray, out OreHit, Mathf.Infinity, layerOre);
         bool clickedGas = Physics.Raycast(ray, out GasHit, Mathf.Infinity, layerGas);
+        bool clickedAllyOC = Physics.Raycast(ray, out allyOcHit, Mathf.Infinity, layerAllyOC);
 
         // 1. 유닛 클릭 = 선택 또는 아군 강제 공격 (A 모드 중이면 해당 아군을 강제로 공격, 아니면 선택)
         if (clickedUnit)
@@ -391,6 +397,54 @@ public class UserControl : MonoBehaviour
                 }
 
                 pendingLeftClickSelect = () => { if (enemyBuilding != null) rtsUnitController.ClickSelectEnemyBuilding(enemyBuilding); };
+
+                return; // 👉 중요: 여기서 종료 (명령 안 함)
+            }
+        }
+
+        // 2.5. 아군 OC 클릭 = 선택(중립 취급) 또는 강제 공격 (A 모드 중이면 강제로 공격, 아니면 선택)
+        // EnemyUnitController/EnemyBuildingController를 그대로 재사용하되, Tag가 "Enemy"가 아니라서
+        // AttackRange의 자동교전 대상에서는 빠지고 이 전용 레이어를 통한 명시적 클릭에만 반응한다(doc/0447).
+        if (clickedAllyOC)
+        {
+            EnemyUnitController allyUnit = allyOcHit.transform.GetComponent<EnemyUnitController>();
+
+            if (allyUnit != null)
+            {
+                if (UsercurrentState == OrderState.Attack)
+                {
+                    rtsUnitController.AttackAllyUnitSelectedUnits(allyUnit);
+                    allyUnit.FlashMarker();
+
+                    ShowAttackPointer(allyUnit.transform.position);
+
+                    UsercurrentState = OrderState.None;
+
+                    return;
+                }
+
+                pendingLeftClickSelect = () => { if (allyUnit != null) rtsUnitController.ClickSelectEnemy(allyUnit); };
+
+                return; // 👉 중요: 여기서 종료 (명령 안 함)
+            }
+
+            EnemyBuildingController allyBuilding = allyOcHit.transform.GetComponent<EnemyBuildingController>();
+
+            if (allyBuilding != null)
+            {
+                if (UsercurrentState == OrderState.Attack)
+                {
+                    rtsUnitController.AttackEnemyBuildingSelectedUnits(allyBuilding);
+                    allyBuilding.FlashMarker();
+
+                    ShowAttackPointer(allyBuilding.transform.position);
+
+                    UsercurrentState = OrderState.None;
+
+                    return;
+                }
+
+                pendingLeftClickSelect = () => { if (allyBuilding != null) rtsUnitController.ClickSelectEnemyBuilding(allyBuilding); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
@@ -1053,8 +1107,8 @@ public class UserControl : MonoBehaviour
         if (Physics.Raycast(ray, Mathf.Infinity, layerUnit | layerBuilding))
             return CursorTarget.Ally;
 
-        if (Physics.Raycast(ray, out RaycastHit resourceHit, Mathf.Infinity, layerOre | layerGas) && IsRevealedByFog(resourceHit.transform.position))
-            return CursorTarget.Neutral;
+        if (Physics.Raycast(ray, out RaycastHit resourceHit, Mathf.Infinity, layerOre | layerGas | layerAllyOC) && IsRevealedByFog(resourceHit.transform.position))
+            return CursorTarget.Neutral; // 중립 자원 + 아군 OC 전부 노란 커서 (doc/0447)
 
         return CursorTarget.None;
     }

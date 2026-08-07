@@ -29,8 +29,11 @@ public class EnemyAttackRange : MonoBehaviour
     private EnemyUnitController enemyUnit;
     private CapsuleCollider detectionCollider;
 
-    // 감지 대상: 플레이어 유닛(Worker/AttackUnit) + 플레이어 건물(MainBase/Tier1~3/SupplyDepot/Lab)
-    private static readonly string[] TargetTags =
+    // 감지 대상 Tag 목록 - 기본값은 플레이어 진영(Worker/AttackUnit/MainBase/Tier1~3/SupplyDepot/Lab).
+    // protected 인스턴스 필드라서 하위 클래스가 기본값을 바꿀 수 있다 - AllyAttackRange(doc/0448)가
+    // 이걸 ["Enemy"]로 바꿔서 플레이어 대신 외계종족을 자동교전 대상으로 삼는 용도로 상속해서 쓴다.
+    [SerializeField]
+    protected string[] targetTags =
         { "Worker", "AttackUnit", "MainBase", "Tier1", "Tier2", "Tier3", "SupplyDepot", "Lab" };
 
     private readonly List<GameObject> targetsInRange = new List<GameObject>();
@@ -103,9 +106,9 @@ public class EnemyAttackRange : MonoBehaviour
             unreachableTarget = null; // 감지 범위를 완전히 벗어났다 다시 들어오면 다시 시도해볼 기회를 준다
     }
 
-    private static bool IsValidTarget(Collider other)
+    private bool IsValidTarget(Collider other)
     {
-        foreach (string tag in TargetTags)
+        foreach (string tag in targetTags)
         {
             if (other.CompareTag(tag))
                 return true;

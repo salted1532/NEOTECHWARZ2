@@ -1,0 +1,148 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6, type: 3}
+  m_Name: Spore Brood Unit Data SO
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyUnitDataSO
+  unitData:
+  - <unitName>k__BackingField: "\uB9BD\uD33D (Ripfang)"
+    <description>k__BackingField: "\uB0A0\uCE74\uB85C\uC6B4 \uD131\uC73C\uB85C \uBB3C\uC5B4\uB72F\uB294
+      \uC800\uBE44\uC6A9 \uB3CC\uACA9 \uAC1C\uCCB4. \uBB34\uB9AC\uB85C \uCC0D\uC5B4
+      \uB20C\uB7EC\uC57C \uD558\uB294 \uC804\uC704."
+    <ID>k__BackingField: 10
+    <tier>k__BackingField: 0
+    <armorType>k__BackingField: 0
+    <sizeType>k__BackingField: 0
+    <hp>k__BackingField: 60
+    <attackDamge>k__BackingField: 9
+    <attackRange>k__BackingField: 2
+    <attackSpeed>k__BackingField: 0.5
+    <canAttackGround>k__BackingField: 1
+    <canAttackAir>k__BackingField: 0
+    <attackDelivery>k__BackingField: 0
+    <mineral>k__BackingField: 45
+    <gas>k__BackingField: 0
+    <population>k__BackingField: 1
+    <productionTime>k__BackingField: 10
+    <requiredBuildingID>k__BackingField: 0
+    <Icon>k__BackingField: {fileID: -1918668761, guid: 44b6304a6698cf74f98d94cfaccd0546, type: 3}
+    <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+    <soundBank>k__BackingField: {fileID: 0}
+    <shortcutKey>k__BackingField: 0
+    <hasTraitChoice>k__BackingField: 0
+    <traitA>k__BackingField:
+      <skillName>k__BackingField: 
+      <description>k__BackingField: 
+      <icon>k__BackingField: {fileID: 0}
+      <isActiveSkill>k__BackingField: 0
+      <shortcutKey>k__BackingField: 0
+      <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
+    <traitB>k__BackingField:
+      <skillName>k__BackingField: 
+      <description>k__BackingField: 
+      <icon>k__BackingField: {fileID: 0}
+      <isActiveSkill>k__BackingField: 0
+      <shortcutKey>k__BackingField: 0
+      <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
+  - <unitName>k__BackingField: "\uC2A4\uD53C\uD130 (Spitter)"
+    <description>k__BackingField: "\uBD80\uC2DD\uC131 \uCCB4\uC561\uC744 \uBC49\uC5B4\uB0B4\uB294
+      \uC6D0\uAC70\uB9AC \uC800\uACA9 \uAC1C\uCCB4."
+    <ID>k__BackingField: 11
+    <tier>k__BackingField: 0
+    <armorType>k__BackingField: 0
+    <sizeType>k__BackingField: 1
+    <hp>k__BackingField: 50
+    <attackDamge>k__BackingField: 11
+    <attackRange>k__BackingField: 13
+    <attackSpeed>k__BackingField: 1.1
+    <canAttackGround>k__BackingField: 1
+    <canAttackAir>k__BackingField: 1
+    <attackDelivery>k__BackingField: 1
+    <mineral>k__BackingField: 80
+    <gas>k__BackingField: 20
+    <population>k__BackingField: 2
+    <productionTime>k__BackingField: 20
+    <requiredBuildingID>k__BackingField: 0
+    <Icon>k__BackingField: {fileID: -1918668761, guid: 44b6304a6698cf74f98d94cfaccd0546, type: 3}
+    <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+    <soundBank>k__BackingField: {fileID: 0}
+    <shortcutKey>k__BackingField: 0
+    <hasTraitChoice>k__BackingField: 0
+    <traitA>k__BackingField:
+      <skillName>k__BackingField: 
+      <description>k__BackingField: 
+      <icon>k__BackingField: {fileID: 0}
+      <isActiveSkill>k__BackingField: 0
+      <shortcutKey>k__BackingField: 0
+      <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
+    <traitB>k__BackingField:
+      <skillName>k__BackingField: 
+      <description>k__BackingField: 
+      <icon>k__BackingField: {fileID: 0}
+      <isActiveSkill>k__BackingField: 0
+      <shortcutKey>k__BackingField: 0
+      <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
+  - <unitName>k__BackingField: "\uC2A4\uD0A4\uD130\uC719 (Skitterwing)"
+    <description>k__BackingField: "\uD558\uB298\uC744 \uB4A4\uB36E\uB294 \uAE30\uC0DD
+      \uBE44\uD589\uCCB4. \uCE58\uACE0 \uBE60\uC9C0\uB294 \uACAC\uC81C\uD615."
+    <ID>k__BackingField: 12
+    <tier>k__BackingField: 0
+    <armorType>k__BackingField: 0
+    <sizeType>k__BackingField: 1
+    <hp>k__BackingField: 65
+    <attackDamge>k__BackingField: 8
+    <attackRange>k__BackingField: 11
+    <attackSpeed>k__BackingField: 0.9
+    <canAttackGround>k__BackingField: 1
+    <canAttackAir>k__BackingField: 1
+    <attackDelivery>k__BackingField: 1
+    <mineral>k__BackingField: 95
+    <gas>k__BackingField: 35
+    <population>k__BackingField: 2
+    <productionTime>k__BackingField: 26
+    <requiredBuildingID>k__BackingField: 0
+    <Icon>k__BackingField: {fileID: 1522560407, guid: 2f7b162e2c0222144bb1b85cdab51336, type: 3}
+    <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 36d8789558a8b45499e9f06db02f8c3b, type: 3}
+    <soundBank>k__BackingField: {fileID: 0}
+    <shortcutKey>k__BackingField: 0
+    <hasTraitChoice>k__BackingField: 0
+    <traitA>k__BackingField:
+      <skillName>k__BackingField: 
+      <description>k__BackingField: 
+      <icon>k__BackingField: {fileID: 0}
+      <isActiveSkill>k__BackingField: 0
+      <shortcutKey>k__BackingField: 0
+      <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
+    <traitB>k__BackingField:
+      <skillName>k__BackingField: 
+      <description>k__BackingField: 
+      <icon>k__BackingField: {fileID: 0}
+      <isActiveSkill>k__BackingField: 0
+      <shortcutKey>k__BackingField: 0
+      <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0

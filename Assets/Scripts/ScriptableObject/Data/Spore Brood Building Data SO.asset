@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7, type: 3}
+  m_Name: Spore Brood Building Data SO
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBuildingDataSO
+  buildingData:
+  - <Name>k__BackingField: "\uD558\uC774\uBE0C \uCF54\uC5B4 (Hive Core)"
+    <description>k__BackingField: "\uC885\uC871\uC758 \uC2EC\uC7A5\uBD80. \uC0B4\uC544\uC788\uB294
+      \uAD6C\uC870\uBB3C\uB85C \uC11C\uC11C\uD788 \uC790\uC5F0 \uC7AC\uC0DD(\uBC14\uC774\uC624
+      \uB9AC\uC81C\uB108\uB808\uC774\uC158)."
+    <ID>k__BackingField: 7
+    <Size>k__BackingField: {x: 4, y: 4}
+    <mineral>k__BackingField: 400
+    <gas>k__BackingField: 0
+    <population>k__BackingField: 0
+    <maxpopulationamount>k__BackingField: 10
+    <productionTime>k__BackingField: 60
+    <requiredBuildingID>k__BackingField: 0
+    <hp>k__BackingField: 1600
+    <Icon>k__BackingField: {fileID: -1295861992, guid: e079c6f895a8c7f4fab192f2fbfce152, type: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: a164bfa8ec4caed49b451fd8aea4f7ac, type: 3}
+    <soundBank>k__BackingField: {fileID: 0}
+  - <Name>k__BackingField: "\uC0B0\uB780\uAD6C\uB369\uC774 (Spawning Pit)"
+    <description>k__BackingField: "\uB9BD\uD33D/\uC2A4\uD53C\uD130/\uC2A4\uD0A4\uD130\uC719\uC744
+      \uBAA8\uB450 \uC0DD\uC0B0\uD558\uB294 \uB2E8\uC77C \uC0DD\uC0B0 \uC2DC\uC124(\uD2F0\uC5B4
+      \uAD6C\uBD84 \uC5C6\uC74C)."
+    <ID>k__BackingField: 8
+    <Size>k__BackingField: {x: 3, y: 3}
+    <mineral>k__BackingField: 150
+    <gas>k__BackingField: 50
+    <population>k__BackingField: 0
+    <maxpopulationamount>k__BackingField: 0
+    <productionTime>k__BackingField: 40
+    <requiredBuildingID>k__BackingField: 0
+    <hp>k__BackingField: 900
+    <Icon>k__BackingField: {fileID: 180484607, guid: bdd76b1222b90f541b813a0fd4acd946, type: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
+    <soundBank>k__BackingField: {fileID: 0}
+  - <Name>k__BackingField: "\uBC14\uC774\uC624\uB9AC\uC561\uD130 (Bio-Reactor)"
+    <description>k__BackingField: "\uC0DD\uCCB4 \uC5D0\uB108\uC9C0\uB97C \uACF5\uAE09\uD558\uB294
+      \uAE30\uAD00. \uC778\uAD6C\uC218(\uBCF4\uAE09) \uACF5\uAE09\uC744 \uACB8\uD568."
+    <ID>k__BackingField: 9
+    <Size>k__BackingField: {x: 2, y: 2}
+    <mineral>k__BackingField: 150
+    <gas>k__BackingField: 0
+    <population>k__BackingField: 0
+    <maxpopulationamount>k__BackingField: 8
+    <productionTime>k__BackingField: 30
+    <requiredBuildingID>k__BackingField: 0
+    <hp>k__BackingField: 700
+    <Icon>k__BackingField: {fileID: 686757515, guid: 73bc0a111b2113046986388d2dcb45da, type: 3}
+    <Prefab>k__BackingField: {fileID: 7636683964052424660, guid: eda20abafc3fc60428a33cdc5a35f567, type: 3}
+    <soundBank>k__BackingField: {fileID: 0}
