@@ -13,6 +13,8 @@ public class BuildingController : MonoBehaviour, IDestructible
     [SerializeField]
     private Sprite icon; // Info_panel 등 선택 UI에 표시할 아이콘
 
+    private string infoDescription; // Info_panel에 표시할 설명 (BuildingData.infoDescription, doc/0476)
+
     // BuildingDataSO.ID와 매칭되는 값 (Info_panel에 이름을 표시할 때 RTSUnitController.GetBuildingName(buildingID)로 조회)
     [SerializeField]
     private int buildingID;
@@ -109,15 +111,16 @@ public class BuildingController : MonoBehaviour, IDestructible
 
         rtsController.BuildingList.Add(this);
 
+        // Info_panel 설명(doc/0476)은 건설 경로와 무관하게 항상 필요하므로 조건 없이 조회해둔다.
+        BuildingData data = rtsController.GetBuildingData(buildingID);
+        if (data != null)
+            infoDescription = data.infoDescription;
+
         // 씬에 직접 배치해둔 건물(정상 건설 흐름을 안 거친 건물)은 CompleteConstruction()을 거치지 않아
         // 인구수 최대치가 반영된 적이 없으므로, 여기서 한 번만 반영해준다 (doc/0366, 유닛의
         // AddPopulationForExistingUnit과 동일한 패턴 - doc/0333).
-        if (!builtByConstruction)
-        {
-            BuildingData data = rtsController.GetBuildingData(buildingID);
-            if (data != null)
-                rtsController.AddMaxPopulation(data.maxpopulationamount);
-        }
+        if (!builtByConstruction && data != null)
+            rtsController.AddMaxPopulation(data.maxpopulationamount);
 
         navMeshObstacle = GetComponent<NavMeshObstacle>();
 
@@ -449,6 +452,7 @@ public class BuildingController : MonoBehaviour, IDestructible
     }
 
     public Sprite GetIcon() => icon;
+    public string GetDescription() => infoDescription;
     public int GetBuildingID() => buildingID;
     public HealthManager GetHealthManager() => healthManager;
 

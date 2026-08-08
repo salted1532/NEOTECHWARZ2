@@ -22,6 +22,7 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
     [SerializeField] private GameObject buildingMarker; // 선택 표시 (EnemyUnitController.enemyMarker와 동일한 패턴)
     [SerializeField] private string buildingName; // Info_panel에 표시할 이름
     [SerializeField] private Sprite icon;          // Info_panel에 표시할 아이콘
+    private string infoDescription;                // Info_panel에 표시할 설명 (BuildingData.infoDescription, doc/0476)
 
     // 미니맵에 표시하는 y20대 스프라이트 마커(자식 오브젝트, 인스펙터에서 연결). EnemyUnitController.minimapIcon과
     // 동일한 이유(안개가 실제 3D Plane이라 Y가 높은 오브젝트는 깊이 테스트로 안 가려짐)로 Update()에서
@@ -141,6 +142,7 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
             return;
 
         icon = data.Icon;
+        infoDescription = data.infoDescription;
         buildingName = data.Name;
 
         healthManager?.InitializeHealth(data.hp);
@@ -162,6 +164,7 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
 
     public string GetBuildingName() => buildingName;
     public Sprite GetIcon() => icon;
+    public string GetDescription() => infoDescription;
 
     // 공격 명령(우클릭/A 모드)을 받았을 때 "어느 건물이 대상인지" 피드백으로 마커를 짧게 깜빡인다
     // (EnemyUnitController.FlashMarker/BuildingController.FlashMarker와 동일한 패턴, doc/0248).

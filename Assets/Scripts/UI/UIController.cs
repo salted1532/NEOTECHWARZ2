@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,6 +10,15 @@ using UnityEngine.UI;
 // RTSUnitController가 현재 선택 상태에 맞는 ShowXXXPanel 메서드를 호출해 패널 내용을 갱신한다.
 public class UIController : MonoBehaviour
 {
+    // PlacementSystem/UnitController 등 RTSUnitController를 거치지 않는 곳에서도 ShowWarning()을 바로
+    // 호출할 수 있도록 TooltipUI.Instance와 동일한 싱글턴 패턴을 쓴다 (doc/0480).
+    public static UIController Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     // Which state the UI is currently in
     // 선택 종류: None(없음) / Worker(일꾼) / CombatUnit(전투유닛) / BuildMode(건설모드) /
     // Tier1~3Building(티어별 생산건물) / MainBase(커맨드센터, 본진)
@@ -251,6 +261,11 @@ public class UIController : MonoBehaviour
     [SerializeField] private Image infoIcon;
     [SerializeField] private TextMeshProUGUI infoNameText;
     [SerializeField] private TextMeshProUGUI infoHpText;
+    [SerializeField] private TextMeshProUGUI infoText; // 선택한 유닛/건물 자체에 대한 설명 (doc/0476) - 생산/건설 버튼 호버 툴팁과는 별개
+
+    [Header("Warning Text (건설실패/인구수부족/자원부족)")]
+    [SerializeField] private TextMeshProUGUI warningText; // Canvas 직속 - doc/0480
+    private Coroutine warningHideCoroutine;
     [SerializeField] private Image attackDamageImage; // 호버 시 "Attack Damge : N" 툴팁 표시
     [SerializeField] private Image armorImage;         // 호버 시 "Armor : N" 툴팁 표시
 
@@ -261,6 +276,8 @@ public class UIController : MonoBehaviour
     private ArmorType infoArmorType;
     private SizeType infoSizeType;
     private int infoShotCount = 1; // 공격 1회당 동시에 나가는 투사체 개수 - 2 이상이면 툴팁에 "x2"로 표기 (doc/0293)
+    private bool infoCanAttackGround = true; // 공격력 툴팁의 "Attack Target" 표기용 (doc/0478)
+    private bool infoCanAttackAir = true;
 
     [Header("Squad Panel (SelectInfo)")]
     [SerializeField] private GameObject squadPanel;
@@ -621,9 +638,9 @@ public class UIController : MonoBehaviour
     // 건물 등 공격력·방어력 개념이 없는 대상용 - 아이콘 자체를 숨긴다 (ShowResourceInfoPanel/
     // ShowBaseStructureInfoPanel과 동일한 패턴, doc/0249). 아군 건물(BuildingController)/
     // 적 건물(EnemyBuildingController) 선택 둘 다 이 오버로드를 쓰므로 여기 한 곳만 고치면 양쪽에 대칭 적용된다.
-    public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health)
+    public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health, string description = "")
     {
-        ShowInfoPanel(icon, unitName, health, 0, 0, AttackEffectType.Bullet, ArmorType.Light, SizeType.Medium, 1);
+        ShowInfoPanel(icon, unitName, health, 0, 0, AttackEffectType.Bullet, ArmorType.Light, SizeType.Medium, 1, description);
         SetCombatStatsVisible(false);
     }
 
@@ -631,7 +648,8 @@ public class UIController : MonoBehaviour
     // 크기)를 함께 받아 저장해둔다. AttackDamageImage/ArmorImage 호버 시(SetupInfoStatHoverTooltips) 이
     // 값을 툴팁으로 보여준다 (doc/0293).
     public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health, int attackDamage, int armor,
-        AttackEffectType attackType, ArmorType armorType, SizeType sizeType, int shotCount)
+        AttackEffectType attackType, ArmorType armorType, SizeType sizeType, int shotCount, string description = "",
+        bool canAttackGround = true, bool canAttackAir = true)
     {
         HideSquadPanel();
 
@@ -647,12 +665,17 @@ public class UIController : MonoBehaviour
         if (infoNameText != null)
             infoNameText.text = unitName;
 
+        if (infoText != null)
+            infoText.text = description;
+
         infoAttackDamage = attackDamage;
         infoArmor = armor;
         infoAttackType = attackType;
         infoArmorType = armorType;
         infoSizeType = sizeType;
         infoShotCount = shotCount;
+        infoCanAttackGround = canAttackGround;
+        infoCanAttackAir = canAttackAir;
 
         SetCombatStatsVisible(true);
         BindInfoHealth(health);
@@ -674,9 +697,42 @@ public class UIController : MonoBehaviour
     private void SetupInfoStatHoverTooltips()
     {
         AddStatHoverTooltip(attackDamageImage, () =>
-            $"Attack Type : {infoAttackType}\nAttack Damage : {infoAttackDamage}{(infoShotCount > 1 ? $" (x{infoShotCount})" : string.Empty)}");
+            $"Attack Type : {infoAttackType}\nAttack Damage : {infoAttackDamage}{(infoShotCount > 1 ? $" (x{infoShotCount})" : string.Empty)}\nAttack Target : {GetAttackTargetText()}");
         AddStatHoverTooltip(armorImage, () =>
             $"Armor : {infoArmor}\nArmor Type : {infoArmorType}\nSize : {infoSizeType}");
+    }
+
+    // 공격력 툴팁에 "Attack Target : Ground/Air" 식으로 표기할 텍스트를 만든다 (doc/0478).
+    private string GetAttackTargetText()
+    {
+        if (infoCanAttackGround && infoCanAttackAir)
+            return "Ground/Air";
+        if (infoCanAttackGround)
+            return "Ground";
+        if (infoCanAttackAir)
+            return "Air";
+        return "None";
+    }
+
+    // 건설실패/인구수부족/자원부족 등 경고 문구를 2초간 띄운다 (doc/0480). 표시 중에 새 경고가 들어오면
+    // 타이머를 처음부터 다시 시작한다.
+    public void ShowWarning(string message)
+    {
+        if (warningText == null)
+            return;
+
+        warningText.text = message;
+
+        if (warningHideCoroutine != null)
+            StopCoroutine(warningHideCoroutine);
+        warningHideCoroutine = StartCoroutine(HideWarningAfterDelay());
+    }
+
+    private IEnumerator HideWarningAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
+        warningText.text = string.Empty;
+        warningHideCoroutine = null;
     }
 
     private void AddStatHoverTooltip(Image image, Func<string> textProvider)
@@ -722,6 +778,9 @@ public class UIController : MonoBehaviour
         if (infoNameText != null)
             infoNameText.text = resourceName;
 
+        if (infoText != null)
+            infoText.text = string.Empty; // 자원 노드는 설명 데이터가 없음 - 이전 선택의 설명이 남지 않도록 비움
+
         SetCombatStatsVisible(false);
         BindInfoHealth(null); // 자원은 HealthManager가 없으므로 체력 구독은 해제
 
@@ -746,6 +805,9 @@ public class UIController : MonoBehaviour
 
         if (infoNameText != null)
             infoNameText.text = buildingName;
+
+        if (infoText != null)
+            infoText.text = string.Empty; // 건설 중인 건물은 완공될 건물의 설명을 아직 안 읽어옴 - 이전 선택의 설명이 남지 않도록 비움
 
         SetCombatStatsVisible(false);
         BindInfoHealth(health);

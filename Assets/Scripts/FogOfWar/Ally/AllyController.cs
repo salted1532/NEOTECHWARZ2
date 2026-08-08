@@ -16,6 +16,8 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
     [SerializeField]
     private Sprite icon; // Info_panel에 표시할 아이콘
 
+    private string infoDescription; // Info_panel에 표시할 설명 (UnitData.infoDescription, doc/0476)
+
     // 미니맵에 표시하는 y40대 스프라이트 마커(자식 오브젝트, 인스펙터에서 연결). 이 프로젝트의 안개(csFogWar)는
     // 실제 3D Plane(Y≈1)으로 구현돼 있어 이렇게 Y가 높은 오브젝트는 깊이 테스트로 가려지지 않는다 - 그래서
     // Update()에서 안개 상태를 직접 조회해 이 렌더러를 켜고 끈다 (doc/0356).
@@ -634,6 +636,7 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
     public bool CanAttackDomain(bool targetIsAirUnit) => targetIsAirUnit ? canAttackAir : canAttackGround;
 
     public Sprite GetIcon() => icon;
+    public string GetDescription() => infoDescription;
     public string GetAllyName() => enemyName;
     public HealthManager GetHealthManager() => healthManager;
     public int GetAllyUnitID() => enemyUnitID;
@@ -645,6 +648,8 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
     public AttackEffectType GetAttackType() => attackType;
     public ArmorType GetArmorType() => armorType;
     public SizeType GetSizeType() => sizeType;
+    public bool GetCanAttackGround() => canAttackGround;
+    public bool GetCanAttackAir() => canAttackAir;
 
     // 공격 1회당 동시에 나가는 투사체 개수 (UnitController.GetShotCount()와 동일한 패턴, doc/0291/0293).
     public int GetShotCount() =>
@@ -660,6 +665,7 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
             return;
 
         icon = data.Icon;
+        infoDescription = data.infoDescription;
         enemyName = data.unitName;
         attackDamage = data.attackDamge;
         armorType = data.armorType;

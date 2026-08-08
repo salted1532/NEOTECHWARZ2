@@ -1400,11 +1400,13 @@ public class RTSUnitController : MonoBehaviour
                 {
                     Debug.Log("자원부족!");
                     SoundManager.Instance?.PlayInsufficientResourcesWarning();
+                    uIController.ShowWarning("Gather more resources.");
                 }
                 else
                 {
                     Debug.Log("인구수부족!");
                     SoundManager.Instance?.PlayInsufficientPopulationWarning();
+                    uIController.ShowWarning("Build a Supply Depot.");
                 }
 
                 break; // 자원이 부족해진 시점부터는 나머지 건물도 어차피 불가능하므로 중단
@@ -1433,6 +1435,7 @@ public class RTSUnitController : MonoBehaviour
         {
             Debug.Log("자원부족!");
             SoundManager.Instance?.PlayInsufficientResourcesWarning();
+            uIController.ShowWarning("Gather more resources.");
             return false;
         }
 
@@ -1524,6 +1527,7 @@ public class RTSUnitController : MonoBehaviour
             // 유닛 생산/연구와 동일한 전역 "자원부족" 나레이션을 재생한다 (doc/0272 - 예전엔 원인 구분
             // 없이 항상 일꾼의 buildFailVoice가 나가서 장애물 음성처럼 들렸음).
             SoundManager.Instance?.PlayInsufficientResourcesWarning();
+            uIController.ShowWarning("Gather more resources.");
             return false;
         }
 
@@ -1605,6 +1609,19 @@ public class RTSUnitController : MonoBehaviour
     {
         BuildingData data = buildingDatabase.buildingData.Find(d => d.ID == buildingID);
         return data != null ? data.Name.Trim() : string.Empty;
+    }
+
+    // Info_panel 설명 조회 - 대기열(생산/연구) 패널이 같이 뜨는 건물은 SO의 infoDescription을 비워뒀으므로
+    // BuildingController.GetDescription()이 그대로 빈 문자열을 반환한다. 보급고만 예외로, 정적 텍스트 대신
+    // 실시간 인구수 정보를 매 프레임 새로 계산해서 보여준다 (doc/0479).
+    private string GetBuildingInfoDescription(BuildingController building)
+    {
+        if (building.GetBuildingID() != BuildingID.SupplyDepot)
+            return building.GetDescription();
+
+        BuildingData data = GetBuildingData(BuildingID.SupplyDepot);
+        int populationAdded = data != null ? data.maxpopulationamount : 0;
+        return $"Current Population : {GetPopulation()}/{GetMaxPopulation()}\nPopulation Capacity Added : +{populationAdded}";
     }
 
     #endregion
@@ -1861,7 +1878,8 @@ public class RTSUnitController : MonoBehaviour
                     // 영웅 유닛(heroName이 채워진 unitID=0 유닛)은 이름을 데이터베이스 대신 자기 자신에게서 가져온다 (doc/0304).
                     string displayName = string.IsNullOrEmpty(unit.GetHeroName()) ? GetUnitName(unit.GetUnitID()) : unit.GetHeroName();
                     uIController.ShowInfoPanel(unit.GetIcon(), displayName, unit.GetHealthManager(), unit.GetAttackDamage(), unit.GetArmor(),
-                        unit.GetAttackType(), unit.GetArmorType(), unit.GetSizeType(), unit.GetShotCount());
+                        unit.GetAttackType(), unit.GetArmorType(), unit.GetSizeType(), unit.GetShotCount(), unit.GetDescription(),
+                        unit.GetCanAttackGround(), unit.GetCanAttackAir());
                 }
                 else
                 {
@@ -1881,7 +1899,7 @@ public class RTSUnitController : MonoBehaviour
                 else if (selectedBuildingList.Count == 1)
                 {
                     BuildingController building = selectedBuildingList[0];
-                    uIController.ShowInfoPanel(building.GetIcon(), GetBuildingName(building.GetBuildingID()), building.GetHealthManager());
+                    uIController.ShowInfoPanel(building.GetIcon(), GetBuildingName(building.GetBuildingID()), building.GetHealthManager(), GetBuildingInfoDescription(building));
                 }
                 else
                 {
@@ -1985,7 +2003,8 @@ public class RTSUnitController : MonoBehaviour
                 {
                     EnemyUnitController enemy = selectedEnemyList[0];
                     uIController.ShowInfoPanel(enemy.GetIcon(), enemy.GetEnemyName(), enemy.GetHealthManager(), enemy.GetAttackDamage(), enemy.GetArmor(),
-                        enemy.GetAttackType(), enemy.GetArmorType(), enemy.GetSizeType(), enemy.GetShotCount());
+                        enemy.GetAttackType(), enemy.GetArmorType(), enemy.GetSizeType(), enemy.GetShotCount(), enemy.GetDescription(),
+                        enemy.GetCanAttackGround(), enemy.GetCanAttackAir());
                 }
                 else
                 {
@@ -2003,7 +2022,8 @@ public class RTSUnitController : MonoBehaviour
                 {
                     AllyController ally = selectedAllyList[0];
                     uIController.ShowInfoPanel(ally.GetIcon(), ally.GetAllyName(), ally.GetHealthManager(), ally.GetAttackDamage(), ally.GetArmor(),
-                        ally.GetAttackType(), ally.GetArmorType(), ally.GetSizeType(), ally.GetShotCount());
+                        ally.GetAttackType(), ally.GetArmorType(), ally.GetSizeType(), ally.GetShotCount(), ally.GetDescription(),
+                        ally.GetCanAttackGround(), ally.GetCanAttackAir());
                 }
                 else
                 {
@@ -2021,7 +2041,7 @@ public class RTSUnitController : MonoBehaviour
                 {
                     // 건물은 공격을 하지 않으므로 공격력/방어력 없이 아이콘/이름/체력만 표시 (3-인자 오버로드,
                     // 아군 건물 Info_panel과 동일한 패턴).
-                    uIController.ShowInfoPanel(selectedEnemyBuilding.GetIcon(), selectedEnemyBuilding.GetBuildingName(), selectedEnemyBuilding.GetHealthManager());
+                    uIController.ShowInfoPanel(selectedEnemyBuilding.GetIcon(), selectedEnemyBuilding.GetBuildingName(), selectedEnemyBuilding.GetHealthManager(), selectedEnemyBuilding.GetDescription());
                 }
                 else
                 {

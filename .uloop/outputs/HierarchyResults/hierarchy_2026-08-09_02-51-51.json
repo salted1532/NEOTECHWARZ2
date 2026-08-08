@@ -1,0 +1,2108 @@
+{
+  "ExportTimestamp": "2026-08-09 02:51:51",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "SampleScene",
+    "nodeCount": 140,
+    "maxDepth": 4
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "SampleScene",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 140,
+        "maxDepth": 4
+      },
+      "componentsLut": [
+        "Transform",
+        "Camera",
+        "AudioListener",
+        "UniversalAdditionalCameraData",
+        "CameraControl",
+        "SpriteRenderer",
+        "RectTransform",
+        "Canvas",
+        "CanvasScaler",
+        "GraphicRaycaster",
+        "HorizontalLayoutGroup",
+        "ControlGroupPanel",
+        "StageManager",
+        "VerticalLayoutGroup",
+        "CanvasRenderer",
+        "Image",
+        "RawImage",
+        "MinimapController",
+        "MinimapAlertController",
+        "MinimapViewIndicator",
+        "Button",
+        "ProductionSlot",
+        "TextMeshProUGUI",
+        "Slider",
+        "TooltipUI",
+        "SoundSettingsPanel",
+        "Toggle",
+        "TMP_InputField",
+        "ResourceManager",
+        "InputManager",
+        "PlacementSystem",
+        "MeshFilter",
+        "MeshRenderer",
+        "SphereCollider",
+        "MeshCollider",
+        "PreviewSystem",
+        "Grid",
+        "RTSUnitController",
+        "UserControl",
+        "UpgradeManager",
+        "UIController",
+        "SceneMenuController",
+        "Volume",
+        "Light",
+        "UniversalAdditionalLightData",
+        "EventSystem",
+        "InputSystemUIInputModule",
+        "csFogWar",
+        "TerritoryFogReveal",
+        "SoundManager",
+        "AudioSource"
+      ],
+      "roots": [
+        {
+          "name": "GameManager",
+          "isActive": true,
+          "componentsIdx": [
+            0
+          ],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "GameManager",
+          "children": [
+            {
+              "name": "Main Camera",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "siblingIndex": 0,
+              "tag": "MainCamera",
+              "layer": 0,
+              "path": "GameManager/Main Camera",
+              "children": [
+                {
+                  "name": "Square",
+                  "isActive": false,
+                  "componentsIdx": [
+                    0,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "path": "GameManager/Main Camera/Square",
+                  "children": []
+                },
+                {
+                  "name": "Indicator Camera",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    1,
+                    3
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "path": "GameManager/Main Camera/Indicator Camera",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Canvas",
+              "isActive": true,
+              "componentsIdx": [
+                6,
+                7,
+                8,
+                9
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "GameManager/Canvas",
+              "children": [
+                {
+                  "name": "HorizontalLayoutGroup",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6,
+                    10,
+                    11
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/HorizontalLayoutGroup",
+                  "children": []
+                },
+                {
+                  "name": "StageObject",
+                  "isActive": false,
+                  "componentsIdx": [
+                    6,
+                    12,
+                    13
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/StageObject",
+                  "children": []
+                },
+                {
+                  "name": "DragRectangle",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    15
+                  ],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/DragRectangle",
+                  "children": []
+                },
+                {
+                  "name": "MiniMap",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    15
+                  ],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/MiniMap",
+                  "children": [
+                    {
+                      "name": "MiniMap_image",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        16,
+                        17,
+                        18
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/MiniMap/MiniMap_image",
+                      "children": [
+                        {
+                          "name": "ViewSquare",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            19
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/MiniMap/MiniMap_image/ViewSquare",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "OrderButtons",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    15
+                  ],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/OrderButtons",
+                  "children": [
+                    {
+                      "name": "Panel",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OrderButtons/Panel",
+                      "children": [
+                        {
+                          "name": "Slot0",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OrderButtons/Panel/Slot0",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot1",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 1,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OrderButtons/Panel/Slot1",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot2",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 2,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OrderButtons/Panel/Slot2",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot3",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 3,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OrderButtons/Panel/Slot3",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot4",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 4,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OrderButtons/Panel/Slot4",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot5",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 5,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OrderButtons/Panel/Slot5",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot6",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 6,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OrderButtons/Panel/Slot6",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot7",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 7,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OrderButtons/Panel/Slot7",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot8",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 8,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OrderButtons/Panel/Slot8",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "SelectInfo",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    15
+                  ],
+                  "siblingIndex": 5,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/SelectInfo",
+                  "children": [
+                    {
+                      "name": "Info_panel",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/SelectInfo/Info_panel",
+                      "children": [
+                        {
+                          "name": "Icon_Image",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Info_panel/Icon_Image",
+                          "children": []
+                        },
+                        {
+                          "name": "HpText",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 1,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Info_panel/HpText",
+                          "children": []
+                        },
+                        {
+                          "name": "UnitDamage",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15
+                          ],
+                          "siblingIndex": 2,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Info_panel/UnitDamage",
+                          "children": []
+                        },
+                        {
+                          "name": "UnitArmor",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15
+                          ],
+                          "siblingIndex": 3,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Info_panel/UnitArmor",
+                          "children": []
+                        },
+                        {
+                          "name": "NameText",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 4,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Info_panel/NameText",
+                          "children": []
+                        },
+                        {
+                          "name": "InfoText",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 5,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Info_panel/InfoText",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "productionQueue_Panel",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/SelectInfo/productionQueue_Panel",
+                      "children": [
+                        {
+                          "name": "Slider",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            23
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/productionQueue_Panel/Slider",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot0",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 1,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/productionQueue_Panel/Slot0",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot1",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 2,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/productionQueue_Panel/Slot1",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot2",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 3,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/productionQueue_Panel/Slot2",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot3",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 4,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/productionQueue_Panel/Slot3",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot4",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 5,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/productionQueue_Panel/Slot4",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Squad_panel",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/SelectInfo/Squad_panel",
+                      "children": [
+                        {
+                          "name": "page1",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/page1",
+                          "children": []
+                        },
+                        {
+                          "name": "page2",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20
+                          ],
+                          "siblingIndex": 1,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/page2",
+                          "children": []
+                        },
+                        {
+                          "name": "page3",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20
+                          ],
+                          "siblingIndex": 2,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/page3",
+                          "children": []
+                        },
+                        {
+                          "name": "page4",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20
+                          ],
+                          "siblingIndex": 3,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/page4",
+                          "children": []
+                        },
+                        {
+                          "name": "page5",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20
+                          ],
+                          "siblingIndex": 4,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/page5",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot0",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 5,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot0",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot1",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 6,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot1",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot2",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 7,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot2",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot3",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 8,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot3",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot4",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 9,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot4",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot5",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 10,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot5",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot6",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 11,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot6",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot7",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 12,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot7",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot8",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 13,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot8",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot9",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 14,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot9",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot10",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 15,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot10",
+                          "children": []
+                        },
+                        {
+                          "name": "Slot11",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            20,
+                            21
+                          ],
+                          "siblingIndex": 16,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/SelectInfo/Squad_panel/Slot11",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "ResourceUI",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6
+                  ],
+                  "siblingIndex": 6,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/ResourceUI",
+                  "children": [
+                    {
+                      "name": "OreImage",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/ResourceUI/OreImage",
+                      "children": [
+                        {
+                          "name": "OreText",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/ResourceUI/OreImage/OreText",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "GasImage",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/ResourceUI/GasImage",
+                      "children": [
+                        {
+                          "name": "GasText",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/ResourceUI/GasImage/GasText",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "populationImage",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/ResourceUI/populationImage",
+                      "children": [
+                        {
+                          "name": "populationText",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/ResourceUI/populationImage/populationText",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "SkillSelect",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    15
+                  ],
+                  "siblingIndex": 7,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/SkillSelect",
+                  "children": [
+                    {
+                      "name": "Slot0",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15,
+                        20,
+                        21
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/SkillSelect/Slot0",
+                      "children": []
+                    },
+                    {
+                      "name": "Slot1",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15,
+                        20,
+                        21
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/SkillSelect/Slot1",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "ToolTip",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    15,
+                    24
+                  ],
+                  "siblingIndex": 8,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/ToolTip",
+                  "children": [
+                    {
+                      "name": "TitleText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        22
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/ToolTip/TitleText",
+                      "children": []
+                    },
+                    {
+                      "name": "DescriptionText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        22
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/ToolTip/DescriptionText",
+                      "children": []
+                    },
+                    {
+                      "name": "Ore_image",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/ToolTip/Ore_image",
+                      "children": [
+                        {
+                          "name": "OreText",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/ToolTip/Ore_image/OreText",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Gas_image",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/ToolTip/Gas_image",
+                      "children": [
+                        {
+                          "name": "Gastext",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/ToolTip/Gas_image/Gastext",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "population_image",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/ToolTip/population_image",
+                      "children": [
+                        {
+                          "name": "PopulationText",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/ToolTip/population_image/PopulationText",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Option",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    15,
+                    20
+                  ],
+                  "siblingIndex": 9,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/Option",
+                  "children": [
+                    {
+                      "name": "Text (TMP)",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        22
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/Option/Text (TMP)",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "OptionPanel",
+                  "isActive": false,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    15,
+                    25
+                  ],
+                  "siblingIndex": 10,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/OptionPanel",
+                  "children": [
+                    {
+                      "name": "Input_Block",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OptionPanel/Input_Block",
+                      "children": []
+                    },
+                    {
+                      "name": "Close",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15,
+                        20
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OptionPanel/Close",
+                      "children": []
+                    },
+                    {
+                      "name": "BackToMainMenu",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15,
+                        20
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OptionPanel/BackToMainMenu",
+                      "children": [
+                        {
+                          "name": "Text (TMP)",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/BackToMainMenu/Text (TMP)",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Master_Volume",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        23
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OptionPanel/Master_Volume",
+                      "children": [
+                        {
+                          "name": "Mute",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            26
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/Master_Volume/Mute",
+                          "children": []
+                        },
+                        {
+                          "name": "Background",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15
+                          ],
+                          "siblingIndex": 1,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/Master_Volume/Background",
+                          "children": []
+                        },
+                        {
+                          "name": "Fill Area",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6
+                          ],
+                          "siblingIndex": 2,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/Master_Volume/Fill Area",
+                          "children": []
+                        },
+                        {
+                          "name": "Handle Slide Area",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6
+                          ],
+                          "siblingIndex": 3,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/Master_Volume/Handle Slide Area",
+                          "children": []
+                        },
+                        {
+                          "name": "MasterVolume_Input",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            27
+                          ],
+                          "siblingIndex": 4,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/Master_Volume/MasterVolume_Input",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "BGM",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        23
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OptionPanel/BGM",
+                      "children": [
+                        {
+                          "name": "Mute",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            26
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/BGM/Mute",
+                          "children": []
+                        },
+                        {
+                          "name": "Background",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15
+                          ],
+                          "siblingIndex": 1,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/BGM/Background",
+                          "children": []
+                        },
+                        {
+                          "name": "Fill Area",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6
+                          ],
+                          "siblingIndex": 2,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/BGM/Fill Area",
+                          "children": []
+                        },
+                        {
+                          "name": "Handle Slide Area",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6
+                          ],
+                          "siblingIndex": 3,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/BGM/Handle Slide Area",
+                          "children": []
+                        },
+                        {
+                          "name": "BGM_Input",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            27
+                          ],
+                          "siblingIndex": 4,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/BGM/BGM_Input",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "SFX",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        23
+                      ],
+                      "siblingIndex": 5,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OptionPanel/SFX",
+                      "children": [
+                        {
+                          "name": "Mute",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            26
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/SFX/Mute",
+                          "children": []
+                        },
+                        {
+                          "name": "Background",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15
+                          ],
+                          "siblingIndex": 1,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/SFX/Background",
+                          "children": []
+                        },
+                        {
+                          "name": "Fill Area",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6
+                          ],
+                          "siblingIndex": 2,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/SFX/Fill Area",
+                          "children": []
+                        },
+                        {
+                          "name": "Handle Slide Area",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6
+                          ],
+                          "siblingIndex": 3,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/SFX/Handle Slide Area",
+                          "children": []
+                        },
+                        {
+                          "name": "SFX_Input",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            27
+                          ],
+                          "siblingIndex": 4,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/SFX/SFX_Input",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "VOICE",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        23
+                      ],
+                      "siblingIndex": 6,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OptionPanel/VOICE",
+                      "children": [
+                        {
+                          "name": "Mute",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            26
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/VOICE/Mute",
+                          "children": []
+                        },
+                        {
+                          "name": "Background",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15
+                          ],
+                          "siblingIndex": 1,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/VOICE/Background",
+                          "children": []
+                        },
+                        {
+                          "name": "Fill Area",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6
+                          ],
+                          "siblingIndex": 2,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/VOICE/Fill Area",
+                          "children": []
+                        },
+                        {
+                          "name": "Handle Slide Area",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6
+                          ],
+                          "siblingIndex": 3,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/VOICE/Handle Slide Area",
+                          "children": []
+                        },
+                        {
+                          "name": "VOICE_Input",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            15,
+                            27
+                          ],
+                          "siblingIndex": 4,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/VOICE/VOICE_Input",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "GoToNextStage",
+                      "isActive": false,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15,
+                        20
+                      ],
+                      "siblingIndex": 7,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OptionPanel/GoToNextStage",
+                      "children": [
+                        {
+                          "name": "Text (TMP)",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/GoToNextStage/Text (TMP)",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "GoToPreviousStage",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15,
+                        20
+                      ],
+                      "siblingIndex": 8,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/OptionPanel/GoToPreviousStage",
+                      "children": [
+                        {
+                          "name": "Text (TMP)",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/OptionPanel/GoToPreviousStage/Text (TMP)",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "VictoryPanel",
+                  "isActive": false,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    15,
+                    25
+                  ],
+                  "siblingIndex": 11,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/VictoryPanel",
+                  "children": [
+                    {
+                      "name": "Input_Block",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/VictoryPanel/Input_Block",
+                      "children": []
+                    },
+                    {
+                      "name": "ReturnToGame",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15,
+                        20
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/VictoryPanel/ReturnToGame",
+                      "children": [
+                        {
+                          "name": "Text (TMP)",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/VictoryPanel/ReturnToGame/Text (TMP)",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "GoToNextStage",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15,
+                        20
+                      ],
+                      "siblingIndex": 2,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/VictoryPanel/GoToNextStage",
+                      "children": [
+                        {
+                          "name": "Text (TMP)",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/VictoryPanel/GoToNextStage/Text (TMP)",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "VictoryText",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        22
+                      ],
+                      "siblingIndex": 3,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/VictoryPanel/VictoryText",
+                      "children": []
+                    },
+                    {
+                      "name": "BackToMainMenu",
+                      "isActive": true,
+                      "componentsIdx": [
+                        6,
+                        14,
+                        15,
+                        20
+                      ],
+                      "siblingIndex": 4,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "GameManager/Canvas/VictoryPanel/BackToMainMenu",
+                      "children": [
+                        {
+                          "name": "Text (TMP)",
+                          "isActive": true,
+                          "componentsIdx": [
+                            6,
+                            14,
+                            22
+                          ],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "GameManager/Canvas/VictoryPanel/BackToMainMenu/Text (TMP)",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "SampleText",
+                  "isActive": true,
+                  "componentsIdx": [
+                    6,
+                    14,
+                    22
+                  ],
+                  "siblingIndex": 12,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "GameManager/Canvas/SampleText",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "ResourceManager",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                28
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/ResourceManager",
+              "children": []
+            },
+            {
+              "name": "MiniMap_Camera",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                1,
+                3
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 11,
+              "path": "GameManager/MiniMap_Camera",
+              "children": []
+            },
+            {
+              "name": "BuildingSystem",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/BuildingSystem",
+              "children": [
+                {
+                  "name": "InputManager",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    29
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "path": "GameManager/BuildingSystem/InputManager",
+                  "children": []
+                },
+                {
+                  "name": "PlacementSustem",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    30
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "path": "GameManager/BuildingSystem/PlacementSustem",
+                  "children": []
+                },
+                {
+                  "name": "Sphere",
+                  "isActive": false,
+                  "componentsIdx": [
+                    0,
+                    31,
+                    32,
+                    33
+                  ],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 12,
+                  "path": "GameManager/BuildingSystem/Sphere",
+                  "children": []
+                },
+                {
+                  "name": "CoursorindicatorParent",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0
+                  ],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 12,
+                  "path": "GameManager/BuildingSystem/CoursorindicatorParent",
+                  "children": [
+                    {
+                      "name": "Coursorindicator",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        31,
+                        32,
+                        34
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 12,
+                      "path": "GameManager/BuildingSystem/CoursorindicatorParent/Coursorindicator",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "PreviewSystem",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    35
+                  ],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "path": "GameManager/BuildingSystem/PreviewSystem",
+                  "children": []
+                },
+                {
+                  "name": "GridParent",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0
+                  ],
+                  "siblingIndex": 5,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "path": "GameManager/BuildingSystem/GridParent",
+                  "children": [
+                    {
+                      "name": "Grid",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0,
+                        36
+                      ],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 0,
+                      "path": "GameManager/BuildingSystem/GridParent/Grid",
+                      "children": []
+                    },
+                    {
+                      "name": "GridVisualization",
+                      "isActive": true,
+                      "componentsIdx": [
+                        0
+                      ],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 0,
+                      "path": "GameManager/BuildingSystem/GridParent/GridVisualization",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "RTSUnitControlSystem",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                37,
+                38,
+                39
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/RTSUnitControlSystem",
+              "children": []
+            },
+            {
+              "name": "UIController",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                40,
+                41
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/UIController",
+              "children": []
+            },
+            {
+              "name": "Global Volume",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                42
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/Global Volume",
+              "children": []
+            },
+            {
+              "name": "Directional Light",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                43,
+                44
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/Directional Light",
+              "children": []
+            },
+            {
+              "name": "EventSystem",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                45,
+                46
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/EventSystem",
+              "children": []
+            },
+            {
+              "name": "StartPoint",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/StartPoint",
+              "children": []
+            },
+            {
+              "name": "MapYAxiz",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/MapYAxiz",
+              "children": [
+                {
+                  "name": "FogWar",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    47,
+                    48
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "path": "GameManager/MapYAxiz/FogWar",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "SoundManager",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                49,
+                50
+              ],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 0,
+              "path": "GameManager/SoundManager",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

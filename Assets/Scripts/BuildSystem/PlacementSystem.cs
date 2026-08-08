@@ -221,6 +221,7 @@ public class PlacementSystem : MonoBehaviour
         if (IsBlockedAtCenter(groundPos, data.Size, worker.gameObject))
         {
             worker.GetComponent<UnitAudio>()?.PlayBuildFailVoice();
+            UIController.Instance?.ShowWarning("Build somewhere else.");
             CancelReservedConstruction(gridPos, ghost);
             rtsController?.RefundBuilding(data.ID);
             return;

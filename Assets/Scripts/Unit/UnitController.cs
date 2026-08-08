@@ -44,6 +44,8 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private Sprite icon; // Squad_panel 등 선택 UI에 표시할 아이콘
 
+    private string infoDescription; // Info_panel에 표시할 설명 (UnitData.infoDescription, doc/0476)
+
     // UnitDataSO.ID와 매칭되는 값 (Info_panel에 이름을 표시할 때 RTSUnitController.GetUnitName(unitID)로 조회)
     [SerializeField]
     private int unitID;
@@ -1097,6 +1099,7 @@ public class UnitController : MonoBehaviour, IDestructible
             if (!isAirUnit && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
             {
                 unitAudio?.PlayBuildFailVoice();
+                UIController.Instance?.ShowWarning("Build somewhere else.");
                 HaltInPlace();
                 CancelBuildOrder();
             }
@@ -2018,6 +2021,7 @@ public class UnitController : MonoBehaviour, IDestructible
     }
 
     public Sprite GetIcon() => icon;
+    public string GetDescription() => infoDescription;
     public int GetUnitID() => unitID;
     public int GetEnemyDataUnitID() => enemyDataUnitID;
     public string GetHeroName() => heroName;
@@ -2062,6 +2066,8 @@ public class UnitController : MonoBehaviour, IDestructible
     public AttackEffectType GetAttackType() => attackType;
     public ArmorType GetArmorType() => armorType;
     public SizeType GetSizeType() => sizeType;
+    public bool GetCanAttackGround() => canAttackGround;
+    public bool GetCanAttackAir() => canAttackAir;
 
     // 공격 1회당 동시에 나가는 투사체 개수 (Projectile + ProjectileAttack의 firePoints가 여러 개일 때만
     // 1 초과, doc/0291/0293) - 정보 패널 툴팁에서 "공격력 x2" 같은 배수 표기에 사용된다.
@@ -2083,6 +2089,7 @@ public class UnitController : MonoBehaviour, IDestructible
             return;
 
         icon = data.Icon;
+        infoDescription = data.infoDescription;
         attackDamage = data.attackDamge;
         armorType = data.armorType;
         sizeType = data.sizeType;
