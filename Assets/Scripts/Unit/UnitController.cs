@@ -65,6 +65,28 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private int enemyDataUnitID;
 
+    // ===== 구조 가능한 OC 유닛 (doc/0458) =====
+    // true면 "구조 전" - 아래 명령 진입점(MoveTo/AttackUnitTarget/... 13곳)이 isConstructing과 같은
+    // 자리에서 함께 막힌다. AttackRange의 자동교전(사거리 내 적 자동 공격)은 이 플래그와 무관하게 계속
+    // 작동한다 - 구조되기 전에도 스스로 방어는 하되, 플레이어가 직접 명령만 못 내리는 상태로 둔다.
+    [SerializeField]
+    private bool isRescueUnit;
+
+    // 구조 후 선택 마커(Green) - 비워두면(일반 유닛) 항상 기존 unitMarker(Yellow)를 그대로 쓴다.
+    // isRescueUnit이 true인 동안엔 이게 설정돼 있어도 unitMarker를 우선 쓴다(구조 전 = Yellow).
+    [SerializeField]
+    private GameObject rescuedMarker;
+
+    // 구조 시 FogRevealerAgent 시야를 이 값으로 되돌린다(구조 전엔 낮은 값으로 설정해둔 상태라고 가정).
+    [SerializeField]
+    private int rescuedSightRange = 25;
+
+    private FogRevealerAgent fogRevealerAgent; // 구조 시 시야 범위를 바꾸는 데 사용 (같은 오브젝트에서 조회)
+
+    // 선택 마커로 지금 실제 써야 할 오브젝트 - 구조 전(isRescueUnit)이거나 rescuedMarker가 없는 일반
+    // 유닛이면 기존 unitMarker(Yellow), 구조 후엔 rescuedMarker(Green)를 쓴다.
+    private GameObject ActiveMarker => (isRescueUnit || rescuedMarker == null) ? unitMarker : rescuedMarker;
+
     // ===== 전투 스탯 (공격력/방어력) =====
     // 공격력은 기존 AttackRange.AttackDamage였던 것을 이곳으로 옮겨 UnitController가 함께 관리한다.
     // Info_panel에서 UnitDamage/UnitArmor 아이콘 호버 시 표시할 값이기도 하다.
@@ -266,6 +288,7 @@ public class UnitController : MonoBehaviour, IDestructible
         unitAudio = GetComponent<UnitAudio>();
         laserBeamAttack = GetComponent<LaserBeamAttack>();
         healthManager = GetComponent<HealthManager>();
+        fogRevealerAgent = GetComponent<FogRevealerAgent>();
         TryGetComponent(out projectileAttack);
 
         if (!isAirUnit)
@@ -285,6 +308,8 @@ public class UnitController : MonoBehaviour, IDestructible
     void Start()
     {
         unitMarker.SetActive(false);
+        if (rescuedMarker != null)
+            rescuedMarker.SetActive(false);
         if (isWorker)
         {
             DepositOre.SetActive(false);
@@ -452,19 +477,19 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public void SelectUnit()
     {
-        unitMarker.SetActive(true);
+        ActiveMarker.SetActive(true);
     }
 
     public void DeselectUnit()
     {
-        unitMarker.SetActive(false);
+        ActiveMarker.SetActive(false);
     }
 
     // 공격 명령(아군 강제 공격 등) 대상으로 지정됐을 때 "이 유닛이 대상"임을 피드백으로 마커를 짧게 깜빡인다.
     // 좌클릭 선택 마커와 같은 오브젝트를 사용하므로, 끝나면 실제 선택 상태에 맞춰 복원한다.
     public void FlashMarker()
     {
-        if (unitMarker == null)
+        if (ActiveMarker == null)
             return;
 
         if (markerFlashRoutine != null)
@@ -476,25 +501,26 @@ public class UnitController : MonoBehaviour, IDestructible
     private IEnumerator FlashMarkerRoutine()
     {
         WaitForSeconds wait = new WaitForSeconds(markerFlashInterval);
+        GameObject marker = ActiveMarker; // 깜빡이는 도중 구조되어 마커가 바뀌어도 이번 루틴은 시작한 마커로 일관되게 끝낸다
 
         for (int i = 0; i < markerFlashCount; i++)
         {
-            unitMarker.SetActive(true);
+            marker.SetActive(true);
             yield return wait;
-            unitMarker.SetActive(false);
+            marker.SetActive(false);
             yield return wait;
         }
 
         // 깜빡이는 도중 선택된 상태였다면(드문 경우) 꺼진 채로 두지 않고 선택 마커 상태로 복원
         bool isSelected = rtsController != null && rtsController.selectedUnitList.Contains(this);
-        unitMarker.SetActive(isSelected);
+        marker.SetActive(isSelected);
 
         markerFlashRoutine = null;
     }
 
     public void MoveTo(Vector3 end)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         CancelGatheringForNewCommand();
         CancelAttackOrder();
@@ -731,7 +757,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // AttackRange가 자동으로 공격을 실행한다.
     public void AttackUnitTarget(EnemyUnitController target)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         CancelGatheringForNewCommand();
 
@@ -756,7 +782,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // 이동 중 사거리에 적이 들어오면 교전하고, 교전이 끝나면(AttackOrderTick) 다시 이 지점으로 이동을 재개한다.
     public void AttackMoveTo(Vector3 destination)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         CancelGatheringForNewCommand();
 
@@ -778,7 +804,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // (FriendlyAttackTick에서 매 프레임 갱신).
     public void AttackFriendlyTarget(MonoBehaviour target)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         bool targetIsAir = IsAirborne(target);
         if (!CanAttackDomain(targetIsAir))
@@ -851,7 +877,7 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public void FollowUnit(UnitController target)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         CancelGatheringForNewCommand();
         CancelAttackOrder();
@@ -928,7 +954,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // 이 메서드를 거치지 않는다 - 이건 "그냥 건물을 우클릭"했을 때(자원이 없거나 워커가 아닌 경우)만 쓰인다.
     public void FollowBuilding(BuildingController building)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         CancelGatheringForNewCommand();
         CancelAttackOrder();
@@ -983,7 +1009,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // destination에 도착하면 onArrived(실제 건물 스폰)를, 도착 전에 다른 명령으로 취소되면 onCancelled(그리드 예약 해제)를 실행한다.
     public void GoBuild(Vector3 destination, System.Action onArrived, System.Action onCancelled)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         CancelGatheringForNewCommand();
         CancelAttackOrder(); // 이전 건설 이동이 있었다면 여기서 먼저 취소 콜백이 실행됨
@@ -1350,7 +1376,7 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public void StopUnit()
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         CancelGatheringForNewCommand();
         CancelAttackOrder();
@@ -1386,7 +1412,7 @@ public class UnitController : MonoBehaviour, IDestructible
     }
     public void PatrolUnit(Vector3 end)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         CancelGatheringForNewCommand();
         CancelAttackOrder();
@@ -1464,7 +1490,7 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public void HoldUnit()
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         CancelGatheringForNewCommand();
         CancelAttackOrder();
@@ -1492,7 +1518,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // ===== 외부에서 호출하는 유일한 진입점 =====
     public void Gather(ResourceNode node)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         if (!isWorker)
         {
@@ -1608,7 +1634,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // ===== Return Cargo 진입점 (UI "반환" 버튼) =====
     public void ReturnCargo()
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         if (!isWorker || !IsCarryingResource())
             return; // 일꾼이 아니거나 들고 있는 자원이 없으면 아무 것도 안 함
@@ -1631,7 +1657,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // (FollowBuilding, doc/0345, doc/0419).
     public void MoveToBuilding(BuildingController building)
     {
-        if (isConstructing) return; // 건설 중엔 다른 명령을 받지 않는다
+        if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
         if (building.CompareTag("MainBase") && isWorker && IsCarryingResource())
         {
@@ -1944,6 +1970,25 @@ public class UnitController : MonoBehaviour, IDestructible
     public Sprite GetIcon() => icon;
     public int GetUnitID() => unitID;
     public string GetHeroName() => heroName;
+
+    // 구조 완료 시 Stage3Objectives 등이 호출한다 (doc/0458) - 명령 억제를 풀고, 선택 마커를
+    // Yellow(unitMarker)에서 Green(rescuedMarker)으로 전환하고, 낮춰뒀던 시야를 원래 범위로 되돌린다.
+    public void Rescue()
+    {
+        if (!isRescueUnit)
+            return; // 이미 구조됨 - 중복 호출 방지
+
+        isRescueUnit = false;
+
+        unitMarker.SetActive(false);
+        if (rescuedMarker != null)
+        {
+            bool isSelected = rtsController != null && rtsController.selectedUnitList.Contains(this);
+            rescuedMarker.SetActive(isSelected);
+        }
+
+        fogRevealerAgent?.SetSightRange(rescuedSightRange);
+    }
 
     // 연구소 업그레이드로 얻은 전역 보너스를 더해서 반환한다 (RTSUnitController를 거쳐서만 조회 - UpgradeManager는 직접 참조하지 않음).
     public int GetAttackDamage() => attackDamage + (rtsController != null ? rtsController.GlobalAttackBonus : 0);

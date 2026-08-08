@@ -51,6 +51,19 @@ public class FogRevealerAgent : MonoBehaviour
 
     private int CurrentSightRange() => isInsideAlliedTerritory ? sightRange : unclaimedSightRange;
 
+    // 시야 범위를 즉시 다른 값으로 바꿔야 할 때(예: 구조 전엔 낮은 시야로 두다가 구조 후 정상 범위로
+    // 복원, doc/0458) 외부에서 호출한다. sightRange엔 세터가 없어 값을 못 바꾸므로, 기존 등록을 지우고
+    // 새 값으로 다시 등록하는 ReplaceRevealer를 그대로 재사용한다.
+    public void SetSightRange(int newRange)
+    {
+        sightRange = newRange;
+
+        if (fogWar == null)
+            return; // Start()가 아직 안 돌았거나 씬에 안개가 없음 - 다음 등록 시점에 새 값이 자연히 반영됨
+
+        ReplaceRevealer(CurrentSightRange());
+    }
+
     private void RegisterRevealer(int range)
     {
         fogRevealer = new csFogWar.FogRevealer(transform, range, updateOnlyOnMove);
