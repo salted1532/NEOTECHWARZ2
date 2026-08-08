@@ -69,6 +69,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackRange
   UnitRange: 20
+  targetTags:
+  - Worker
+  - AttackUnit
+  - MainBase
+  - Tier1
+  - Tier2
+  - Tier3
+  - SupplyDepot
+  - Lab
+  - AllyOC
 --- !u!1 &2151467041808487892
 GameObject:
   m_ObjectHideFlags: 0
