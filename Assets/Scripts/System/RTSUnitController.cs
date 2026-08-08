@@ -18,6 +18,7 @@ public class RTSUnitController : MonoBehaviour
     // 그대로 상속하므로 selectedEnemyBuilding을 그대로 다형성으로 재사용 - 별도 목록 불필요.
     public List<AllyController> selectedAllyList;
     public ResourceNode selectedResourceNode; // 광물/가스는 항상 단일 선택
+    public MissionItem selectedMissionItem; // 유물/데이터베이스 등 미션 오브젝트도 항상 단일 선택 (doc/0455)
     public BaseStructure selectedBaseStructure; // 건설 중인 건물 기반도 항상 단일 선택
 
     // ===== 부대 지정(컨트롤 그룹) - Ctrl+숫자(1~9,0)로 저장, 숫자만 누르면 해당 부대를 선택 =====
@@ -92,7 +93,8 @@ public class RTSUnitController : MonoBehaviour
         OreSelect,
         BaseStructureSelect,
         BuildMode,
-        AllySelect // 아군 OC 유닛 선택 (doc/0452)
+        AllySelect, // 아군 OC 유닛 선택 (doc/0452)
+        MissionItemSelect // 유물/데이터베이스 등 미션 오브젝트 선택 (doc/0455)
     }
 
     public enum UnitState
@@ -876,6 +878,40 @@ public class RTSUnitController : MonoBehaviour
 
     #endregion
 
+    #region MissionItem선택 관련 (doc/0455 - Ore/Gas선택과 동일한 패턴)
+
+    /// <summary>
+    /// 좌클릭 선택 처리 (미션 오브젝트도 항상 단일 선택)
+    /// </summary>
+    public void ClickSelectMissionItem(MissionItem item)
+    {
+        DeselectAll();
+        SelectMissionItem(item);
+    }
+
+    private void SelectMissionItem(MissionItem item)
+    {
+        if (IsBuildMode())
+            return;
+
+        RTScurrentSate = SelectState.MissionItemSelect;
+
+        item.SelectItem();
+        selectedMissionItem = item;
+    }
+
+    // 미션 오브젝트가 반납 완료 등으로 비활성화/파괴될 때 선택 상태가 유령 참조로 남지 않도록 정리한다.
+    public void ClearSelectedMissionItemIfMatches(MissionItem item)
+    {
+        if (selectedMissionItem != item)
+            return;
+
+        selectedMissionItem = null;
+        RTScurrentSate = SelectState.None;
+    }
+
+    #endregion
+
     #region BaseStructure선택 관련
 
     /// <summary>
@@ -940,6 +976,7 @@ public class RTSUnitController : MonoBehaviour
 
         selectedEnemyBuilding?.DeselectEnemyBuilding();
         selectedResourceNode?.DeselectResource();
+        selectedMissionItem?.DeselectItem();
         selectedBaseStructure?.DeselectStructure();
 
         RTScurrentSate = SelectState.None;
@@ -949,6 +986,7 @@ public class RTSUnitController : MonoBehaviour
         selectedAllyList.Clear();
         selectedEnemyBuilding = null;
         selectedResourceNode = null;
+        selectedMissionItem = null;
         selectedBaseStructure = null;
     }
 
@@ -2003,6 +2041,22 @@ public class RTSUnitController : MonoBehaviour
                         selectedResourceNode.GetIcon(),
                         selectedResourceNode.Type == ResourceType.Ore ? "Ore" : "Gas",
                         selectedResourceNode.RemainingAmount);
+                }
+                else
+                {
+                    uIController.HideInfoPanel();
+                }
+
+                uIController.ClearPanel();
+                uIController.HideProductionUI();
+                uIController.HideSquadPanel();
+                break;
+
+            case SelectState.MissionItemSelect: // 유물/데이터베이스 등 - 체력/전투 스탯 없이 이름+이미지만 (doc/0455)
+
+                if (selectedMissionItem != null)
+                {
+                    uIController.ShowInfoPanel(selectedMissionItem.GetIcon(), selectedMissionItem.GetItemName(), null);
                 }
                 else
                 {

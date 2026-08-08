@@ -29,6 +29,9 @@ public class UserControl : MonoBehaviour
     // 빠지지만, 이 레이어로 클릭은 감지되어 강제공격/선택이 가능하다 (doc/0447).
     [SerializeField]
     private LayerMask layerAllyOC;
+    // 유물/데이터베이스 등 미션 오브젝트 선택 전용 레이어 (doc/0455).
+    [SerializeField]
+    private LayerMask layerMissionObject;
 
     [SerializeField]
     private Camera mainCamera;
@@ -282,6 +285,7 @@ public class UserControl : MonoBehaviour
         RaycastHit OreHit;
         RaycastHit GasHit;
         RaycastHit allyOcHit;
+        RaycastHit missionObjectHit;
 
         bool clickedUnit = Physics.Raycast(ray, out unitHit, Mathf.Infinity, layerUnit);
         bool clickedGround = Physics.Raycast(ray, out groundHit, Mathf.Infinity, layerGround);
@@ -290,6 +294,7 @@ public class UserControl : MonoBehaviour
         bool clickedOre = Physics.Raycast(ray, out OreHit, Mathf.Infinity, layerOre);
         bool clickedGas = Physics.Raycast(ray, out GasHit, Mathf.Infinity, layerGas);
         bool clickedAllyOC = Physics.Raycast(ray, out allyOcHit, Mathf.Infinity, layerAllyOC);
+        bool clickedMissionObject = Physics.Raycast(ray, out missionObjectHit, Mathf.Infinity, layerMissionObject);
 
         // 1. 유닛 클릭 = 선택 또는 아군 강제 공격 (A 모드 중이면 해당 아군을 강제로 공격, 아니면 선택)
         if (clickedUnit)
@@ -530,6 +535,19 @@ public class UserControl : MonoBehaviour
             if (node != null && IsRevealedByFog(node.transform.position))
             {
                 pendingLeftClickSelect = () => { if (node != null) rtsUnitController.ClickSelectResource(node); };
+
+                return; // 👉 중요: 여기서 종료 (명령 안 함)
+            }
+        }
+
+        // 5.5. 미션 오브젝트(유물/데이터베이스 등) 클릭 = 선택 처리 (doc/0455, Ore/Gas와 동일한 패턴)
+        if (clickedMissionObject)
+        {
+            MissionItem item = missionObjectHit.transform.GetComponent<MissionItem>();
+
+            if (item != null)
+            {
+                pendingLeftClickSelect = () => { if (item != null) rtsUnitController.ClickSelectMissionItem(item); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }
@@ -1108,8 +1126,8 @@ public class UserControl : MonoBehaviour
         if (Physics.Raycast(ray, Mathf.Infinity, layerUnit | layerBuilding))
             return CursorTarget.Ally;
 
-        if (Physics.Raycast(ray, out RaycastHit resourceHit, Mathf.Infinity, layerOre | layerGas | layerAllyOC) && IsRevealedByFog(resourceHit.transform.position))
-            return CursorTarget.Neutral; // 중립 자원 + 아군 OC 전부 노란 커서 (doc/0447)
+        if (Physics.Raycast(ray, out RaycastHit resourceHit, Mathf.Infinity, layerOre | layerGas | layerAllyOC | layerMissionObject) && IsRevealedByFog(resourceHit.transform.position))
+            return CursorTarget.Neutral; // 중립 자원 + 아군 OC + 미션 오브젝트 전부 노란 커서 (doc/0447/0455)
 
         return CursorTarget.None;
     }

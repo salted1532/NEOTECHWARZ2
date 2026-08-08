@@ -7601,7 +7601,9 @@ MonoBehaviour:
   selectedBuildingList: []
   selectedEnemyList: []
   selectedEnemyBuilding: {fileID: 0}
+  selectedAllyList: []
   selectedResourceNode: {fileID: 0}
+  selectedMissionItem: {fileID: 0}
   selectedBaseStructure: {fileID: 0}
   UnitList: []
   BuildingList: []
@@ -7654,6 +7656,9 @@ MonoBehaviour:
   layerAllyOC:
     serializedVersion: 2
     m_Bits: 8192
+  layerMissionObject:
+    serializedVersion: 2
+    m_Bits: 16384
   mainCamera: {fileID: 7541556353271575199}
   mainCameraControl: {fileID: 1298732187011494947}
   dragRectangle: {fileID: 3198855097577738063}
