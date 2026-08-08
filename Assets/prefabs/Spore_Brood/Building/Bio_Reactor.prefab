@@ -261,6 +261,7 @@ GameObject:
   - component: {fileID: 8930109125239737442}
   - component: {fileID: -8937272862018730580}
   - component: {fileID: -4482163489716210618}
+  - component: {fileID: 8987350178664054079}
   m_Layer: 8
   m_Name: Bio_Reactor
   m_TagString: Enemy
@@ -381,7 +382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBuildingController
   buildingMarker: {fileID: 7296833267826986796}
-  buildingName: 바이오리액터 (Bio-Reactor)
+  buildingName: "\uBC14\uC774\uC624\uB9AC\uC561\uD130 (Bio-Reactor)"
   icon: {fileID: 0}
   minimapIcon: {fileID: 8540347942998740173}
   flashInterval: 0.3
@@ -470,6 +471,22 @@ MonoBehaviour:
   researchGasCost: 64000000c8000000fa000000
   attackBonusPerLevel: 1
   armorBonusPerLevel: 1
+--- !u!114 &8987350178664054079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7636683964052424660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
+  sightRange: 1
+  updateOnlyOnMove: 1
+  shrinkSightOutsideAlliedTerritory: 0
+  unclaimedSightRange: 1
 --- !u!1 &8400817228800124961
 GameObject:
   m_ObjectHideFlags: 0

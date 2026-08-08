@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -18,6 +19,9 @@ public class Stage3Objectives : MonoBehaviour
     [SerializeField] private Collider rescueBeacon; // 생존자 구조 지점의 트리거 콜라이더 - 직접 연결 (doc/0459 후속)
     [SerializeField] private List<UnitController> rescuedUnits; // 위장 OC(실제로는 조종 가능한 아군 유닛) 목록 - 직접 연결 (doc/0458)
     [SerializeField] private TextMeshProUGUI rescueSurvivorsText;
+    // rescuedUnits를 전부 같은 프레임에 Rescue()하면 각자의 마커 깜빡임/SFX(doc/0465)가 겹쳐 보이고
+    // 들린다 - 리스트 순서대로 이 간격만큼 텀을 두고 한 마리씩 구조 처리한다 (doc/0466).
+    [SerializeField] private float rescueStaggerInterval = 0.1f;
 
     private RTSUnitController rtsController;
     private bool alienOutpostAssigned;
@@ -41,10 +45,7 @@ public class Stage3Objectives : MonoBehaviour
         {
             survivorsRescued = IsAnyUnitTouchingBeacon();
             if (survivorsRescued)
-            {
-                foreach (UnitController unit in rescuedUnits)
-                    unit?.Rescue();
-            }
+                StartCoroutine(RescueSequence());
         }
 
         ObjectiveTextUtil.SetObjectiveText(destroyOutpostText, "(주목표) 외계 전초기지 제거", outpostDestroyed);
@@ -52,6 +53,15 @@ public class Stage3Objectives : MonoBehaviour
 
         if (outpostDestroyed)
             StageManager.Instance?.ReportVictory();
+    }
+
+    private IEnumerator RescueSequence()
+    {
+        foreach (UnitController unit in rescuedUnits)
+        {
+            unit?.Rescue();
+            yield return new WaitForSeconds(rescueStaggerInterval);
+        }
     }
 
     // 비콘의 실제 트리거 콜라이더에 닿았는지로 판정한다(UnitController.IsTouching - MissionItem/doc/0456과

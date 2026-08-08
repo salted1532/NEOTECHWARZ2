@@ -89,6 +89,20 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private int rescuedSightRange = 25;
 
+    // 구조 시 미니맵 아이콘 색을 이 값(#19FF00)으로 바꿔서 아직 안 구조된 OC(노란색)와 구분되게 한다.
+    [SerializeField]
+    private SpriteRenderer miniMapIconRenderer;
+    private static readonly Color RescuedMiniMapIconColor = new Color(0.09803922f, 1f, 0f);
+
+    // 구조 완료 순간 마커(초록으로 바뀐 뒤)를 짧게 깜빡여 피드백을 주는 연출 (doc/0465) - 공격 대상 지정
+    // 깜빡임(markerFlashCount/Interval)과 의도가 달라 별도 필드로 둔다.
+    [SerializeField]
+    private float rescueFlashInterval = 0.3f;
+    [SerializeField]
+    private int rescueFlashCount = 3;
+    [SerializeField]
+    private SoundClipSet rescueSfx;
+
     private FogRevealerAgent fogRevealerAgent; // 구조 시 시야 범위를 바꾸는 데 사용 (같은 오브젝트에서 조회)
 
     // 구조 비콘 등 트리거 콜라이더에 실제로 겹쳐 있는지 판정한다 - 겹친 트리거를 전부 추적해서, 특정
@@ -527,14 +541,14 @@ public class UnitController : MonoBehaviour, IDestructible
         if (markerFlashRoutine != null)
             StopCoroutine(markerFlashRoutine);
 
-        markerFlashRoutine = StartCoroutine(FlashMarkerRoutine());
+        markerFlashRoutine = StartCoroutine(FlashMarkerRoutine(markerFlashCount, markerFlashInterval));
     }
 
-    private IEnumerator FlashMarkerRoutine()
+    private IEnumerator FlashMarkerRoutine(int count, float interval)
     {
-        WaitForSeconds wait = new WaitForSeconds(markerFlashInterval);
+        WaitForSeconds wait = new WaitForSeconds(interval);
 
-        for (int i = 0; i < markerFlashCount; i++)
+        for (int i = 0; i < count; i++)
         {
             unitMarker.SetActive(true);
             yield return wait;
@@ -2024,6 +2038,22 @@ public class UnitController : MonoBehaviour, IDestructible
             rescuedMarker.SetActive(true);
 
         fogRevealerAgent?.SetSightRange(rescuedSightRange);
+
+        if (miniMapIconRenderer != null)
+            miniMapIconRenderer.color = RescuedMiniMapIconColor;
+
+        // 초록으로 바뀐 마커를 짧게 깜빡여 구조됐다는 피드백을 준다 (doc/0465) - unitMarker 자체를
+        // FlashMarker()와 동일한 방식으로 강제로 켰다 끄지만, 지금은 rescuedMarker가 이미 영구히
+        // 켜진 상태라 깜빡일 때마다 초록으로 보인다.
+        if (unitMarker != null)
+        {
+            if (markerFlashRoutine != null)
+                StopCoroutine(markerFlashRoutine);
+
+            markerFlashRoutine = StartCoroutine(FlashMarkerRoutine(rescueFlashCount, rescueFlashInterval));
+        }
+
+        SoundManager.Instance?.PlaySFX(rescueSfx, transform.position);
     }
 
     // 연구소 업그레이드로 얻은 전역 보너스를 더해서 반환한다 (RTSUnitController를 거쳐서만 조회 - UpgradeManager는 직접 참조하지 않음).

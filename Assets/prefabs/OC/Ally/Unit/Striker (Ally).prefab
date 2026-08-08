@@ -150,6 +150,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4698038001367890631, guid: 2b9940fdf7738ca4c8946e5fd0c34770, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1589971164742309579}
+    - targetCorrespondingSourceObject: {fileID: 4698038001367890631, guid: 2b9940fdf7738ca4c8946e5fd0c34770, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1817134865940425192}
     - targetCorrespondingSourceObject: {fileID: 670878647040245498, guid: 2b9940fdf7738ca4c8946e5fd0c34770, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1941973571819488010}
@@ -202,6 +205,22 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   timeBetweenAttacks: 1.2
+--- !u!114 &-1817134865940425192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3904233730634825791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
+  sightRange: 25
+  updateOnlyOnMove: 1
+  shrinkSightOutsideAlliedTerritory: 0
+  unclaimedSightRange: 2
 --- !u!1 &4486210914847310475 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5286784239653861491, guid: 2b9940fdf7738ca4c8946e5fd0c34770, type: 3}

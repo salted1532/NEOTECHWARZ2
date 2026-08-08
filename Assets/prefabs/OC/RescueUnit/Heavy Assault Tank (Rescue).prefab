@@ -257,6 +257,14 @@ MonoBehaviour:
   rescuedMarker: {fileID: 8595973494087306434}
   preRescueMarker: {fileID: 3389838738539035581}
   rescuedSightRange: 25
+  miniMapIconRenderer: {fileID: 8470478172234629387}
+  rescueFlashInterval: 0.3
+  rescueFlashCount: 3
+  rescueSfx:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 60896dc0e65755b4dbfd566ad0426b4f, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
   attackDamage: 0
   armor: 0
   attackType: 1
