@@ -16,6 +16,7 @@ public class InfantryIdleLookAround : MonoBehaviour
 
     private UnitController unitController;
     private EnemyUnitController enemyUnitController;
+    private AllyController allyController; // 아군 OC 보병 - EnemyController와 동일 판정 (doc/0468)
     private float idleTimer;
     private float nextLookWait;
     private Tween turnTween;
@@ -24,6 +25,7 @@ public class InfantryIdleLookAround : MonoBehaviour
     {
         unitController = GetComponent<UnitController>();
         enemyUnitController = GetComponent<EnemyUnitController>();
+        allyController = GetComponent<AllyController>();
         nextLookWait = Random.Range(idleWaitMin, idleWaitMax);
     }
 
@@ -53,6 +55,8 @@ public class InfantryIdleLookAround : MonoBehaviour
             return !unitController.IsCurrentlyMoving() && !unitController.IsAttack();
         if (enemyUnitController != null)
             return !enemyUnitController.IsCurrentlyMoving() && !enemyUnitController.IsAttack();
+        if (allyController != null)
+            return !allyController.IsCurrentlyMoving() && !allyController.IsAttack();
         return false;
     }
 

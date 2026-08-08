@@ -206,6 +206,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackRange
   UnitRange: 20
+  targetTags:
+  - Worker
+  - AttackUnit
+  - MainBase
+  - Tier1
+  - Tier2
+  - Tier3
+  - SupplyDepot
+  - Lab
+  - AllyOC
 --- !u!1 &3861308579626577649
 GameObject:
   m_ObjectHideFlags: 0
@@ -257,6 +267,7 @@ GameObject:
   - component: {fileID: 5216606494986298842}
   - component: {fileID: 1893831155959136481}
   - component: {fileID: -8464300020049961208}
+  - component: {fileID: 4402361038460300068}
   m_Layer: 8
   m_Name: Railgunner
   m_TagString: Enemy
@@ -536,6 +547,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8c2ad14de2c2834da003b4d876c7eaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitAudio
+--- !u!114 &4402361038460300068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4698038001367890631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19b88ddad9b24ce4fa3260c5873d0849, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InfantryIdleLookAround
+  idleWaitMin: 5
+  idleWaitMax: 15
+  turnDuration: 1
+  turnEase: 4
 --- !u!1 &5286784239653861491
 GameObject:
   m_ObjectHideFlags: 0

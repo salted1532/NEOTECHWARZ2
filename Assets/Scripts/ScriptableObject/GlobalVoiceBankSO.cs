@@ -15,4 +15,6 @@ public class GlobalVoiceBankSO : ScriptableObject
     public SoundClipSet buildingUnderAttackWarning { get; private set; } // 화면 밖에서 아군 건물이 공격받았을 때
     [field: SerializeField]
     public SoundClipSet upgradeComplete { get; private set; }
+    [field: SerializeField]
+    public SoundClipSet missionSuccess { get; private set; } // 임무(스테이지) 목표 달성 시(doc/0464)
 }

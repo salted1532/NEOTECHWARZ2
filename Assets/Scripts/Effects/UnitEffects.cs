@@ -37,6 +37,7 @@ public class UnitEffects : MonoBehaviour
     // 채워지고 나머지는 null로 남는다 (doc/0233).
     private UnitController unitController;
     private EnemyUnitController enemyUnitController;
+    private AllyController allyController; // 아군 OC (doc/0469)
     private HealthManager healthManager;
     private Collider bodyCollider; // 피격 이펙트 위치 계산용 (AttackRange의 트리거 콜라이더가 아니라 유닛 본체 콜라이더)
 
@@ -48,6 +49,7 @@ public class UnitEffects : MonoBehaviour
     {
         unitController = GetComponent<UnitController>();
         enemyUnitController = GetComponent<EnemyUnitController>();
+        allyController = GetComponent<AllyController>();
         healthManager = GetComponent<HealthManager>();
         bodyCollider = GetComponent<Collider>(); // 클릭 판정(UserControl의 layerUnit 레이캐스트)에 쓰는 것과 동일한 콜라이더
         fogWar = FindFirstObjectByType<csFogWar>();
@@ -75,7 +77,8 @@ public class UnitEffects : MonoBehaviour
     private void Update()
     {
         bool moving = (unitController != null && unitController.IsCurrentlyMoving())
-            || (enemyUnitController != null && enemyUnitController.IsCurrentlyMoving());
+            || (enemyUnitController != null && enemyUnitController.IsCurrentlyMoving())
+            || (allyController != null && allyController.IsCurrentlyMoving());
         SetMoveTrail(moving && FogVisibility.IsRevealed(fogWar, transform.position));
     }
 

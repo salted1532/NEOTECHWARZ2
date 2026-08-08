@@ -8,6 +8,7 @@ public class UnitAudio : MonoBehaviour
 {
     private UnitController unitController;
     private EnemyUnitController enemyUnitController;
+    private AllyController allyController; // 아군 OC (doc/0469)
     private HealthManager healthManager;
     private RTSUnitController rtsController;
     private UnitSoundBankSO bank;
@@ -20,15 +21,21 @@ public class UnitAudio : MonoBehaviour
     {
         unitController = GetComponent<UnitController>();
         enemyUnitController = GetComponent<EnemyUnitController>();
+        allyController = GetComponent<AllyController>();
         healthManager = GetComponent<HealthManager>();
 
         rtsController = FindFirstObjectByType<RTSUnitController>();
         if (rtsController == null)
             return;
 
+        // 아군 OC(AllyController)도 적 OC와 같은 EnemyUnitDataSO 로스터를 그대로 재사용하므로(doc/0447/0448),
+        // enemyUnitController와 동일하게 GetEnemyUnitData로 조회한다 - 이게 빠져있어서 Ally OC 유닛은
+        // bank가 계속 null로 남아 공격음/스폰음/선택대사 등 모든 소리가 조용히 씹히고 있었다(doc/0469).
         UnitData data = unitController != null
             ? rtsController.GetUnitData(unitController.GetUnitID())
-            : (enemyUnitController != null ? rtsController.GetEnemyUnitData(enemyUnitController.GetEnemyUnitID()) : null);
+            : enemyUnitController != null ? rtsController.GetEnemyUnitData(enemyUnitController.GetEnemyUnitID())
+            : allyController != null ? rtsController.GetEnemyUnitData(allyController.GetAllyUnitID())
+            : null;
 
         // "구조 가능한 OC 유닛"(enemyDataUnitID로 스탯을 가져오는 UnitController, doc/0458)은 unitID가
         // 0이라 위 조회가 항상 실패한다. OC 로스터는 NTA와 완전히 동일한 번호로 재스킨된 구조라서(doc/0441),

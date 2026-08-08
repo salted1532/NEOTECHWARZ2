@@ -13,6 +13,10 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Button exitButton;
     [SerializeField] private Button optionCloseButton; // 옵션 패널의 X(닫기) 버튼
 
+    // 개발자용 - 정식 버전 출시 전 이 버튼과 연결을 제거할 것. 미션 선택 화면(doc/0472)에 있던
+    // 것을 메인 화면으로 옮겨왔다 - 여기서 초기화하면 아직 아무 씬도 진입하기 전이라 헷갈릴 일이 없다.
+    [SerializeField] private Button playerPrefsResetButton;
+
     [Header("씬 이동")]
     [SerializeField] private string testSceneName = "TestScene";
 
@@ -42,11 +46,12 @@ public class MainMenuController : MonoBehaviour
         optionButton?.onClick.AddListener(OnOptionClicked);
         exitButton?.onClick.AddListener(OnExitClicked);
         optionCloseButton?.onClick.AddListener(CloseOptionsPanel);
+        playerPrefsResetButton?.onClick.AddListener(ResetPlayerPrefs);
 
         mainMenuPanel?.SetActive(true);  // 꺼진 채로 저장돼있어도 시작하면 항상 켜지도록
         optionsPanel?.SetActive(false);
 
-        hoverableButtons = new[] { playButton, optionButton, exitButton, optionCloseButton };
+        hoverableButtons = new[] { playButton, optionButton, exitButton, optionCloseButton, playerPrefsResetButton };
 
         if (cursorTexture != null)
             Cursor.SetCursor(cursorTexture, cursorHotspot, CursorMode.Auto);
@@ -107,5 +112,14 @@ public class MainMenuController : MonoBehaviour
 #else
         Application.Quit();
 #endif
+    }
+
+    // 개발자용 - 미션 해금 진행 상황(doc/0472)과 SoundManager 볼륨/뮤트 설정(doc/0288)까지, 이
+    // 프로젝트가 PlayerPrefs에 저장하는 값 전부를 지운다. 정식 버전 출시 전 이 버튼/메소드를
+    // playerPrefsResetButton과 함께 제거할 것.
+    private void ResetPlayerPrefs()
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
     }
 }

@@ -69,6 +69,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackRange
   UnitRange: 2
+  targetTags:
+  - Worker
+  - AttackUnit
+  - MainBase
+  - Tier1
+  - Tier2
+  - Tier3
+  - SupplyDepot
+  - Lab
+  - AllyOC
 --- !u!1 &864714298434707452
 GameObject:
   m_ObjectHideFlags: 0
@@ -719,6 +729,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4641279379937375252, guid: 6e186a0174101ea4eb532dd7c33668bd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3659261283694263847}
+    - targetCorrespondingSourceObject: {fileID: 4641279379937375252, guid: 6e186a0174101ea4eb532dd7c33668bd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1110476387694986079}
   m_SourcePrefab: {fileID: 100100000, guid: 6e186a0174101ea4eb532dd7c33668bd, type: 3}
 --- !u!1 &338091822484216800 stripped
 GameObject:
@@ -740,6 +753,28 @@ MonoBehaviour:
   shakeStrength: 0.03
   vibrato: 15
   shakeCycleDuration: 0.2
+--- !u!114 &1110476387694986079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338091822484216800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9f80318a0341c3498e0d387baf39a52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleIdleAnimation
+  turretController: {fileID: 0}
+  idleWaitMin: 5
+  idleWaitMax: 15
+  turretWanderDuration: 1
+  turretHoldMin: 5
+  turretHoldMax: 10
+  idleShakeStrength: 0.01
+  idleShakeVibrato: 10
+  idleShakeCycleDuration: 0.15
+  manualIdle: 0
 --- !u!4 &1151501022524506458 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5414157630471106222, guid: 6e186a0174101ea4eb532dd7c33668bd, type: 3}

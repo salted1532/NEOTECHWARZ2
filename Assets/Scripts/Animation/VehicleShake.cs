@@ -12,14 +12,19 @@ public class VehicleShake : MonoBehaviour
 
     private UnitController unitController;               // 아군 유닛에 붙어있으면 세팅
     private EnemyUnitController enemyUnitController;      // 적 유닛에 붙어있으면 세팅 (doc/0242)
+    private AllyController allyController;                // 아군 OC에 붙어있으면 세팅 (doc/0469)
     private Vector3 basePosition;
     private Tween shakeTween;
     private bool shaking;
 
-    private void Awake()
+    // HoverBob/VehicleIdleAnimation과 동일한 이유(doc/0466/0468)로 Awake가 아니라 Start에서 조회한다 -
+    // 이 오브젝트는 상위 프리팹 안에 중첩된 프리팹 인스턴스(차량 메쉬)의 자식으로 추가되는 경우가 많아서,
+    // Awake() 시점엔 아직 바깥쪽 루트에 재부모되기 전이라 GetComponentInParent가 못 찾는 문제가 있었다.
+    private void Start()
     {
         unitController = GetComponentInParent<UnitController>();
         enemyUnitController = GetComponentInParent<EnemyUnitController>();
+        allyController = GetComponentInParent<AllyController>();
         basePosition = transform.localPosition;
     }
 
@@ -27,7 +32,8 @@ public class VehicleShake : MonoBehaviour
     private void Update()
     {
         bool shouldShake = (unitController != null && unitController.IsCurrentlyMoving())
-            || (enemyUnitController != null && enemyUnitController.IsCurrentlyMoving());
+            || (enemyUnitController != null && enemyUnitController.IsCurrentlyMoving())
+            || (allyController != null && allyController.IsCurrentlyMoving());
 
         if (shouldShake && !shaking)
             StartShake();

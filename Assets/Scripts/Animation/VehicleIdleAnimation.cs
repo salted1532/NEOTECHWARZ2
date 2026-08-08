@@ -33,8 +33,9 @@ public class VehicleIdleAnimation : MonoBehaviour
 
     private UnitController unitController;
     private EnemyUnitController enemyUnitController;
+    private AllyController allyController; // 아군 OC 차량 - EnemyController와 동일 판정 (doc/0468)
     private AttackRange attackRange;
-    private EnemyAttackRange enemyAttackRange;
+    private EnemyAttackRange enemyAttackRange; // AllyController.GetAttackRange()도 이 타입이라 그대로 재사용(doc/0448)
 
     private Vector3 basePosition;
     private Tween shakeTween;
@@ -42,22 +43,26 @@ public class VehicleIdleAnimation : MonoBehaviour
     private Coroutine wanderRoutine;
     private bool isIdling;
 
-    private void Awake()
+    // 이 컴포넌트는 HoverBob과 마찬가지로 상위 프리팹 안에 중첩된 프리팹 인스턴스(차량 메쉬)의 자식으로
+    // 추가되는 경우가 많다 - Awake() 시점엔 아직 바깥쪽 루트에 재부모(reparent)되기 전이라
+    // GetComponentInParent/transform.root가 루트의 컨트롤러를 못 찾는 문제가 있었다(doc/0466/0468).
+    // Start()는 전체 계층이 다 붙은 뒤(다음 프레임) 호출되므로 여기서 한 번에 조회한다.
+    private void Start()
     {
         unitController = GetComponentInParent<UnitController>();
         enemyUnitController = GetComponentInParent<EnemyUnitController>();
+        allyController = GetComponentInParent<AllyController>();
         basePosition = transform.localPosition;
 
         if (turretController == null)
             turretController = transform.root.GetComponentInChildren<TurretController>();
-    }
 
-    private void Start()
-    {
         if (unitController != null)
             attackRange = unitController.GetAttackRange();
         else if (enemyUnitController != null)
             enemyAttackRange = enemyUnitController.GetAttackRange();
+        else if (allyController != null)
+            enemyAttackRange = allyController.GetAttackRange();
     }
 
     // VehicleShake/HoverBob과 동일한 폴링 토글 패턴(doc/0105).
@@ -95,6 +100,8 @@ public class VehicleIdleAnimation : MonoBehaviour
             return !unitController.IsCurrentlyMoving() && !unitController.IsAttack();
         if (enemyUnitController != null)
             return !enemyUnitController.IsCurrentlyMoving() && !enemyUnitController.IsAttack();
+        if (allyController != null)
+            return !allyController.IsCurrentlyMoving() && !allyController.IsAttack();
         return manualIdle; // 유닛 컨트롤러가 없는 오브젝트에서는 이 값으로 직접 idle 여부를 제어한다
     }
 

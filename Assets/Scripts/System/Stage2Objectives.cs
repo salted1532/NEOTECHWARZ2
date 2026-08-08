@@ -34,6 +34,9 @@ public class Stage2Objectives : MonoBehaviour
     private UnitController dataCarrier;
     private bool dataDelivered;
 
+    private bool artifactSuccessSfxPlayed;
+    private bool dataSuccessSfxPlayed;
+
     private void Start()
     {
         StageManager.Instance.WireObjectiveTexts(this);
@@ -53,6 +56,21 @@ public class Stage2Objectives : MonoBehaviour
 
         if (artifactDelivered)
             StageManager.Instance?.ReportVictory();
+
+        // 주목표(유물)뿐 아니라 서브목표(연구 데이터) 반납 완료 시에도 각각 재생한다(doc/0465).
+        // delivered 플래그는 한 번 켜지면 계속 true라 Update()가 매 프레임 여기로 들어오므로,
+        // 성공 SFX는 목표별로 최초 1회만 울리도록 별도 플래그로 막는다(doc/0464).
+        PlayMissionSuccessSfxOnce(artifactDelivered, ref artifactSuccessSfxPlayed);
+        PlayMissionSuccessSfxOnce(dataDelivered, ref dataSuccessSfxPlayed);
+    }
+
+    private void PlayMissionSuccessSfxOnce(bool objectiveDelivered, ref bool alreadyPlayed)
+    {
+        if (!objectiveDelivered || alreadyPlayed)
+            return;
+
+        alreadyPlayed = true;
+        SoundManager.Instance?.PlayMissionSuccessVoice();
     }
 
     private void UpdateCarry(MissionItem item, Collider beacon, ref UnitController carrier, ref bool delivered)

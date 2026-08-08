@@ -52,7 +52,17 @@ public class TurretController : MonoBehaviour
         }
 
         EnemyUnitController enemyUnitController = GetComponentInParent<EnemyUnitController>();
-        enemyAttackRange = enemyUnitController != null ? enemyUnitController.GetAttackRange() : null;
+        if (enemyUnitController != null)
+        {
+            enemyAttackRange = enemyUnitController.GetAttackRange();
+            return;
+        }
+
+        // 아군 OC(AllyController, doc/0452)도 EnemyUnitController와 동일한 EnemyAttackRange 타입을 쓰므로
+        // 그대로 재사용한다 - 이게 빠져있어서 Ally OC 차량의 포탑이 대상을 감지해도 조준하지 못하고
+        // 계속 정면만 보고 있었다(doc/0469).
+        AllyController allyController = GetComponentInParent<AllyController>();
+        enemyAttackRange = allyController != null ? allyController.GetAttackRange() : null;
     }
 
     // 조준할 대상이 있으면 그쪽을, 없으면(사거리 이탈 등으로 target == null) 몸체 기준 원래 정면으로
