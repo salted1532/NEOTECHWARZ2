@@ -21,3 +21,18 @@ Invasion→침공, United Front→연합 전선, Final Offensive→최후의 공
 
 ## 확인
 컴파일 확인 완료(에러 0). JSON 키 173개, en/ko 키 집합 일치·중복 없음 확인.
+
+## 후속 정정 - `&lt;`/`&gt;`가 실제로는 안 먹힘
+"< 표시가 안 되네 확인해주고 안되면 그냥 빼줘"라는 후속 리포트를 받고 Play Mode에서 실제 TMP
+컴포넌트에 직접 텍스트를 넣어 `ForceMeshUpdate()` 후 `textInfo.characterInfo`를 읽어 확인:
+
+- `"&lt;Boot Camp&gt;"`를 넣으면 → 렌더링된 글자가 정확히 `&lt;Boot Camp&gt;`(17글자) 그대로.
+  이 프로젝트의 TMP 설정에서는 HTML 엔티티가 디코딩되지 않고 글자 그대로 찍힘 - 처음에
+  "리치 텍스트라 그냥 `<`/`>`를 넣으면 태그로 오인될 것"이라고 예상해서 엔티티로 이스케이프했던
+  게 틀린 가정이었음.
+- `"<Boot Camp>"`(리터럴)를 넣으면 → 렌더링된 글자가 정확히 `<Boot Camp>`(11글자) 그대로 정상
+  출력. `Boot Camp>`가 유효한 TMP 태그 이름이 아니라서 TMP가 그냥 일반 텍스트로 통과시킴 -
+  애초에 이스케이프가 필요 없었음.
+
+`MissionSelectManager.cs`의 `$"&lt;{missionName}&gt;"`를 `$"<{missionName}>"`로 되돌림.
+컴파일 확인 완료(에러 0).

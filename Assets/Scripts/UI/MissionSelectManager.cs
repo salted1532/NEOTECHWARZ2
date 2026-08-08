@@ -151,10 +151,11 @@ public class MissionSelectManager : MonoBehaviour
         EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
         enterEntry.callback.AddListener(_ =>
         {
-            // &lt;/&gt; 사용 이유: 툴팁 타이틀은 리치 텍스트(TMP)라 그냥 "<"/">"를 넣으면 태그로
-            // 오인돼 사라질 수 있음 - HTML 엔티티로 escape해서 리터럴 <> 로 표시한다.
+            // &lt;/&gt;는 이 프로젝트의 TMP 설정에서 디코딩되지 않고 글자 그대로 찍혀서(doc/0490
+            // 확인) 리터럴 "<"/">"로 되돌림 - "Boot Camp>" 같은 유효하지 않은 태그는 TMP가 그냥
+            // 일반 텍스트로 그려주므로 실제로는 이스케이프 없이도 안전하다.
             string missionName = LocalizationManager.GetTextOrFallback($"missionselect.name.{entry.missionNumber}", entry.missionName);
-            TooltipUI.Instance?.Show(rect, $"&lt;{missionName}&gt;", LocalizationManager.GetText("missionselect.tooltip.subtitle", entry.missionNumber));
+            TooltipUI.Instance?.Show(rect, $"<{missionName}>", LocalizationManager.GetText("missionselect.tooltip.subtitle", entry.missionNumber));
         });
         trigger.triggers.Add(enterEntry);
 
