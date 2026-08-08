@@ -328,6 +328,13 @@ public class UnitController : MonoBehaviour, IDestructible
             : rtsController.GetUnitData(unitID);
         ApplyUnitData(unitData);
 
+        // ApplyUnitData 자체는 이름을 안 건드린다(스탯만) - Info Panel 이름은 RTSUnitController가
+        // heroName(있으면) 아니면 GetUnitName(unitID)(NTA 테이블)로 별도 조회한다. enemyDataUnitID
+        // 경로는 unitID가 0이라 그 조회가 항상 빈 문자열이 되므로, heroName이 비어있으면 OC 데이터의
+        // 이름으로 자동 채워준다(doc/0458 - "구조 가능한 OC 유닛"이 이름 없이 뜨는 것 방지).
+        if (enemyDataUnitID > 0 && string.IsNullOrEmpty(heroName) && unitData != null)
+            heroName = unitData.unitName;
+
         // 생산 큐를 거치지 않은 유닛(씬에 미리 배치된 시작 유닛 등)만 여기서 인구수를 반영한다.
         // 생산 큐를 거친 유닛은 이미 큐잉 시점(TryProduceUnit)에 인구수가 소모됐으므로 건너뛴다.
         if (!spawnedByProduction)
@@ -1969,6 +1976,7 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public Sprite GetIcon() => icon;
     public int GetUnitID() => unitID;
+    public int GetEnemyDataUnitID() => enemyDataUnitID;
     public string GetHeroName() => heroName;
 
     // 구조 완료 시 Stage3Objectives 등이 호출한다 (doc/0458) - 명령 억제를 풀고, 선택 마커를

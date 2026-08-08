@@ -55,9 +55,14 @@ public class Stage3Objectives : MonoBehaviour
             StageManager.Instance?.ReportVictory();
     }
 
+    // 수평 거리(XZ)만 본다 - 공중 유닛은 항상 airCruiseAltitude(기본 5)만큼 떠 있어서, Y축까지 포함한
+    // 3D 거리로 재면 비콘 바로 위까지 가도 rescueRadius(기본 2)를 절대 못 만족한다(doc/0459 후속 -
+    // 실제로 공중 유닛이 인식 안 되는 문제로 발견됨).
     private bool IsAnyUnitWithinRadius(Vector3 position, float radius)
     {
         float radiusSqr = radius * radius;
+        Vector2 flatPosition = new Vector2(position.x, position.z);
+
         foreach (UnitController unit in rtsController.UnitList)
         {
             // 구조 대상 유닛 자기 자신은 제외한다 - 처음부터 비콘 근처에 배치돼 있어서 그것만으로
@@ -66,7 +71,10 @@ public class Stage3Objectives : MonoBehaviour
             if (unit == null || rescuedUnits.Contains(unit))
                 continue;
 
-            if ((unit.transform.position - position).sqrMagnitude <= radiusSqr)
+            Vector3 unitPos = unit.transform.position;
+            Vector2 flatUnitPos = new Vector2(unitPos.x, unitPos.z);
+
+            if ((flatUnitPos - flatPosition).sqrMagnitude <= radiusSqr)
                 return true;
         }
         return false;

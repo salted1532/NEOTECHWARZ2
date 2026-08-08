@@ -30,6 +30,13 @@ public class UnitAudio : MonoBehaviour
             ? rtsController.GetUnitData(unitController.GetUnitID())
             : (enemyUnitController != null ? rtsController.GetEnemyUnitData(enemyUnitController.GetEnemyUnitID()) : null);
 
+        // "구조 가능한 OC 유닛"(enemyDataUnitID로 스탯을 가져오는 UnitController, doc/0458)은 unitID가
+        // 0이라 위 조회가 항상 실패한다. OC 로스터는 NTA와 완전히 동일한 번호로 재스킨된 구조라서(doc/0441),
+        // OC 쪽에 사운드뱅크가 없으면 enemyDataUnitID를 그대로 NTA unitID로 다시 조회해서 사운드뱅크만
+        // 대신 가져온다(스탯은 이미 ApplyUnitData에서 OC 값으로 적용됐으므로 안 건드림).
+        if (data?.soundBank == null && unitController != null && unitController.GetEnemyDataUnitID() > 0)
+            data = rtsController.GetUnitData(unitController.GetEnemyDataUnitID());
+
         bank = data?.soundBank;
     }
 
