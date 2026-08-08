@@ -3105,6 +3105,10 @@ MonoBehaviour:
   backToMainMenuButton: {fileID: 26228417}
   mainMenuSceneName: MainScene
   unlockAllMissionButton: {fileID: 1297760229}
+  cursorTexture: {fileID: 2800000, guid: 9c2d77e276d94de40bbf9f244dce00b8, type: 3}
+  cursorHoverTexture: {fileID: 2800000, guid: a4bfefaaa0a9380408d8bd5ddda6c7c1, type: 3}
+  cursorHotspot: {x: 0, y: 0}
+  uiCamera: {fileID: 0}
 --- !u!4 &1903440105
 Transform:
   m_ObjectHideFlags: 0
