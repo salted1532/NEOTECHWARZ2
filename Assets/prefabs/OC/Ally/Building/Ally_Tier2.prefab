@@ -58,10 +58,51 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7636683964052424660, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: AllyOC
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3566054540396190834, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7636683964052424660, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2479383657235851985}
   m_SourcePrefab: {fileID: 100100000, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
+--- !u!212 &1534722765769815235 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 2204765114495745439, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
+  m_PrefabInstance: {fileID: 852455805287074140}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7074727937808748168 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7636683964052424660, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
+  m_PrefabInstance: {fileID: 852455805287074140}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2479383657235851985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7074727937808748168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b397bf5936319340946459d85206354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AllyBuildingController
+  buildingMarker: {fileID: 7968846018706900592}
+  buildingName: 
+  icon: {fileID: 21300000, guid: 0807f6fe106d72e4a97f1751f3d7ff1d, type: 3}
+  minimapIcon: {fileID: 1534722765769815235}
+  flashInterval: 0.3
+  flashCount: 3
+  enemyBuildingID: 4
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+--- !u!1 &7968846018706900592 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7296833267826986796, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
+  m_PrefabInstance: {fileID: 852455805287074140}
+  m_PrefabAsset: {fileID: 0}

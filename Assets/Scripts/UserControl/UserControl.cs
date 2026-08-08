@@ -403,11 +403,12 @@ public class UserControl : MonoBehaviour
         }
 
         // 2.5. 아군 OC 클릭 = 선택(중립 취급) 또는 강제 공격 (A 모드 중이면 강제로 공격, 아니면 선택)
-        // EnemyUnitController/EnemyBuildingController를 그대로 재사용하되, Tag가 "Enemy"가 아니라서
-        // AttackRange의 자동교전 대상에서는 빠지고 이 전용 레이어를 통한 명시적 클릭에만 반응한다(doc/0447).
+        // 유닛은 AllyController(EnemyUnitController와 독립된 전용 클래스, doc/0452), 건물은
+        // EnemyBuildingController를 그대로 재사용한다(AllyBuildingController가 상속) - Tag가 "Enemy"가
+        // 아니라서 AttackRange의 자동교전 대상에서는 빠지고 이 전용 레이어를 통한 명시적 클릭에만 반응한다(doc/0447).
         if (clickedAllyOC)
         {
-            EnemyUnitController allyUnit = allyOcHit.transform.GetComponent<EnemyUnitController>();
+            AllyController allyUnit = allyOcHit.transform.GetComponent<AllyController>();
 
             if (allyUnit != null)
             {
@@ -423,7 +424,7 @@ public class UserControl : MonoBehaviour
                     return;
                 }
 
-                pendingLeftClickSelect = () => { if (allyUnit != null) rtsUnitController.ClickSelectEnemy(allyUnit); };
+                pendingLeftClickSelect = () => { if (allyUnit != null) rtsUnitController.ClickSelectAlly(allyUnit); };
 
                 return; // 👉 중요: 여기서 종료 (명령 안 함)
             }

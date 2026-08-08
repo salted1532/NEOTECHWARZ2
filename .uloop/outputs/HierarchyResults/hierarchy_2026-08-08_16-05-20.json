@@ -1,0 +1,3304 @@
+{
+  "ExportTimestamp": "2026-08-08 16:05:20",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "TestScene",
+    "nodeCount": 246,
+    "maxDepth": 1
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "TestScene",
+      "stats": {
+        "rootCount": 27,
+        "nodeCount": 246,
+        "maxDepth": 1
+      },
+      "componentsLut": [
+        "Transform",
+        "Camera",
+        "AudioListener",
+        "UniversalAdditionalCameraData",
+        "CameraControl",
+        "RectTransform",
+        "Canvas",
+        "CanvasScaler",
+        "GraphicRaycaster",
+        "ResourceManager",
+        "RTSUnitController",
+        "UserControl",
+        "UpgradeManager",
+        "UIController",
+        "SceneMenuController",
+        "Volume",
+        "Light",
+        "UniversalAdditionalLightData",
+        "EventSystem",
+        "InputSystemUIInputModule",
+        "SoundManager",
+        "AudioSource",
+        "Stage0Objectives",
+        "VictoryPanelController",
+        "SphereCollider",
+        "CaptureSystem",
+        "FogRevealerAgent",
+        "MeshFilter",
+        "MeshRenderer",
+        "BoxCollider",
+        "NavMeshObstacle",
+        "ParticleSystem",
+        "ParticleSystemRenderer",
+        "LineRenderer",
+        "TerritoryZone",
+        "SpriteRenderer",
+        "CapsuleCollider",
+        "ResourceNode",
+        "ResourceController",
+        "LowPolyWater",
+        "NavMeshSurface",
+        "MeshCombiner",
+        "MeshCollider",
+        "NavMeshAgent",
+        "UnitController",
+        "HealthManager",
+        "UnitEffects",
+        "Rigidbody",
+        "UnitAudio",
+        "InfantryIdleLookAround",
+        "AttackRange",
+        "EnemyUnitController",
+        "EnemyAttackRange",
+        "VehicleShake",
+        "EnemyBuildingController",
+        "BuildingEffects",
+        "ResearchQueue",
+        "Animator",
+        "LaserBeamAttack",
+        "AllyController",
+        "AllyAttackRange"
+      ],
+      "roots": [
+        {
+          "name": "GameManager",
+          "isActive": true,
+          "componentsIdx": [
+            0
+          ],
+          "siblingIndex": 0,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": [
+            {
+              "name": "Main Camera",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "siblingIndex": 0,
+              "tag": "MainCamera",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Canvas",
+              "isActive": true,
+              "componentsIdx": [
+                5,
+                6,
+                7,
+                8
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            },
+            {
+              "name": "ResourceManager",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                9
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MiniMap_Camera",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                1,
+                3
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 11,
+              "children": []
+            },
+            {
+              "name": "BuildingSystem",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "RTSUnitControlSystem",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                10,
+                11,
+                12
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "UIController",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                13,
+                14
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Global Volume",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                15
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Directional Light",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                16,
+                17
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "EventSystem",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                18,
+                19
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "StartPoint",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MapYAxiz",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "SoundManager",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                20,
+                21
+              ],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "StageObject",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            22,
+            23
+          ],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Capture_Point",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            24,
+            25,
+            26
+          ],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": [
+            {
+              "name": "CaptureBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "struct_Radar_Outpost_A_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                29,
+                30
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 9,
+              "children": []
+            },
+            {
+              "name": "Capture_point GREEN",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                31,
+                32
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Capture_point RED",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                31,
+                32
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Capture_point WHITE",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                31,
+                32
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Capture_territory",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                33,
+                34
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Capture_Pointer",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Resource",
+          "isActive": true,
+          "componentsIdx": [
+            0
+          ],
+          "siblingIndex": 3,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": [
+            {
+              "name": "Gas",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Gas (1)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Ore",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Ore (1)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Ore (2)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Ore (3)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Ore (4)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Ore (5)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Ore (6)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Ore (7)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            },
+            {
+              "name": "Ore (8)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                36,
+                37,
+                38,
+                30
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 10,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Ocean",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            39
+          ],
+          "siblingIndex": 4,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Mission0",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            40
+          ],
+          "siblingIndex": 5,
+          "tag": "Untagged",
+          "layer": 7,
+          "children": [
+            {
+              "name": "layer1",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                41,
+                42
+              ],
+              "siblingIndex": 0,
+              "tag": "Layer1",
+              "layer": 7,
+              "children": []
+            },
+            {
+              "name": "layer2",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                41,
+                42
+              ],
+              "siblingIndex": 1,
+              "tag": "Layer2",
+              "layer": 7,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Assault Trooper",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            43,
+            44,
+            45,
+            46,
+            47,
+            26,
+            48,
+            49
+          ],
+          "siblingIndex": 6,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DeathPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                50
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Cube",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Assault Trooper (1)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            43,
+            44,
+            45,
+            46,
+            47,
+            26,
+            48,
+            49
+          ],
+          "siblingIndex": 7,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DeathPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                50
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Cube",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Worker Drone",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            43,
+            44,
+            45,
+            46,
+            47,
+            26,
+            48
+          ],
+          "siblingIndex": 8,
+          "tag": "Worker",
+          "layer": 6,
+          "children": [
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                50
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Cube",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (2)",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (1)",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Ore",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Gas",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "unit_Grav_Light_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DeathPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Worker Drone (1)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            43,
+            44,
+            45,
+            46,
+            47,
+            26,
+            48
+          ],
+          "siblingIndex": 9,
+          "tag": "Worker",
+          "layer": 6,
+          "children": [
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                50
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Cube",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (2)",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (1)",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Ore",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Gas",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "unit_Grav_Light_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DeathPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Worker Drone (2)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            43,
+            44,
+            45,
+            46,
+            47,
+            26,
+            48
+          ],
+          "siblingIndex": 10,
+          "tag": "Worker",
+          "layer": 6,
+          "children": [
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                50
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Cube",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (2)",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (1)",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Ore",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Gas",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "unit_Grav_Light_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DeathPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Worker Drone (3)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            43,
+            44,
+            45,
+            46,
+            47,
+            26,
+            48
+          ],
+          "siblingIndex": 11,
+          "tag": "Worker",
+          "layer": 6,
+          "children": [
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                50
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Cube",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (2)",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (1)",
+              "isActive": false,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Ore",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Gas",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "unit_Grav_Light_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DeathPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Cyborg Soldier ",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            51,
+            45,
+            46,
+            48
+          ],
+          "siblingIndex": 12,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                52
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Cyborg Soldier  (1)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            51,
+            45,
+            46,
+            48
+          ],
+          "siblingIndex": 13,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                52
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Cyborg Soldier  (2)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            51,
+            45,
+            46,
+            48
+          ],
+          "siblingIndex": 14,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                52
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Cyborg Soldier  (3)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            51,
+            45,
+            46,
+            48
+          ],
+          "siblingIndex": 15,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                52
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Striker",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            51,
+            45,
+            46,
+            48
+          ],
+          "siblingIndex": 16,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos (1)",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                52
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "unit_Trike_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28,
+                53
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Bio_Reactor",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            29,
+            54,
+            30,
+            45,
+            55,
+            56
+          ],
+          "siblingIndex": 17,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "TakeOffPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "LandingPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DestroyPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 9,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Bio-Reactor",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                57
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Hive_Core",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            29,
+            54,
+            30,
+            45,
+            55
+          ],
+          "siblingIndex": 18,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "TakeOffPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "LandingPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DestroyPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 9,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Hive Core",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                57
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Spawning Pit",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            29,
+            54,
+            30,
+            45,
+            55
+          ],
+          "siblingIndex": 19,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "TakeOffPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "LandingPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DestroyPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 9,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Spawning_Pit",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                57
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Raven",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            51,
+            45,
+            46,
+            58,
+            48
+          ],
+          "siblingIndex": 20,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "Body",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 1,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AirUnitMarker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                52
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Spitter",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            51,
+            45,
+            46,
+            48
+          ],
+          "siblingIndex": 21,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                52
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Body",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Ripfang",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            51,
+            45,
+            46,
+            48
+          ],
+          "siblingIndex": 22,
+          "tag": "Enemy",
+          "layer": 8,
+          "children": [
+            {
+              "name": "Body",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 1,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                52
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Cyborg Soldier (Ally)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            45,
+            46,
+            48,
+            59
+          ],
+          "siblingIndex": 23,
+          "tag": "AllyOC",
+          "layer": 13,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                60
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Cyborg Soldier (Ally) (1)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            45,
+            46,
+            48,
+            59
+          ],
+          "siblingIndex": 24,
+          "tag": "AllyOC",
+          "layer": 13,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                60
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Cyborg Soldier (Ally) (2)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            45,
+            46,
+            48,
+            59
+          ],
+          "siblingIndex": 25,
+          "tag": "AllyOC",
+          "layer": 13,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                60
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Cyborg Soldier (Ally) (3)",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            27,
+            28,
+            36,
+            47,
+            43,
+            45,
+            46,
+            48,
+            59
+          ],
+          "siblingIndex": 26,
+          "tag": "AllyOC",
+          "layer": 13,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                35
+              ],
+              "siblingIndex": 0,
+              "tag": "Enemy",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "unit_Infantry_Special_B_yup",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Deathpos",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 8,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                36,
+                60
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "componentsIdx": [
+                0
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                27,
+                28
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

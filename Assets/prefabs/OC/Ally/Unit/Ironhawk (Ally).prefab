@@ -58,17 +58,74 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4698038001367890631, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: AllyOC
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 543167732550466395, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
+    - {fileID: -1181422328391644967, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4698038001367890631, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3145907369802178537}
     - targetCorrespondingSourceObject: {fileID: 670878647040245498, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5036394308503503783}
   m_SourcePrefab: {fileID: 100100000, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
+--- !u!1 &179268000197020448 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5286784239653861491, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
+  m_PrefabInstance: {fileID: 5414044779361416019}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &725156099865741716 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4698038001367890631, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
+  m_PrefabInstance: {fileID: 5414044779361416019}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3145907369802178537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 725156099865741716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a751db2b55632140ba17f1c4702241b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AllyController
+  enemyMarker: {fileID: 179268000197020448}
+  icon: {fileID: 21300000, guid: 04b3f4d7f72d40a48b0eff1ac5006315, type: 3}
+  minimapIcon: {fileID: 903747470300327165}
+  minimapFogVisibilityMargin: 1
+  enemyName: Ironhawk
+  enemyUnitID: 7
+  attackDamage: 16
+  armor: 1
+  attackType: 1
+  armorType: 1
+  sizeType: 1
+  canAttackGround: 0
+  canAttackAir: 1
+  attackDelivery: 0
+  bonusVersusArmorType: 0
+  bonusVersusArmorPercent: 0
+  flashInterval: 0.3
+  flashCount: 3
+  isAirUnit: 0
+  moveSpeed: 10
+  arriveDistance: 0.5
+  airCruiseAltitude: 5
+  airGroundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  timeBetweenAttacks: 1
+--- !u!212 &903747470300327165 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 5163461100620849070, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
+  m_PrefabInstance: {fileID: 5414044779361416019}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &4786760814883196329 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 670878647040245498, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}

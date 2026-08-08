@@ -58,10 +58,51 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7636683964052424660, guid: c01369b9700ce5d4c82dbe7ad016855e, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: AllyOC
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4727112927152655131, guid: c01369b9700ce5d4c82dbe7ad016855e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7636683964052424660, guid: c01369b9700ce5d4c82dbe7ad016855e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5148240189611835598}
   m_SourcePrefab: {fileID: 100100000, guid: c01369b9700ce5d4c82dbe7ad016855e, type: 3}
+--- !u!1 &3688949504926234534 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7296833267826986796, guid: c01369b9700ce5d4c82dbe7ad016855e, type: 3}
+  m_PrefabInstance: {fileID: 6229119530810980490}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4578107686984089438 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7636683964052424660, guid: c01369b9700ce5d4c82dbe7ad016855e, type: 3}
+  m_PrefabInstance: {fileID: 6229119530810980490}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5148240189611835598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4578107686984089438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b397bf5936319340946459d85206354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AllyBuildingController
+  buildingMarker: {fileID: 3688949504926234534}
+  buildingName: 
+  icon: {fileID: 21300000, guid: dd15a21c5d9100640bb815f22be622a6, type: 3}
+  minimapIcon: {fileID: 6054048608436277245}
+  flashInterval: 0.3
+  flashCount: 3
+  enemyBuildingID: 5
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+--- !u!212 &6054048608436277245 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 177340333383055223, guid: c01369b9700ce5d4c82dbe7ad016855e, type: 3}
+  m_PrefabInstance: {fileID: 6229119530810980490}
+  m_PrefabAsset: {fileID: 0}

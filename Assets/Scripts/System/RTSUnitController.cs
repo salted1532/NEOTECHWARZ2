@@ -13,6 +13,10 @@ public class RTSUnitController : MonoBehaviour
     public List<BuildingController> selectedBuildingList;
     public List<EnemyUnitController> selectedEnemyList;
     public EnemyBuildingController selectedEnemyBuilding; // 적 건물도 항상 단일 선택 (doc/0244)
+    // 아군 OC 유닛 선택 목록 - AllyController가 EnemyUnitController를 상속하지 않는 완전 독립 클래스라서
+    // (doc/0452) selectedEnemyList와 별개로 둔다. 아군 OC 건물(AllyBuildingController)은 EnemyBuildingController를
+    // 그대로 상속하므로 selectedEnemyBuilding을 그대로 다형성으로 재사용 - 별도 목록 불필요.
+    public List<AllyController> selectedAllyList;
     public ResourceNode selectedResourceNode; // 광물/가스는 항상 단일 선택
     public BaseStructure selectedBaseStructure; // 건설 중인 건물 기반도 항상 단일 선택
 
@@ -87,7 +91,8 @@ public class RTSUnitController : MonoBehaviour
         EnemyBuildingSelect,
         OreSelect,
         BaseStructureSelect,
-        BuildMode
+        BuildMode,
+        AllySelect // 아군 OC 유닛 선택 (doc/0452)
     }
 
     public enum UnitState
@@ -143,6 +148,7 @@ public class RTSUnitController : MonoBehaviour
         selectedUnitList = new List<UnitController>();
         selectedBuildingList = new List<BuildingController>();
         selectedEnemyList = new List<EnemyUnitController>();
+        selectedAllyList = new List<AllyController>();
         UnitList = new List<UnitController>();
         BuildingList = new List<BuildingController>();
         ResourceNodeList = new List<ResourceNode>();
@@ -473,8 +479,10 @@ public class RTSUnitController : MonoBehaviour
     /// AttackRange(자동/지정 추격 공용 트리거)가 감지하지 못하므로, AttackSelectedUnits(orderedTarget
     /// 경로)가 아니라 AttackFriendlyTarget(거리 상관없이 파괴될 때까지 계속 추격/공격, Tag와 무관하게
     /// 직접 거리 판정)을 재사용한다 - 플레이어 자신의 유닛/건물을 강제공격할 때와 동일한 경로.
+    /// target 타입은 AllyController(doc/0452, EnemyUnitController와 독립) - AttackFriendlyTarget이
+    /// MonoBehaviour를 받으므로 아래 로직은 변경 없음.
     /// </summary>
-    public void AttackAllyUnitSelectedUnits(EnemyUnitController target)
+    public void AttackAllyUnitSelectedUnits(AllyController target)
     {
         for (int i = 0; i < selectedUnitList.Count; ++i)
         {
@@ -761,6 +769,42 @@ public class RTSUnitController : MonoBehaviour
 
     #endregion
 
+    #region Ally선택 관련 (doc/0452 - AllyController가 EnemyUnitController와 독립된 타입이라 병행 구현)
+
+    /// <summary>
+    /// 좌클릭 선택 처리 (아군 OC도 항상 단일 선택 - ClickSelectEnemy와 동일한 패턴)
+    /// </summary>
+    public void ClickSelectAlly(AllyController ally)
+    {
+        DeselectAll();
+        SelectAlly(ally);
+    }
+
+    private void SelectAlly(AllyController ally)
+    {
+        if (IsBuildMode())
+            return;
+
+        RTScurrentSate = SelectState.AllySelect;
+
+        ally.SelectAlly();
+        selectedAllyList.Add(ally);
+    }
+
+    // 안개에 가려지는 등, 외부 이벤트로 특정 아군 OC 유닛의 선택을 해제해야 할 때 호출한다
+    // (ClearSelectedEnemyIfMatches와 동일한 패턴, doc/0360).
+    public void ClearSelectedAllyIfMatches(AllyController ally)
+    {
+        if (!selectedAllyList.Contains(ally))
+            return;
+
+        ally.DeselectAlly();
+        selectedAllyList.Remove(ally);
+        RTScurrentSate = SelectState.None;
+    }
+
+    #endregion
+
     #region EnemyBuilding선택 관련
 
     /// <summary>
@@ -889,6 +933,11 @@ public class RTSUnitController : MonoBehaviour
             enemy.DeselectEnemy();
         }
 
+        foreach (AllyController ally in selectedAllyList)
+        {
+            ally.DeselectAlly();
+        }
+
         selectedEnemyBuilding?.DeselectEnemyBuilding();
         selectedResourceNode?.DeselectResource();
         selectedBaseStructure?.DeselectStructure();
@@ -897,6 +946,7 @@ public class RTSUnitController : MonoBehaviour
         selectedUnitList.Clear();
         selectedBuildingList.Clear();
         selectedEnemyList.Clear();
+        selectedAllyList.Clear();
         selectedEnemyBuilding = null;
         selectedResourceNode = null;
         selectedBaseStructure = null;
@@ -1898,6 +1948,24 @@ public class RTSUnitController : MonoBehaviour
                     EnemyUnitController enemy = selectedEnemyList[0];
                     uIController.ShowInfoPanel(enemy.GetIcon(), enemy.GetEnemyName(), enemy.GetHealthManager(), enemy.GetAttackDamage(), enemy.GetArmor(),
                         enemy.GetAttackType(), enemy.GetArmorType(), enemy.GetSizeType(), enemy.GetShotCount());
+                }
+                else
+                {
+                    uIController.HideInfoPanel();
+                }
+
+                uIController.ClearPanel();
+                uIController.HideProductionUI();
+                uIController.HideSquadPanel();
+                break;
+
+            case SelectState.AllySelect: // 아군 OC 유닛 Info Panel (doc/0452, EnemySelect와 동일한 패턴)
+
+                if (selectedAllyList.Count > 0)
+                {
+                    AllyController ally = selectedAllyList[0];
+                    uIController.ShowInfoPanel(ally.GetIcon(), ally.GetAllyName(), ally.GetHealthManager(), ally.GetAttackDamage(), ally.GetArmor(),
+                        ally.GetAttackType(), ally.GetArmorType(), ally.GetSizeType(), ally.GetShotCount());
                 }
                 else
                 {

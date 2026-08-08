@@ -58,17 +58,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4698038001367890631, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: AllyOC
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 543167732550466395, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
+    - {fileID: -1181422328391644967, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4698038001367890631, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 499939195804968121}
     - targetCorrespondingSourceObject: {fileID: 670878647040245498, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 74675349202399195}
   m_SourcePrefab: {fileID: 100100000, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
+--- !u!212 &539149291168416352 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3533016565306346057, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
+  m_PrefabInstance: {fileID: 3926218259771721769}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &4554205920147732179 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 670878647040245498, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
@@ -89,3 +98,51 @@ MonoBehaviour:
   UnitRange: 20
   targetTags:
   - Enemy
+--- !u!1 &8596934217383359214 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4698038001367890631, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
+  m_PrefabInstance: {fileID: 3926218259771721769}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &499939195804968121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8596934217383359214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a751db2b55632140ba17f1c4702241b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AllyController
+  enemyMarker: {fileID: 9161118744731922522}
+  icon: {fileID: 21300000, guid: 2cf1e1b8455dc8346b3135d7ea2df0cd, type: 3}
+  minimapIcon: {fileID: 539149291168416352}
+  minimapFogVisibilityMargin: 1
+  enemyName: Heavy Assault Tank
+  enemyUnitID: 6
+  attackDamage: 20
+  armor: 1
+  attackType: 1
+  armorType: 1
+  sizeType: 2
+  canAttackGround: 1
+  canAttackAir: 0
+  attackDelivery: 0
+  bonusVersusArmorType: 0
+  bonusVersusArmorPercent: 0
+  flashInterval: 0.3
+  flashCount: 3
+  isAirUnit: 0
+  moveSpeed: 10
+  arriveDistance: 0.5
+  airCruiseAltitude: 5
+  airGroundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  timeBetweenAttacks: 1.5
+--- !u!1 &9161118744731922522 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5286784239653861491, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
+  m_PrefabInstance: {fileID: 3926218259771721769}
+  m_PrefabAsset: {fileID: 0}

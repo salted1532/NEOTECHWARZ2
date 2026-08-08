@@ -510,7 +510,7 @@ public class UnitController : MonoBehaviour, IDestructible
     }
 
     // friendlyTarget(아군 강제공격 대상)은 UnitController/BuildingController 외에 아군 OC 유닛
-    // (EnemyUnitController, doc/0450)도 될 수 있어서, 실제로 지금 공중에 떠 있는 상태인지 타입별로
+    // (AllyController, doc/0450/0452)도 될 수 있어서, 실제로 지금 공중에 떠 있는 상태인지 타입별로
     // 확인해야 AirTargetPosition에 정확히 알려줄 수 있다.
     private static bool IsAirborne(MonoBehaviour target)
     {
@@ -518,8 +518,8 @@ public class UnitController : MonoBehaviour, IDestructible
             return unit.isAirUnit;
         if (target is BuildingController building)
             return building.IsLifted();
-        if (target is EnemyUnitController enemyUnit)
-            return enemyUnit.IsAirUnit();
+        if (target is AllyController allyUnit) // 아군 OC 강제공격 대상(doc/0450) - 더 이상 EnemyUnitController가 아님(doc/0452)
+            return allyUnit.IsAirUnit();
         return false;
     }
 
@@ -1184,12 +1184,13 @@ public class UnitController : MonoBehaviour, IDestructible
         if (alreadyAttacked)
             return;
 
-        // 대상 종류(아군 유닛 / 적 유닛)를 한 번만 조회해서, 아래 도메인 판정/데미지 계산 전체가 이 결과를 공유한다
+        // 대상 종류(아군 유닛 / 적 유닛 / 아군 OC)를 한 번만 조회해서, 아래 도메인 판정/데미지 계산 전체가 이 결과를 공유한다
         // (예전엔 IsTargetAirborne/GetTargetArmor/GetTargetSizeType/GetTargetArmorType이 각자 다시 조회했음).
         enemy.TryGetComponent<UnitController>(out var targetFriendlyUnit);
         enemy.TryGetComponent<EnemyUnitController>(out var targetEnemyUnit);
+        enemy.TryGetComponent<AllyController>(out var targetAllyUnit); // 아군 OC 강제공격(doc/0450) 대상 스탯 조회용 (doc/0452)
 
-        bool targetIsAir = IsTargetAirborne(enemy, targetFriendlyUnit, targetEnemyUnit);
+        bool targetIsAir = IsTargetAirborne(enemy, targetFriendlyUnit, targetEnemyUnit, targetAllyUnit);
         if (!CanAttackDomain(targetIsAir))
         {
             // 쿨다운(alreadyAttacked)은 건드리지 않는다 - 대상이 다시 공격 가능한 도메인으로 돌아오면(예: 건물 착륙)
@@ -1200,8 +1201,8 @@ public class UnitController : MonoBehaviour, IDestructible
 
         if (enemy.TryGetComponent<HealthManager>(out var targetHealth))
         {
-            int targetArmor = GetTargetArmor(targetFriendlyUnit, targetEnemyUnit);
-            int finalDamage = CalculateFinalDamage(targetFriendlyUnit, targetEnemyUnit, targetArmor);
+            int targetArmor = GetTargetArmor(targetFriendlyUnit, targetEnemyUnit, targetAllyUnit);
+            int finalDamage = CalculateFinalDamage(targetFriendlyUnit, targetEnemyUnit, targetAllyUnit, targetArmor);
 
             // Projectile이면 즉시 데미지를 넣지 않고 투사체가 명중했을 때 처음 적용한다 (doc/0290).
             // ProjectileAttack이 안 붙어있으면(설정 실수) 데미지가 아예 안 들어가는 사고를 막기 위해 Hitscan으로 폴백.
@@ -1228,10 +1229,10 @@ public class UnitController : MonoBehaviour, IDestructible
 
     // 공격방식×대상크기 배율(DamageMultiplierTableSO)과 이 유닛의 고유 장갑타입 보너스를 곱연산으로 적용한 뒤,
     // 대상의 고정 방어력을 감산해 최종 데미지를 계산한다. 최소 1은 항상 보장.
-    private int CalculateFinalDamage(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit, int targetArmor)
+    private int CalculateFinalDamage(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit, AllyController targetAllyUnit, int targetArmor)
     {
-        SizeType targetSize = GetTargetSizeType(targetFriendlyUnit, targetEnemyUnit);
-        ArmorType targetArmorType = GetTargetArmorType(targetFriendlyUnit, targetEnemyUnit);
+        SizeType targetSize = GetTargetSizeType(targetFriendlyUnit, targetEnemyUnit, targetAllyUnit);
+        ArmorType targetArmorType = GetTargetArmorType(targetFriendlyUnit, targetEnemyUnit, targetAllyUnit);
 
         DamageMultiplierTableSO table = rtsController != null ? rtsController.DamageMultiplierTable : null;
         float sizeMultiplier = table != null ? table.GetMultiplier(attackType, targetSize) : 1f;
@@ -1244,8 +1245,9 @@ public class UnitController : MonoBehaviour, IDestructible
         return Mathf.Max(1, scaledAttack - targetArmor);
     }
 
-    // 공격 대상의 방어력을 조회한다 (아군 유닛이면 연구 보너스가 반영된 GetArmor(), 적 유닛이면 EnemyUnitController의 armor, 그 외(건물/자원)는 0).
-    private int GetTargetArmor(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit)
+    // 공격 대상의 방어력을 조회한다 (아군 유닛이면 연구 보너스가 반영된 GetArmor(), 적 유닛/아군 OC(doc/0452)면 각자의
+    // armor, 그 외(건물/자원)는 0).
+    private int GetTargetArmor(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit, AllyController targetAllyUnit)
     {
         if (targetFriendlyUnit != null)
             return targetFriendlyUnit.GetArmor();
@@ -1253,11 +1255,14 @@ public class UnitController : MonoBehaviour, IDestructible
         if (targetEnemyUnit != null)
             return targetEnemyUnit.GetArmor();
 
+        if (targetAllyUnit != null)
+            return targetAllyUnit.GetArmor();
+
         return 0;
     }
 
     // 공격 대상의 크기 타입을 조회한다 (건물/자원 등 타입 정보가 없는 대상은 Medium → 배율 100%로 영향 없음).
-    private SizeType GetTargetSizeType(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit)
+    private SizeType GetTargetSizeType(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit, AllyController targetAllyUnit)
     {
         if (targetFriendlyUnit != null)
             return targetFriendlyUnit.GetSizeType();
@@ -1265,11 +1270,14 @@ public class UnitController : MonoBehaviour, IDestructible
         if (targetEnemyUnit != null)
             return targetEnemyUnit.GetSizeType();
 
+        if (targetAllyUnit != null)
+            return targetAllyUnit.GetSizeType();
+
         return SizeType.Medium;
     }
 
     // 공격 대상의 장갑 타입을 조회한다 (건물/자원 등은 고유 보너스가 적용될 일이 없으므로 Light를 기본값으로 반환).
-    private ArmorType GetTargetArmorType(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit)
+    private ArmorType GetTargetArmorType(UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit, AllyController targetAllyUnit)
     {
         if (targetFriendlyUnit != null)
             return targetFriendlyUnit.GetArmorType();
@@ -1277,19 +1285,25 @@ public class UnitController : MonoBehaviour, IDestructible
         if (targetEnemyUnit != null)
             return targetEnemyUnit.GetArmorType();
 
+        if (targetAllyUnit != null)
+            return targetAllyUnit.GetArmorType();
+
         return ArmorType.Light;
     }
 
     // 공격 대상이 "지금" 공중 상태인지 조회한다. 건물은 이/착륙으로 실시간 바뀔 수 있어(BuildingController.IsLifted)
     // 매 공격 사이클마다 다시 확인해야 한다 - 명령을 내린 시점에 캐싱해둔 값을 계속 쓰면 안 된다.
-    // EnemyUnitController도 이제 isAirUnit 개념이 있어(doc/0231) 그 값을 그대로 물어본다.
-    private bool IsTargetAirborne(GameObject target, UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit)
+    // EnemyUnitController/AllyController(doc/0452)도 이제 isAirUnit 개념이 있어(doc/0231) 그 값을 그대로 물어본다.
+    private bool IsTargetAirborne(GameObject target, UnitController targetFriendlyUnit, EnemyUnitController targetEnemyUnit, AllyController targetAllyUnit)
     {
         if (targetFriendlyUnit != null)
             return targetFriendlyUnit.IsAirUnit();
 
         if (targetEnemyUnit != null)
             return targetEnemyUnit.IsAirUnit();
+
+        if (targetAllyUnit != null)
+            return targetAllyUnit.IsAirUnit();
 
         if (target.TryGetComponent<BuildingController>(out var building))
             return building.IsLifted();
@@ -1901,7 +1915,10 @@ public class UnitController : MonoBehaviour, IDestructible
     // ======================
     public bool IsIdle() => UnitcurrentState == UnitState.Idle;
     public bool IsMove() => UnitcurrentState == UnitState.Move;
-    public bool IsAttack() => UnitcurrentState == UnitState.Attack;
+    // 자동교전(AttackMoveTo/FollowUnit/FollowBuilding/패시브 대기 중 사거리 내 적 발견)은 UnitcurrentState를
+    // 계속 Idle로 유지하므로(각 명령 지점 주석 참고), 상태값만으로는 "실제로 쏘는 중"을 놓친다 - AttackRange의
+    // 실시간 교전 여부도 함께 확인해야 두리번 애니메이션 등이 전투 중을 정확히 인식한다 (doc/0451).
+    public bool IsAttack() => UnitcurrentState == UnitState.Attack || (attackRange != null && attackRange.HasEnemyInRange);
     public bool IsAirUnit() => isAirUnit; // HoverBob 등 외부 이펙트 컴포넌트가 폴링용으로 사용(doc/0119)
 
     // 이동 이펙트(UnitEffects)가 상태머신을 직접 건드리지 않고 매 프레임 폴링으로 이동 여부를 판단할 수 있도록 노출.

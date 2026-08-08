@@ -7,7 +7,7 @@ using FischlWorks_FogWar;
 // 이동/전투 AI까지 합쳐서 이름을 바꿨다 (doc/0231) - 플레이어의 UnitController에 대응하는 적 진영 버전이지만
 // 기능은 훨씬 단순하다: 자동 교전(사거리 내 감지), 이동, 공격-이동 세 가지만 지원한다
 // (지정 대상 강제 추격, 건설/채집, 특성 스킬, 포탑/레이저 연동 등은 없음 - 필요해지면 그때 추가).
-public class EnemyUnitController : MonoBehaviour, IDestructible
+public class EnemyUnitController : MonoBehaviour, IDestructible, IAttackRangeUnit
 {
     [SerializeField]
     private GameObject enemyMarker;

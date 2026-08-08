@@ -1,6 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// EnemyAttackRange가 부모 유닛에게 요구하는 상태 조회/명령 계약. EnemyUnitController(적)와
+// AllyController(아군 OC, doc/0452 - EnemyUnitController를 상속하지 않는 완전 독립 클래스)가 각자
+// 구현해서, 하나의 EnemyAttackRange/AllyAttackRange 감지 로직을 서로 다른(비상속) 두 컨트롤러 타입에
+// 모두 재사용할 수 있게 한다.
+public interface IAttackRangeUnit
+{
+    bool IsAttack();
+    bool IsIdle();
+    void Attack(Vector3 end, GameObject target);
+    bool ChaseTarget(Vector3 pos);
+    bool CanAttackDomain(bool targetIsAirUnit);
+}
+
 // 적 유닛(EnemyUnitController)의 자식 오브젝트(트리거 콜라이더)에 부착되어 사거리 내 상대 감지 및
 // 자동 공격/추격을 담당한다. 플레이어 쪽 AttackRange.cs를 반대 방향(플레이어 유닛/건물을 감지)으로 뒤집은
 // 축소판 - 지정 대상 강제 추격 개념은 없고, 항상 "사거리 안의 가장 가까운 대상"만 본다 (doc/0231).
@@ -26,15 +39,17 @@ public class EnemyAttackRange : MonoBehaviour
     // 반복하지 않는다 - 그래야 다른(도달 가능한) 대상이 있으면 그쪽으로 넘어간다 (doc/0398).
     private GameObject unreachableTarget;
 
-    private EnemyUnitController enemyUnit;
+    // EnemyUnitController 또는 AllyController(doc/0452, 서로 비상속) - IAttackRangeUnit 계약으로 통일해서 다룬다.
+    private IAttackRangeUnit enemyUnit;
     private CapsuleCollider detectionCollider;
 
-    // 감지 대상 Tag 목록 - 기본값은 플레이어 진영(Worker/AttackUnit/MainBase/Tier1~3/SupplyDepot/Lab).
-    // protected 인스턴스 필드라서 하위 클래스가 기본값을 바꿀 수 있다 - AllyAttackRange(doc/0448)가
-    // 이걸 ["Enemy"]로 바꿔서 플레이어 대신 외계종족을 자동교전 대상으로 삼는 용도로 상속해서 쓴다.
+    // 감지 대상 Tag 목록 - 기본값은 플레이어 진영(Worker/AttackUnit/MainBase/Tier1~3/SupplyDepot/Lab) +
+    // 아군 OC("AllyOC" Tag, doc/0452 - 적이 아군 OC도 자동교전 대상으로 삼는다). protected 인스턴스
+    // 필드라서 하위 클래스가 기본값을 바꿀 수 있다 - AllyAttackRange(doc/0448)가 이걸 ["Enemy"]로 바꿔서
+    // 플레이어/아군 대신 외계종족을 자동교전 대상으로 삼는 용도로 상속해서 쓴다.
     [SerializeField]
     protected string[] targetTags =
-        { "Worker", "AttackUnit", "MainBase", "Tier1", "Tier2", "Tier3", "SupplyDepot", "Lab" };
+        { "Worker", "AttackUnit", "MainBase", "Tier1", "Tier2", "Tier3", "SupplyDepot", "Lab", "AllyOC" };
 
     private readonly List<GameObject> targetsInRange = new List<GameObject>();
 
@@ -73,7 +88,7 @@ public class EnemyAttackRange : MonoBehaviour
 
     private void Awake()
     {
-        enemyUnit = transform.parent.GetComponent<EnemyUnitController>();
+        enemyUnit = transform.parent.GetComponent<IAttackRangeUnit>();
         detectionCollider = GetComponent<CapsuleCollider>();
         EnsureDetectionRadius();
     }
@@ -214,6 +229,8 @@ public class EnemyAttackRange : MonoBehaviour
         }
         else if (target.TryGetComponent<BuildingController>(out var building))
             targetIsAir = building.IsLifted();
+        else if (target.TryGetComponent<AllyController>(out var allyUnit)) // 아군 OC 유닛 (doc/0452)
+            targetIsAir = allyUnit.IsAirUnit();
         else
             targetIsAir = false;
 

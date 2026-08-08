@@ -58,13 +58,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4698038001367890631, guid: 1dae83340f356d64fb61db34071b4f1d, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: AllyOC
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 543167732550466395, guid: 1dae83340f356d64fb61db34071b4f1d, type: 3}
+    - {fileID: -1181422328391644967, guid: 1dae83340f356d64fb61db34071b4f1d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4698038001367890631, guid: 1dae83340f356d64fb61db34071b4f1d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 906014969538712481}
     - targetCorrespondingSourceObject: {fileID: 670878647040245498, guid: 1dae83340f356d64fb61db34071b4f1d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9045422757007453763}
@@ -89,3 +93,56 @@ MonoBehaviour:
   UnitRange: 20
   targetTags:
   - Enemy
+--- !u!212 &4238227775586378193 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 44068352846739062, guid: 1dae83340f356d64fb61db34071b4f1d, type: 3}
+  m_PrefabInstance: {fileID: 4201218923187738535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8292204553042046932 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5286784239653861491, guid: 1dae83340f356d64fb61db34071b4f1d, type: 3}
+  m_PrefabInstance: {fileID: 4201218923187738535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8898957771350781280 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4698038001367890631, guid: 1dae83340f356d64fb61db34071b4f1d, type: 3}
+  m_PrefabInstance: {fileID: 4201218923187738535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &906014969538712481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8898957771350781280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a751db2b55632140ba17f1c4702241b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AllyController
+  enemyMarker: {fileID: 8292204553042046932}
+  icon: {fileID: 21300000, guid: d6e905e97221d6141ae8f9bd7256fb0a, type: 3}
+  minimapIcon: {fileID: 4238227775586378193}
+  minimapFogVisibilityMargin: 1
+  enemyName: Strike Drone
+  enemyUnitID: 9
+  attackDamage: 25
+  armor: 1
+  attackType: 1
+  armorType: 1
+  sizeType: 2
+  canAttackGround: 1
+  canAttackAir: 1
+  attackDelivery: 0
+  bonusVersusArmorType: 0
+  bonusVersusArmorPercent: 0
+  flashInterval: 0.3
+  flashCount: 3
+  isAirUnit: 1
+  moveSpeed: 3
+  arriveDistance: 0.5
+  airCruiseAltitude: 5
+  airGroundLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  timeBetweenAttacks: 1.2

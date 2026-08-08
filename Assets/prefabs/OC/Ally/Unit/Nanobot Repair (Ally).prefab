@@ -58,13 +58,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4698038001367890631, guid: 611672d581903da42a55e939a7f7ffcf, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: AllyOC
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 543167732550466395, guid: 611672d581903da42a55e939a7f7ffcf, type: 3}
+    - {fileID: -1181422328391644967, guid: 611672d581903da42a55e939a7f7ffcf, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4698038001367890631, guid: 611672d581903da42a55e939a7f7ffcf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8882553701136400586}
     - targetCorrespondingSourceObject: {fileID: 670878647040245498, guid: 611672d581903da42a55e939a7f7ffcf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4324391634071163748}
@@ -89,3 +93,56 @@ MonoBehaviour:
   UnitRange: 4
   targetTags:
   - Enemy
+--- !u!1 &6124019018197211514 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4698038001367890631, guid: 611672d581903da42a55e939a7f7ffcf, type: 3}
+  m_PrefabInstance: {fileID: 1571239989208949693}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8882553701136400586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6124019018197211514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a751db2b55632140ba17f1c4702241b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AllyController
+  enemyMarker: {fileID: 6669906035664460750}
+  icon: {fileID: 21300000, guid: f9088a500c2a2184c90293aea40e17bb, type: 3}
+  minimapIcon: {fileID: 8592268561647540845}
+  minimapFogVisibilityMargin: 1
+  enemyName: Nanobot Repair
+  enemyUnitID: 1
+  attackDamage: 5
+  armor: 0
+  attackType: 0
+  armorType: 0
+  sizeType: 0
+  canAttackGround: 1
+  canAttackAir: 0
+  attackDelivery: 0
+  bonusVersusArmorType: 0
+  bonusVersusArmorPercent: 0
+  flashInterval: 0.3
+  flashCount: 3
+  isAirUnit: 0
+  moveSpeed: 10
+  arriveDistance: 0.5
+  airCruiseAltitude: 5
+  airGroundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  timeBetweenAttacks: 0.6
+--- !u!1 &6669906035664460750 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5286784239653861491, guid: 611672d581903da42a55e939a7f7ffcf, type: 3}
+  m_PrefabInstance: {fileID: 1571239989208949693}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &8592268561647540845 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 7130311781908625872, guid: 611672d581903da42a55e939a7f7ffcf, type: 3}
+  m_PrefabInstance: {fileID: 1571239989208949693}
+  m_PrefabAsset: {fileID: 0}

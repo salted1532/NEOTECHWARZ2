@@ -58,10 +58,51 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7636683964052424660, guid: 83897057a276d304aa77f21f7a31637d, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: AllyOC
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8660248747276885106, guid: 83897057a276d304aa77f21f7a31637d, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7636683964052424660, guid: 83897057a276d304aa77f21f7a31637d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3854171340385826856}
   m_SourcePrefab: {fileID: 100100000, guid: 83897057a276d304aa77f21f7a31637d, type: 3}
+--- !u!212 &4881735406013130859 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 5793501393195663084, guid: 83897057a276d304aa77f21f7a31637d, type: 3}
+  m_PrefabInstance: {fileID: 1430401607043143303}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8546215384311716267 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7296833267826986796, guid: 83897057a276d304aa77f21f7a31637d, type: 3}
+  m_PrefabInstance: {fileID: 1430401607043143303}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8800945392015380819 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7636683964052424660, guid: 83897057a276d304aa77f21f7a31637d, type: 3}
+  m_PrefabInstance: {fileID: 1430401607043143303}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3854171340385826856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8800945392015380819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b397bf5936319340946459d85206354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AllyBuildingController
+  buildingMarker: {fileID: 8546215384311716267}
+  buildingName: 
+  icon: {fileID: 21300000, guid: 71da5815b92d5cd4c8762dd9ef7d5b8d, type: 3}
+  minimapIcon: {fileID: 4881735406013130859}
+  flashInterval: 0.3
+  flashCount: 3
+  enemyBuildingID: 2
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
