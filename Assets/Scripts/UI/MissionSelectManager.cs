@@ -150,7 +150,12 @@ public class MissionSelectManager : MonoBehaviour
 
         EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
         enterEntry.callback.AddListener(_ =>
-            TooltipUI.Instance?.Show(rect, entry.missionName, LocalizationManager.GetText("missionselect.tooltip.subtitle", entry.missionNumber)));
+        {
+            // &lt;/&gt; 사용 이유: 툴팁 타이틀은 리치 텍스트(TMP)라 그냥 "<"/">"를 넣으면 태그로
+            // 오인돼 사라질 수 있음 - HTML 엔티티로 escape해서 리터럴 <> 로 표시한다.
+            string missionName = LocalizationManager.GetTextOrFallback($"missionselect.name.{entry.missionNumber}", entry.missionName);
+            TooltipUI.Instance?.Show(rect, $"&lt;{missionName}&gt;", LocalizationManager.GetText("missionselect.tooltip.subtitle", entry.missionNumber));
+        });
         trigger.triggers.Add(enterEntry);
 
         EventTrigger.Entry exitEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };

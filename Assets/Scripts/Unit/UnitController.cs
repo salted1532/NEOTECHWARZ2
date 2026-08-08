@@ -367,14 +367,14 @@ public class UnitController : MonoBehaviour, IDestructible
         UnitData unitData = enemyDataUnitID > 0
             ? rtsController.GetEnemyUnitData(enemyDataUnitID)
             : rtsController.GetUnitData(unitID);
-        ApplyUnitData(unitData);
+        ApplyUnitData(unitData, enemyDataUnitID > 0 ? "oc" : "nta");
 
         // ApplyUnitData 자체는 이름을 안 건드린다(스탯만) - Info Panel 이름은 RTSUnitController가
         // heroName(있으면) 아니면 GetUnitName(unitID)(NTA 테이블)로 별도 조회한다. enemyDataUnitID
         // 경로는 unitID가 0이라 그 조회가 항상 빈 문자열이 되므로, heroName이 비어있으면 OC 데이터의
         // 이름으로 자동 채워준다(doc/0458 - "구조 가능한 OC 유닛"이 이름 없이 뜨는 것 방지).
         if (enemyDataUnitID > 0 && string.IsNullOrEmpty(heroName) && unitData != null)
-            heroName = unitData.unitName;
+            heroName = LocalizationManager.GetTextOrFallback($"unit.oc.{unitData.ID}.name", unitData.unitName);
 
         // 생산 큐를 거치지 않은 유닛(씬에 미리 배치된 시작 유닛 등)만 여기서 인구수를 반영한다.
         // 생산 큐를 거친 유닛은 이미 큐잉 시점(TryProduceUnit)에 인구수가 소모됐으므로 건너뛴다.
@@ -2083,13 +2083,15 @@ public class UnitController : MonoBehaviour, IDestructible
     // 생산 시점에 UnitDataSO의 값으로 전투 스탯(체력/공격력/사거리/아이콘/장갑타입/크기타입)을 덮어쓴다.
     // 프리팹 자체에 미리 박아둔 값은 인스펙터 프리뷰/테스트용 기본값 역할만 하고, 실제로 생산되어 스폰된
     // 유닛은 이 메서드를 통해 UnitDataSO 값을 반영받는다 (UnitSpawner.Spawn()에서 호출).
-    public void ApplyUnitData(UnitData data)
+    // faction: "nta"(기본) 또는 "oc" - 구조 가능한 OC 유닛(enemyDataUnitID>0) 경로에서 OC 데이터를
+    // 적용할 때 "oc"를 넘긴다. 번역 키(unit.<faction>.<ID>.info)를 올바른 진영 테이블에서 찾기 위함(doc/0487).
+    public void ApplyUnitData(UnitData data, string faction = "nta")
     {
         if (data == null)
             return;
 
         icon = data.Icon;
-        infoDescription = data.infoDescription;
+        infoDescription = LocalizationManager.GetTextOrFallback($"unit.{faction}.{data.ID}.info", data.infoDescription);
         attackDamage = data.attackDamge;
         armorType = data.armorType;
         sizeType = data.sizeType;

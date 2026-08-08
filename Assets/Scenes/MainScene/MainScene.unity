@@ -437,8 +437,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: KR
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
+  m_sharedMaterial: {fileID: -7267651362464213874, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -775,8 +775,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Player Prefab Reset
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
+  m_sharedMaterial: {fileID: -7267651362464213874, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1111,8 +1111,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: EN
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
+  m_sharedMaterial: {fileID: -7267651362464213874, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2134,7 +2134,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Ver 0.0.1
+  m_text: 'Ver 0.1.1
 
 '
   m_isRightToLeft: 0
@@ -2503,8 +2503,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "08-03 \uBBF8\uB2C8\uB9F5\uC5D0 \uC790\uC6D0 \uD45C\uC2DC \uCD94\uAC00
-    \uBC84\uC804"
+  m_text: "08-09 \uD55C\uAE00 \uC601\uC5B4 \uBC88\uC5ED \uC2DC\uC2A4\uD15C \uAD6C\uD604"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
   m_sharedMaterial: {fileID: -7267651362464213874, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
@@ -3486,13 +3485,13 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1005964613}
+  - {fileID: 45529091}
   - {fileID: 275867530}
   - {fileID: 577969884}
   - {fileID: 1425673926}
   - {fileID: 1266599882}
   - {fileID: 1358349641}
-  - {fileID: 1005964613}
-  - {fileID: 45529091}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

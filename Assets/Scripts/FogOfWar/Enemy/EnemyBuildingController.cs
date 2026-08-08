@@ -142,8 +142,8 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
             return;
 
         icon = data.Icon;
-        infoDescription = data.infoDescription;
-        buildingName = data.Name;
+        infoDescription = LocalizationManager.GetTextOrFallback($"building.oc.{data.ID}.info", data.infoDescription);
+        buildingName = LocalizationManager.GetTextOrFallback($"building.oc.{data.ID}.name", data.Name);
 
         healthManager?.InitializeHealth(data.hp);
     }

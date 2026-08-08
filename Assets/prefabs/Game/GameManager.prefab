@@ -2113,7 +2113,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2157,7 +2157,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -3237,7 +3237,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -3281,7 +3281,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -4141,7 +4141,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   target: {fileID: 7341772051859908306}
   legacyTarget: {fileID: 0}
-  key: ui.goto
+  key: ui.gotonextstage
 --- !u!1 &3457168352209730278
 GameObject:
   m_ObjectHideFlags: 0
@@ -4705,7 +4705,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   target: {fileID: 2539472311124481373}
   legacyTarget: {fileID: 0}
-  key: ui.goto
+  key: ui.gotopreviousstage
 --- !u!1 &3795871138216423338
 GameObject:
   m_ObjectHideFlags: 0
@@ -4860,7 +4860,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   target: {fileID: 2897216955627206736}
   legacyTarget: {fileID: 0}
-  key: ui.goto
+  key: ui.gotonextstage
 --- !u!1 &3870403259815799904
 GameObject:
   m_ObjectHideFlags: 0
@@ -6113,7 +6113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   target: {fileID: 1893360571089204414}
   legacyTarget: {fileID: 0}
-  key: ui.backto
+  key: ui.backtomainmenu
 --- !u!1 &4925251628860947319
 GameObject:
   m_ObjectHideFlags: 0
@@ -6183,8 +6183,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
+  m_sharedMaterial: {fileID: -7267651362464213874, guid: 82cbbef41c7b30a49a2ed4607e4eec4e, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8418,7 +8418,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   target: {fileID: 6586398302105797777}
   legacyTarget: {fileID: 0}
-  key: ui.backto
+  key: ui.backtomainmenu
 --- !u!1 &6507648710165850649
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,6 +22,8 @@ public class TooltipContentFitter : MonoBehaviour
     private Vector2[] defaultCostRowPositions;
     private float defaultRootHeight;
     private float defaultRootWidth;
+    private float defaultTitleWidth;
+    private float defaultDescriptionWidth;
     private bool isConfigured;
 
     // TooltipUI가 이미 인스펙터에서 갖고 있는 참조를 그대로 넘겨서 초기화한다 - 씬/프리팹에 새로
@@ -37,6 +39,11 @@ public class TooltipContentFitter : MonoBehaviour
             defaultRootHeight = root.sizeDelta.y;
             defaultRootWidth = root.sizeDelta.x;
         }
+
+        if (titleText != null)
+            defaultTitleWidth = titleText.rectTransform.sizeDelta.x;
+        if (descriptionText != null)
+            defaultDescriptionWidth = descriptionText.rectTransform.sizeDelta.x;
 
         SetupAutoHeight(titleText);
         SetupAutoHeight(descriptionText);
@@ -76,7 +83,11 @@ public class TooltipContentFitter : MonoBehaviour
         fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
     }
 
-    private static void SetHorizontalFit(TMP_Text text, bool autoWidth)
+    // autoWidth=false일 때 fitter를 Unconstrained로 바꾸는 것만으로는 RectTransform 폭이 그대로
+    // 남는다 - 직전에 autoWidth=true였던 다른 텍스트(예: 비용 없는 Move 툴팁)가 PreferredSize로 폭을
+    // 줄여놨으면 그 좁은 폭이 이어져서, 건설모드처럼 hasCost=true(autoWidth=false)인 다음 텍스트가
+    // 그 좁은 폭 안에서 줄바꿈된다("건물 이름이 2글자씩 줄바꿈"). 매번 원래 폭으로 명시적으로 되돌린다.
+    private static void SetHorizontalFit(TMP_Text text, bool autoWidth, float defaultWidth)
     {
         if (text == null)
             return;
@@ -84,6 +95,13 @@ public class TooltipContentFitter : MonoBehaviour
         ContentSizeFitter fitter = text.GetComponent<ContentSizeFitter>();
         if (fitter != null)
             fitter.horizontalFit = autoWidth ? ContentSizeFitter.FitMode.PreferredSize : ContentSizeFitter.FitMode.Unconstrained;
+
+        if (!autoWidth)
+        {
+            Vector2 size = text.rectTransform.sizeDelta;
+            size.x = defaultWidth;
+            text.rectTransform.sizeDelta = size;
+        }
     }
 
     // hasDescription/hasCost: 지금 이 툴팁에 그 요소가 실제로 표시되는지 (title/description의 text는
@@ -96,8 +114,8 @@ public class TooltipContentFitter : MonoBehaviour
         // 비용(Ore/Gas/Population 아이콘) 3줄은 root 기준 고정 좌표에 배치돼 있어서, 폭까지 늘리면
         // 그 배치가 어긋난다 - 비용이 없는 경우에만 폭도 내용에 맞춰 자동으로 늘어나게 한다(doc/0471).
         bool autoWidth = !hasCost;
-        SetHorizontalFit(titleText, autoWidth);
-        SetHorizontalFit(descriptionText, autoWidth);
+        SetHorizontalFit(titleText, autoWidth, defaultTitleWidth);
+        SetHorizontalFit(descriptionText, autoWidth, defaultDescriptionWidth);
 
         // ContentSizeFitter가 이번 프레임에 적용한 새 크기를 즉시 읽으려면 레이아웃을 강제로 갱신해야 한다.
         LayoutRebuilder.ForceRebuildLayoutImmediate(titleText.rectTransform);
@@ -140,15 +158,19 @@ public class TooltipContentFitter : MonoBehaviour
         float halfHeight = totalHeight * 0.5f;
         float titleY = halfHeight - topPadding - titleHeight * 0.5f;
         SetY(titleText.rectTransform, titleY);
-        if (autoWidth)
-            SetX(titleText.rectTransform, 0f);
+        // 폭 자동조절 여부와 무관하게 항상 가운데 정렬한다 - 프리팹에 원래 박혀있던 title/description의
+        // X=15 오프셋이, hasCost=true(고정 폭) 경로에서는 SetX가 아예 호출되지 않아 그대로 남아있었음.
+        // 텍스트 박스 폭이 root(패널)와 정확히 같은데 중심만 오른쪽으로 15만큼 밀려있어서, 오른쪽
+        // 가장자리가 패널보다 15px 더 튀어나가 있었다 - "건설모드에서 이름/설명이 살짝 삐져나온다"의
+        // 원인. Pretendard-Black(볼드)로 폰트를 바꾸면서 글자가 그 가장자리에 더 가깝게 닿아 눈에 띄게
+        // 됐을 뿐, 오프셋 자체는 폰트와 무관한 기존 버그였다.
+        SetX(titleText.rectTransform, 0f);
 
         if (hasDescription && descriptionText != null)
         {
             float descriptionY = titleY - titleHeight * 0.5f - titleDescriptionGap - descriptionHeight * 0.5f;
             SetY(descriptionText.rectTransform, descriptionY);
-            if (autoWidth)
-                SetX(descriptionText.rectTransform, 0f);
+            SetX(descriptionText.rectTransform, 0f);
         }
 
         // 비용 3줄은 늘어난 높이의 절반만큼 아래로 밀어서, description과의 원래 간격을 그대로 유지한다.

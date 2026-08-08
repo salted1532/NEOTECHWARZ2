@@ -665,8 +665,8 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
             return;
 
         icon = data.Icon;
-        infoDescription = data.infoDescription;
-        enemyName = data.unitName;
+        infoDescription = LocalizationManager.GetTextOrFallback($"unit.oc.{data.ID}.info", data.infoDescription);
+        enemyName = LocalizationManager.GetTextOrFallback($"unit.oc.{data.ID}.name", data.unitName);
         attackDamage = data.attackDamge;
         armorType = data.armorType;
         sizeType = data.sizeType;

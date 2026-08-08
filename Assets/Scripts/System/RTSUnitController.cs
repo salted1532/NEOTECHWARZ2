@@ -1549,9 +1549,11 @@ public class RTSUnitController : MonoBehaviour
         if (data == null)
             return ButtonAction.Simple(callback, string.Empty, string.Empty);
 
+        string unitName = LocalizationManager.GetTextOrFallback($"unit.nta.{unitID}.name", data.unitName);
+
         string description = string.IsNullOrEmpty(data.description)
-            ? LocalizationManager.GetText("unit.trainfallback", data.unitName)
-            : data.description;
+            ? LocalizationManager.GetText("unit.trainfallback", unitName)
+            : LocalizationManager.GetTextOrFallback($"unit.nta.{unitID}.desc", data.description);
 
         if (data.requiredBuildingID != 0 && !HasCompletedBuilding(data.requiredBuildingID))
         {
@@ -1559,7 +1561,7 @@ public class RTSUnitController : MonoBehaviour
             description += LocalizationManager.GetText("cmd.requiresbuilding", requiredName);
         }
 
-        return ButtonAction.WithCost(callback, data.unitName, description, data.mineral, data.gas, data.population, shortcut);
+        return ButtonAction.WithCost(callback, unitName, description, data.mineral, data.gas, data.population, shortcut);
     }
 
     // 연구 버튼용 ButtonAction 생성 (제목="Attack/Armor Upgrade Lv.N", 비용=다음 레벨 광물/가스, 최대 레벨이면 "MAX" 표시)
@@ -1589,9 +1591,11 @@ public class RTSUnitController : MonoBehaviour
         if (data == null)
             return ButtonAction.Simple(callback, string.Empty, string.Empty);
 
+        string buildingName = LocalizationManager.GetTextOrFallback($"building.nta.{buildingID}.name", data.Name);
+
         string description = string.IsNullOrEmpty(data.description)
-            ? LocalizationManager.GetText("building.constructfallback", data.Name)
-            : data.description;
+            ? LocalizationManager.GetText("building.constructfallback", buildingName)
+            : LocalizationManager.GetTextOrFallback($"building.nta.{buildingID}.desc", data.description);
 
         if (data.requiredBuildingID != 0 && !HasCompletedBuilding(data.requiredBuildingID))
         {
@@ -1599,20 +1603,20 @@ public class RTSUnitController : MonoBehaviour
             description += LocalizationManager.GetText("cmd.requiresbuilding", requiredName);
         }
 
-        return ButtonAction.WithCost(callback, data.Name, description, data.mineral, data.gas, data.population, shortcut);
+        return ButtonAction.WithCost(callback, buildingName, description, data.mineral, data.gas, data.population, shortcut);
     }
 
     // Info_panel에 표시할 유닛/건물 이름 조회 (UnitController.unitID / BuildingController.buildingID 기준)
     public string GetUnitName(int unitID)
     {
         UnitData data = unitDatabase.unitData.Find(d => d.ID == unitID);
-        return data != null ? data.unitName.Trim() : string.Empty;
+        return data != null ? LocalizationManager.GetTextOrFallback($"unit.nta.{unitID}.name", data.unitName.Trim()) : string.Empty;
     }
 
     public string GetBuildingName(int buildingID)
     {
         BuildingData data = buildingDatabase.buildingData.Find(d => d.ID == buildingID);
-        return data != null ? data.Name.Trim() : string.Empty;
+        return data != null ? LocalizationManager.GetTextOrFallback($"building.nta.{buildingID}.name", data.Name.Trim()) : string.Empty;
     }
 
     // Info_panel 설명 조회 - 대기열(생산/연구) 패널이 같이 뜨는 건물은 SO의 infoDescription을 비워뒀으므로

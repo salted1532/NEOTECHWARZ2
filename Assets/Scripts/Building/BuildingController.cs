@@ -114,7 +114,7 @@ public class BuildingController : MonoBehaviour, IDestructible
         // Info_panel 설명(doc/0476)은 건설 경로와 무관하게 항상 필요하므로 조건 없이 조회해둔다.
         BuildingData data = rtsController.GetBuildingData(buildingID);
         if (data != null)
-            infoDescription = data.infoDescription;
+            infoDescription = LocalizationManager.GetTextOrFallback($"building.nta.{data.ID}.info", data.infoDescription);
 
         // 씬에 직접 배치해둔 건물(정상 건설 흐름을 안 거친 건물)은 CompleteConstruction()을 거치지 않아
         // 인구수 최대치가 반영된 적이 없으므로, 여기서 한 번만 반영해준다 (doc/0366, 유닛의

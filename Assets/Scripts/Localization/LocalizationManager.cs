@@ -11,8 +11,12 @@ public class LocalizationManager : MonoBehaviour
     private const string LanguagePrefsKey = "Language";
     private const string DefaultLanguage = "en";
 
-    // 언어가 바뀌면 이미 떠 있는 정적 라벨(LocalizedText)이 다시 그릴 수 있도록 발행한다.
-    public event System.Action OnLanguageChanged;
+    // static인 이유: 인스턴스 이벤트로 두면 LocalizedText.OnEnable이 이 매니저의 Awake보다 먼저 실행될
+    // 경우(씬의 다른 오브젝트와의 Awake/OnEnable 순서는 보장되지 않음) Instance가 아직 null이라
+    // 구독 자체가 조용히 스킵되고, 그 뒤로는 오브젝트를 껐다 켜서 OnEnable을 다시 태우기 전까진 언어
+    // 변경 버튼을 눌러도 갱신되지 않는 버그가 있었다(doc/0485). static 이벤트는 Instance 존재 여부와
+    // 무관하게 항상 구독에 성공한다.
+    public static event System.Action OnLanguageChanged;
 
     private readonly Dictionary<string, string> strings = new Dictionary<string, string>();
 
@@ -66,6 +70,22 @@ public class LocalizationManager : MonoBehaviour
     // 정적 패스스루 - 이 경우에도 키 자체를 보여줘서 번역 누락과 동일하게 눈에 띈다.
     public static string GetText(string key) => Instance != null ? Instance.Get(key) : key;
     public static string GetText(string key, params object[] args) => Instance != null ? Instance.Get(key, args) : key;
+
+    // 유닛/건물 ScriptableObject 이름·설명처럼, 키가 없거나 매니저가 없거나 조회 중 예외가 나더라도
+    // "키 문자열"이 아니라 원래 SO에 적혀있던 원문을 그대로 보여줘야 하는 곳에서 쓴다 (doc/0487).
+    public string GetOrFallback(string key, string fallback) => strings.TryGetValue(key, out string value) ? value : fallback;
+
+    public static string GetTextOrFallback(string key, string fallback)
+    {
+        try
+        {
+            return Instance != null ? Instance.GetOrFallback(key, fallback) : fallback;
+        }
+        catch
+        {
+            return fallback;
+        }
+    }
 }
 
 [System.Serializable]

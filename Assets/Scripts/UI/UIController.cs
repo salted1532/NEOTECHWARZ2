@@ -996,7 +996,7 @@ public class UIController : MonoBehaviour
         {
             UnitData data = database.unitData.Find(d => d.ID == unit.GetUnitID());
             if (data != null && !string.IsNullOrEmpty(data.unitName))
-                return data.unitName.Trim();
+                return LocalizationManager.GetTextOrFallback($"unit.nta.{data.ID}.name", data.unitName.Trim());
         }
 
         return LocalizationManager.GetText("squad.unitfallback");

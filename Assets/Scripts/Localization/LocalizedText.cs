@@ -25,15 +25,23 @@ public class LocalizedText : MonoBehaviour
 
     private void OnEnable()
     {
+        LocalizationManager.OnLanguageChanged += Apply;
         Apply();
-        if (LocalizationManager.Instance != null)
-            LocalizationManager.Instance.OnLanguageChanged += Apply;
+    }
+
+    // 씬 로드 시점의 최초 적용은 Start()에서 한 번 더 한다 - OnEnable은 씬의 다른 오브젝트보다 먼저
+    // 실행될 수 있어(Awake/OnEnable 순서 불보장) LocalizationManager.Instance가 아직 null인 채로
+    // Apply()가 조용히 아무 것도 안 하고 끝날 수 있다. Start는 씬의 모든 Awake가 끝난 뒤에 호출되는
+    // 게 보장되므로 이 시점엔 Instance가 항상 준비돼 있다(doc/0485 - 이게 없으면 씬을 다시 불러올 때
+    // 저장된 언어 대신 에디터에 박혀있던 원본 텍스트가 그대로 보이는 버그가 있었다).
+    private void Start()
+    {
+        Apply();
     }
 
     private void OnDisable()
     {
-        if (LocalizationManager.Instance != null)
-            LocalizationManager.Instance.OnLanguageChanged -= Apply;
+        LocalizationManager.OnLanguageChanged -= Apply;
     }
 
     private void Apply()
