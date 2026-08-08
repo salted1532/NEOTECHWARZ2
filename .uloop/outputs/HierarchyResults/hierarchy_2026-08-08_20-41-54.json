@@ -1,0 +1,166 @@
+{
+  "ExportTimestamp": "2026-08-08 20:41:54",
+  "Context": {
+    "sceneType": "prefab",
+    "sceneName": "Assets/prefabs/NTA/Unit/Tier3/Firehawk.prefab",
+    "nodeCount": 16,
+    "maxDepth": 1
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "Firehawk",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 16,
+        "maxDepth": 1
+      },
+      "roots": [
+        {
+          "name": "Firehawk",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 0,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "FirePos",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "MoveTrailPos",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DeathPos",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "AttackRange",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "AirUnitMarker",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 12,
+              "children": []
+            },
+            {
+              "name": "Cube",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (2)",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (1)",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (4)",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (3)",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "Cube (5)",
+              "isActive": false,
+              "components": [],
+              "siblingIndex": 13,
+              "tag": "Untagged",
+              "layer": 6,
+              "children": []
+            },
+            {
+              "name": "unit_Ornithopter_Light_B_yup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 14,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

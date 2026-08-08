@@ -3,8 +3,8 @@ using TMPro;
 using UnityEngine;
 
 // 3스테이지("침공") 임무 목표 체크리스트. 주목표(외계 전초기지 제거)가 완료되면 승리 처리한다.
-// 서브목표(생존자 구조)는 맵의 구조 비콘 rescueRadius 안에 (구조 대상 자신을 제외한) 아무 아군
-// 유닛이나 들어오면 완료로 처리하고, 한 번 완료되면 되돌리지 않는다("구조했다"는 사실은 유닛이
+// 서브목표(생존자 구조)는 맵의 구조 비콘 트리거 콜라이더에 (구조 대상 자신을 제외한) 아무 아군
+// 유닛이나 닿으면 완료로 처리하고, 한 번 완료되면 되돌리지 않는다("구조했다"는 사실은 유닛이
 // 다시 벗어나도 취소되지 않아야 하므로 - Stage0/1의 "재평가" 목표들과 다름). 완료되는 순간 미리
 // 배치해둔 위장 OC(실제로는 UnitController.isRescueUnit이 붙은 조종 가능한 아군 유닛, doc/0458)의
 // 억제도 함께 풀어준다.
@@ -15,8 +15,7 @@ public class Stage3Objectives : MonoBehaviour
     [SerializeField] private TextMeshProUGUI destroyOutpostText;
 
     [Header("서브목표")]
-    [SerializeField] private Transform rescueBeacon; // 생존자 구조 지점 - 직접 연결
-    [SerializeField] private float rescueRadius = 2f;
+    [SerializeField] private Collider rescueBeacon; // 생존자 구조 지점의 트리거 콜라이더 - 직접 연결 (doc/0459 후속)
     [SerializeField] private List<UnitController> rescuedUnits; // 위장 OC(실제로는 조종 가능한 아군 유닛) 목록 - 직접 연결 (doc/0458)
     [SerializeField] private TextMeshProUGUI rescueSurvivorsText;
 
@@ -40,7 +39,7 @@ public class Stage3Objectives : MonoBehaviour
 
         if (!survivorsRescued && rescueBeacon != null && rtsController != null)
         {
-            survivorsRescued = IsAnyUnitWithinRadius(rescueBeacon.position, rescueRadius);
+            survivorsRescued = IsAnyUnitTouchingBeacon();
             if (survivorsRescued)
             {
                 foreach (UnitController unit in rescuedUnits)
@@ -55,14 +54,10 @@ public class Stage3Objectives : MonoBehaviour
             StageManager.Instance?.ReportVictory();
     }
 
-    // 수평 거리(XZ)만 본다 - 공중 유닛은 항상 airCruiseAltitude(기본 5)만큼 떠 있어서, Y축까지 포함한
-    // 3D 거리로 재면 비콘 바로 위까지 가도 rescueRadius(기본 2)를 절대 못 만족한다(doc/0459 후속 -
-    // 실제로 공중 유닛이 인식 안 되는 문제로 발견됨).
-    private bool IsAnyUnitWithinRadius(Vector3 position, float radius)
+    // 비콘의 실제 트리거 콜라이더에 닿았는지로 판정한다(UnitController.IsTouching - MissionItem/doc/0456과
+    // 동일한 패턴, doc/0459 후속 - 거리/반경 대신 실제 물리 트리거 접촉으로 변경).
+    private bool IsAnyUnitTouchingBeacon()
     {
-        float radiusSqr = radius * radius;
-        Vector2 flatPosition = new Vector2(position.x, position.z);
-
         foreach (UnitController unit in rtsController.UnitList)
         {
             // 구조 대상 유닛 자기 자신은 제외한다 - 처음부터 비콘 근처에 배치돼 있어서 그것만으로
@@ -71,10 +66,7 @@ public class Stage3Objectives : MonoBehaviour
             if (unit == null || rescuedUnits.Contains(unit))
                 continue;
 
-            Vector3 unitPos = unit.transform.position;
-            Vector2 flatUnitPos = new Vector2(unitPos.x, unitPos.z);
-
-            if ((flatUnitPos - flatPosition).sqrMagnitude <= radiusSqr)
+            if (unit.IsTouching(rescueBeacon))
                 return true;
         }
         return false;

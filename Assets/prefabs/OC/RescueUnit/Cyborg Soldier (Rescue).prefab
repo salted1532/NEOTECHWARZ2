@@ -323,6 +323,7 @@ MonoBehaviour:
   enemyDataUnitID: 2
   isRescueUnit: 1
   rescuedMarker: {fileID: 8492924165849636411}
+  preRescueMarker: {fileID: 2526047972632559771}
   rescuedSightRange: 25
   attackDamage: 0
   armor: 0
@@ -802,6 +803,11 @@ PrefabInstance:
 --- !u!4 &1124639599467331765 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2578521146470503909, guid: 3b9ccdaa46d29b64db353152e6765e18, type: 3}
+  m_PrefabInstance: {fileID: 3193960967656674640}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2526047972632559771 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1107157273978836427, guid: 3b9ccdaa46d29b64db353152e6765e18, type: 3}
   m_PrefabInstance: {fileID: 3193960967656674640}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5097994017845135404

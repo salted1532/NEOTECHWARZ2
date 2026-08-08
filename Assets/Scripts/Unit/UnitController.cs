@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -72,10 +73,17 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private bool isRescueUnit;
 
-    // 구조 후 선택 마커(Green) - 비워두면(일반 유닛) 항상 기존 unitMarker(Yellow)를 그대로 쓴다.
-    // isRescueUnit이 true인 동안엔 이게 설정돼 있어도 unitMarker를 우선 쓴다(구조 전 = Yellow).
+    // unitMarker(선택 시 켜지는 마커 오브젝트) 자체는 그대로 재사용하고, 그 안에 있는 "Green" 효과만
+    // 구조 시 켠다 - 마커의 on/off(선택/해제)는 항상 기존 SelectUnit/DeselectUnit이 그대로 담당하고,
+    // 이 필드는 그 마커가 켜졌을 때 초록으로 보이게 하는 효과만 담당한다. 한 번 구조되면 계속 켜진
+    // 채로 둔다(다시 꺼지지 않음 - "구조했다"는 사실은 되돌리지 않는다).
     [SerializeField]
     private GameObject rescuedMarker;
+
+    // 구조 전 기본으로 켜져 있는 "Yellow" 효과 - rescuedMarker(Green)와 같은 마커 안에서 서로 배타적으로
+    // 보여야 하므로, 구조 시 이것도 함께 꺼준다(Green 켜질 때 Yellow는 반드시 꺼짐).
+    [SerializeField]
+    private GameObject preRescueMarker;
 
     // 구조 시 FogRevealerAgent 시야를 이 값으로 되돌린다(구조 전엔 낮은 값으로 설정해둔 상태라고 가정).
     [SerializeField]
@@ -83,9 +91,25 @@ public class UnitController : MonoBehaviour, IDestructible
 
     private FogRevealerAgent fogRevealerAgent; // 구조 시 시야 범위를 바꾸는 데 사용 (같은 오브젝트에서 조회)
 
-    // 선택 마커로 지금 실제 써야 할 오브젝트 - 구조 전(isRescueUnit)이거나 rescuedMarker가 없는 일반
-    // 유닛이면 기존 unitMarker(Yellow), 구조 후엔 rescuedMarker(Green)를 쓴다.
-    private GameObject ActiveMarker => (isRescueUnit || rescuedMarker == null) ? unitMarker : rescuedMarker;
+    // 구조 비콘 등 트리거 콜라이더에 실제로 겹쳐 있는지 판정한다 - 겹친 트리거를 전부 추적해서, 특정
+    // 콜라이더(비콘)에 지금 닿아 있는지 IsTouching()으로 물어볼 수 있게 한다(MissionItem과 동일한
+    // 패턴, doc/0456/0459 후속 - Stage3Objectives가 거리 대신 실제 트리거 접촉으로 판정하도록 변경).
+    private readonly HashSet<Collider> overlappingTriggers = new HashSet<Collider>();
+
+    // AttackRange의 감지용 콜라이더는 Rigidbody가 없는 자식이라 OnTriggerEnter/Exit이 이 유닛(부모의
+    // Rigidbody)로도 함께 올라온다 - 그대로 두면 사거리(AttackRange)만 닿아도 비콘에 닿은 것으로
+    // 오판된다(doc/0463). 실제 몸체 콜라이더(bodyCollider)의 Bounds와 겹치는 경우만 인정한다.
+    private Collider bodyCollider;
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (bodyCollider != null && bodyCollider.bounds.Intersects(other.bounds))
+            overlappingTriggers.Add(other);
+    }
+
+    private void OnTriggerExit(Collider other) => overlappingTriggers.Remove(other);
+
+    public bool IsTouching(Collider other) => other != null && overlappingTriggers.Contains(other);
 
     // ===== 전투 스탯 (공격력/방어력) =====
     // 공격력은 기존 AttackRange.AttackDamage였던 것을 이곳으로 옮겨 UnitController가 함께 관리한다.
@@ -289,6 +313,7 @@ public class UnitController : MonoBehaviour, IDestructible
         laserBeamAttack = GetComponent<LaserBeamAttack>();
         healthManager = GetComponent<HealthManager>();
         fogRevealerAgent = GetComponent<FogRevealerAgent>();
+        bodyCollider = GetComponent<Collider>();
         TryGetComponent(out projectileAttack);
 
         if (!isAirUnit)
@@ -484,19 +509,19 @@ public class UnitController : MonoBehaviour, IDestructible
 
     public void SelectUnit()
     {
-        ActiveMarker.SetActive(true);
+        unitMarker.SetActive(true);
     }
 
     public void DeselectUnit()
     {
-        ActiveMarker.SetActive(false);
+        unitMarker.SetActive(false);
     }
 
     // 공격 명령(아군 강제 공격 등) 대상으로 지정됐을 때 "이 유닛이 대상"임을 피드백으로 마커를 짧게 깜빡인다.
     // 좌클릭 선택 마커와 같은 오브젝트를 사용하므로, 끝나면 실제 선택 상태에 맞춰 복원한다.
     public void FlashMarker()
     {
-        if (ActiveMarker == null)
+        if (unitMarker == null)
             return;
 
         if (markerFlashRoutine != null)
@@ -508,19 +533,18 @@ public class UnitController : MonoBehaviour, IDestructible
     private IEnumerator FlashMarkerRoutine()
     {
         WaitForSeconds wait = new WaitForSeconds(markerFlashInterval);
-        GameObject marker = ActiveMarker; // 깜빡이는 도중 구조되어 마커가 바뀌어도 이번 루틴은 시작한 마커로 일관되게 끝낸다
 
         for (int i = 0; i < markerFlashCount; i++)
         {
-            marker.SetActive(true);
+            unitMarker.SetActive(true);
             yield return wait;
-            marker.SetActive(false);
+            unitMarker.SetActive(false);
             yield return wait;
         }
 
         // 깜빡이는 도중 선택된 상태였다면(드문 경우) 꺼진 채로 두지 않고 선택 마커 상태로 복원
         bool isSelected = rtsController != null && rtsController.selectedUnitList.Contains(this);
-        marker.SetActive(isSelected);
+        unitMarker.SetActive(isSelected);
 
         markerFlashRoutine = null;
     }
@@ -1963,6 +1987,11 @@ public class UnitController : MonoBehaviour, IDestructible
     // 계속 Idle로 유지하므로(각 명령 지점 주석 참고), 상태값만으로는 "실제로 쏘는 중"을 놓친다 - AttackRange의
     // 실시간 교전 여부도 함께 확인해야 두리번 애니메이션 등이 전투 중을 정확히 인식한다 (doc/0451).
     public bool IsAttack() => UnitcurrentState == UnitState.Attack || (attackRange != null && attackRange.HasEnemyInRange);
+    // AttackRange.Update()의 자동교전 게이트 전용 - IsAttack()과 달리 실제 명령 상태만 본다. IsAttack()은
+    // 애니메이션용으로 사거리 내 적 존재 여부까지 넓게 판정해서(doc/0451), 이동 명령(Move) 중에도 직전까지
+    // 싸우던 적이 감지 범위 안에 남아있으면 true가 되어 MoveTo() 등으로 공격을 끊으려 해도 AttackRange가
+    // 매 프레임 다시 Attack()을 호출해 이동을 계속 막는 문제가 있었다(doc/0464).
+    public bool IsAttackOrderState() => UnitcurrentState == UnitState.Attack;
     public bool IsAirUnit() => isAirUnit; // HoverBob 등 외부 이펙트 컴포넌트가 폴링용으로 사용(doc/0119)
 
     // 이동 이펙트(UnitEffects)가 상태머신을 직접 건드리지 않고 매 프레임 폴링으로 이동 여부를 판단할 수 있도록 노출.
@@ -1979,8 +2008,9 @@ public class UnitController : MonoBehaviour, IDestructible
     public int GetEnemyDataUnitID() => enemyDataUnitID;
     public string GetHeroName() => heroName;
 
-    // 구조 완료 시 Stage3Objectives 등이 호출한다 (doc/0458) - 명령 억제를 풀고, 선택 마커를
-    // Yellow(unitMarker)에서 Green(rescuedMarker)으로 전환하고, 낮춰뒀던 시야를 원래 범위로 되돌린다.
+    // 구조 완료 시 Stage3Objectives 등이 호출한다 (doc/0458/0459 후속) - 명령 억제를 풀고, 선택 마커
+    // 안의 Green 효과를 영구히 켜면서 Yellow는 꺼서 서로 배타적으로 만들고(마커 자체의 on/off는 그대로
+    // SelectUnit/DeselectUnit이 담당), 낮춰뒀던 시야를 원래 범위로 되돌린다.
     public void Rescue()
     {
         if (!isRescueUnit)
@@ -1988,12 +2018,10 @@ public class UnitController : MonoBehaviour, IDestructible
 
         isRescueUnit = false;
 
-        unitMarker.SetActive(false);
+        if (preRescueMarker != null)
+            preRescueMarker.SetActive(false);
         if (rescuedMarker != null)
-        {
-            bool isSelected = rtsController != null && rtsController.selectedUnitList.Contains(this);
-            rescuedMarker.SetActive(isSelected);
-        }
+            rescuedMarker.SetActive(true);
 
         fogRevealerAgent?.SetSightRange(rescuedSightRange);
     }

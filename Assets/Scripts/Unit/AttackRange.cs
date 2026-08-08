@@ -86,7 +86,7 @@ public class AttackRange : MonoBehaviour
 
         float sqrDistance = (transform.position - target.transform.position).sqrMagnitude;
 
-        if (unitController.IsAttack() || unitController.IsIdle())
+        if (unitController.IsAttackOrderState() || unitController.IsIdle())
         {
             if (sqrDistance <= UnitRange * UnitRange)
             {
@@ -136,6 +136,13 @@ public class AttackRange : MonoBehaviour
     // 이미 물고 있던 대상은 완전히 멀어지기 전까지는 그대로 우선시한다(doc/0388).
     private GameObject GetEngagedOrClosestEnemy()
     {
+        // 사거리 내 실제 적 유닛(건물 제외)이 있으면 항상 최우선 - 건물을 자동공격/공격-이동으로 물고
+        // 있던 중이었어도 즉시 교체한다(doc/0460). 강제공격(FriendlyAttackTick)은 이 함수를 아예
+        // 거치지 않으므로 영향 없음(doc/0125 동작 그대로 유지).
+        GameObject priorityEnemyUnit = GetClosestEnemy(requireUnit: true);
+        if (priorityEnemyUnit != null)
+            return engagedEnemy = priorityEnemyUnit;
+
         if (engagedEnemy != null && CanEngage(engagedEnemy))
         {
             float loseSightRange = UnitRange + DetectionRangeMargin + EngagedTargetLoseSightMargin;
@@ -150,7 +157,7 @@ public class AttackRange : MonoBehaviour
     // 감지된 적들 중 자신과의 거리(제곱 거리)가 가장 짧은 적을 찾아 반환한다. 이 유닛이 공격할 수 없는
     // 도메인(지상 전용 유닛에게 공중 적, 혹은 그 반대)의 대상은 아예 후보에서 제외한다 - 그래야 공격-이동
     // 중에 상대하지 못할 적을 스쳐 지나가도 멈추거나 쫓아가지 않고 원래 목적지로 계속 이동한다.
-    private GameObject GetClosestEnemy()
+    private GameObject GetClosestEnemy(bool requireUnit = false)
     {
         GameObject closest = null;
         float closestSqrDist = float.MaxValue;
@@ -161,6 +168,9 @@ public class AttackRange : MonoBehaviour
                 continue;
 
             if (!CanEngage(enemy))
+                continue;
+
+            if (requireUnit && !enemy.TryGetComponent<EnemyUnitController>(out _))
                 continue;
 
             float sqrDist = (enemy.transform.position - transform.position).sqrMagnitude;
