@@ -59,6 +59,12 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private string heroName;
 
+    // 0(기본값)이면 지금처럼 unitID로 NTA Unit Data SO를 조회한다. 0이 아니면 이 값으로 OC Unit Data SO를
+    // 대신 조회해서 스탯(공격력/방어력/체력 등)을 적용한다 - 겉모습은 OC 프리팹 그대로 두고 조종만
+    // 플레이어가 가능하게 만드는 "구조 가능한 OC 유닛"에 사용 (doc/0458).
+    [SerializeField]
+    private int enemyDataUnitID;
+
     // ===== 전투 스탯 (공격력/방어력) =====
     // 공격력은 기존 AttackRange.AttackDamage였던 것을 이곳으로 옮겨 UnitController가 함께 관리한다.
     // Info_panel에서 UnitDamage/UnitArmor 아이콘 호버 시 표시할 값이기도 하다.
@@ -290,7 +296,12 @@ public class UnitController : MonoBehaviour, IDestructible
 
         // 생산 큐를 거쳤든 씬에 직접 배치됐든, 어떤 경로로 만들어진 인스턴스든 항상 자기 unitID로
         // UnitDataSO를 조회해서 스스로 스탯을 적용한다 (UnitSpawner가 밖에서 push하던 방식 대체).
-        ApplyUnitData(rtsController.GetUnitData(unitID));
+        // enemyDataUnitID가 지정돼 있으면 NTA 테이블 대신 OC Unit Data SO를 조회한다(doc/0458 - 겉모습은
+        // OC 프리팹 그대로 두고 스탯도 OC 그대로 가져오는 "구조 가능한 OC 유닛"용).
+        UnitData unitData = enemyDataUnitID > 0
+            ? rtsController.GetEnemyUnitData(enemyDataUnitID)
+            : rtsController.GetUnitData(unitID);
+        ApplyUnitData(unitData);
 
         // 생산 큐를 거치지 않은 유닛(씬에 미리 배치된 시작 유닛 등)만 여기서 인구수를 반영한다.
         // 생산 큐를 거친 유닛은 이미 큐잉 시점(TryProduceUnit)에 인구수가 소모됐으므로 건너뛴다.

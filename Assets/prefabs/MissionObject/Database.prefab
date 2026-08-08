@@ -105,8 +105,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MissionItem
   itemName: "OC \uC5F0\uAD6C \uB370\uC774\uD130"
-  icon: {fileID: 0}
-  selectionMarker: {fileID: 0}
+  icon: {fileID: 375156730, guid: 473b0bdd5b447844c9793688f7b91893, type: 3}
+  selectionMarker: {fileID: 2554373474004587855}
 --- !u!54 &4378361880018549740
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -151,7 +151,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5900288653206522361
 Transform:
   m_ObjectHideFlags: 0

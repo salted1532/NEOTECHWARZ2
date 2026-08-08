@@ -22,6 +22,13 @@ public class MissionItem : MonoBehaviour
 
     public bool IsTouching(Collider other) => other != null && overlappingTriggers.Contains(other);
 
+    // 선택 전까지는 꺼둔다 (ResourceNode.resourceMarker/EnemyUnitController.enemyMarker와 동일한 패턴, doc/0457).
+    private void Start()
+    {
+        if (selectionMarker != null)
+            selectionMarker.SetActive(false);
+    }
+
     public void SelectItem()
     {
         if (selectionMarker != null)

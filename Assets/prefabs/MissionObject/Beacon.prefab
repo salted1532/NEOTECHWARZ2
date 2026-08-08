@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 167258426889669419}
   - component: {fileID: 4955301240130557851}
+  - component: {fileID: 4918877250787472046}
   m_Layer: 0
   m_Name: Beacon
   m_TagString: Untagged
@@ -54,6 +55,22 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 10
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4918877250787472046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5591001881842621956}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7658e932e3cb16542a205dba64e3fa20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FogRevealerAgent
+  sightRange: 1
+  updateOnlyOnMove: 1
+  shrinkSightOutsideAlliedTerritory: 0
+  unclaimedSightRange: 1
 --- !u!1001 &2493223259756577355
 PrefabInstance:
   m_ObjectHideFlags: 0
