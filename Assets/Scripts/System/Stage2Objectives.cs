@@ -51,8 +51,8 @@ public class Stage2Objectives : MonoBehaviour
         UpdateCarry(artifact, artifactBeacon, ref artifactCarrier, ref artifactDelivered);
         UpdateCarry(researchData, researchDataBeacon, ref dataCarrier, ref dataDelivered);
 
-        ObjectiveTextUtil.SetObjectiveText(collectArtifactText, "(주목표) 외계 유물 확보", artifactDelivered);
-        ObjectiveTextUtil.SetObjectiveText(collectResearchDataText, "(서브) OC 연구 데이터 확보", dataDelivered);
+        ObjectiveTextUtil.SetObjectiveText(collectArtifactText, LocalizationManager.GetText("objective.stage2.main1"), artifactDelivered);
+        ObjectiveTextUtil.SetObjectiveText(collectResearchDataText, LocalizationManager.GetText("objective.stage2.sub1"), dataDelivered);
 
         if (artifactDelivered)
             StageManager.Instance?.ReportVictory();

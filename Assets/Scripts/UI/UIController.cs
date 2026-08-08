@@ -697,21 +697,22 @@ public class UIController : MonoBehaviour
     private void SetupInfoStatHoverTooltips()
     {
         AddStatHoverTooltip(attackDamageImage, () =>
-            $"Attack Type : {infoAttackType}\nAttack Damage : {infoAttackDamage}{(infoShotCount > 1 ? $" (x{infoShotCount})" : string.Empty)}\nAttack Target : {GetAttackTargetText()}");
+            LocalizationManager.GetText("infopanel.attacktooltip", infoAttackType, infoAttackDamage,
+                infoShotCount > 1 ? $" (x{infoShotCount})" : string.Empty, GetAttackTargetText()));
         AddStatHoverTooltip(armorImage, () =>
-            $"Armor : {infoArmor}\nArmor Type : {infoArmorType}\nSize : {infoSizeType}");
+            LocalizationManager.GetText("infopanel.armortooltip", infoArmor, infoArmorType, infoSizeType));
     }
 
     // 공격력 툴팁에 "Attack Target : Ground/Air" 식으로 표기할 텍스트를 만든다 (doc/0478).
     private string GetAttackTargetText()
     {
         if (infoCanAttackGround && infoCanAttackAir)
-            return "Ground/Air";
+            return LocalizationManager.GetText("infopanel.attacktarget.groundair");
         if (infoCanAttackGround)
-            return "Ground";
+            return LocalizationManager.GetText("infopanel.attacktarget.ground");
         if (infoCanAttackAir)
-            return "Air";
-        return "None";
+            return LocalizationManager.GetText("infopanel.attacktarget.air");
+        return LocalizationManager.GetText("infopanel.attacktarget.none");
     }
 
     // 건설실패/인구수부족/자원부족 등 경고 문구를 2초간 띄운다 (doc/0480). 표시 중에 새 경고가 들어오면
@@ -978,7 +979,7 @@ public class UIController : MonoBehaviour
                         () => squadOnShiftClickUnit(unit),
                         () => squadOnCtrlClickUnit(unit),
                         GetUnitDisplayName(unit),
-                        "Click: Select Unit\nShift+Click: Deselect Unit\nCtrl+Click: Select Unit Type")));
+                        LocalizationManager.GetText("squad.unittooltip"))));
             }
             else
             {
@@ -998,7 +999,7 @@ public class UIController : MonoBehaviour
                 return data.unitName.Trim();
         }
 
-        return "Unit";
+        return LocalizationManager.GetText("squad.unitfallback");
     }
 
     // 선택된 유닛 수로 채워지는 페이지 버튼만 보이도록 켠다 (예: 36마리면 1~3페이지만 SetActive(true), 나머지는 숨김).
@@ -1053,8 +1054,8 @@ public class UIController : MonoBehaviour
                         () => squadOnSelectBuilding(building),
                         () => squadOnShiftClickBuilding(building),
                         () => squadOnCtrlClickBuilding(building),
-                        "Building",
-                        "Click: Select Building\nShift+Click: Deselect Building\nCtrl+Click: Select Building Type")));
+                        LocalizationManager.GetText("squad.buildingtitle"),
+                        LocalizationManager.GetText("squad.buildingtooltip"))));
             }
             else
             {

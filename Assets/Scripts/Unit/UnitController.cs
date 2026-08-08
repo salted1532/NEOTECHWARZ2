@@ -1099,7 +1099,7 @@ public class UnitController : MonoBehaviour, IDestructible
             if (!isAirUnit && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
             {
                 unitAudio?.PlayBuildFailVoice();
-                UIController.Instance?.ShowWarning("Build somewhere else.");
+                UIController.Instance?.ShowWarning(LocalizationManager.GetText("warning.constructionfail"));
                 HaltInPlace();
                 CancelBuildOrder();
             }

@@ -58,10 +58,10 @@ public class Stage1Objectives : MonoBehaviour
         int oreAmount = rtsController != null ? rtsController.GetOre() : 0;
         bool radarCaptured = radarBaseZone != null && radarBaseZone.Owner == CaptureOwner.Ally;
 
-        ObjectiveTextUtil.SetObjectiveText(destroyMainBaseText, "(주목표) OC 전초기지(메인기지) 파괴", mainBaseDestroyed);
-        ObjectiveTextUtil.SetObjectiveText(secureOreText, "(서브) 광물 확보", oreAmount, RequiredOre);
-        ObjectiveTextUtil.SetObjectiveText(captureRadarBaseText, "(서브) 레이더 기지 점령", radarCaptured);
-        ObjectiveTextUtil.SetObjectiveText(destroyAllEnemyBuildingsText, "(서브) 적 건물 모두 파괴", allEnemyBuildingsDestroyed);
+        ObjectiveTextUtil.SetObjectiveText(destroyMainBaseText, LocalizationManager.GetText("objective.stage1.main1"), mainBaseDestroyed);
+        ObjectiveTextUtil.SetObjectiveText(secureOreText, LocalizationManager.GetText("objective.stage1.sub1"), oreAmount, RequiredOre);
+        ObjectiveTextUtil.SetObjectiveText(captureRadarBaseText, LocalizationManager.GetText("objective.stage1.sub2"), radarCaptured);
+        ObjectiveTextUtil.SetObjectiveText(destroyAllEnemyBuildingsText, LocalizationManager.GetText("objective.stage1.sub3"), allEnemyBuildingsDestroyed);
 
         if (mainBaseDestroyed)
             StageManager.Instance?.ReportVictory();

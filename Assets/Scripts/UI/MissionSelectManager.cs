@@ -150,7 +150,7 @@ public class MissionSelectManager : MonoBehaviour
 
         EventTrigger.Entry enterEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
         enterEntry.callback.AddListener(_ =>
-            TooltipUI.Instance?.Show(rect, entry.missionName, $"Mission {entry.missionNumber}"));
+            TooltipUI.Instance?.Show(rect, entry.missionName, LocalizationManager.GetText("missionselect.tooltip.subtitle", entry.missionNumber)));
         trigger.triggers.Add(enterEntry);
 
         EventTrigger.Entry exitEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };

@@ -35,8 +35,8 @@ public class Stage5Objectives : MonoBehaviour
 
         bool commandCoreDestroyed = alienCommandCoreAssigned && alienCommandCore == null;
 
-        ObjectiveTextUtil.SetObjectiveText(destroyEnergyCoresText, "(주목표) 에너지 코어 파괴", destroyedCoreCount, trackedEnergyCores.Count);
-        ObjectiveTextUtil.SetObjectiveText(destroyCommandCoreText, "(주목표) 외계 지휘 코어 제거", commandCoreDestroyed);
+        ObjectiveTextUtil.SetObjectiveText(destroyEnergyCoresText, LocalizationManager.GetText("objective.stage5.main1"), destroyedCoreCount, trackedEnergyCores.Count);
+        ObjectiveTextUtil.SetObjectiveText(destroyCommandCoreText, LocalizationManager.GetText("objective.stage5.main2"), commandCoreDestroyed);
 
         if (allCoresDestroyed && commandCoreDestroyed)
             StageManager.Instance?.ReportVictory();

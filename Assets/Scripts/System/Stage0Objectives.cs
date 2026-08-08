@@ -56,11 +56,11 @@ public class Stage0Objectives : MonoBehaviour
 
         bool oreSecured = oreAmount >= RequiredOre;
 
-        ObjectiveTextUtil.SetObjectiveText(captureZoneText, "(주목표) 거점 1개 점령하기", zoneCaptured);
-        ObjectiveTextUtil.SetObjectiveText(produceTroopersText, "(주목표) 어썰트 트루퍼 생산하기", trooperCount, RequiredTrooperCount);
-        ObjectiveTextUtil.SetObjectiveText(buildBarracksText, "(주목표) 병영 건설하기", barracksBuilt);
-        ObjectiveTextUtil.SetObjectiveText(clearEnemiesText, "(서브) 주변 적 유닛 모두 제거", enemiesCleared);
-        ObjectiveTextUtil.SetObjectiveText(secureOreText, "(서브) 광물 확보", oreAmount, RequiredOre);
+        ObjectiveTextUtil.SetObjectiveText(captureZoneText, LocalizationManager.GetText("objective.stage0.main1"), zoneCaptured);
+        ObjectiveTextUtil.SetObjectiveText(produceTroopersText, LocalizationManager.GetText("objective.stage0.main2"), trooperCount, RequiredTrooperCount);
+        ObjectiveTextUtil.SetObjectiveText(buildBarracksText, LocalizationManager.GetText("objective.stage0.main3"), barracksBuilt);
+        ObjectiveTextUtil.SetObjectiveText(clearEnemiesText, LocalizationManager.GetText("objective.stage0.sub1"), enemiesCleared);
+        ObjectiveTextUtil.SetObjectiveText(secureOreText, LocalizationManager.GetText("objective.stage0.sub2"), oreAmount, RequiredOre);
 
         if (zoneCaptured && troopersReady && barracksBuilt)
             StageManager.Instance?.ReportVictory();

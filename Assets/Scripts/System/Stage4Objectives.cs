@@ -35,8 +35,8 @@ public class Stage4Objectives : MonoBehaviour
         if (!ocCommandCenterDestroyedPermanently && ocCommandCenterAssigned && ocCommandCenter == null)
             ocCommandCenterDestroyedPermanently = true;
 
-        ObjectiveTextUtil.SetObjectiveText(destroyCommandBaseText, "(주목표) 외계 사령기지 파괴", commandBaseDestroyed);
-        ObjectiveTextUtil.SetSurvivalObjectiveText(survivalOcCommandText, "(서브) OC 사령부 생존", ocCommandCenterDestroyedPermanently);
+        ObjectiveTextUtil.SetObjectiveText(destroyCommandBaseText, LocalizationManager.GetText("objective.stage4.main1"), commandBaseDestroyed);
+        ObjectiveTextUtil.SetSurvivalObjectiveText(survivalOcCommandText, LocalizationManager.GetText("objective.stage4.sub1"), ocCommandCenterDestroyedPermanently);
 
         if (commandBaseDestroyed)
             StageManager.Instance?.ReportVictory();

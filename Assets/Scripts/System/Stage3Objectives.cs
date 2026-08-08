@@ -48,8 +48,8 @@ public class Stage3Objectives : MonoBehaviour
                 StartCoroutine(RescueSequence());
         }
 
-        ObjectiveTextUtil.SetObjectiveText(destroyOutpostText, "(주목표) 외계 전초기지 제거", outpostDestroyed);
-        ObjectiveTextUtil.SetObjectiveText(rescueSurvivorsText, "(서브) 생존한 OC 병사 구조", survivorsRescued);
+        ObjectiveTextUtil.SetObjectiveText(destroyOutpostText, LocalizationManager.GetText("objective.stage3.main1"), outpostDestroyed);
+        ObjectiveTextUtil.SetObjectiveText(rescueSurvivorsText, LocalizationManager.GetText("objective.stage3.sub1"), survivorsRescued);
 
         if (outpostDestroyed)
             StageManager.Instance?.ReportVictory();

@@ -356,6 +356,7 @@ GameObject:
   - component: {fileID: 1573330982593053573}
   - component: {fileID: 7937240719873656867}
   - component: {fileID: 2123685375346360281}
+  - component: {fileID: 3860937331370232866}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -426,6 +427,21 @@ MonoBehaviour:
   m_Text: 'BGM
 
 '
+--- !u!114 &3860937331370232866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1024418147667501764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b21f21ae842ea245bd2716532ff75e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  target: {fileID: 0}
+  legacyTarget: {fileID: 2123685375346360281}
+  key: settings.audio.bgm
 --- !u!1 &1364558943374106769
 GameObject:
   m_ObjectHideFlags: 0
@@ -1558,6 +1574,7 @@ GameObject:
   - component: {fileID: 5818829701084964246}
   - component: {fileID: 3489424664949515819}
   - component: {fileID: 7876308768690866418}
+  - component: {fileID: 305721976411461437}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -1628,6 +1645,21 @@ MonoBehaviour:
   m_Text: 'Voice
 
 '
+--- !u!114 &305721976411461437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3887454675574215724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b21f21ae842ea245bd2716532ff75e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  target: {fileID: 0}
+  legacyTarget: {fileID: 7876308768690866418}
+  key: settings.audio.voice
 --- !u!1 &3889954005473504250
 GameObject:
   m_ObjectHideFlags: 0
@@ -2873,6 +2905,7 @@ GameObject:
   - component: {fileID: 7468263824021525084}
   - component: {fileID: 6699134700124114324}
   - component: {fileID: 7228537487361651887}
+  - component: {fileID: 7244216082986310758}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -2943,6 +2976,21 @@ MonoBehaviour:
   m_Text: 'Master
 
 '
+--- !u!114 &7244216082986310758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6152723769488065253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b21f21ae842ea245bd2716532ff75e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  target: {fileID: 0}
+  legacyTarget: {fileID: 7228537487361651887}
+  key: settings.audio.master
 --- !u!1 &6228972169935354014
 GameObject:
   m_ObjectHideFlags: 0
@@ -3101,6 +3149,7 @@ GameObject:
   - component: {fileID: 4775652510809376815}
   - component: {fileID: 5784031600236755943}
   - component: {fileID: 1385765397970003889}
+  - component: {fileID: 6482389072182072560}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -3169,6 +3218,21 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: SFX
+--- !u!114 &6482389072182072560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7154208604472503754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b21f21ae842ea245bd2716532ff75e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  target: {fileID: 0}
+  legacyTarget: {fileID: 1385765397970003889}
+  key: settings.audio.sfx
 --- !u!1 &7217345488244307843
 GameObject:
   m_ObjectHideFlags: 0
@@ -4342,7 +4406,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

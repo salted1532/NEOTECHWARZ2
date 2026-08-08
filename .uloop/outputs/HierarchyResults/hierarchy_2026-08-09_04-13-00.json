@@ -1,0 +1,425 @@
+{
+  "ExportTimestamp": "2026-08-09 04:13:00",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "MissionSelect",
+    "nodeCount": 27,
+    "maxDepth": 2
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "MissionSelect",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 27,
+        "maxDepth": 2
+      },
+      "componentsLut": [
+        "RectTransform",
+        "Canvas",
+        "CanvasScaler",
+        "GraphicRaycaster",
+        "CanvasRenderer",
+        "Image",
+        "Button",
+        "TooltipUI",
+        "TextMeshProUGUI"
+      ],
+      "roots": [
+        {
+          "name": "Canvas",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 5,
+          "path": "Canvas",
+          "children": [
+            {
+              "name": "Close",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Close",
+              "children": []
+            },
+            {
+              "name": "Mission0",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Mission0",
+              "children": []
+            },
+            {
+              "name": "Mission1",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Mission1",
+              "children": []
+            },
+            {
+              "name": "Sub_Mission1",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Sub_Mission1",
+              "children": []
+            },
+            {
+              "name": "Sub_Mission2",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Sub_Mission2",
+              "children": []
+            },
+            {
+              "name": "Sub_Mission3",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Sub_Mission3",
+              "children": []
+            },
+            {
+              "name": "Sub_Mission4",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Sub_Mission4",
+              "children": []
+            },
+            {
+              "name": "Mission2",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Mission2",
+              "children": []
+            },
+            {
+              "name": "Mission3",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Mission3",
+              "children": []
+            },
+            {
+              "name": "Mission4",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 9,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Mission4",
+              "children": []
+            },
+            {
+              "name": "Mission5",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 10,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Mission5",
+              "children": []
+            },
+            {
+              "name": "Line",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 11,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Line",
+              "children": []
+            },
+            {
+              "name": "Line (5)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 12,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Line (5)",
+              "children": []
+            },
+            {
+              "name": "Line (6)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 13,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Line (6)",
+              "children": []
+            },
+            {
+              "name": "Line (7)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 14,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Line (7)",
+              "children": []
+            },
+            {
+              "name": "Line (8)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 15,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Line (8)",
+              "children": []
+            },
+            {
+              "name": "Line (1)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 16,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Line (1)",
+              "children": []
+            },
+            {
+              "name": "Line (2)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 17,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Line (2)",
+              "children": []
+            },
+            {
+              "name": "Line (3)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 18,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Line (3)",
+              "children": []
+            },
+            {
+              "name": "Line (4)",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 19,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Line (4)",
+              "children": []
+            },
+            {
+              "name": "ToolTip",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                7
+              ],
+              "siblingIndex": 20,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/ToolTip",
+              "children": [
+                {
+                  "name": "Image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ToolTip/Image",
+                  "children": []
+                },
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    8
+                  ],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ToolTip/Text (TMP)",
+                  "children": []
+                },
+                {
+                  "name": "Text (TMP) (1)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    8
+                  ],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/ToolTip/Text (TMP) (1)",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "UnlockMission",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                6
+              ],
+              "siblingIndex": 21,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/UnlockMission",
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    8
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/UnlockMission/Text (TMP)",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

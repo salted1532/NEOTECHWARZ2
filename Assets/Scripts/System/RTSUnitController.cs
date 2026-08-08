@@ -1123,8 +1123,8 @@ public class RTSUnitController : MonoBehaviour
     {
         return ButtonAction.Simple(
             EnterRallyMode,
-            "Rally",
-            "Set the rally point for newly produced units. \nshortcut key [<color=yellow>Y</color>]",
+            LocalizationManager.GetText("cmd.rally.title"),
+            LocalizationManager.GetText("cmd.rally.desc", ShortcutTag(KeyCode.Y)),
             KeyCode.Y);
     }
 
@@ -1400,13 +1400,13 @@ public class RTSUnitController : MonoBehaviour
                 {
                     Debug.Log("자원부족!");
                     SoundManager.Instance?.PlayInsufficientResourcesWarning();
-                    uIController.ShowWarning("Gather more resources.");
+                    uIController.ShowWarning(LocalizationManager.GetText("warning.resource"));
                 }
                 else
                 {
                     Debug.Log("인구수부족!");
                     SoundManager.Instance?.PlayInsufficientPopulationWarning();
-                    uIController.ShowWarning("Build a Supply Depot.");
+                    uIController.ShowWarning(LocalizationManager.GetText("warning.population"));
                 }
 
                 break; // 자원이 부족해진 시점부터는 나머지 건물도 어차피 불가능하므로 중단
@@ -1435,7 +1435,7 @@ public class RTSUnitController : MonoBehaviour
         {
             Debug.Log("자원부족!");
             SoundManager.Instance?.PlayInsufficientResourcesWarning();
-            uIController.ShowWarning("Gather more resources.");
+            uIController.ShowWarning(LocalizationManager.GetText("warning.resource"));
             return false;
         }
 
@@ -1527,7 +1527,7 @@ public class RTSUnitController : MonoBehaviour
             // 유닛 생산/연구와 동일한 전역 "자원부족" 나레이션을 재생한다 (doc/0272 - 예전엔 원인 구분
             // 없이 항상 일꾼의 buildFailVoice가 나가서 장애물 음성처럼 들렸음).
             SoundManager.Instance?.PlayInsufficientResourcesWarning();
-            uIController.ShowWarning("Gather more resources.");
+            uIController.ShowWarning(LocalizationManager.GetText("warning.resource"));
             return false;
         }
 
@@ -1538,6 +1538,10 @@ public class RTSUnitController : MonoBehaviour
 
     #region 버튼 툴팁 데이터 구성
 
+    // 커맨드 버튼 설명 템플릿의 {0}에 채워넣는 단축키 표시 - "<color=yellow>Y</color>" 형태
+    // (doc/0481, 예전엔 각 설명 문자열에 이 태그를 직접 손으로 박아뒀었음).
+    private static string ShortcutTag(KeyCode key) => $"<color=yellow>{key}</color>";
+
     // 유닛 생산 버튼용 ButtonAction 생성 (제목=유닛명, 비용=광물/가스/인구수)
     private ButtonAction UnitButtonAction(Action callback, int unitID, KeyCode shortcut = KeyCode.None)
     {
@@ -1546,13 +1550,13 @@ public class RTSUnitController : MonoBehaviour
             return ButtonAction.Simple(callback, string.Empty, string.Empty);
 
         string description = string.IsNullOrEmpty(data.description)
-            ? $"Train {data.unitName}."
+            ? LocalizationManager.GetText("unit.trainfallback", data.unitName)
             : data.description;
 
         if (data.requiredBuildingID != 0 && !HasCompletedBuilding(data.requiredBuildingID))
         {
             string requiredName = GetBuildingName(data.requiredBuildingID);
-            description += $"\n<color=red>Requires {requiredName}</color>";
+            description += LocalizationManager.GetText("cmd.requiresbuilding", requiredName);
         }
 
         return ButtonAction.WithCost(callback, data.unitName, description, data.mineral, data.gas, data.population, shortcut);
@@ -1565,15 +1569,15 @@ public class RTSUnitController : MonoBehaviour
         int currentLevel = building != null ? building.GetResearchLevel(type) : 0;
         var (ore, gas) = building != null ? building.GetResearchCost(type) : (0, 0);
 
-        string baseTitle = type == ResearchType.Attack ? "Attack Upgrade" : "Armor Upgrade";
+        string baseTitle = LocalizationManager.GetText(type == ResearchType.Attack ? "research.attack.name" : "research.armor.name");
         bool maxed = currentLevel >= ResearchQueue.MaxLevel;
 
-        string title = maxed ? $"{baseTitle} (MAX)" : $"{baseTitle} Lv.{currentLevel + 1}";
+        string title = maxed
+            ? LocalizationManager.GetText("research.title.maxed", baseTitle)
+            : LocalizationManager.GetText("research.title.level", baseTitle, currentLevel + 1);
         string description = maxed
-            ? $"{baseTitle} fully researched."
-            : (type == ResearchType.Attack
-                ? $"Research increased attack damage for all units. (Lv.{currentLevel} → Lv.{currentLevel + 1})"
-                : $"Research increased armor for all units. (Lv.{currentLevel} → Lv.{currentLevel + 1})");
+            ? LocalizationManager.GetText("research.desc.maxed", baseTitle)
+            : LocalizationManager.GetText(type == ResearchType.Attack ? "research.desc.attack" : "research.desc.armor", currentLevel, currentLevel + 1);
 
         return ButtonAction.WithCost(() => TryResearch(type), title, description, ore, gas, 0);
     }
@@ -1586,13 +1590,13 @@ public class RTSUnitController : MonoBehaviour
             return ButtonAction.Simple(callback, string.Empty, string.Empty);
 
         string description = string.IsNullOrEmpty(data.description)
-            ? $"Construct {data.Name}."
+            ? LocalizationManager.GetText("building.constructfallback", data.Name)
             : data.description;
 
         if (data.requiredBuildingID != 0 && !HasCompletedBuilding(data.requiredBuildingID))
         {
             string requiredName = GetBuildingName(data.requiredBuildingID);
-            description += $"\n<color=red>Requires {requiredName}</color>";
+            description += LocalizationManager.GetText("cmd.requiresbuilding", requiredName);
         }
 
         return ButtonAction.WithCost(callback, data.Name, description, data.mineral, data.gas, data.population, shortcut);
@@ -1787,8 +1791,8 @@ public class RTSUnitController : MonoBehaviour
         bool onCooldown = trait.isActiveSkill && skillCooldownRemaining > 0f;
 
         string description = trait.isActiveSkill
-            ? $"{trait.description} \nshortcut key [<color=yellow>{trait.shortcutKey}</color>]"
-                + (onCooldown ? $"\nRemain time: {skillCooldownRemaining:F1}" : "")
+            ? $"{trait.description} " + LocalizationManager.GetText("trait.shortcutsuffix", ShortcutTag(trait.shortcutKey))
+                + (onCooldown ? LocalizationManager.GetText("trait.cooldownsuffix", skillCooldownRemaining) : "")
             : trait.description;
 
         // 진단용(doc/0368): 스킬이 이 슬롯을 처음 차지하는 순간인데 이미 다른 버튼이 남아있으면
@@ -1846,22 +1850,22 @@ public class RTSUnitController : MonoBehaviour
                 {
                     case UnitState.Worker:
                         uIController.ShowWorkerPanel(
-                            ButtonAction.Simple(EnterMoveMode, "Move", "Move to a location. \nshortcut key [<color=yellow>M</color>]", KeyCode.M),
-                            ButtonAction.Simple(EnterAttackMode, "Attack", "Attack a target or location. \nshortcut key [<color=yellow>A</color>]", KeyCode.A),
-                            ButtonAction.Simple(StopSelectedUnits, "Stop", "Stop the current action. \nshortcut key [<color=yellow>S</color>]", KeyCode.S),
-                            ButtonAction.Simple(EnterPatrolMode, "Patrol", "Patrol along a path. \nshortcut key [<color=yellow>P</color>]", KeyCode.P),
-                            ButtonAction.Simple(HoldSelectedUnits, "Hold", "Hold the current position. \nshortcut key [<color=yellow>H</color>]", KeyCode.H),
-                            ButtonAction.Simple(EnterReturnMode, "Return Cargo", "Return gathered resources to base. \nshortcut key [<color=yellow>R</color>]", KeyCode.R),
-                            ButtonAction.Simple(BuildModeOn, "Build", "Enter build mode. \nshortcut key [<color=yellow>B</color>]", KeyCode.B));
+                            ButtonAction.Simple(EnterMoveMode, LocalizationManager.GetText("cmd.move.title"), LocalizationManager.GetText("cmd.move.desc", ShortcutTag(KeyCode.M)), KeyCode.M),
+                            ButtonAction.Simple(EnterAttackMode, LocalizationManager.GetText("cmd.attack.title"), LocalizationManager.GetText("cmd.attack.desc", ShortcutTag(KeyCode.A)), KeyCode.A),
+                            ButtonAction.Simple(StopSelectedUnits, LocalizationManager.GetText("cmd.stop.title"), LocalizationManager.GetText("cmd.stop.desc", ShortcutTag(KeyCode.S)), KeyCode.S),
+                            ButtonAction.Simple(EnterPatrolMode, LocalizationManager.GetText("cmd.patrol.title"), LocalizationManager.GetText("cmd.patrol.desc", ShortcutTag(KeyCode.P)), KeyCode.P),
+                            ButtonAction.Simple(HoldSelectedUnits, LocalizationManager.GetText("cmd.hold.title"), LocalizationManager.GetText("cmd.hold.desc", ShortcutTag(KeyCode.H)), KeyCode.H),
+                            ButtonAction.Simple(EnterReturnMode, LocalizationManager.GetText("cmd.returncargo.title"), LocalizationManager.GetText("cmd.returncargo.desc", ShortcutTag(KeyCode.R)), KeyCode.R),
+                            ButtonAction.Simple(BuildModeOn, LocalizationManager.GetText("cmd.build.title"), LocalizationManager.GetText("cmd.build.desc", ShortcutTag(KeyCode.B)), KeyCode.B));
                         break;
 
                     case UnitState.AttackUnit:
                         uIController.ShowAttackUnitPanel(
-                            ButtonAction.Simple(EnterMoveMode, "Move", "Move to a location. \nshortcut key [<color=yellow>M</color>]", KeyCode.M),
-                            ButtonAction.Simple(EnterAttackMode, "Attack", "Attack a target or location. \nshortcut key [<color=yellow>A</color>]", KeyCode.A),
-                            ButtonAction.Simple(StopSelectedUnits, "Stop", "Stop the current action. \nshortcut key [<color=yellow>S</color>]", KeyCode.S),
-                            ButtonAction.Simple(EnterPatrolMode, "Patrol", "Patrol along a path. \nshortcut key [<color=yellow>P</color>]", KeyCode.P),
-                            ButtonAction.Simple(HoldSelectedUnits, "Hold", "Hold the current position. \nshortcut key [<color=yellow>H</color>]", KeyCode.H));
+                            ButtonAction.Simple(EnterMoveMode, LocalizationManager.GetText("cmd.move.title"), LocalizationManager.GetText("cmd.move.desc", ShortcutTag(KeyCode.M)), KeyCode.M),
+                            ButtonAction.Simple(EnterAttackMode, LocalizationManager.GetText("cmd.attack.title"), LocalizationManager.GetText("cmd.attack.desc", ShortcutTag(KeyCode.A)), KeyCode.A),
+                            ButtonAction.Simple(StopSelectedUnits, LocalizationManager.GetText("cmd.stop.title"), LocalizationManager.GetText("cmd.stop.desc", ShortcutTag(KeyCode.S)), KeyCode.S),
+                            ButtonAction.Simple(EnterPatrolMode, LocalizationManager.GetText("cmd.patrol.title"), LocalizationManager.GetText("cmd.patrol.desc", ShortcutTag(KeyCode.P)), KeyCode.P),
+                            ButtonAction.Simple(HoldSelectedUnits, LocalizationManager.GetText("cmd.hold.title"), LocalizationManager.GetText("cmd.hold.desc", ShortcutTag(KeyCode.H)), KeyCode.H));
                         break;
                 }
 
@@ -1979,14 +1983,14 @@ public class RTSUnitController : MonoBehaviour
                     uIController.ShowBuildingLiftCommand(
                         representativeBuilding.IsLifted(),
                         representativeBuilding.IsLifted()
-                            ? ButtonAction.Simple(BeginLandingSelectedBuilding, "Land", "Choose a landing site. \nshortcut key [<color=yellow>L</color>]", KeyCode.L)
-                            : ButtonAction.Simple(LiftSelectedBuilding, "Lift Off", "Lift the building into the air. \nshortcut key [<color=yellow>L</color>]", KeyCode.L));
+                            ? ButtonAction.Simple(BeginLandingSelectedBuilding, LocalizationManager.GetText("cmd.land.title"), LocalizationManager.GetText("cmd.land.desc", ShortcutTag(KeyCode.L)), KeyCode.L)
+                            : ButtonAction.Simple(LiftSelectedBuilding, LocalizationManager.GetText("cmd.liftoff.title"), LocalizationManager.GetText("cmd.liftoff.desc", ShortcutTag(KeyCode.L)), KeyCode.L));
 
                     // 공중에 뜬 상태에서만 고정 슬롯(0번)에 "이동" 버튼을 추가로 노출한다.
                     if (representativeBuilding.IsLifted())
                     {
                         uIController.ShowBuildingMoveCommand(
-                            ButtonAction.Simple(EnterBuildingMoveMode, "Move", "Move to a location while airborne. \nshortcut key [<color=yellow>M</color>]", KeyCode.M));
+                            ButtonAction.Simple(EnterBuildingMoveMode, LocalizationManager.GetText("cmd.move.title"), LocalizationManager.GetText("cmd.moveairborne.desc", ShortcutTag(KeyCode.M)), KeyCode.M));
                     }
                 }
                 else if (selectedBuildingList.Count > 0)
@@ -2100,8 +2104,8 @@ public class RTSUnitController : MonoBehaviour
                     uIController.ShowBaseStructureCommandPanel(
                         ButtonAction.Simple(
                             CancelSelectedBaseStructure,
-                            "Cancel",
-                            "Cancel construction and refund resources. \nshortcut key [<color=yellow>T</color>]",
+                            LocalizationManager.GetText("cmd.cancel.title"),
+                            LocalizationManager.GetText("cmd.cancelconstruction.desc", ShortcutTag(KeyCode.T)),
                             KeyCode.T));
                 }
                 else
@@ -2126,8 +2130,8 @@ public class RTSUnitController : MonoBehaviour
                     BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Lab), BuildingID.Lab, KeyCode.L),
                     ButtonAction.Simple(
                         CancelBuildMode,
-                        "Cancel",
-                        "Exit build mode. \nshortcut key [<color=yellow>T</color>]",
+                        LocalizationManager.GetText("cmd.cancel.title"),
+                        LocalizationManager.GetText("cmd.cancelbuildmode.desc", ShortcutTag(KeyCode.T)),
                         KeyCode.T));
 
                 uIController.HideProductionUI();

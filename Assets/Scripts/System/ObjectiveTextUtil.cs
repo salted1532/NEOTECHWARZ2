@@ -27,6 +27,6 @@ public static class ObjectiveTextUtil
     public static void SetSurvivalObjectiveText(TextMeshProUGUI text, string description, bool failed)
     {
         if (text == null) return;
-        text.text = failed ? $"<s>{description}</s> (실패)" : description;
+        text.text = failed ? $"<s>{description}</s>{LocalizationManager.GetText("objective.fail.suffix")}" : description;
     }
 }
