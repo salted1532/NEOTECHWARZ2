@@ -1,0 +1,234 @@
+{
+  "ExportTimestamp": "2026-08-09 19:06:29",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "MainScene",
+    "nodeCount": 23,
+    "maxDepth": 1
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "MainScene",
+      "stats": {
+        "rootCount": 12,
+        "nodeCount": 23,
+        "maxDepth": 1
+      },
+      "roots": [
+        {
+          "name": "Main Camera",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 0,
+          "tag": "MainCamera",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Directional Light",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Canvas",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 5,
+          "children": [
+            {
+              "name": "MainScreen",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "MainMenuController",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 3,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "EventSystem",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 4,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "Mission5",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 5,
+          "tag": "Untagged",
+          "layer": 7,
+          "children": [
+            {
+              "name": "layer1",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Layer1",
+              "layer": 7,
+              "children": []
+            },
+            {
+              "name": "layer2",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Layer2",
+              "layer": 7,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Scout Drone",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 6,
+          "tag": "AttackUnit",
+          "layer": 6,
+          "children": [
+            {
+              "name": "unit_Quad_B_Wheel_Front_yup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "unit_Quad_B_Wheel_Rear_yup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "unit_Trike_B_yup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "struct_Headquarters_A_yup",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 7,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": [
+            {
+              "name": "struct_Headquarters_Guard_A_yup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "firehawks",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 8,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": [
+            {
+              "name": "unit_Ornithopter_Light_B_yup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "unit_Ornithopter_Light_B_yup (1)",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "unit_Ornithopter_Light_B_yup (2)",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "WFX_SmokeGrenade AlphaBlend Gray",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 9,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": [
+            {
+              "name": "Smoke",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "SoundManager",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 10,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        },
+        {
+          "name": "LocalizationManager",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 11,
+          "tag": "Untagged",
+          "layer": 0,
+          "children": []
+        }
+      ]
+    }
+  ]
+}
