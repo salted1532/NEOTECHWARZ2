@@ -19,23 +19,30 @@ Unity로 제작 중인 스타크래프트 스타일의 RTS(실시간 전략) 게
 ```
 Assets/
 ├─ Scripts/
-│  ├─ Animation/        # 공중유닛/리프트 건물 호버링(HoverBob), 지상 차량 이동 셰이크(VehicleShake), 지속 회전(AutoRotate) - DOTween 기반
+│  ├─ Animation/        # 공중유닛/리프트 건물 호버링(HoverBob), 지상 차량 이동 셰이크(VehicleShake), 지속 회전(AutoRotate), 보병 대기 중 둘러보기(InfantryIdleLookAround), 차량 대기 애니메이션(VehicleIdleAnimation), 유닛 애니메이터 파라미터 갱신(UnitAnimatorDriver), 아이템 부유(ItemHover) - DOTween 기반
 │  ├─ Audio/            # 사운드 전담 싱글턴(SoundManager), 유닛/건물 사운드 재생 컴포넌트(UnitAudio/BuildingAudio), 랜덤 재생 클립 묶음(SoundClipSet)
-│  ├─ Building/        # 건물 컨트롤러, 건설 중 건물 기반(BaseStructure)
+│  ├─ Building/        # 건물 컨트롤러, 건설 중 건물 기반(BaseStructure), 연구 대기열(ResearchQueue)
 │  ├─ BuildSystem/      # 건물 배치 시스템 (그리드, 미리보기, 입력)
-│  ├─ Camera/           # RTS 카메라/미니맵 이동·조작(명령까지 확장), 지형 티어별 줌 범위 보정, 미니맵 시야 사각형 표시, 공격받은 위치 미니맵 마커(MinimapAlertController)
+│  ├─ Camera/           # RTS 카메라/미니맵 이동·조작(명령까지 확장), 지형 티어별 줌 범위 보정, 미니맵 시야 사각형 표시, 공격받은 위치 미니맵 마커(MinimapAlertController), 미니맵 위 미션 목표 오브젝트 마커(MinimapObjectiveMarker/MinimapObjectiveOverlay)
 │  ├─ CaptureSystem/    # 거점 점령(밀당식 Ally↔Neutral↔Enemy 순환, 완전 점령 되돌리기/재점령 2배속/방치 시 감쇠) + 다각형 영토 판정(TerritoryZone/TerritoryManager)
-│  ├─ Effects/          # 공격/이동/피격/사망/건물 이착륙/건설 이펙트 재생 시스템(EffectPlayer 등), 안개에 가려진 위치면 스폰 자체를 건너뜀
+│  ├─ Effects/          # 공격/이동/피격/사망/건물 이착륙/건설 이펙트 재생 시스템(EffectPlayer 등), 스킬 범위 표시(RadiusIndicator), 안개에 가려진 위치면 스폰 자체를 건너뜀
 │  ├─ FogOfWar/         # 전장의 안개(csFogWar) 연동 어댑터 — 유닛/건물 시야 소스 등록(FogRevealerAgent), 점령 영토 강제 시야 확보(TerritoryFogReveal), 안개 상태 조회 공용 헬퍼(FogVisibility)
-│  │  └─ Enemy/         # 적 유닛/건물 컨트롤러(EnemyUnitController/EnemyBuildingController) — 마커·미니맵 아이콘·체력 데이터 + 기초 AI(자동 교전/이동/공격-이동), 안개에 가려지면 미니맵 마커 숨김·선택 자동 해제
+│  │  ├─ Enemy/         # 적(외계종족) 유닛/건물 컨트롤러(EnemyUnitController/EnemyBuildingController/EnemyAttackRange) — 마커·미니맵 아이콘·체력 데이터 + 기초 AI(자동 교전/이동/공격-이동), 안개에 가려지면 미니맵 마커 숨김·선택 자동 해제
+│  │  └─ Ally/          # 아군 OC(플레이어에게 적대적이지 않은 구조 유닛) 컨트롤러(AllyController/AllyBuildingController/AllyAttackRange) — Enemy 쪽 로직을 상속 없이 복제해 피아식별만 반대로 유지(doc/0452)
+│  ├─ Localization/     # 언어별(en/ko) JSON 텍스트 조회 싱글턴(LocalizationManager), 정적 UI 라벨 자동 번역 컴포넌트(LocalizedText)
 │  ├─ Resource/         # 자원 노드 및 자원 관리 (`ResourceController.cs`는 미사용 빈 스텁)
-│  ├─ ScriptableObject/ # 유닛/건물 데이터 정의(SO)
-│  ├─ System/           # RTS 유닛 통합 컨트롤 시스템
-│  ├─ UI/               # 생산 슬롯, 인게임 UI 컨트롤러, 툴팁
-│  ├─ Unit/             # 유닛 컨트롤러, 공격 범위, 체력 관리
+│  ├─ ScriptableObject/ # 유닛/건물 데이터 정의(SO) — NTA(UnitDataSO/BuildingDataSO) + OC/스포어 브루드(EnemyUnitDataSO/EnemyBuildingDataSO, 같은 UnitData/BuildingData 구조 재사용)
+│  ├─ System/           # RTS 유닛 통합 컨트롤 시스템, 캠페인 스테이지별 목표 스크립트(Stage0~5Objectives/StageManager/ObjectiveTextUtil/MissionItem), 연구 보너스 전역 관리(UpgradeManager)
+│  ├─ UI/               # 생산 슬롯, 인게임 UI 컨트롤러, 툴팁, 메인 메뉴(MainMenuController/MainMenuFlyby/SceneMenuController), 미션 선택 화면(MissionSelectManager), 승리 패널(VictoryPanelController), 부대지정 UI(ControlGroupPanel)
+│  ├─ Unit/             # 유닛 컨트롤러, 공격 범위, 체력 관리, 포탑(TurretController), 투사체(Projectile), 지속 피해(DamageOverTimeEffect), 은신 비주얼(StealthVisual)
+│  │  └─ Skills/         # 고급유닛 액티브 스킬(SharpshooterSkill/SkyLancerSkill/GuardianDroneSkill)
 │  ├─ UnitSpawner/      # 유닛 생산/스폰
+│  ├─ Upgrade/          # 연구소 업그레이드로 얻는 전역 공격/방어 보너스 관리(UpgradeManager)
 │  └─ UserControl/      # 유닛 선택 및 명령 입력 처리, 마우스 커서 상태 전환
-├─ Scenes/              # 게임 씬 (SampleScene, TestScene — TestScene이 1스테이지 맵(Mission1) 복원용 씬)
+├─ Scenes/
+│  ├─ MainScene/        # 메인 메뉴(Play/Option/Exit), 언어 선택(EN/KR) 버튼
+│  ├─ Missions/         # MissionSelect(미션 선택 화면) + Mission0~5(캠페인 스테이지 0~5 본편 씬)
+│  ├─ SampleScene, TestScene  # 초기 프로토타입/기능 확인용 씬(캠페인 씬으로 대체되어 현재는 미사용에 가까움)
 ├─ prefabs/             # 유닛/건물 프리팹 (`NTA/`, 유닛은 전부·건물은 대부분 기본 프리미티브 메시 사용 — 병영 건물에만 실제 모델 1개 적용 시작), 맵 프리팹(`Maps/Mission1~5`, YuME 타일맵 기반 — 실제 사용 중인 건 Mission1뿐)
 ├─ AssetFolder/         # 3rd-party 에셋 — 모델링/스카이박스(Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox, TZ_Futuristic Panel Textures, LowPolyWater_Pack, 임포트+URP 머티리얼 변환 완료했지만 게임플레이 프리팹엔 대부분 미적용 — 병영 건물에 실제 모델 1개 적용 시작) + 전장의 안개 플러그인(`AOSFogWar`/csFogWar, 실제로 적용되어 작동 중)
 ├─ Material, Shader/    # 머티리얼 및 커스텀 셰이더
@@ -57,9 +64,20 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `UserControl` | 마우스/키보드 입력을 해석해 선택·명령을 `RTSUnitController`에 전달, 상태별(기본/선택/이동/공격) 마우스 커서 아이콘 전환, ESC로 대기 명령 취소 | [doc](Docs/UserControl.md) |
 | `UnitController` | 유닛의 이동/전투/순찰/자원 채취 상태머신 (지상+공중 유닛 공통) | [doc](Docs/UnitController.md) |
 | `AttackRange` | 사거리 내 적 감지 및 자동 공격/추격 | [doc](Docs/AttackRange.md) |
+| `TurretController` | 차량형 유닛의 포탑 오브젝트가 몸체와 별개로 `AttackRange` 감지 대상을 향해 조준(이동 중에도 계속 조준), DOTween 반동 연출 | [doc](Docs/TurretController.md) |
+| `UnitAnimatorDriver` | 유닛의 이동/공격 상태를 Animator 파라미터(IsMoving/Fire)에 반영, Animator 없는 유닛은 조용히 무시 | [doc](Docs/UnitAnimatorDriver.md) |
+| `Projectile` | 투사체 인스턴스 자신이 이동/명중을 처리(발사자 사망 후에도 끊기지 않도록 소유권 이전, doc/0319) | [doc](Docs/Projectile.md) |
+| `DamageOverTimeEffect` | 대상에 붙어 일정 시간 주기적으로 데미지를 주는 범용 DoT 컴포넌트, 재요청 시 스택 대신 지속시간만 갱신 | [doc](Docs/DamageOverTimeEffect.md) |
+| `StealthVisual` | 살아있는 유닛의 머티리얼을 일시적으로 반투명 흰색으로 바꿨다가 원본으로 복원하는 은신 비주얼 컴포넌트 | [doc](Docs/StealthVisual.md) |
+| `RadiusIndicator` | `LineRenderer` 기반으로 원형 범위를 잠깐 바닥에 그려 보여주는 범용 스킬 이펙트(텍스처/머티리얼 불필요) | [doc](Docs/RadiusIndicator.md) |
+| `SharpshooterSkill` | 저격수 액티브 스킬 2종(저격 즉시데미지 / 은신) — `IUnitSkill` 구현, 특성(trait) 시스템에 연결 | [doc](Docs/SharpshooterSkill.md) |
+| `SkyLancerSkill` | 스카이랜서 스킬 2종(공중 강화 패시브 화염 도트 / 지상 폭격 범위 데미지) | [doc](Docs/SkyLancerSkill.md) |
+| `GuardianDroneSkill` | 가디언 드론 스킬 2종(집중 포화 3연발 투사체 / 쉴드 전개 임시 최대체력) | [doc](Docs/GuardianDroneSkill.md) |
 | `BuildingController` | 건물 선택, 랠리 포인트, 생산 위임, 파괴 시 대기열 환불/인구수 반환 | [doc](Docs/BuildingController.md) |
 | `BaseStructure` | 건설 중인 건물 기반 — 담당 일꾼이 붙어있을 때만 건설 진행(체력 상승), 완공 시 실제 건물 스폰, 취소/파괴 시 환불 | [doc](Docs/BaseStructure.md) |
 | `UnitSpawner` | 건물의 유닛 생산 대기열(FIFO) 관리 및 스폰, 대기열 취소 시 환불용 유닛ID 반환 | [doc](Docs/UnitSpawner.md) |
+| `ResearchQueue` | 연구소(Lab) 부착, 공격력/방어력 연구 대기열(레벨 1~3) 관리 — `UnitSpawner`와 동일한 FIFO 타이머 구조 | [doc](Docs/ResearchQueue.md) |
+| `UpgradeManager` | 연구로 얻은 전역 공격력/방어력 보너스 저장, `RTSUnitController`의 `AddGlobalBonus` 경로로만 값이 오감 | [doc](Docs/UpgradeManager.md) |
 | `PlacementSystem` | 그리드 기반 건물 배치, 배치 가능 여부 판정, 프리팹 높이 기반 자동 지면 정렬 | [doc](Docs/PlacementSystem.md) |
 | `GridData` | 그리드 셀 점유 정보 관리 (순수 데이터 클래스) | [doc](Docs/GridData.md) |
 | `PreviewSystem` | 배치 프리뷰(고스트 오브젝트) 및 셀 커서 표시 | [doc](Docs/PreviewSystem.md) |
@@ -69,6 +87,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `HealthManager` | 체력/데미지/치유/사망 처리 공용 컴포넌트, 절대값 지정(SetHealth/SetMaxHealth), 데미지 이벤트에 공격자 진영 정보(isEnemyAttacker) 포함 | [doc](Docs/HealthManager.md) |
 | `UnitDataSO` | 유닛 스탯 데이터베이스 — 체력/공격력/사거리/공격속도/아이콘/장갑타입/크기타입까지 스폰되는 유닛이 자기 `unitID`로 직접 조회해 스스로 적용(`UnitController.ApplyUnitData`, `doc/0205`), `tier`로 생산 가능 건물 자동 분류(`doc/0200`), 공격 전달 방식(Hitscan/Projectile) 선택 | [doc](Docs/UnitDataSO.md) |
 | `BuildingDataSO` | 건물 스펙(비용/크기/생산시간/인구수 제공량 등) 데이터베이스 | [doc](Docs/BuildingDataSO.md) |
+| `EnemyUnitDataSO` | 적(OC 등) 진영 유닛 데이터베이스 — `UnitDataSO`와 동일한 `UnitData` 구조 재사용, 진영별로 SO 에셋만 분리 | [doc](Docs/EnemyUnitDataSO.md) |
+| `EnemyBuildingDataSO` | 적(OC 등) 진영 건물 데이터베이스 — `BuildingDataSO`와 동일한 `BuildingData` 구조 재사용 | [doc](Docs/EnemyBuildingDataSO.md) |
 | `DamageMultiplierTableSO` | 공격 방식(소총/폭발/레이저/화염) × 대상 크기(소형/중형/대형) 데미지 배율표 — 코드가 아니라 별도 에셋으로 분리해 인스펙터에서 밸런스 조정 가능 | [doc](doc/0201-armor-size-damage-multiplier-system.md) |
 | `DamageTypes` | 전투 공용 열거형 모음(ArmorType/SizeType/AttackDeliveryType) | [doc](Docs/DamageTypes.md) |
 | `LaserBeamAttack` | 레이저 공격 유닛 전용 옵셔널 컴포넌트 — firePoint~대상을 매 프레임 월드 좌표로 잇는 재사용 빔(순수 시각효과, 데미지는 이미 적용된 뒤) | [doc](Docs/LaserBeamAttack.md) |
@@ -80,14 +100,22 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `FogVisibility` | 월드 좌표가 지금 안개에 가려져 있는지(Revealed/PreviouslyRevealed면 보임) 조회하는 공용 정적 헬퍼 — 미니맵 마커/체력바/점령 타이머/이펙트 스폰이 전부 이걸 통해 안개 속에서 숨겨짐 | [doc](Docs/FogVisibility.md) |
 | `EnemyUnitController` | 적 유닛 컨트롤러(구 `EnemyController`, doc/0231에서 개명) — 선택/마커/스탯뿐 아니라 자동 교전·이동·공격-이동까지 담당하는 단순 AI, 미니맵 마커/체력바가 안개 속에서 자동으로 숨겨지고 안개에 가려지면 선택도 자동 해제됨 | [doc](Docs/EnemyUnitController.md) |
 | `EnemyBuildingController` | 적 건물 "껍데기" — 체력/선택/미니맵 마커만 있고 실제 생산 큐는 없음(캠페인 전용 배치형), 안개에 가려지면 미니맵 마커가 숨겨지고 선택도 자동 해제 | [doc](Docs/EnemyBuildingController.md) |
+| `EnemyAttackRange` | 적 유닛의 자식 트리거 콜라이더 부착, 사거리 내 상대(플레이어) 자동 감지·공격·추격 — `AllyAttackRange`가 태그만 바꿔 상속 | [doc](Docs/EnemyAttackRange.md) |
+| `AllyController` | 아군 OC(구조된 유닛 등) 컨트롤러 — `EnemyUnitController` 로직을 상속 없이 복제, 피아식별 방향만 반대(doc/0452) | [doc](Docs/AllyController.md) |
+| `AllyBuildingController` | 아군 OC 건물 컨트롤러 — 껍데기라 AI가 없어 `EnemyBuildingController`를 이름만 다르게 그대로 상속 | [doc](Docs/AllyBuildingController.md) |
+| `AllyAttackRange` | 아군 OC 유닛의 자식 오브젝트, 사거리 내 "적대 세력"(외계종족) 자동 감지/교전 — `EnemyAttackRange` 상속, 대상 태그만 교체 | [doc](Docs/AllyAttackRange.md) |
 | `CaptureSystem` | 거점 점령 — 트리거 범위 내 아군/적 유닛 수에 따라 부호 있는 점령치를 밀당, 양쪽 다 있으면 교착, 완전 점령을 되돌리려면 1배속으로 30초+30초, 한 번도 완전 점령된 적 없는 상태에서 반대 진영 진행치를 지우는 중이면 2배속, 방치 시 완전 점령이면 원래 소유자 쪽으로 회복·중립 진행중이면 0으로 감쇠(3초 후 바 자동 숨김), 점령 타이머가 안개에 가려진 위치면 숨겨짐 | [doc](Docs/CaptureSystem.md) |
 | `TerritoryZone` | 인스펙터에서 핀(꼭짓점) 개수만 늘리면 자동 생성되는 다각형 영토 범위(오목 다각형도 판정 가능), 소유자에 따라 외곽선 색이 흰색/초록/빨강으로 자동 전환 | [doc](doc/0133-territoryzone-implementation.md) |
 | `TerritoryManager` | 씬의 모든 `TerritoryZone`을 등록해 특정 좌표가 아군 영토 안인지 한 번에 질의(여러 영토가 겹치면 합집합) | [doc](doc/0141-territory-restriction-implementation-design.md) |
 | `FogRevealerAgent` | 유닛/건물에 부착해 `csFogWar`에 자신을 시야 소스로 등록/해제하는 어댑터(기존 컨트롤러는 건드리지 않음) | [doc](doc/0166-fogofwar-folder-and-eye-script-design.md) |
 | `TerritoryFogReveal` | 아군이 점령한 `TerritoryZone` 내부를 시야 소스 없이도 항상 밝게 강제 반영 | [doc](doc/0166-fogofwar-folder-and-eye-script-design.md) |
+| `LocalizationManager` | 현재 언어(PlayerPrefs)에 맞는 `Resources/Localization` JSON을 읽어 텍스트 조회를 제공하는 싱글턴(doc/0481) | [doc](Docs/LocalizationManager.md) |
+| `LocalizedText` | 스크립트로 갱신되지 않는 정적 UI 라벨을 언어 변경 이벤트에 맞춰 자동 재표시, TMP/레거시 Text 둘 다 지원 | [doc](Docs/LocalizedText.md) |
 | `UIController` | 커맨드 패널, 생산 대기열, 자원 표시 UI 총괄, 버튼별 키보드 단축키 데이터 보유 | [doc](Docs/UIController.md) |
 | `ProductionSlot` | 커맨드/생산 대기열의 버튼 슬롯 하나, 자기 단축키 자동 감지 + 눌림 효과 재현 | [doc](Docs/ProductionSlot.md) |
 | `TooltipUI` | 버튼/스탯 호버 시 툴팁 표시 | [doc](Docs/TooltipUI.md) |
+| `TooltipContentFitter` | 툴팁 배경 크기를 실제 표시 중인 제목/설명 텍스트 분량에 맞춰 매번 다시 계산 | [doc](Docs/TooltipContentFitter.md) |
+| `ControlGroupPanel` | 부대(컨트롤 그룹) 선택 버튼을 그룹 생성/전멸에 맞춰 자동 생성·파괴, `HorizontalLayoutGroup`으로 정렬 | [doc](Docs/ControlGroupPanel.md) |
 | `HealthBarBillboard` | 체력바 UI가 카메라의 X(피치) 각도만 따라 회전(Y/Z 고정)하도록 하는 빌보드 컴포넌트 | [doc](Docs/HealthBarBillboard.md) |
 | `EffectPlayer` | 이펙트 프리팹(파티클/사운드) 스폰·자동 파괴 공용 정적 헬퍼 — 단발/다중지점/지속형 재생 지원 | [doc](doc/0105-effect-system-integration-design.md) |
 | `HitEffectSet` | 공격 타입(총기/폭발/레이저/화염)별 피격 이펙트 프리팹 묶음(직렬화 클래스) | [doc](doc/0108-hit-effect-attack-type-variants.md) |
@@ -98,6 +126,9 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `HoverBob` | 공중 유닛/리프트 중인 건물의 비주얼 자식 오브젝트를 DOTween으로 둥실거리게 하는 컴포넌트 | [doc](doc/0119-dotween-hover-bob-design.md) |
 | `VehicleShake` | 지상 차량 유닛이 이동 중일 때 DOTween으로 흔들림을 재현하는 컴포넌트 | [doc](doc/0120-vehicle-shake-and-animation-folder.md) |
 | `AutoRotate` | 레이더 접시/터렛 헤드 등을 DOTween으로 조건 없이 지속 회전시키는 컴포넌트 | [doc](doc/0147-autorotate-dotween-script.md) |
+| `InfantryIdleLookAround` | 보병 유닛이 대기 상태일 때 랜덤 주기로 몸을 돌려 주변을 경계하는 연출(이동/공격 중에는 개입 안 함) | [doc](Docs/InfantryIdleLookAround.md) |
+| `VehicleIdleAnimation` | 차량 유닛 대기 시 엔진 떨림 + 포탑 방황 연출, 실제 조준 대상이 잡히면 즉시 `TurretController`에 제어권 반환 | [doc](Docs/VehicleIdleAnimation.md) |
+| `ItemHover` | 조건 판정 없이 붙이기만 하면 항상 둥실거리고 회전하는 미션 아이템(유물 등) 전용 장식 컴포넌트 | [doc](Docs/ItemHover.md) |
 | `SoundManager` | 사운드 전담 싱글턴 — BGM/SFX/Voice 볼륨·뮤트 관리, AudioSource 풀링, 동시재생 스팸 방지, 명령확인음 전용 단일채널 | [doc](Docs/SoundManager.md) |
 | `SoundClipSet` | 랜덤 재생용 오디오 클립 묶음 직렬화 클래스 (모든 사운드 뱅크의 슬롯 타입) | [doc](Docs/SoundClipSet.md) |
 | `UnitAudio` | 유닛의 SFX(공격/생성/사망/스킬/채취)·Voice(선택/명령/생성/사망) 재생 전담 컴포넌트 | [doc](Docs/UnitAudio.md) |
@@ -106,6 +137,17 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `BuildingSoundBankSO` | 건물 종류별 사운드 뱅크 에셋 | [doc](Docs/BuildingSoundBankSO.md) |
 | `GlobalVoiceBankSO` | 유닛/건물에 안 묶이는 전역 나레이션(자원/인구 부족, 피격 경고, 업그레이드 완료) 에셋 | [doc](Docs/GlobalVoiceBankSO.md) |
 | `SoundSettingsPanel` | 볼륨 슬라이더/뮤트 토글 UI 로직 (SoundManager API 연결, 실제 Canvas 배치는 미완료) | [doc](Docs/SoundSettingsPanel.md) |
+| `MainMenuController` | 메인 메뉴(MainScene) Play/Option/Exit 버튼 연결, 버튼 호버 시 커서 전환 | [doc](Docs/MainMenuController.md) |
+| `MainMenuFlyby` | 메인화면 배경 장식(우주선 등) — 대각선 비행 후 시작점 텔레포트, 랜덤 대기 반복 | [doc](Docs/MainMenuFlyby.md) |
+| `SceneMenuController` | 게임플레이 씬의 옵션 패널 표시/숨김, "메인화면으로"·스테이지 이동 처리 | [doc](Docs/SceneMenuController.md) |
+| `MissionSelectManager` | 미션 선택 씬의 스테이지 버튼 연결(인스펙터 리스트), 호버 툴팁, 해금 상태는 PlayerPrefs로 관리 | [doc](Docs/MissionSelectManager.md) |
+| `MissionItem` | 유물/연구 데이터베이스 등 미션 오브젝트에 부착 — 선택 시 Info Panel 표시(이름/설명, 로컬라이제이션 지원), 트리거 접촉 판정(비콘 반납용) | [doc](Docs/MissionItem.md) |
+| `ObjectiveTextUtil` | 스테이지 목표 체크리스트 텍스트 표시 공용 헬퍼 — 완료 시 취소선, 생존형 목표는 실패 확정 후 고정 | [doc](Docs/ObjectiveTextUtil.md) |
+| `StageManager` | 스테이지 승리/패배 "결과"만 담당하는 최소 골격 싱글턴 — 판정은 각 `Stage0~5Objectives`가 직접 하고 결과만 보고 | [doc](Docs/StageManager.md) |
+| `Stage0Objectives` ~ `Stage5Objectives` | 스테이지별 목표 체크리스트 — 거점 점령/생산·건설, 적 전초기지 파괴, 유물·연구데이터 확보·운반, 생존자 구조, 에너지 코어 파괴 등 목표 성격에 맞는 감지 방식(매 프레임 폴링/이벤트 기반/생존형) | [doc](Docs/Stage0Objectives.md) 외 |
+| `MinimapObjectiveMarker` | 미션 목표 오브젝트에 붙이면 미니맵에 아이콘 표시, 오브젝트 비활성화/파괴 시 자동으로 사라짐(doc/0349) | [doc](Docs/MinimapObjectiveMarker.md) |
+| `MinimapObjectiveOverlay` | 씬의 `MinimapObjectiveMarker`들을 미니맵 위에 아이콘으로 렌더링하는 싱글턴 | [doc](Docs/MinimapObjectiveOverlay.md) |
+| `VictoryPanelController` | `StageManager.OnVictory` 구독, 승리 패널 표시 + "메인화면/다음 스테이지/계속하기" 버튼 처리 | [doc](Docs/VictoryPanelController.md) |
 
 > 문서 칸이 `doc/NNNN-...` 형식인 스크립트(`DamageMultiplierTableSO`, `TerritoryZone`~`TerritoryFogReveal`, `EffectPlayer`~`AutoRotate` 등)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
 
@@ -113,6 +155,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 
 - [`Docs/UnitAndBuildingStats.md`](Docs/UnitAndBuildingStats.md) — 유닛 9종 + 건물 6종의 현재 스탯을 정해진 양식(유닛명/ID/생산티어/공격범위/공격방식/장갑/크기/가격&인구수/생산시간/체력/공격력/사거리/공격속도/단축키)으로 정리한 최신 레퍼런스. `UnitDataSO`/`BuildingDataSO`에 적힌 실제 값 기준.
 - [`Docs/UnitBalanceReference.md`](Docs/UnitBalanceReference.md) — 어떤 값이 실제로 게임에 반영되는지(SO vs 프리팹) 조사한 감사 기록, 설계 스펙과 실측값이 어긋났던 부분들의 이력.
+- [`Docs/EnemyUnitAndBuildingStats.md`](Docs/EnemyUnitAndBuildingStats.md) — 적 진영(OC) 유닛/건물 수치를 아군과 동일한 양식으로 정리, `EnemyUnitDataSO`/`EnemyBuildingDataSO` 기준.
+- [`Docs/Campaign.md`](Docs/Campaign.md) — 캠페인 세계관/스토리 설정, 스테이지 0~5 시놉시스.
 
 ## 주요 기능
 
@@ -144,7 +188,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 
 1. [Unity Hub](https://unity.com/download)에서 **Unity 6000.4.8f1** 버전을 설치합니다.
 2. 저장소를 클론한 뒤 Unity Hub에서 프로젝트 폴더를 엽니다.
-3. `Assets/Scenes/MainScene`(Play/Option/Exit 메인 메뉴)에서 시작하거나, `Assets/Scenes/SampleScene`을 바로 실행하여 플레이합니다.
+3. `Assets/Scenes/MainScene`(Play/Option/Exit 메인 메뉴)에서 시작해 Play → 미션 선택 화면(`Assets/Scenes/Missions/MissionSelect`)에서 스테이지(0~5)를 골라 플레이합니다. 각 미션 씬을 바로 열어(`Assets/Scenes/Missions/Mission0`~`Mission5`) 개별 실행할 수도 있습니다.
 
 ## 구현 완료 기능
 
@@ -171,6 +215,16 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 생산 가능 건물 자동 분류 — `UnitDataSO`에 `tier`(0=본진/1=병영/2=공장/3=우주공항) 값만 지정하면 코드 수정 없이 해당 건물 생산 패널에 자동으로 나타남
 - [x] 유닛 스탯 자가 동기화 — 유닛이 스폰 시 `Start()`에서 자기 `unitID`로 `UnitDataSO`를 직접 조회해 체력/공격력/사거리/공격속도/아이콘/장갑·크기 타입을 스스로 적용, 생산 큐를 거쳤든 씬에 직접 배치됐든 항상 적용됨
 - [x] 신규 유닛 2종 추가 — Sharpshooter(저격수, 병영), SkyLancer(스카이랜서, 공장), 둘 다 특정 장갑 타입 상대 고유 추가 데미지 보유
+- [x] 유닛 이동속도 전체 1.5배 증가
+- [x] 카메라 줌 아웃 범위 증가
+- [x] 건물 클릭 히트박스 조정 — 실제로 클릭되길 기대하는 위치에서 더 확실하게 선택되도록 콜라이더/판정 보정
+- [x] 도달/추격 로직 정비(도달 가능/불가 2모드 통일) — 목적지가 도달 가능하면 매 프레임 실시간으로 추적(이동→재탐색→경로갱신 무한반복), 도달 불가능(경사로 없는 언덕 등)하면 가장 가까운 위치로 이동 후 도착 시점에만 재탐색해서 도달 가능 여부를 다시 확인 — 강제공격/이동(따라가기)/적 강제공격 전부 동일한 두 모드로 통일, 도중에 목적지가 도달 가능한 위치로 바뀌면 자동으로 실시간 추적 모드로 전환됨
+- [x] 올라갈 수 없는 언덕(경사로가 연결되지 않아 NavMesh가 길을 못 찾는 경우) 이동/추격 예외처리 — 도달 불가로 판정되면 갈 수 있는 가장 가까운 위치까지만 이동
+- [x] 올라갈 수 없거나 도달할 수 없는 대상에 대한 공격 명령 처리 — 최대한 가까운 곳까지 이동 후 사거리 안에 들면 공격, 도저히 도달할 수 없고 사거리 안에도 들지 않으면 공격 명령 자동 취소
+- [x] 적 유닛(`EnemyAttackRange`)도 동일한 도달 가능/불가 추격 로직 적용 — 사거리 내 진입 시 추격, 도달 불가 대상은 가장 가까운 위치로 이동, 이동 중 사거리를 들락날락하는 대상 재탐색으로 인한 멈칫거림도 함께 해결(`engagedTarget` 우선 유지, doc/0388)
+- [x] 고급유닛 스킬 사용이 공격 명령보다 우선순위 — 전투 중이더라도 스킬 사용 명령(지정 유닛/위치)을 내리면 사거리 내 여부와 무관하게 나머지를 무시하고 스킬을 사용하러 이동
+- [x] 일꾼 자원 채취/반납 로직 개선 — 자신이 캐던 자원을 기억해뒀다가 건물 우클릭 시 반납 후 그 자원으로 복귀, 다른 자원을 우클릭하면 자원을 들고 있을 때만 먼저 반납하고 새로 지정한 자원으로 이동
+- [x] 메인기지 착륙 시 자원을 보유 중인 모든 일꾼에게 자동으로 리턴 명령(각자 기준 가장 가까운 메인기지 재탐색) 하달
 
 ### 데미지 시스템
 - [x] 장갑 타입(경장갑/중장갑) × 크기 타입(소형/중형/대형) × 공격 방식(소총/폭발/레이저/화염) 3축 분류
@@ -180,6 +234,9 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 
 ### 건물 / 생산
 - [x] 건물 배치(그리드 기반, 배치 가능 여부 판정)
+- [x] 언덕 벽면 건설 차단 — 점령지 영역이 언덕과 지상을 함께 포함할 때 언덕 벽을 뚫고 짓던 문제 해결, 지형 끝 모서리에 건설 불가 영역을 지정해 Layer2(언덕) 벽면에는 건물을 지을 수 없음
+- [x] 점령지(거점) 위 건설/착륙 차단 — 점령지 오브젝트도 건물 판정을 받아 그 위에 건물을 짓거나 리프트 중인 건물이 착륙할 수 없음
+- [x] 일꾼이 도달할 수 없는 위치로 건설 명령 시 자동 취소 — 높이가 안 맞거나 경사로 없는 언덕 등, 가장 가까운 위치까지 이동해도 도달 불가능하면 건설 명령을 취소하고 건설 실패 음성 재생
 - [x] 프리팹 높이 기반 자동 지면 정렬(`PlacementSystem.GetGroundOffsetY`) — 건물마다 크기가 달라도 뜨거나 파묻히지 않게 자동 계산
 - [x] 게임 시작 시 `startPoint` 위치에 메인기지 자동 생성(그리드 등록 포함)
 - [x] 메인기지 건설 시 자원(광물/가스)과 최소 이격 거리 규칙(기본 7칸, 인스펙터 조정 가능, 다른 건물엔 미적용)
@@ -254,6 +311,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 커맨드 패널 버튼별 키보드 단축키 + 눌림 시각 효과(아래 "키보드 단축키" 참고)
 - [x] 유닛/건물별 체력바 UI — `HealthManager`의 `Slider` 필드가 체력 변화에 맞춰 자동 갱신, `HealthBarBillboard`로 카메라의 X(피치)만 따라 회전(Y/Z 고정)
 - [x] 부대지정 단축키(컨트롤 그룹) — `Ctrl+숫자` 저장, `Shift+숫자` 병합 추가, 숫자만 눌러 선택
+- [x] 미니맵에 자원 노드(광물/가스) 표시
+- [x] 유닛/건물 아이콘 이미지 개선
 
 ### 사운드
 - [x] `SoundManager` 싱글턴 — 주음량/배경음악/효과음/음성 4개 카테고리 볼륨·뮤트 관리, `PlayerPrefs` 영속화(설정 UI가 실제로 값을 저장하기 전까지는 인스펙터 기본값 유지), `AudioSource` 풀 순환 재사용(SFX 16개/Voice 4개)
@@ -264,18 +323,42 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 동시다발 SFX/Voice 스팸 방지 — 같은 사운드가 짧은 시간 내 재요청되면 무시(최소 재생 간격), 동시 재생 개수 상한 초과 시 무시(여러 유닛이 한 프레임에 공격/사망해도 소리가 무제한으로 안 겹침)
 - [x] "적에게 공격받음" 경고음이 아군사격(오인사격)에는 울리지 않음 — 공격자 진영 정보(`isEnemyAttacker`)가 데미지 이벤트를 타고 끝까지 전달됨
 - [x] 볼륨 슬라이더/뮤트 토글 UI(`SoundSettingsPanel`) — `SoundManager` API 연결 + `MainScene`의 "Option" 패널에 실제 배치 완료
+- [x] 유닛별 사망 사운드
+- [x] 건물 이륙/착륙 사운드
+- [x] 건물 파괴 사운드
+
+### 캠페인 / 미션
+- [x] 캠페인 기획 및 스테이지 0~5 구성 — `Assets/Scenes/Missions/Mission0`~`Mission5`, 각 스테이지 맵 꾸미기 완료
+- [x] 스테이지별 목표 오브젝트 스크립트(`Stage0Objectives`~`Stage5Objectives`) — 주목표/서브목표를 스테이지마다 구성. 유물/데이터 확보처럼 트리거 기반으로 획득/운반해 완료하는 목표, 적 건물 전멸처럼 리스트 변화가 있을 때만(매 프레임이 아니라) 갱신되는 목표, 오브젝트 파괴 여부를 구독해 완료/실패를 가르는 목표 등 목표 성격에 맞는 감지 방식을 각각 사용
+- [x] 미션 선택 화면(`MissionSelectManager`) — 스테이지 0~5 버튼, 마우스 호버 시 미션 이름(번역 지원 + `<이름>` 장식) 툴팁, 미해금 스테이지 잠금 처리, 메인화면으로 돌아가기
+- [x] 씬 간 이동 연결 — 메인화면 → 미션 선택 → 각 스테이지, 스테이지 내 옵션 패널에서 이전/다음 미션 이동 및 메인화면 복귀
+- [x] 외계종족(스포어 브루드) 신규 진영 구현 — 유닛 3종(Ripfang/Spitter/Skitterwing) + 건물 3종(Hive Core/Spawning Pit/Bio-Reactor)
+- [x] 아군 OC(구조 가능한 유닛) 구현 — NTA(플레이어) 유닛의 강제공격 대상은 되지만 자동 공격 대상으로는 인식되지 않음, `EnemyUnitController`/`EnemyBuildingController`와 별개로 `AllyController`/`AllyBuildingController`/`AllyAttackRange`가 피아식별만 반대로 동일 로직을 담당(doc/0452)
+- [x] 버전/변경 이력 관리 — `doc/0001-`부터 번호순으로 세션별 요청·코드 변경 내역을 전부 기록(사실상의 패치노트 로그, 아래 "개발 프로세스 메모" 참고)
+
+### 로컬라이제이션(다국어)
+- [x] 영어/한글 텍스트를 `Assets/Resources/Localization/en.json`·`ko.json`로 외부화, `LocalizationManager` 싱글턴이 현재 언어에 맞는 JSON을 읽어 조회 제공
+- [x] 정적 UI 라벨(스크립트로 갱신되지 않는 버튼/텍스트)도 `LocalizedText` 컴포넌트로 자동 번역
+- [x] 메인화면 EN/KR 버튼으로 즉시 언어 전환 — `PlayerPrefs`로 씬을 넘어가도 선택한 언어 유지, 버튼 클릭 즉시(오브젝트를 껐다 켤 필요 없이) 화면의 모든 텍스트가 갱신됨
+- [x] 유닛/건물 이름·설명(생산 버튼 툴팁 + Info Panel 설명) 번역 — `unit.<진영>.<ID>.name/desc/info`, `building.<진영>.<ID>.name/desc/info` 키 체계, 번역 누락/매니저 없음/조회 예외 시 `ScriptableObject`에 적힌 원문을 그대로 표시하는 안전장치 포함(`LocalizationManager.GetTextOrFallback`)
+- [x] 미션 선택 화면의 미션명도 번역 지원
+- [x] 미션 오브젝트(유물/연구 데이터베이스) 이름·설명 번역 — `missionitem.<id>.name/desc` 키 체계, Info Panel에 설명까지 표시(doc/0490)
 
 ## 로드맵 (미구현)
 
-- [ ] 사망 시 래그돌/사망 애니메이션 — 현재는 사망 즉시 `Destroy(gameObject)` + 파티클 스폰만 지원(옵션 A), 오브젝트를 유지한 채 애니메이션 재생 후 지연 파괴하는 구조(옵션 B, doc/0105 3.5절)는 미구현
-- [ ] Enemy AI 고도화 — `EnemyUnitController`에 기초적인 AI(사거리 내 자동 교전, 이동, 공격-이동)는 이미 구현돼 있지만, 건물 배치/유닛 생산/다중 유닛 조율 같은 전략적 판단을 내리는 AI 디렉터는 아직 없음(현재 적 유닛/건물은 씬에 미리 배치되는 방식). 1대1(플레이어 vs AI 진영) 대전용 AI도 별도 구상 필요
+- [ ] Enemy AI 구현(스크립트로 동작하는 진짜 "적 지휘관") — 지금은 적 유닛/건물이 씬에 미리 배치되고 `EnemyUnitController`의 기초 AI(사거리 내 자동 교전/이동/공격-이동)만 동작함. 시간에 맞춰 공격 병력을 모아 보내는 타이머 기반 웨이브(예: 5/10/15분 간격), 점령지에 별동대를 보내 탈환을 노리는 로직 등 전략적 판단을 내리는 AI 디렉터가 필요 — `EnemyController`(적 진영 조종 스크립트)와 아군 OC 조종 스크립트 별도 제작 예정
+- [ ] 외계종족 전용 공격/사망 이펙트 — 현재는 기존 이펙트를 재사용 중, 외계종족만의 별도 비주얼 준비 예정
+- [ ] 서브 스테이지 구성 — 메인 스테이지 0~5 사이/주변에 약 4개 서브 스테이지 기획 및 구현 예정(기획 단계)
+- [ ] 스테이지 사이 브리핑룸 구현 — 미션 시작 전 현재 상황(스토리)/목표를 텍스트+음성으로 안내하고 캐릭터 얼굴을 보여주는 연출
 - [ ] 건물 고유 스킬 추가 — 유닛 고급 특성(스킬 선택)처럼 건물 전용 고유 스킬은 아직 기획/구현 전
-- [ ] UI 버튼 하단 이미지 등 비주얼 개선
+- [ ] 건물 선택 사운드 — 유닛별 사망/건물 이착륙·파괴 사운드는 완료, 건물 선택 사운드만 남음
+- [ ] UI 디자인 개선 — 버튼 하단 이미지 등 전반적인 UI 비주얼 개선
+- [ ] 1대1(플레이어 vs AI 진영) 대전용 AI — 위 Enemy AI와는 별도로 구상 필요
+- [ ] 사망 시 래그돌/사망 애니메이션 — 현재는 사망 즉시 `Destroy(gameObject)` + 파티클 스폰만 지원(옵션 A), 오브젝트를 유지한 채 애니메이션 재생 후 지연 파괴하는 구조(옵션 B, doc/0105 3.5절)는 미구현
 - [ ] `AttackRange`의 자동 사거리 탐지가 `BaseStructure`(건설 중인 건물)를 대상으로 삼는 경로 — 현재는 A 모드 강제 공격(오인사격 포함)으로만 공격 가능하고, 자동 교전 대상에는 포함되지 않음
-- [ ] 캠페인 맵/스테이지 구성 — 0~5 메인 스테이지 + 서브 스테이지 약 4개 기획 예정, `Mission2~5` 프리팹은 존재하지만 아직 어느 씬에서도 사용되지 않음(1스테이지 `Mission1`만 분위기 확인용 프로토타입으로 사용 중), 스테이지 사이 브리핑룸도 미구현
 - [ ] 지원기(Support Ship) 유닛 — 공격 없이 주변 아군 버프를 주는 티어3 유닛으로 구상 중, 프리팹/SO 데이터/버프 시스템 전부 미착수
 - [ ] 점령지(거점) 미니맵 마커 — 유닛/건물은 미니맵에 원/사각형으로 표시되지만, 거점(`CaptureSystem`)은 아직 전용 미니맵 마커(노란 원 예정)가 없음
-- [ ] 사운드 콘텐츠 보강 — 유닛별 사망 사운드, 건물 선택/이착륙/파괴 사운드(재생 코드 자체는 `UnitAudio`/`BuildingAudio`에 이미 있으나 일부 종류는 실제 오디오 클립이 아직 안 채워짐)
+- [ ] Pretendard 다른 폰트 웨이트 추가 — 현재 Black 웨이트 SDF 폰트 애셋 하나만 생성돼 있어 전체 텍스트에 통일 적용 중, Regular 등 다른 웨이트가 필요해지면 Font Asset Creator로 추가 생성 필요
 
 ## UI 설계 노트 (기획 원문 정리)
 

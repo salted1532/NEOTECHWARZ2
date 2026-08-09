@@ -2067,8 +2067,9 @@ public class RTSUnitController : MonoBehaviour
                 {
                     uIController.ShowResourceInfoPanel(
                         selectedResourceNode.GetIcon(),
-                        selectedResourceNode.Type == ResourceType.Ore ? "Ore" : "Gas",
-                        selectedResourceNode.RemainingAmount);
+                        selectedResourceNode.GetName(),
+                        selectedResourceNode.RemainingAmount,
+                        selectedResourceNode.GetDescription());
                 }
                 else
                 {
@@ -2084,7 +2085,8 @@ public class RTSUnitController : MonoBehaviour
 
                 if (selectedMissionItem != null)
                 {
-                    uIController.ShowInfoPanel(selectedMissionItem.GetIcon(), selectedMissionItem.GetItemName(), null);
+                    uIController.ShowInfoPanel(selectedMissionItem.GetIcon(), selectedMissionItem.GetItemName(), null,
+                        selectedMissionItem.GetDescription());
                 }
                 else
                 {

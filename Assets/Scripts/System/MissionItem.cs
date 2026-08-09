@@ -7,7 +7,9 @@ using UnityEngine;
 // 닿아 있는지"(비콘 반납 판정용, doc/0456)를 담당한다.
 public class MissionItem : MonoBehaviour
 {
+    [SerializeField] private string itemID; // 로컬라이제이션 키 구분용 (예: "artifact", "researchdata")
     [SerializeField] private string itemName;
+    [SerializeField, TextArea] private string description;
     [SerializeField] private Sprite icon;
     [SerializeField] private GameObject selectionMarker; // 선택 시 표시할 마커 (없으면 그냥 표시 없이 선택만 됨)
 
@@ -42,5 +44,10 @@ public class MissionItem : MonoBehaviour
     }
 
     public Sprite GetIcon() => icon;
-    public string GetItemName() => itemName;
+
+    public string GetItemName() =>
+        LocalizationManager.GetTextOrFallback($"missionitem.{itemID}.name", itemName);
+
+    public string GetDescription() =>
+        LocalizationManager.GetTextOrFallback($"missionitem.{itemID}.desc", description);
 }

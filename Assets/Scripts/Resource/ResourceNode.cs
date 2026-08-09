@@ -109,6 +109,16 @@ public class ResourceNode : MonoBehaviour
 
     public Sprite GetIcon() => icon;
 
+    public string GetName() => resourceType == ResourceType.Ore
+        ? LocalizationManager.GetTextOrFallback("resource.ore.name", "Ironite Ore")
+        : LocalizationManager.GetTextOrFallback("resource.gas.name", "Petronite");
+
+    public string GetDescription() => resourceType == ResourceType.Ore
+        ? LocalizationManager.GetTextOrFallback("resource.ore.desc",
+            "A versatile metal ore refined into anything from armor plating to circuitry - the basic material behind everything NTA builds.")
+        : LocalizationManager.GetTextOrFallback("resource.gas.desc",
+            "Mined as a green crystal, but refining it yields a fuel as energy-dense as crude oil.");
+
     // 채취 명령(우클릭)을 받았을 때 "어느 자원이 대상인지" 피드백으로 마커를 짧게 깜빡인다.
     // 좌클릭 선택 마커와 같은 오브젝트를 사용하므로, 끝나면 실제 선택 상태에 맞춰 복원한다.
     public void FlashMarker()
