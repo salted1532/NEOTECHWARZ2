@@ -443,7 +443,7 @@ public class BuildingController : MonoBehaviour, IDestructible
     // 지정 유닛 ID를 생산 대기열에 추가하도록 UnitSpawner에 위임한다.
     public void SpawnUnit(int unitID)
     {
-        UnitSpawner.Enqueue(unitID);
+        UnitSpawner?.Enqueue(unitID);
     }
 
     public Vector3 GetRallyPos()
@@ -467,13 +467,13 @@ public class BuildingController : MonoBehaviour, IDestructible
     // 현재 생산 대기열 목록을 반환 (UI 표시용, UnitSpawner에 위임)
     public IReadOnlyList<ProductionData> GetProductionQueue()
     {
-        return UnitSpawner.GetProductionQueue();
+        return UnitSpawner != null ? UnitSpawner.GetProductionQueue() : null;
     }
 
     // 현재 생산 중인 항목의 진행률(0~1) 반환 (UnitSpawner에 위임)
     public float GetProductionProgress()
     {
-        return UnitSpawner.GetProductionProgress();
+        return UnitSpawner != null ? UnitSpawner.GetProductionProgress() : 0f;
     }
 
     // 생산 대기열이 가득 찼는지 (UnitSpawner에 위임) - 자원을 소모하기 전에 먼저 확인하기 위함
@@ -482,10 +482,10 @@ public class BuildingController : MonoBehaviour, IDestructible
         return UnitSpawner != null && UnitSpawner.IsQueueFull();
     }
 
-    // 대기열의 특정 항목 생산을 취소한다 (UnitSpawner에 위임) - 환불을 위해 취소된 유닛ID를 반환한다.
+    // 대기열의 특정 항목 생산을 취소한다 (UnitSpawner에 위임) - 환불을 위해 취소된 유닛ID를 반환한다(유효하지 않으면 -1).
     public int CancelProduction(int index)
     {
-        return UnitSpawner.Cancel(index);
+        return UnitSpawner != null ? UnitSpawner.Cancel(index) : -1;
     }
 
     // 파괴 시 대기열에 남아있던 항목들을 반환(제거)한다 - UnitSpawner가 없는 건물(생산 불가 건물)은 null.

@@ -480,6 +480,11 @@ public class EnemyUnitController : MonoBehaviour, IDestructible, IAttackRangeUni
         if (target.TryGetComponent<UnitController>(out var playerUnit))
             return playerUnit.GetArmor();
 
+        // 구조된 아군 OC(AllyController)도 공격 대상이 될 수 있으므로(doc/0452) AllyController의
+        // 대칭 메소드와 동일하게 조회한다 (doc/0493 - 이 분기 누락으로 항상 기본값이 나가던 버그 수정).
+        if (target.TryGetComponent<AllyController>(out var allyUnit))
+            return allyUnit.GetArmor();
+
         return 0;
     }
 
@@ -488,6 +493,9 @@ public class EnemyUnitController : MonoBehaviour, IDestructible, IAttackRangeUni
     {
         if (target.TryGetComponent<UnitController>(out var playerUnit))
             return playerUnit.GetSizeType();
+
+        if (target.TryGetComponent<AllyController>(out var allyUnit))
+            return allyUnit.GetSizeType();
 
         return SizeType.Medium;
     }
@@ -498,6 +506,9 @@ public class EnemyUnitController : MonoBehaviour, IDestructible, IAttackRangeUni
         if (target.TryGetComponent<UnitController>(out var playerUnit))
             return playerUnit.GetArmorType();
 
+        if (target.TryGetComponent<AllyController>(out var allyUnit))
+            return allyUnit.GetArmorType();
+
         return ArmorType.Light;
     }
 
@@ -506,6 +517,9 @@ public class EnemyUnitController : MonoBehaviour, IDestructible, IAttackRangeUni
     {
         if (target.TryGetComponent<UnitController>(out var playerUnit))
             return playerUnit.IsAirUnit();
+
+        if (target.TryGetComponent<AllyController>(out var allyUnit))
+            return allyUnit.IsAirUnit();
 
         if (target.TryGetComponent<BuildingController>(out var building))
             return building.IsLifted();

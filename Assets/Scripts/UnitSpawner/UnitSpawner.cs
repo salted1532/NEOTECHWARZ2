@@ -67,8 +67,6 @@ public class UnitSpawner : MonoBehaviour
         productionQueue.Add(
             new ProductionData(data.ID, data.productionTime)
         );
-
-        PrintQueue();
     }
 
     // 대기열이 가득 찼는지(자원 소모 전에 미리 확인하기 위함, RTSUnitController.TryProduceUnit에서 사용)
@@ -101,9 +99,6 @@ public class UnitSpawner : MonoBehaviour
 
             unitController.MoveTo(buildingController.GetRallyPos());
         }
-
-        PrintQueue();
-
     }
 
     // 매 프레임 대기열 맨 앞(index 0) 항목의 남은 시간을 줄이고, 0 이하가 되면 스폰을 실행한다.
@@ -141,7 +136,6 @@ public class UnitSpawner : MonoBehaviour
 
         int unitID = productionQueue[index].UnitID;
         productionQueue.RemoveAt(index);
-        PrintQueue();
         return unitID;
     }
 
@@ -153,31 +147,6 @@ public class UnitSpawner : MonoBehaviour
         return remaining;
     }
    
-
-    /// <summary>
-    /// 콘솔 디버그용 대기열 출력
-    /// </summary>
-    private void PrintQueue()
-    {
-        string log = "생산 대기열 : ";
-
-        if (productionQueue.Count == 0)
-        {
-            log += "비어있음";
-        }
-        else
-        {
-            for (int i = 0; i < productionQueue.Count; i++)
-            {
-                log += $"[{i}] ID:{productionQueue[i].UnitID} ({productionQueue[i].RemainTime:F1}s) ";
-
-                if (i < productionQueue.Count - 1)
-                    log += "-> ";
-            }
-        }
-
-        Debug.Log(log);
-    }
 
     // 대기열 반환 (읽기 전용 - UI 표시용)
     public IReadOnlyList<ProductionData> GetProductionQueue()

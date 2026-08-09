@@ -40,6 +40,7 @@
 | `Start()` | 마커 비활성화, `RTSUnitController.ResourceNodeList`에 자신을 등록 |
 | `SelectResource()` / `DeselectResource()` | 좌클릭 선택 시 마커 on/off |
 | `GetIcon()` | Info_panel용 아이콘 반환 |
+| `GetName()` / `GetDescription()` | `resourceType`으로 분기해 `LocalizationManager.GetTextOrFallback`으로 조회하는 표시 이름/설명("아이로나이트 광석"/"페트로나이트", doc/0494) — Info_panel 표시용, 프리팹 인스펙터 필드가 아니라 `ResourceType` 값으로 코드에서 직접 분기 |
 | `FlashMarker()` | 우클릭 채취 명령을 받았을 때 "이 자원이 대상"임을 마커 깜빡임(0.3초 간격 3회)으로 피드백. 좌클릭 선택 마커와 같은 오브젝트를 재사용하므로 끝나면 실제 선택 상태로 복원 |
 | `FlashMarkerRoutine()` (private) | 깜빡임 코루틴 본체 |
 | `Extract(amountPerTrip)` | 채취 시도 시 실제로 캐갈 수 있는 양을 반환(고갈 임박 시 `amountPerTrip`보다 적을 수 있음). 채취 후 크기 축소, 고갈되면 선택 상태 정리 후(`ClearSelectedResourceIfMatches`) 자기 자신을 파괴 |

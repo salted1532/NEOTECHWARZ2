@@ -70,7 +70,10 @@ public class GridData
     // 해당 셀을 점유한 오브젝트가 차지하던 모든 셀을 일괄 해제(제거)한다.
     internal void RemoveObjectAt(Vector3Int gridPosition)
     {
-        foreach (var pos in placedObjects[gridPosition].occupiedPositions)
+        if (!placedObjects.TryGetValue(gridPosition, out var data))
+            return;
+
+        foreach (var pos in data.occupiedPositions)
         {
             placedObjects.Remove(pos);
         }

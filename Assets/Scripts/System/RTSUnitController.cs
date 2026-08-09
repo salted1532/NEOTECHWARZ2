@@ -176,11 +176,16 @@ public class RTSUnitController : MonoBehaviour
         }
     }
 
+    // 매 프레임 새 델리게이트를 할당하지 않도록 미리 만들어둔 null 판정 (doc/0498 Tier 4-2)
+    private static readonly System.Predicate<UnitController> IsNullUnit = unit => unit == null;
+    private static readonly System.Predicate<BuildingController> IsNullBuilding = building => building == null;
+    private static readonly System.Predicate<ResourceNode> IsNullResourceNode = node => node == null;
+
     private void Update()
     {
-        UnitList.RemoveAll(unit => unit == null);
-        BuildingList.RemoveAll(building => building == null);
-        ResourceNodeList.RemoveAll(node => node == null);
+        UnitList.RemoveAll(IsNullUnit);
+        BuildingList.RemoveAll(IsNullBuilding);
+        ResourceNodeList.RemoveAll(IsNullResourceNode);
 
         //UI 갱신
         UpdateUI();
@@ -296,14 +301,6 @@ public class RTSUnitController : MonoBehaviour
             if (other != null && other.GetUnitID() != unitID)
                 DeselectUnit(other);
         }
-    }
-
-    /// <summary>
-    /// 현재 선택된 유닛 반환
-    /// </summary>
-    public List<UnitController> GetSelectedUnits()
-    {
-        return selectedUnitList;
     }
 
     // 건설모드 진입 시점에 선택돼 있던 일꾼을 건설 담당자로 그대로 사용한다.
@@ -2226,24 +2223,9 @@ public class RTSUnitController : MonoBehaviour
     #region 선택 상태 확인
 
     // 상태 확인용
-    public bool IsNone() => RTScurrentSate == SelectState.None;
     public bool IsUnitSelect() => RTScurrentSate == SelectState.UnitSelect;
     public bool IsBuildingSelect() => RTScurrentSate == SelectState.BuildingSelect;
-    public bool IsEnemySelect() => RTScurrentSate == SelectState.EnemySelect;
-    public bool IsOreSelect() => RTScurrentSate == SelectState.OreSelect;
     public bool IsBuildMode() => RTScurrentSate == SelectState.BuildMode;
-
-    #endregion
-
-    #region Building 상태 확인
-
-    public bool IsBuildingNone() => BuildingSelectState == BuildingState.None;
-    public bool IsMainBase() => BuildingSelectState == BuildingState.MainBaseSelect;
-    public bool IsTier1Building() => BuildingSelectState == BuildingState.Tier1Select;
-    public bool IsTier2Building() => BuildingSelectState == BuildingState.Tier2Select;
-    public bool IsTier3Building() => BuildingSelectState == BuildingState.Tier3Select;
-    public bool IsSupplyDepot() => BuildingSelectState == BuildingState.SupplyDepot;
-    public bool IsLab() => BuildingSelectState == BuildingState.Lab;
 
     #endregion
 }

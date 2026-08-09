@@ -59,7 +59,7 @@ public class HoverBob : MonoBehaviour
     {
         bobbing = false;
         bobTween?.Kill();
-        transform.DOLocalMoveY(baseY, 0.3f).SetEase(Ease.OutSine); // 착륙 시 원래 높이로 부드럽게 복귀
+        bobTween = transform.DOLocalMoveY(baseY, 0.3f).SetEase(Ease.OutSine); // 착륙 시 원래 높이로 부드럽게 복귀
     }
 
     private void OnDestroy() => bobTween?.Kill();

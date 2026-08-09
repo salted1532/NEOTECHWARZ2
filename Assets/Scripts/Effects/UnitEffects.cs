@@ -52,7 +52,7 @@ public class UnitEffects : MonoBehaviour
         allyController = GetComponent<AllyController>();
         healthManager = GetComponent<HealthManager>();
         bodyCollider = GetComponent<Collider>(); // 클릭 판정(UserControl의 layerUnit 레이캐스트)에 쓰는 것과 동일한 콜라이더
-        fogWar = FindFirstObjectByType<csFogWar>();
+        fogWar = EffectPlayer.GetFogWar(); // 스폰마다 씬 전체를 재탐색하지 않도록 EffectPlayer의 캐시 재사용 (doc/0498 Tier 4-1)
     }
 
     private void OnEnable()

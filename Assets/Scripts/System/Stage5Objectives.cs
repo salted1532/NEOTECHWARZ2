@@ -30,7 +30,12 @@ public class Stage5Objectives : MonoBehaviour
         if (StageManager.Instance != null && StageManager.Instance.Result != StageManager.StageResult.InProgress)
             return;
 
-        int destroyedCoreCount = trackedEnergyCores.FindAll(core => core == null).Count;
+        int destroyedCoreCount = 0;
+        foreach (var core in trackedEnergyCores)
+        {
+            if (core == null)
+                destroyedCoreCount++;
+        }
         bool allCoresDestroyed = trackedEnergyCores.Count > 0 && destroyedCoreCount == trackedEnergyCores.Count;
 
         bool commandCoreDestroyed = alienCommandCoreAssigned && alienCommandCore == null;

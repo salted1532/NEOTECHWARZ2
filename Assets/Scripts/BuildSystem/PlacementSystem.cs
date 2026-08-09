@@ -109,17 +109,17 @@ public class PlacementSystem : MonoBehaviour
     {
         StopPlacement();
 
+        if (ID == 0)
+        {
+            selectedObjectIndex = -1;
+            return;
+        }
+
         selectedObjectIndex = database.buildingData.FindIndex(d => d.ID == ID);
 
         if (selectedObjectIndex < 0)
         {
             Debug.LogError($"No ID found {ID}");
-            return;
-        }
-
-        if (ID == 0)
-        {
-            selectedObjectIndex = -1;
             return;
         }
 

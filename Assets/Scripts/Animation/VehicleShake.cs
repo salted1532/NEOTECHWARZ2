@@ -64,7 +64,7 @@ public class VehicleShake : MonoBehaviour
     {
         shaking = false;
         shakeTween?.Kill();
-        transform.DOLocalMove(basePosition, 0.15f).SetEase(Ease.OutSine);
+        shakeTween = transform.DOLocalMove(basePosition, 0.15f).SetEase(Ease.OutSine);
     }
 
     private void OnDestroy() => shakeTween?.Kill();

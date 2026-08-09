@@ -62,6 +62,9 @@ public class SceneMenuController : MonoBehaviour
 
     private void OnPreviousStageClicked()
     {
+        if (string.IsNullOrEmpty(previousStageSceneName))
+            return;
+
         Time.timeScale = 1f;
         UserControl.IsPaused = false;
         SceneManager.LoadScene(previousStageSceneName);

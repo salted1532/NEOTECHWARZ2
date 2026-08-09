@@ -10,6 +10,7 @@ public class RadiusIndicator : MonoBehaviour
     [SerializeField] private Color color = new Color(1f, 0.4f, 0.1f, 0.9f);
 
     private static Shader cachedLineShader; // Shader.Find 문자열 조회를 스킬 사용 때마다 반복하지 않도록 캐싱
+    private Material lineMaterial; // 파괴 시 해제하기 위해 인스턴스 보관 (doc/0498 Tier 4-4)
 
     // 일회성 표시 - duration 뒤에 자동으로 사라진다 (스킬이 실제로 발동돼서 범위를 확인시켜줄 때).
     public static void Show(Vector3 center, float radius, float duration)
@@ -46,7 +47,8 @@ public class RadiusIndicator : MonoBehaviour
         line.startWidth = lineWidth;
         line.endWidth = lineWidth;
         if (cachedLineShader == null) cachedLineShader = Shader.Find("Sprites/Default");
-        line.material = new Material(cachedLineShader);
+        lineMaterial = new Material(cachedLineShader);
+        line.material = lineMaterial;
         line.startColor = color;
         line.endColor = color;
 
@@ -55,5 +57,12 @@ public class RadiusIndicator : MonoBehaviour
             float angle = i * Mathf.PI * 2f / segmentCount;
             line.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius, 0.1f, Mathf.Sin(angle) * radius)); // 지면에서 살짝 띄워 Z-fighting 방지
         }
+    }
+
+    // 인스턴스 머티리얼은 GameObject가 파괴돼도 자동으로 해제되지 않으므로 직접 정리한다 (doc/0498 Tier 4-4).
+    private void OnDestroy()
+    {
+        if (lineMaterial != null)
+            Destroy(lineMaterial);
     }
 }

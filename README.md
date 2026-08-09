@@ -43,7 +43,7 @@ Assets/
 │  ├─ MainScene/        # 메인 메뉴(Play/Option/Exit), 언어 선택(EN/KR) 버튼
 │  ├─ Missions/         # MissionSelect(미션 선택 화면) + Mission0~5(캠페인 스테이지 0~5 본편 씬)
 │  ├─ SampleScene, TestScene  # 초기 프로토타입/기능 확인용 씬(캠페인 씬으로 대체되어 현재는 미사용에 가까움)
-├─ prefabs/             # 유닛/건물 프리팹 (`NTA/`, 유닛은 전부·건물은 대부분 기본 프리미티브 메시 사용 — 병영 건물에만 실제 모델 1개 적용 시작), 맵 프리팹(`Maps/Mission1~5`, YuME 타일맵 기반 — 실제 사용 중인 건 Mission1뿐)
+├─ prefabs/             # 유닛/건물 프리팹 (`NTA/`, 유닛은 전부·건물은 대부분 기본 프리미티브 메시 사용 — 병영 건물에만 실제 모델 1개 적용 시작), 맵 프리팹(`Maps/Mission0~5`, YuME 타일맵 기반 — 캠페인 스테이지 0~5 씬이 각각 대응하는 프리팹을 사용)
 ├─ AssetFolder/         # 3rd-party 에셋 — 모델링/스카이박스(Canopus-III Sci-Fi Desert Units, Yoge Stylized Nature, Animated Sun Skybox, TZ_Futuristic Panel Textures, LowPolyWater_Pack, 임포트+URP 머티리얼 변환 완료했지만 게임플레이 프리팹엔 대부분 미적용 — 병영 건물에 실제 모델 1개 적용 시작) + 전장의 안개 플러그인(`AOSFogWar`/csFogWar, 실제로 적용되어 작동 중)
 ├─ Material, Shader/    # 머티리얼 및 커스텀 셰이더
 └─ Settings/            # URP 렌더 파이프라인 설정 + 포스트프로세싱 Volume Profile(Bloom/Color Adjustments/SSAO)
@@ -156,6 +156,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [`Docs/UnitAndBuildingStats.md`](Docs/UnitAndBuildingStats.md) — 유닛 9종 + 건물 6종의 현재 스탯을 정해진 양식(유닛명/ID/생산티어/공격범위/공격방식/장갑/크기/가격&인구수/생산시간/체력/공격력/사거리/공격속도/단축키)으로 정리한 최신 레퍼런스. `UnitDataSO`/`BuildingDataSO`에 적힌 실제 값 기준.
 - [`Docs/UnitBalanceReference.md`](Docs/UnitBalanceReference.md) — 어떤 값이 실제로 게임에 반영되는지(SO vs 프리팹) 조사한 감사 기록, 설계 스펙과 실측값이 어긋났던 부분들의 이력.
 - [`Docs/EnemyUnitAndBuildingStats.md`](Docs/EnemyUnitAndBuildingStats.md) — 적 진영(OC) 유닛/건물 수치를 아군과 동일한 양식으로 정리, `EnemyUnitDataSO`/`EnemyBuildingDataSO` 기준.
+- [`Docs/SporeBrood.md`](Docs/SporeBrood.md) — 외계 종족 "스포어 브루드" 컨셉 + 유닛 3종/건물 3종 수치(설계 제안 [`doc/0441`](doc/0441-alien-monster-faction-design-proposal.md)의 구현 상태 확인 포함).
+- [`Docs/ResourceSystem.md`](Docs/ResourceSystem.md) — 자원 "아이로나이트 광석(Ore)"/"페트로나이트(Gas)" 컨셉·명칭과 채취/저장 시스템 개요.
 - [`Docs/Campaign.md`](Docs/Campaign.md) — 캠페인 세계관/스토리 설정, 스테이지 0~5 시놉시스.
 
 ## 주요 기능
@@ -290,7 +292,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] Screen Space Ambient Occlusion(SSAO) — URP Renderer Feature로 적용
 - [x] 빌드 프리뷰 고스트/셀 커서/유닛 이동·공격 명령 포인터는 전용 레이어(`Indicators`) + 오버레이 카메라(`Indicator Camera`, Depth Only + PostProcessing 끔)로 분리해 포스트프로세싱(Bloom/Color Adjustments)이 적용되지 않도록 처리
 - [x] 3rd-party 유닛/건물/자연 모델링 에셋 임포트 — Canopus-III Low-Poly Sci-Fi Desert Units Set, Yoge Stylized Nature, Animated Sun Skybox, TZ_Futuristic Panel Textures Lite, LowPolyWater_Pack, 전부 Built-in RP 셰이더로 제작돼 있던 것을 URP(Lit/Unlit)로 변환해 마젠타/핑크 깨짐 해결(게임플레이 유닛 프리팹은 아직 전부 기본 프리미티브 메시, 건물 프리팹은 병영에 실제 모델 1개 적용 시작 — 나머지 적용은 로드맵)
-- [x] 1스테이지 맵 복원 — `TestScene` 씬 + `Mission1` 프리팹(YuME 타일맵 기반, `Layer1`/`Layer2` 태그로 언덕 단 구분), 게임 분위기/색감 확인용 프로토타입(`Mission2~5` 프리팹은 아직 미사용, 캠페인 맵은 추후 별도 제작 예정)
+- [x] 캠페인 스테이지 0~5 맵 전체 제작 완료 — `Assets/Scenes/Missions/Mission0`~`Mission5` 각 씬이 대응하는 `Maps/Mission0`~`Mission5` 프리팹(YuME 타일맵 기반, `Layer1`/`Layer2` 태그로 언덕 단 구분) 사용, 초기 프로토타입이었던 `TestScene`/`SampleScene`은 대체되어 현재 미사용에 가까움
 
 ### UI
 - [x] 커맨드 패널(선택 상태별 버튼 자동 전환)
@@ -343,6 +345,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 유닛/건물 이름·설명(생산 버튼 툴팁 + Info Panel 설명) 번역 — `unit.<진영>.<ID>.name/desc/info`, `building.<진영>.<ID>.name/desc/info` 키 체계, 번역 누락/매니저 없음/조회 예외 시 `ScriptableObject`에 적힌 원문을 그대로 표시하는 안전장치 포함(`LocalizationManager.GetTextOrFallback`)
 - [x] 미션 선택 화면의 미션명도 번역 지원
 - [x] 미션 오브젝트(유물/연구 데이터베이스) 이름·설명 번역 — `missionitem.<id>.name/desc` 키 체계, Info Panel에 설명까지 표시(doc/0490)
+- [x] 자원 노드(광물/가스) 명칭·설명 번역 — 기존 "Ore"/"Gas"를 세계관에 맞게 "아이로나이트 광석(Ironite Ore)"/"페트로나이트(Petronite)"로 재정의(doc/0493), `resource.ore/gas.name/desc` 키 체계로 Info Panel에 이름+로어 설명 표시(doc/0494)
 
 ## 로드맵 (미구현)
 

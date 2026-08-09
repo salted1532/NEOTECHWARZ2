@@ -38,7 +38,7 @@ public class HealthManager : MonoBehaviour
     private void Awake()
     {
         currentHp = maxHealth;
-        fogWar = FindFirstObjectByType<csFogWar>();
+        fogWar = EffectPlayer.GetFogWar(); // 스폰마다 씬 전체를 재탐색하지 않도록 EffectPlayer의 캐시 재사용 (doc/0498 Tier 4-1)
 
         OnHealthChanged += UpdateHealthSlider;
         UpdateHealthSlider(currentHp, maxHealth);

@@ -654,13 +654,9 @@ public class UserControl : MonoBehaviour
             }
         }
 
-        // 2. 땅 클릭 = 명령 처리 (미니맵 클릭에서도 재사용 - IssueRightClickMoveAt 참고, doc/0349)
-        if (clickedGround)
-        {
-            IssueRightClickMoveAt(groundHit.point);
-        }
-
-        // 건물 우클릭
+        // 2. 건물 우클릭 (땅보다 먼저 처리해야 한다: 건물도 지면 위에 서 있어 clickedGround가 함께
+        // true가 되기 때문에, 더 구체적인 대상(건물)이 우선권을 가져야 이동 명령이 끼어들지 않는다 -
+        // 적 처리(위 1번)와 동일한 이유, doc/0493)
         if(clickedBuilding)
         {
             BuildingController building = BuildingHit.transform.GetComponent<BuildingController>();
@@ -675,6 +671,8 @@ public class UserControl : MonoBehaviour
                 ShowMovePointer(building.transform.position);
 
                 UsercurrentState = OrderState.None;
+
+                return;
             }
 
             // 건설이 중단된 BaseStructure 우클릭 = 선택된 일꾼을 보내 건설 재개
@@ -685,10 +683,12 @@ public class UserControl : MonoBehaviour
                 baseStructure.FlashMarker();
 
                 ShowMovePointer(baseStructure.transform.position);
+
+                return;
             }
         }
 
-        // 5. 광물 클릭 = 명령 처리
+        // 3. 광물 클릭 = 명령 처리 (땅보다 먼저 처리 - 위와 동일한 이유)
         if (clickedOre)
         {
             ResourceNode node = OreHit.transform.GetComponent<ResourceNode>();
@@ -706,10 +706,12 @@ public class UserControl : MonoBehaviour
 
                     ShowMovePointer(OreHit.point);
                 }
+
+                return;
             }
         }
 
-        // 5. 가스 클릭 = 명령 처리
+        // 4. 가스 클릭 = 명령 처리 (땅보다 먼저 처리 - 위와 동일한 이유)
         if (clickedGas)
         {
             ResourceNode node = GasHit.transform.GetComponent<ResourceNode>();
@@ -727,7 +729,15 @@ public class UserControl : MonoBehaviour
 
                     ShowMovePointer(GasHit.point);
                 }
+
+                return;
             }
+        }
+
+        // 5. 땅 클릭 = 명령 처리 (미니맵 클릭에서도 재사용 - IssueRightClickMoveAt 참고, doc/0349)
+        if (clickedGround)
+        {
+            IssueRightClickMoveAt(groundHit.point);
         }
     }
 

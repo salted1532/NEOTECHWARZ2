@@ -474,6 +474,8 @@ public class UIController : MonoBehaviour
 
             int queueIndex = i;
 
+            if (queueSlots[i] == null) continue;
+
             int unitIndex = database.unitData.FindIndex(d => d.ID == queue[queueIndex].UnitID);
 
             if (unitIndex == -1)
@@ -519,7 +521,7 @@ public class UIController : MonoBehaviour
             productionPanel.SetActive(false);
 
         foreach (var slot in queueSlots)
-            slot.Clear();
+            slot?.Clear();
 
         progressSlider.gameObject.SetActive(false);
 
@@ -552,6 +554,8 @@ public class UIController : MonoBehaviour
                 SetEmptyQueueSlot(i);
                 continue;
             }
+
+            if (queueSlots[i] == null) continue;
 
             int queueIndex = i;
             Sprite icon = queue[queueIndex].Type == ResearchType.Attack ? attackResearchIcon : armorResearchIcon;
@@ -586,7 +590,7 @@ public class UIController : MonoBehaviour
             productionPanel.SetActive(false);
 
         foreach (var slot in queueSlots)
-            slot.Clear();
+            slot?.Clear();
 
         progressSlider.gameObject.SetActive(false);
 
@@ -600,6 +604,8 @@ public class UIController : MonoBehaviour
     // 빈 대기열 슬롯에 "다음 슬롯 번호" 아이콘을 비활성 상태로 표시한다.
     private void SetEmptyQueueSlot(int index)
     {
+        if (queueSlots[index] == null) return;
+
         queueSlots[index].SetData(
             new CommandButtonData(
                 emptyQueueIcons[index],

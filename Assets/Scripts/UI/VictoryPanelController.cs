@@ -62,6 +62,9 @@ public class VictoryPanelController : MonoBehaviour
 
     private void OnNextStageClicked()
     {
+        if (string.IsNullOrEmpty(nextStageSceneName))
+            return;
+
         Time.timeScale = 1f;
         UserControl.IsPaused = false;
         SceneManager.LoadScene(nextStageSceneName);

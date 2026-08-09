@@ -12,7 +12,9 @@ public static class EffectPlayer
     private static csFogWar fogWar;
     private static bool fogWarChecked;
 
-    private static csFogWar GetFogWar()
+    // internal - HealthManager/UnitEffects도 이 캐시를 재사용해 스폰마다 FindFirstObjectByType를 반복하지
+    // 않도록 한다(doc/0498 Tier 4-1). 이 클래스 안에서의 동작은 그대로.
+    internal static csFogWar GetFogWar()
     {
         if (!fogWarChecked)
         {
