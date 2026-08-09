@@ -40,7 +40,12 @@ public class CaptureSystem : MonoBehaviour
 
     public CaptureOwner CurrentOwner { get; private set; } = CaptureOwner.Neutral;
 
-    // 콜라이더 트리거 범위 안에 들어와 있는 아군/적 유닛 목록
+    // 콜라이더 트리거 범위 안에 들어와 있는 아군/적 유닛 목록. 실린더 콜라이더가 서로 겹치는 여러
+    // BoxCollider로 구성되어 있어서, 한 유닛이 동시에 여러 박스 안에 있을 수 있다. 그래서 이 리스트는
+    // "겹친 박스 개수만큼" 같은 유닛이 중복으로 들어갈 수 있는 멀티셋으로 쓴다 (Enter마다 추가,
+    // Exit마다 하나만 제거) - Count > 0이면 최소 하나의 박스 안에 있다는 뜻. 유닛당 1개로 중복 제거해
+    // 버리면, 겹치는 두 박스 사이를 지나갈 때(박스A는 나가지만 여전히 박스B 안인 순간) Exit 하나만으로
+    // 유닛이 통째로 빠져버려서 점령 진행이 계속 끊기고 되감기는 버그가 있었다.
     private readonly List<UnitController> alliesInRange = new List<UnitController>();
     private readonly List<EnemyUnitController> enemiesInRange = new List<EnemyUnitController>();
 
@@ -78,13 +83,9 @@ public class CaptureSystem : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent<UnitController>(out var ally))
-        {
-            if (!alliesInRange.Contains(ally)) alliesInRange.Add(ally);
-        }
+            alliesInRange.Add(ally);
         else if (other.TryGetComponent<EnemyUnitController>(out var enemy))
-        {
-            if (!enemiesInRange.Contains(enemy)) enemiesInRange.Add(enemy);
-        }
+            enemiesInRange.Add(enemy);
     }
 
     private void OnTriggerExit(Collider other)
