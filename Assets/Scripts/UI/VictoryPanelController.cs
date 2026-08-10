@@ -8,8 +8,15 @@ using UnityEngine.UI;
 // 버튼만 연결하면 된다 - SceneMenuController와 동일한 컨벤션(패널 표시/씬 전환만 담당).
 public class VictoryPanelController : MonoBehaviour
 {
+    // MissionSelectManager.HighestUnlockedMissionKey와 동일한 문자열(doc/0511) - 클리어 시
+    // 다음 미션 번호로 갱신해서 MissionSelect 화면에서 잠금이 풀리게 한다.
+    private const string HighestUnlockedMissionKey = "HighestUnlockedMission";
+
     [Header("승리 패널 (레이아웃은 직접 제작 후 연결)")]
     [SerializeField] private GameObject victoryPanel;
+
+    [Header("해금 진행 (doc/0511)")]
+    [SerializeField] private int missionNumber; // 이 씬이 몇 번 미션인지 - MissionSelectEntry.missionNumber와 동일 컨벤션
 
     [Header("버튼 연결")]
     [SerializeField] private Button mainMenuButton;
@@ -43,7 +50,21 @@ public class VictoryPanelController : MonoBehaviour
             StageManager.Instance.OnVictory -= HandleVictory;
     }
 
-    private void HandleVictory() => StartCoroutine(ShowVictoryPanelAfterDelay());
+    private void HandleVictory()
+    {
+        UnlockNextMission();
+        StartCoroutine(ShowVictoryPanelAfterDelay());
+    }
+
+    private void UnlockNextMission()
+    {
+        int highest = PlayerPrefs.GetInt(HighestUnlockedMissionKey, 1);
+        if (missionNumber + 1 <= highest)
+            return;
+
+        PlayerPrefs.SetInt(HighestUnlockedMissionKey, missionNumber + 1);
+        PlayerPrefs.Save();
+    }
 
     private IEnumerator ShowVictoryPanelAfterDelay()
     {
