@@ -2063,6 +2063,13 @@ public class UnitController : MonoBehaviour, IDestructible
     // 연구소 업그레이드로 얻은 전역 보너스를 더해서 반환한다 (RTSUnitController를 거쳐서만 조회 - UpgradeManager는 직접 참조하지 않음).
     public int GetAttackDamage() => attackDamage + (rtsController != null ? rtsController.GlobalAttackBonus : 0);
     public int GetArmor() => armor + (rtsController != null ? rtsController.GlobalArmorBonus : 0);
+
+    // Info Panel에서 "기본값 +보너스"로 나눠 표시하기 위한 getter (doc/0517) - 전투 계산은 위
+    // GetAttackDamage()/GetArmor()(합산값)를 그대로 쓰고, 이 둘은 표시 전용이다.
+    public int GetBaseAttackDamage() => attackDamage;
+    public int GetBaseArmor() => armor;
+    public int GetAttackBonus() => rtsController != null ? rtsController.GlobalAttackBonus : 0;
+    public int GetArmorBonus() => rtsController != null ? rtsController.GlobalArmorBonus : 0;
     public AttackEffectType GetAttackType() => attackType;
     public ArmorType GetArmorType() => armorType;
     public SizeType GetSizeType() => sizeType;

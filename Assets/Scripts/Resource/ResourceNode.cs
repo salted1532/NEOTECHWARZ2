@@ -33,6 +33,7 @@ public class ResourceNode : MonoBehaviour
     [SerializeField] private int minimapFogVisibilityMargin = 1; // UserControl.fogVisibilityMargin과 동일한 목적
 
     [SerializeField] private Transform visualRoot; // 축소 애니메이션을 적용할 그래픽 전용 자식 (직접 연결)
+    [SerializeField] private Light resourceLight; // 자원 안의 조명 - 크기가 줄어드는 비율만큼 밝기/범위도 함께 줄인다 (doc/0520)
 
     private csFogWar fogWar;
 
@@ -41,6 +42,10 @@ public class ResourceNode : MonoBehaviour
 
     private int initialAmount;
     private int consumedQuarters; // 지금까지 줄어든 구간 수 (0~4)
+
+    private float initialVisualScaleY;
+    private float initialLightIntensity;
+    private float initialLightRange;
 
     // 대기열(큐): 맨 앞(index 0)의 일꾼만 실제로 채취하고, 나머지는 자기 차례를 기다린다. 인원 제한 없음
     private readonly List<UnitController> workerQueue = new List<UnitController>();
@@ -74,6 +79,15 @@ public class ResourceNode : MonoBehaviour
     {
         initialAmount = remainingAmount;
         transform.Rotate(Vector3.up, Random.Range(0f, 360f), Space.World);
+
+        if (visualRoot != null)
+            initialVisualScaleY = visualRoot.localScale.y;
+
+        if (resourceLight != null)
+        {
+            initialLightIntensity = resourceLight.intensity;
+            initialLightRange = resourceLight.range;
+        }
     }
 
     private void Start()
@@ -196,6 +210,14 @@ public class ResourceNode : MonoBehaviour
 
             // 크기(Y)가 줄어드는 만큼(0.2씩) 위치도 그대로 아래로 내림
             visualRoot.localPosition -= new Vector3(0f, appliedYShrink, 0f);
+
+            // 매쉬가 줄어든 비율만큼 안의 조명 밝기/범위도 함께 줄인다 (doc/0520)
+            if (resourceLight != null && initialVisualScaleY > 0f)
+            {
+                float ratio = newY / initialVisualScaleY;
+                resourceLight.intensity = initialLightIntensity * ratio;
+                resourceLight.range = initialLightRange * ratio;
+            }
         }
     }
 }

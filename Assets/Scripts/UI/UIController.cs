@@ -209,16 +209,9 @@ public class UIController : MonoBehaviour
     [SerializeField] private Sprite returnIcon; // ShowWorkerPanel 전용
     [SerializeField] private Sprite buildIcon;  // ShowWorkerPanel 전용 (건설모드 진입)
 
-    [Header("Building Icons (ShowBuildPanel)")]
-    [SerializeField] private Sprite commandCenterIcon;
-    [SerializeField] private Sprite supplyDepotIcon;
-    [SerializeField] private Sprite barracksIcon;
-    [SerializeField] private Sprite factoryIcon;
-    [SerializeField] private Sprite airportIcon;
-    [SerializeField] private Sprite labIcon;
-
-    // 유닛 생산 패널 아이콘은 더 이상 여기 고정 필드로 두지 않고, UnitData.Icon을 그대로 사용한다
-    // (ShowUnitProductionPanel 참고). 새 유닛을 추가해도 이 파일을 건드릴 필요가 없도록 하기 위함.
+    // 건설 버튼(ShowBuildPanel)/생산 버튼(ShowUnitTierPanel) 아이콘은 더 이상 여기 고정 필드로 두지 않고,
+    // BuildingData.ConstructionIcon/UnitData.ProductionIcon을 그대로 사용한다. 새 건물/유닛을 추가해도
+    // 이 파일을 건드릴 필요가 없도록 하기 위함 (doc/0514).
 
     [Header("Research Icons (ShowLabPanel)")]
     [SerializeField] private Sprite attackResearchIcon;
@@ -270,8 +263,10 @@ public class UIController : MonoBehaviour
     [SerializeField] private Image armorImage;         // 호버 시 "Armor : N" 툴팁 표시
 
     private HealthManager infoBoundHealth; // 현재 Info_panel이 구독 중인 대상 (선택이 바뀌면 구독 해제 후 갈아끼움)
-    private int infoAttackDamage;
-    private int infoArmor;
+    private int infoAttackDamage; // 연구 보너스 제외한 기본값 (doc/0517)
+    private int infoArmor;        // 연구 보너스 제외한 기본값 (doc/0517)
+    private int infoAttackBonus;  // 연구소 공격력 연구로 얻은 전역 보너스 - 0이면 툴팁에 표기 안 함 (doc/0517)
+    private int infoArmorBonus;   // 연구소 방어력 연구로 얻은 전역 보너스 - 0이면 툴팁에 표기 안 함 (doc/0517)
     private AttackEffectType infoAttackType;
     private ArmorType infoArmorType;
     private SizeType infoSizeType;
@@ -391,7 +386,7 @@ public class UIController : MonoBehaviour
     /// Show build mode panel (auto-adds a cancel button)
     /// </summary>
     // 건설모드 패널 표시 (건물 목록 뒤에 취소 버튼을 자동으로 추가해서 표시)
-    public void ShowBuildPanel(CommandButtonData[] buildingCommands, Action onCancel)
+    public void ShowBuildPanel(CommandButtonData[] buildingCommands, ButtonAction onCancel)
     {
         CurrentState = UISelectionState.BuildMode;
 
@@ -429,7 +424,7 @@ public class UIController : MonoBehaviour
     }
 
     // 기존 커맨드 배열 끝에 취소(Cancel) 버튼 하나를 추가한 새 배열을 만들어 반환한다 (슬롯 수 초과 시 잘라냄).
-    private CommandButtonData[] AddCancelCommand(CommandButtonData[] commands, Action onCancel)
+    private CommandButtonData[] AddCancelCommand(CommandButtonData[] commands, ButtonAction onCancel)
     {
         int commandCount = commands == null ? 0 : commands.Length;
         int maxCount = Mathf.Min(commandCount + 1, slots.Length);
@@ -488,7 +483,7 @@ public class UIController : MonoBehaviour
 
             queueSlots[i].SetData(
                 new CommandButtonData(
-                    data.Icon,
+                    data.ProductionIcon,
                     () => onCancel(queueIndex)
                 )
             );
@@ -655,7 +650,7 @@ public class UIController : MonoBehaviour
     // 값을 툴팁으로 보여준다 (doc/0293).
     public void ShowInfoPanel(Sprite icon, string unitName, HealthManager health, int attackDamage, int armor,
         AttackEffectType attackType, ArmorType armorType, SizeType sizeType, int shotCount, string description = "",
-        bool canAttackGround = true, bool canAttackAir = true)
+        bool canAttackGround = true, bool canAttackAir = true, int attackBonus = 0, int armorBonus = 0)
     {
         HideSquadPanel();
 
@@ -676,6 +671,8 @@ public class UIController : MonoBehaviour
 
         infoAttackDamage = attackDamage;
         infoArmor = armor;
+        infoAttackBonus = attackBonus;
+        infoArmorBonus = armorBonus;
         infoAttackType = attackType;
         infoArmorType = armorType;
         infoSizeType = sizeType;
@@ -703,11 +700,16 @@ public class UIController : MonoBehaviour
     private void SetupInfoStatHoverTooltips()
     {
         AddStatHoverTooltip(attackDamageImage, () =>
-            LocalizationManager.GetText("infopanel.attacktooltip", infoAttackType, infoAttackDamage,
+            LocalizationManager.GetText("infopanel.attacktooltip", infoAttackType, FormatStatWithBonus(infoAttackDamage, infoAttackBonus),
                 infoShotCount > 1 ? $" (x{infoShotCount})" : string.Empty, GetAttackTargetText()));
         AddStatHoverTooltip(armorImage, () =>
-            LocalizationManager.GetText("infopanel.armortooltip", infoArmor, infoArmorType, infoSizeType));
+            LocalizationManager.GetText("infopanel.armortooltip", FormatStatWithBonus(infoArmor, infoArmorBonus), infoArmorType, infoSizeType));
     }
+
+    // 연구소 연구로 얻은 전역 보너스를 기본값에 합산하지 않고 "6 +2"처럼 별도 표기한다 (doc/0517) -
+    // 보너스가 없으면(적/아군/미연구 상태) 지금까지와 동일하게 숫자만 표시.
+    private static string FormatStatWithBonus(int baseValue, int bonus) =>
+        bonus > 0 ? $"{baseValue + bonus} ({baseValue} +{bonus})" : baseValue.ToString();
 
     // 공격력 툴팁에 "Attack Target : Ground/Air" 식으로 표기할 텍스트를 만든다 (doc/0478).
     private string GetAttackTargetText()
@@ -996,8 +998,13 @@ public class UIController : MonoBehaviour
 
     // Squad_panel 툴팁 제목용 유닛 이름 조회 (database에 없으면 "Unit"로 대체 - Title이 비어있으면
     // ProductionSlot이 툴팁 자체를 안 띄우므로 항상 비어있지 않은 값을 돌려줘야 한다).
+    // heroName을 먼저 확인 - 구조된 유닛(unitID=0, enemyDataUnitID로만 종류 구분)은 NTA database에
+    // 없으므로 heroName을 안 보면 항상 fallback 문구로 떨어짐 (doc/0519, Info Panel과 동일 우선순위).
     private string GetUnitDisplayName(UnitController unit)
     {
+        if (!string.IsNullOrEmpty(unit.GetHeroName()))
+            return unit.GetHeroName();
+
         if (database != null)
         {
             UnitData data = database.unitData.Find(d => d.ID == unit.GetUnitID());
@@ -1200,33 +1207,6 @@ public class UIController : MonoBehaviour
         int index = useFallbackSlot ? UnitSkillFallbackSlotIndex : UnitSkillSlotIndex;
         if (index < slots.Length)
             slots[index]?.SetCooldownFill(normalizedRemaining);
-    }
-
-    // Build mode
-    // 건설모드 패널 (건물 종류별 버튼 + 취소 버튼)
-    public void ShowBuildPanel(
-    ButtonAction onCommandCenter,
-    ButtonAction onSupplyDepot,
-    ButtonAction onBarracks,
-    ButtonAction onFactory,
-    bool factoryUnlocked,
-    ButtonAction onAirport,
-    bool airportUnlocked,
-    ButtonAction onLab,
-    ButtonAction onCancel)
-    {
-        CurrentState = UISelectionState.BuildMode;
-
-        SetCommands(
-
-            new CommandButtonData(commandCenterIcon, onCommandCenter),
-            new CommandButtonData(supplyDepotIcon, onSupplyDepot),
-            new CommandButtonData(barracksIcon, onBarracks),
-            new CommandButtonData(factoryIcon, onFactory, factoryUnlocked),
-            new CommandButtonData(airportIcon, onAirport, airportUnlocked),
-            new CommandButtonData(labIcon, onLab),
-            new CommandButtonData(cancelIcon, onCancel)
-        );
     }
 
     // Unit production (MainBase / Tier1 / Tier2 / Tier3)

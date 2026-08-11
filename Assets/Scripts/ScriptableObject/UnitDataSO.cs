@@ -123,8 +123,12 @@ public class UnitData
     // 이 유닛을 생산하기 전에 미리 완공되어 있어야 하는 건물의 ID (RTSUnitController.BuildingID 상수, 0이면 조건 없음)
     [field: SerializeField]
     public int requiredBuildingID { get; private set; }
+    // 선택 시 Squad Panel/Info Panel에 표시할 아이콘.
     [field: SerializeField]
     public Sprite Icon { get; private set; }
+    // 생산 버튼(ShowUnitTierPanel)/생산 대기열에 표시할 아이콘 - 위 Icon(선택 아이콘)과는 별개로 관리 (doc/0514).
+    [field: SerializeField]
+    public Sprite ProductionIcon { get; private set; }
     [field: SerializeField]
     public GameObject Prefab { get; private set; }
 

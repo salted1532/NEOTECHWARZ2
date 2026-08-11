@@ -144,6 +144,17 @@ public class RTSUnitController : MonoBehaviour
         public const int Lab = 6;
     }
 
+    // 건설 패널 버튼의 단축키 (건물별 shortcutKey 필드는 SO에 없으므로 여기서 매핑, doc/0514)
+    private static readonly Dictionary<int, KeyCode> BuildPanelShortcuts = new Dictionary<int, KeyCode>
+    {
+        { BuildingID.CommandCenter, KeyCode.C },
+        { BuildingID.SupplyDepot, KeyCode.S },
+        { BuildingID.Barracks, KeyCode.B },
+        { BuildingID.Factory, KeyCode.F },
+        { BuildingID.Airport, KeyCode.P },
+        { BuildingID.Lab, KeyCode.L },
+    };
+
 
     private void Awake()
     {
@@ -286,19 +297,24 @@ public class RTSUnitController : MonoBehaviour
         DeselectUnit(unit);
     }
 
-    // Squad_panel Ctrl+Click: 현재 선택 목록에서 그 유닛과 같은 종류(unitID)만 남기고 나머지는 선택 해제한다.
+    // Squad_panel Ctrl+Click: 현재 선택 목록에서 그 유닛과 같은 종류(unitID + enemyDataUnitID)만
+    // 남기고 나머지는 선택 해제한다. 구조된 유닛(unitID=0, 실제 종류는 enemyDataUnitID로만 구분됨,
+    // doc/0458)까지 unitID 하나로만 비교하면 서로 다른 구조 유닛이 전부 "같은 종류"로 묶여버려서
+    // enemyDataUnitID도 함께 비교한다 (doc/0519). 일반 NTA 유닛은 enemyDataUnitID가 항상 0이라
+    // 기존 동작과 동일함.
     public void KeepOnlySameUnitTypeInSelection(UnitController unit)
     {
         if (unit == null)
             return;
 
         int unitID = unit.GetUnitID();
+        int enemyDataUnitID = unit.GetEnemyDataUnitID();
 
         // 뒤에서부터 순회 - 앞에서부터 Remove하면 인덱스가 밀려서 일부를 건너뛸 수 있다.
         for (int i = selectedUnitList.Count - 1; i >= 0; i--)
         {
             UnitController other = selectedUnitList[i];
-            if (other != null && other.GetUnitID() != unitID)
+            if (other != null && (other.GetUnitID() != unitID || other.GetEnemyDataUnitID() != enemyDataUnitID))
                 DeselectUnit(other);
         }
     }
@@ -706,7 +722,12 @@ public class RTSUnitController : MonoBehaviour
     // "리프트" 버튼: 선택된 건물들 중 대표 건물을 공중으로 띄운다.
     public void LiftSelectedBuilding()
     {
-        GetRepresentativeBuilding()?.LiftOff();
+        BuildingController building = GetRepresentativeBuilding();
+        if (building == null)
+            return;
+
+        if (!building.LiftOff())
+            uIController.ShowWarning(LocalizationManager.GetText("warning.liftoffproducing")); // 생산 중이라 이륙 실패 (doc/0519)
     }
 
     // "착륙" 버튼: 선택된 건물들 중 대표 건물의 착륙 위치 선택 모드로 진입한다.
@@ -1349,7 +1370,7 @@ public class RTSUnitController : MonoBehaviour
                 bool met = IsUnitPrerequisiteMet(data.ID);
                 interactable[i] = met;
                 commands[i] = new CommandButtonData(
-                    data.Icon,
+                    data.ProductionIcon,
                     UnitButtonAction(() => TryProduceUnit(data.ID), data.ID, data.shortcutKey),
                     met);
             }
@@ -1360,6 +1381,63 @@ public class RTSUnitController : MonoBehaviour
         }
 
         uIController.ShowUnitProductionPanel(TierPanelStates[tier], lastTierPanelCommands);
+    }
+
+    // ShowBuildModePanel이 마지막으로 만든 버튼 배열/활성화 상태 캐시 (lastTierPanelCommands와 동일한 이유 - doc/0514).
+    private CommandButtonData[] lastBuildPanelCommands;
+    private bool[] lastBuildPanelInteractable;
+
+    // buildingDatabase 전체를 순회해 건설모드 패널을 구성한다 (ShowUnitTierPanel의 건물 버전).
+    // BuildingDataSO에 건물을 추가해도 UIController를 건드릴 필요가 없도록 ConstructionIcon을 그대로 쓴다 (doc/0514).
+    private void ShowBuildModePanel()
+    {
+        List<BuildingData> buildings = buildingDatabase.buildingData;
+
+        bool needsRebuild = lastBuildPanelCommands == null
+            || lastBuildPanelInteractable == null
+            || lastBuildPanelInteractable.Length != buildings.Count;
+
+        if (!needsRebuild)
+        {
+            for (int i = 0; i < buildings.Count; i++)
+            {
+                if (lastBuildPanelInteractable[i] != IsBuildingPrerequisiteMet(buildings[i].ID))
+                {
+                    needsRebuild = true;
+                    break;
+                }
+            }
+        }
+
+        if (needsRebuild)
+        {
+            CommandButtonData[] commands = new CommandButtonData[buildings.Count];
+            bool[] interactable = new bool[buildings.Count];
+
+            for (int i = 0; i < buildings.Count; ++i)
+            {
+                BuildingData data = buildings[i];
+                bool met = IsBuildingPrerequisiteMet(data.ID);
+                KeyCode shortcut = BuildPanelShortcuts.TryGetValue(data.ID, out KeyCode key) ? key : KeyCode.None;
+
+                interactable[i] = met;
+                commands[i] = new CommandButtonData(
+                    data.ConstructionIcon,
+                    BuildingButtonAction(() => PlacementSystem.StartPlacement(data.ID), data.ID, shortcut),
+                    met);
+            }
+
+            lastBuildPanelCommands = commands;
+            lastBuildPanelInteractable = interactable;
+        }
+
+        uIController.ShowBuildPanel(
+            lastBuildPanelCommands,
+            ButtonAction.Simple(
+                CancelBuildMode,
+                LocalizationManager.GetText("cmd.cancel.title"),
+                LocalizationManager.GetText("cmd.cancelbuildmode.desc", ShortcutTag(KeyCode.T)),
+                KeyCode.T));
     }
 
     /// 유닛 생산 요청 (선택된 건물 각각에 대해 생산 가능 여부/대기열/자원을 확인하고,
@@ -1774,11 +1852,15 @@ public class RTSUnitController : MonoBehaviour
         if (chosen == TraitChoice.None)
         {
             ClearUnitContextSkillSlot(useFallbackSlot);
+            string traitAName = LocalizationManager.GetTextOrFallback($"trait.nta.{data.ID}.a.name", data.traitA.skillName);
+            string traitADesc = LocalizationManager.GetTextOrFallback($"trait.nta.{data.ID}.a.desc", data.traitA.description);
+            string traitBName = LocalizationManager.GetTextOrFallback($"trait.nta.{data.ID}.b.name", data.traitB.skillName);
+            string traitBDesc = LocalizationManager.GetTextOrFallback($"trait.nta.{data.ID}.b.desc", data.traitB.description);
             uIController.ShowSkillSelectPanel(
                 new CommandButtonData(data.traitA.icon, ButtonAction.Simple(
-                    () => ChooseTrait(data.ID, TraitChoice.A), data.traitA.skillName, data.traitA.description)),
+                    () => ChooseTrait(data.ID, TraitChoice.A), traitAName, traitADesc)),
                 new CommandButtonData(data.traitB.icon, ButtonAction.Simple(
-                    () => ChooseTrait(data.ID, TraitChoice.B), data.traitB.skillName, data.traitB.description)));
+                    () => ChooseTrait(data.ID, TraitChoice.B), traitBName, traitBDesc)));
             return;
         }
 
@@ -1787,14 +1869,17 @@ public class RTSUnitController : MonoBehaviour
         // 액티브/패시브 상관없이 슬롯 6엔 항상 선택된 트레이트를 넣는다(호버 시 설명을 볼 수 있어야 하므로).
         // 액티브면 클릭/단축키로 실제 사용 가능하고, 패시브면 버튼만 비활성화(클릭 불가)로 보여준다.
         UnitTraitOption trait = chosen == TraitChoice.A ? data.traitA : data.traitB;
+        string traitSlotKey = chosen == TraitChoice.A ? "a" : "b";
+        string traitName = LocalizationManager.GetTextOrFallback($"trait.nta.{data.ID}.{traitSlotKey}.name", trait.skillName);
+        string traitBaseDesc = LocalizationManager.GetTextOrFallback($"trait.nta.{data.ID}.{traitSlotKey}.desc", trait.description);
 
         float skillCooldownRemaining = representative.GetSkillCooldownRemaining();
         bool onCooldown = trait.isActiveSkill && skillCooldownRemaining > 0f;
 
         string description = trait.isActiveSkill
-            ? $"{trait.description} " + LocalizationManager.GetText("trait.shortcutsuffix", ShortcutTag(trait.shortcutKey))
+            ? $"{traitBaseDesc} " + LocalizationManager.GetText("trait.shortcutsuffix", ShortcutTag(trait.shortcutKey))
                 + (onCooldown ? LocalizationManager.GetText("trait.cooldownsuffix", skillCooldownRemaining) : "")
-            : trait.description;
+            : traitBaseDesc;
 
         // 진단용(doc/0368): 스킬이 이 슬롯을 처음 차지하는 순간인데 이미 다른 버튼이 남아있으면
         // 정상 흐름이 아니다(위 ClearUnitContextSkillSlot이 미리 비웠어야 함) - 그래도 스킬 표시는
@@ -1809,7 +1894,7 @@ public class RTSUnitController : MonoBehaviour
             trait.icon,
             ButtonAction.Simple(
                 () => ActivateSkill(data.ID, trait),
-                trait.skillName,
+                traitName,
                 description,
                 trait.isActiveSkill ? trait.shortcutKey : KeyCode.None),
             trait.isActiveSkill && !onCooldown), // Interactable = 액티브이면서 쿨다운이 끝났을 때만 true
@@ -1882,9 +1967,9 @@ public class RTSUnitController : MonoBehaviour
                     UnitController unit = selectedUnitList[0];
                     // 영웅 유닛(heroName이 채워진 unitID=0 유닛)은 이름을 데이터베이스 대신 자기 자신에게서 가져온다 (doc/0304).
                     string displayName = string.IsNullOrEmpty(unit.GetHeroName()) ? GetUnitName(unit.GetUnitID()) : unit.GetHeroName();
-                    uIController.ShowInfoPanel(unit.GetIcon(), displayName, unit.GetHealthManager(), unit.GetAttackDamage(), unit.GetArmor(),
+                    uIController.ShowInfoPanel(unit.GetIcon(), displayName, unit.GetHealthManager(), unit.GetBaseAttackDamage(), unit.GetBaseArmor(),
                         unit.GetAttackType(), unit.GetArmorType(), unit.GetSizeType(), unit.GetShotCount(), unit.GetDescription(),
-                        unit.GetCanAttackGround(), unit.GetCanAttackAir());
+                        unit.GetCanAttackGround(), unit.GetCanAttackAir(), unit.GetAttackBonus(), unit.GetArmorBonus());
                 }
                 else
                 {
@@ -2122,20 +2207,7 @@ public class RTSUnitController : MonoBehaviour
                 break;
 
             case SelectState.BuildMode:
-                uIController.ShowBuildPanel(
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.CommandCenter), BuildingID.CommandCenter, KeyCode.C),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.SupplyDepot), BuildingID.SupplyDepot, KeyCode.S),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Barracks), BuildingID.Barracks, KeyCode.B),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Factory), BuildingID.Factory, KeyCode.F),
-                    IsBuildingPrerequisiteMet(BuildingID.Factory),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Airport), BuildingID.Airport, KeyCode.P),
-                    IsBuildingPrerequisiteMet(BuildingID.Airport),
-                    BuildingButtonAction(() => PlacementSystem.StartPlacement(BuildingID.Lab), BuildingID.Lab, KeyCode.L),
-                    ButtonAction.Simple(
-                        CancelBuildMode,
-                        LocalizationManager.GetText("cmd.cancel.title"),
-                        LocalizationManager.GetText("cmd.cancelbuildmode.desc", ShortcutTag(KeyCode.T)),
-                        KeyCode.T));
+                ShowBuildModePanel();
 
                 uIController.HideProductionUI();
                 uIController.HideInfoPanel();
@@ -2217,6 +2289,16 @@ public class RTSUnitController : MonoBehaviour
         upgradeManager.AddBonus(type, amount);
         SoundManager.Instance?.PlayUpgradeCompleteVoice();
     }
+
+    // 연구소(Lab)가 여러 개여도 레벨/진행 여부가 항상 일치하도록, ResearchQueue는 로컬 상태 대신
+    // 이 위임 메서드들을 거쳐 UpgradeManager의 전역 상태를 읽고 쓴다 (doc/0518).
+    public int GetGlobalResearchLevel(ResearchType type) => upgradeManager.GetLevel(type);
+
+    public void AddGlobalResearchLevel(ResearchType type) => upgradeManager.AddLevel(type);
+
+    public bool IsResearchInProgressAnywhere(ResearchType type) => upgradeManager.IsInProgress(type);
+
+    public void SetResearchInProgress(ResearchType type, bool inProgress) => upgradeManager.SetInProgress(type, inProgress);
 
     #endregion
 

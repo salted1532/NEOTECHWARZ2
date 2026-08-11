@@ -110,7 +110,12 @@ public class BaseStructure : MonoBehaviour, IDestructible
         }
 
         if (remainingBuildTime <= 0f)
+        {
+            if (healthManager != null && healAccumulator > 0f)
+                healthManager.Heal(Mathf.CeilToInt(healAccumulator)); // 마지막 프레임에 남은 소수부 손실 방지 (doc/0517)
+
             CompleteConstruction();
+        }
     }
 
     // 일꾼이 도착해서 건설을 시작(또는 재개)할 때 호출된다. 이미 다른 일꾼이 담당 중이었다면 그 일꾼의 건설 담당을 풀어준다.

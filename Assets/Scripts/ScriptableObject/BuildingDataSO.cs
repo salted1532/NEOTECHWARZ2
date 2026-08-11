@@ -51,6 +51,9 @@ public class BuildingData
     // Info_panel에 표시할 아이콘. 아군 건물도 아직 안 쓰고 있음(마찬가지로 EnemyBuildingController 전용).
     [field: SerializeField]
     public Sprite Icon { get; private set; }
+    // 건설 버튼(ShowBuildPanel)에 표시할 아이콘 - 위 Icon(선택 아이콘)과는 별개로 관리 (doc/0514).
+    [field: SerializeField]
+    public Sprite ConstructionIcon { get; private set; }
     [field: SerializeField]
     public GameObject Prefab { get; private set; }
 

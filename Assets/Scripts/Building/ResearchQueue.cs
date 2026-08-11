@@ -48,9 +48,6 @@ public class ResearchQueue : MonoBehaviour
     private RTSUnitController rtsController;
     private BuildingController buildingController;
 
-    private int attackLevel; // 0~3
-    private int armorLevel;  // 0~3
-
     void Start()
     {
         rtsController = FindFirstObjectByType<RTSUnitController>();
@@ -62,18 +59,16 @@ public class ResearchQueue : MonoBehaviour
         Research();
     }
 
-    public int GetLevel(ResearchType type) => type == ResearchType.Attack ? attackLevel : armorLevel;
+    // 레벨은 이 연구소만의 상태가 아니라 전역(모든 연구소 공용)이다 - RTSUnitController를 거쳐
+    // UpgradeManager에서 읽는다 (doc/0518, 연구소가 여러 개면 서로 다른 레벨을 보여주던 버그 수정).
+    public int GetLevel(ResearchType type) => rtsController != null ? rtsController.GetGlobalResearchLevel(type) : 0;
 
-    // 같은 타입이 이미 대기열에 있는지 (공격 1업 연구 중에는 공격 2업을 큐잉할 수 없게 막기 위함)
-    private bool IsQueued(ResearchType type)
-    {
-        foreach (var r in researchQueue)
-            if (r.Type == type) return true;
-        return false;
-    }
-
+    // "이 종류가 지금 어딘가(다른 연구소 포함)에서 연구 중인지"도 전역 판정 - 자기 자신의 로컬 큐만
+    // 보던 예전 방식은 다른 연구소가 이미 연구 중인 종류를 또 큐잉할 수 있는 버그였다 (doc/0518).
     public bool CanEnqueue(ResearchType type) =>
-        GetLevel(type) < MaxLevel && !IsQueued(type) && researchQueue.Count < MaxQueueSize;
+        GetLevel(type) < MaxLevel
+        && (rtsController == null || !rtsController.IsResearchInProgressAnywhere(type))
+        && researchQueue.Count < MaxQueueSize;
 
     // "현재 레벨+1"을 연구하는 데 드는 비용. 이미 최대 레벨이면 (0,0) 반환.
     public (int ore, int gas) GetCost(ResearchType type)
@@ -95,6 +90,7 @@ public class ResearchQueue : MonoBehaviour
         float time = (type == ResearchType.Attack ? attackResearchTime : armorResearchTime)[nextLevel - 1];
 
         researchQueue.Add(new ResearchData(type, nextLevel, time));
+        rtsController?.SetResearchInProgress(type, true); // 이 종류가 다른 연구소에서 큐잉되지 못하도록 전역으로 잠금 (doc/0518)
     }
 
     // 매 프레임 대기열 맨 앞 항목의 남은 시간을 줄이고, 0 이하가 되면 연구를 완료 처리한다.
@@ -120,13 +116,11 @@ public class ResearchQueue : MonoBehaviour
 
     private void Complete(ResearchType type)
     {
-        if (type == ResearchType.Attack)
-            attackLevel++;
-        else
-            armorLevel++;
+        rtsController.AddGlobalResearchLevel(type); // 전역 레벨 증가 (doc/0518)
 
         int bonus = type == ResearchType.Attack ? attackBonusPerLevel : armorBonusPerLevel;
         rtsController.AddGlobalBonus(type, bonus); // UpgradeManager를 직접 만지지 않고 RTSUnitController를 거쳐서 반영
+        rtsController.SetResearchInProgress(type, false); // 완료됐으니 다른 연구소도 다시 큐잉 가능하게 잠금 해제
     }
 
     // 대기열의 특정 인덱스 항목을 취소하고, 환불을 위해 그 ResearchType을 int로 반환한다 (유효하지 않으면 -1).
@@ -138,6 +132,7 @@ public class ResearchQueue : MonoBehaviour
 
         ResearchType type = researchQueue[index].Type;
         researchQueue.RemoveAt(index);
+        rtsController?.SetResearchInProgress(type, false); // 취소됐으니 다른 연구소에서 다시 큐잉 가능하게 잠금 해제 (doc/0518)
         return (int)type;
     }
 
@@ -146,6 +141,10 @@ public class ResearchQueue : MonoBehaviour
     {
         List<ResearchData> remaining = new List<ResearchData>(researchQueue);
         researchQueue.Clear();
+
+        foreach (ResearchData item in remaining)
+            rtsController?.SetResearchInProgress(item.Type, false); // 이 건물이 사라지니 전역 잠금도 같이 풀어줌 (doc/0518)
+
         return remaining;
     }
 

@@ -276,13 +276,14 @@ public class BuildingController : MonoBehaviour, IDestructible
     }
 
     // "리프트" 버튼: 공중으로 떠오르며 그리드에서 자신의 위치를 지운다(공중 유닛처럼 그리드/NavMesh 영향을 받지 않음).
-    public void LiftOff()
+    // 반환값은 실제로 이륙했는지 여부 - 호출측(RTSUnitController)이 실패 시 경고를 띄우는 데 씀 (doc/0519).
+    public bool LiftOff()
     {
         if (!canLift || isLifted)
-            return;
+            return false;
 
         if (HasActiveProductionQueue()) // 생산 대기열에 뭔가 있으면 이륙 불가(공중에서 생산이 계속되는 것 방지)
-            return;
+            return false;
 
         if (hasGridPosition)
         {
@@ -299,6 +300,7 @@ public class BuildingController : MonoBehaviour, IDestructible
 
         GetComponent<BuildingEffects>()?.PlayTakeoff();
         GetComponent<BuildingAudio>()?.PlayTakeoff();
+        return true;
     }
 
     // "착륙" 버튼: 완전히 떠 있는 상태(상승/이동/하강 중이 아님)에서만 착륙 위치 선택 모드로 진입한다.
