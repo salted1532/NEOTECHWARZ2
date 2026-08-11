@@ -730,6 +730,7 @@ public class UIController : MonoBehaviour
         if (warningText == null)
             return;
 
+        SoundManager.Instance?.PlayActionFailedWarning(); // 모든 실패 경고 공통 SFX(doc/0524)
         warningText.text = message;
 
         if (warningHideCoroutine != null)

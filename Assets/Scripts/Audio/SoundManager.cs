@@ -320,6 +320,12 @@ public class SoundManager : MonoBehaviour
         if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.missionSuccess);
     }
 
+    // 행동 실패 공통 SFX(doc/0524) - UIController.ShowWarning()이 호출될 때마다 재생된다.
+    public void PlayActionFailedWarning()
+    {
+        if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.actionFailed);
+    }
+
     // AudioSource를 반환하는 이유: PlayGlobalVoice가 "이 카테고리가 지금 재생 중인지"를 나중에
     // 확인할 수 있어야 하기 때문 (doc/0271). 반환값이 필요 없는 호출부(PlaySFX/PlayVoice 등)는 그냥 버린다.
     // limitSpam=true면 doc/0284의 두 가지 방지 규칙을 적용한다: 같은 SoundClipSet이 sfxRetriggerInterval

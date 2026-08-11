@@ -28,6 +28,10 @@ public class PlacementSystem : MonoBehaviour
 
     private int selectedObjectIndex = -1;
 
+    // 건설/착륙 배치 모드가 활성 상태인지 - UserControl이 배치 모드 중 유닛 선택(클릭/드래그)을
+    // 막을 때 조회한다 (doc/0526). StartPlacement/StartBuildingRelocation이 켜고 StopPlacement가 끈다.
+    public bool IsPlacementModeActive => selectedObjectIndex >= 0;
+
     private GridData StructureData;
     private List<GameObject> placedGameObject = new();
 
@@ -146,31 +150,14 @@ public class PlacementSystem : MonoBehaviour
 
         var data = database.buildingData[selectedObjectIndex];
 
-        if (!StructureData.CanPlaceObejctAt(gridPos, data.Size))
-            return;
-
         // 현재 선택된 일꾼은 장애물 판정에서 제외 - 일꾼이 서 있는 자리에도 건물을 지을 수 있게
         UnitController worker = rtsController != null ? rtsController.GetSelectedWorker() : null;
 
-        // ⭐ 유닛 체크 추가
-        if (IsBlocked(mousePos, data.Size, worker != null ? worker.gameObject : null))
+        if (!IsValidPlacement(mousePos, gridPos, data, worker != null ? worker.gameObject : null))
+        {
+            UIController.Instance?.ShowWarning(LocalizationManager.GetText("warning.constructionfail")); // 빨간 프리뷰 클릭(doc/0525)
             return;
-
-        // ⭐ 자원(광물/가스)과 너무 가까우면 배치 불가
-        if (IsTooCloseToResource(data.ID, gridPos, data.Size))
-            return;
-
-        // ⭐ 아군 영토 밖이면 배치 불가
-        if (!IsInsideAlliedTerritory(gridPos, data.Size))
-            return;
-
-        // ⭐ 절벽/벽면에 걸쳐 있으면 배치 불가 (doc/0376)
-        if (!IsFootprintTerrainFlat(gridPos, data.Size))
-            return;
-
-        // ⭐ 맵 가장자리 1칸 여백 검사 (doc/0380)
-        if (!HasTerrainMargin(gridPos, data.Size))
-            return;
+        }
 
         if (worker == null)
             return; // 건설을 맡을 일꾼이 없으면 배치하지 않음
@@ -295,12 +282,11 @@ public class PlacementSystem : MonoBehaviour
 
         var data = database.buildingData[selectedObjectIndex];
 
-        if (!StructureData.CanPlaceObejctAt(gridPos, data.Size)) return;
-        if (IsBlocked(mousePos, data.Size)) return;
-        if (IsTooCloseToResource(data.ID, gridPos, data.Size)) return;
-        if (!IsInsideAlliedTerritory(gridPos, data.Size)) return;
-        if (!IsFootprintTerrainFlat(gridPos, data.Size)) return; // 절벽/벽면에 걸쳐 있으면 배치 불가 (doc/0376)
-        if (!HasTerrainMargin(gridPos, data.Size)) return; // 맵 가장자리 1칸 여백 검사 (doc/0380)
+        if (!IsValidPlacement(mousePos, gridPos, data, null))
+        {
+            UIController.Instance?.ShowWarning(LocalizationManager.GetText("warning.landingblocked")); // 빨간 프리뷰 클릭(doc/0525)
+            return;
+        }
 
         Vector3 groundPos = GetGroundPosition(gridPos, data.Size, mousePos.y);
         Vector3 landingPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab); // 착륙 완료 시 최종 정착 위치
@@ -579,6 +565,18 @@ public class PlacementSystem : MonoBehaviour
         lastDectectedPosition = Vector3Int.zero;
     }
 
+    // 배치 가능 여부 판정 (프리뷰 색상 갱신 + 클릭 검증 공용) - Update()와 클릭 핸들러가 항상 같은
+    // 조건을 쓰도록 한 곳에 모은다 (doc/0525 - 예전엔 세 곳에 조건이 중복돼 있었음).
+    private bool IsValidPlacement(Vector3 mousePos, Vector3Int gridPos, BuildingData data, GameObject ignoreObject)
+    {
+        return StructureData.CanPlaceObejctAt(gridPos, data.Size)
+            && !IsBlocked(mousePos, data.Size, ignoreObject)
+            && !IsTooCloseToResource(data.ID, gridPos, data.Size)
+            && IsInsideAlliedTerritory(gridPos, data.Size)
+            && IsFootprintTerrainFlat(gridPos, data.Size)
+            && HasTerrainMargin(gridPos, data.Size);
+    }
+
     // 배치 모드일 때만 동작: 마우스가 새 그리드 셀로 이동하면 유효성(valid)을 재계산해 프리뷰 색상/위치를 갱신한다.
     void Update()
     {
@@ -593,12 +591,7 @@ public class PlacementSystem : MonoBehaviour
 
             UnitController worker = rtsController != null ? rtsController.GetSelectedWorker() : null;
 
-            bool valid = StructureData.CanPlaceObejctAt(gridPos, data.Size)
-                && !IsBlocked(mousePos, data.Size, worker != null ? worker.gameObject : null)
-                && !IsTooCloseToResource(data.ID, gridPos, data.Size)
-                && IsInsideAlliedTerritory(gridPos, data.Size)
-                && IsFootprintTerrainFlat(gridPos, data.Size)
-                && HasTerrainMargin(gridPos, data.Size);
+            bool valid = IsValidPlacement(mousePos, gridPos, data, worker != null ? worker.gameObject : null);
 
             Vector3 groundPos = GetGroundPosition(gridPos, data.Size, mousePos.y);
             Vector3 previewPos = groundPos + Vector3.up * GetGroundOffsetY(data.Prefab);

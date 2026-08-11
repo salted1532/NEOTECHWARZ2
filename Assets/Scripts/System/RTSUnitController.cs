@@ -58,6 +58,9 @@ public class RTSUnitController : MonoBehaviour
     private UIController uIController;
     [SerializeField]
     private PlacementSystem PlacementSystem;
+
+    // 건설/착륙 배치 모드 중엔 유닛 선택을 막기 위해 UserControl이 조회한다 (doc/0526).
+    public bool IsPlacementModeActive => PlacementSystem != null && PlacementSystem.IsPlacementModeActive;
     [SerializeField]
     private ResourceManager resourceManager;
     [SerializeField]

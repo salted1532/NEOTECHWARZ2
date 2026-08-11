@@ -17,4 +17,6 @@ public class GlobalVoiceBankSO : ScriptableObject
     public SoundClipSet upgradeComplete { get; private set; }
     [field: SerializeField]
     public SoundClipSet missionSuccess { get; private set; } // 임무(스테이지) 목표 달성 시(doc/0464)
+    [field: SerializeField]
+    public SoundClipSet actionFailed { get; private set; } // 행동 실패 공통 SFX(doc/0524) - 자원/인구부족, 건설실패, 이륙불가 등 ShowWarning()이 뜨는 모든 경우에 공통 재생
 }

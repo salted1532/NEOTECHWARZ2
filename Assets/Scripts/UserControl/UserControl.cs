@@ -277,6 +277,9 @@ public class UserControl : MonoBehaviour
     /// </summary>
     private void HandleLeftClick()
     {
+        if (rtsUnitController != null && rtsUnitController.IsPlacementModeActive)
+            return; // 건설/착륙 배치 모드 중엔 클릭이 PlacementSystem 전담(doc/0526) - 유닛 클릭 선택 안 함
+
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit unitHit;
         RaycastHit groundHit;
@@ -968,6 +971,9 @@ public class UserControl : MonoBehaviour
     /// </summary>
     private void SelectObject()
     {
+        if (rtsUnitController != null && rtsUnitController.IsPlacementModeActive)
+            return; // 건설/착륙 배치 모드 중엔 드래그 선택도 막는다 (doc/0526)
+
         //드래그 범위 안에 들어오는 유닛부터 먼저 계산
         List<UnitController> unitsInDrag = new List<UnitController>();
 
