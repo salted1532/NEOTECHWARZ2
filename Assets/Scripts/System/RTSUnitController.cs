@@ -722,6 +722,12 @@ public class RTSUnitController : MonoBehaviour
         }
     }
 
+    // 건설 중인 건물(BaseStructure)이 선택된 상태에서 우클릭으로 랠리 포인트를 지정한다 (doc/0529).
+    public void SetRallySelectedStructure(Vector3 position)
+    {
+        selectedBaseStructure?.SetRallyPosition(position);
+    }
+
     // "리프트" 버튼: 선택된 건물들 중 대표 건물을 공중으로 띄운다.
     public void LiftSelectedBuilding()
     {
@@ -953,6 +959,11 @@ public class RTSUnitController : MonoBehaviour
 
         structure.SelectStructure();
         selectedBaseStructure = structure;
+
+        // 우클릭으로 지정해둔 랠리 포인트가 있으면 선택하는 순간 잠깐 보여준다
+        // (완공 건물 선택 시와 동일한 패턴, doc/0530).
+        if (structure.HasCustomRally())
+            userControl.ShowMovePointerAt(structure.GetRallyPos());
     }
 
     // 건설이 완료되어 BaseStructure가 파괴될 때 선택 상태가 유령 참조로 남지 않도록 정리한다.
@@ -2310,6 +2321,7 @@ public class RTSUnitController : MonoBehaviour
     // 상태 확인용
     public bool IsUnitSelect() => RTScurrentSate == SelectState.UnitSelect;
     public bool IsBuildingSelect() => RTScurrentSate == SelectState.BuildingSelect;
+    public bool IsBaseStructureSelect() => RTScurrentSate == SelectState.BaseStructureSelect;
     public bool IsBuildMode() => RTScurrentSate == SelectState.BuildMode;
 
     #endregion

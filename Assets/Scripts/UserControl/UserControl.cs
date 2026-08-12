@@ -834,6 +834,14 @@ public class UserControl : MonoBehaviour
 
             ShowMovePointer(groundPoint);
         }
+
+        // 건설 중인 건물(BaseStructure)이 선택된 상태에서도 완공 건물과 동일하게 땅 우클릭으로 랠리
+        // 포인트를 지정할 수 있게 한다 - 완공 시 그 값이 완공 건물로 그대로 이관된다 (doc/0529).
+        if (rtsUnitController.IsBaseStructureSelect())
+        {
+            rtsUnitController.SetRallySelectedStructure(groundPoint);
+            ShowMovePointer(groundPoint);
+        }
     }
 
     private void HandlekeyBoard()

@@ -30,6 +30,8 @@ public class BuildingController : MonoBehaviour, IDestructible
 
     // 생산된 유닛이 스폰 후 이동할 집결 지점
     private Vector3 RallyPosition;
+    private bool rallyInitialized; // true면 SetRallyPosition()으로 이미 값이 세팅됨(건설 중 BaseStructure에서
+                                    // 이관된 값 포함) - Start()가 기본값으로 덮어쓰지 않도록 구분
 
     private RTSUnitController rtsController;
     private Coroutine markerFlashRoutine;
@@ -127,8 +129,10 @@ public class BuildingController : MonoBehaviour, IDestructible
         UnitSpawner = GetComponentInChildren<UnitSpawner>();
         researchQueue = GetComponentInChildren<ResearchQueue>();
 
-        // 기본 랠리 포인트는 건물 앞쪽(약간 -Z 방향)으로 설정
-        RallyPosition = transform.position + new Vector3(0, 0, -2f);
+        // 기본 랠리 포인트는 건물 앞쪽(약간 -Z 방향)으로 설정. 건설 중이던 BaseStructure에서 랠리 포인트를
+        // 이관받은 경우(SetRallyPosition이 Start()보다 먼저 호출됨, doc/0529) 여기서 덮어쓰지 않는다.
+        if (!rallyInitialized)
+            RallyPosition = transform.position + new Vector3(0, 0, -5f);
     }
 
     // Update is called once per frame
@@ -440,6 +444,7 @@ public class BuildingController : MonoBehaviour, IDestructible
     public void SetRallyPosition(Vector3 position)
     {
         RallyPosition = position;
+        rallyInitialized = true;
     }
 
     // 지정 유닛 ID를 생산 대기열에 추가하도록 UnitSpawner에 위임한다.

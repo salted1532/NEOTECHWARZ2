@@ -30,6 +30,10 @@ public class BaseStructure : MonoBehaviour, IDestructible
     private RTSUnitController rtsController;
     private System.Action onCancelledByPlayer; // 플레이어가 직접 취소했을 때 그리드 예약을 풀어주는 콜백(PlacementSystem 제공)
 
+    // 생산된 유닛이 스폰 후 이동할 집결 지점 (건설 중에 우클릭으로 미리 지정 가능, 완공 시 완공 건물로 이관, doc/0529)
+    private Vector3 RallyPosition;
+    private bool hasCustomRally; // 플레이어가 실제로 랠리를 지정한 적이 있는지 (없으면 완공 건물이 자체 기본값을 쓰게 둠)
+
     private GameObject risingBuilding; // 지면 아래에서 서서히 떠오르는 완공될 건물 프리뷰 (doc/0527)
     private Tween risingTween;
 
@@ -44,6 +48,10 @@ public class BaseStructure : MonoBehaviour, IDestructible
     private void Start()
     {
         rtsController = FindFirstObjectByType<RTSUnitController>();
+
+        // 기본 랠리 포인트는 완공 건물과 동일한 공식(건물 앞쪽 -Z 방향) - 아직 지정 전 상태의 기본값일 뿐,
+        // hasCustomRally가 true가 되기 전까지는 완공 시 이관하지 않는다.
+        RallyPosition = transform.position + new Vector3(0, 0, -5f);
     }
 
     private BuildingData GetBuildingData() =>
@@ -165,6 +173,16 @@ public class BaseStructure : MonoBehaviour, IDestructible
     public Sprite GetIcon() => icon;
     public HealthManager GetHealthManager() => healthManager;
 
+    // 랠리 포인트(신규 생산 유닛의 집결지)를 지정 위치로 변경한다 (건설 중 우클릭, doc/0529).
+    public void SetRallyPosition(Vector3 position)
+    {
+        RallyPosition = position;
+        hasCustomRally = true;
+    }
+
+    public Vector3 GetRallyPos() => RallyPosition;
+    public bool HasCustomRally() => hasCustomRally;
+
     // 좌클릭 선택 시(RTSUnitController) 마커를 켠다. 우클릭 피드백 깜빡임(FlashMarker)과 같은 마커를 공유한다.
     public void SelectStructure()
     {
@@ -232,7 +250,15 @@ public class BaseStructure : MonoBehaviour, IDestructible
                 obstacle.enabled = true;
 
             if (obj.TryGetComponent<BuildingController>(out var builtController))
+            {
                 builtController.SetGridInfo(gridPosition); // 이후 리프트 이동 시 자기 자리를 해제할 수 있도록 전달
+
+                // 건설 중 우클릭으로 랠리 포인트를 지정해뒀다면 완공 건물에 그대로 이관한다 (doc/0529).
+                // 완공 건물 자신의 Start()가 아직 돌기 전이라(Instantiate 직후 동기 호출), 여기서 세팅해두면
+                // Start()의 기본값 계산이 이 값을 덮어쓰지 않는다(BuildingController.rallyInitialized 참고).
+                if (hasCustomRally)
+                    builtController.SetRallyPosition(RallyPosition);
+            }
 
             rtsController?.AddMaxPopulation(data.maxpopulationamount); // 건설 완료 시점에만 인구수 한도 반영 (건설 중엔 미반영)
         }
