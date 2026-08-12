@@ -174,6 +174,19 @@ public class PreviewSystem : MonoBehaviour
         return ghost;
     }
 
+    // 건설 상승 애니메이션(BaseStructure)용: 실제 건물 프리팹을 원래 머티리얼 그대로 생성하되,
+    // 게임플레이에 영향을 주는 컴포넌트만 비활성화한다 (doc/0527). SpawnConstructionGhost와 달리
+    // 반투명 고스트 머티리얼로 바꾸지 않는다 - "실제 건물이 올라오는" 것처럼 보여야 하기 때문.
+    public GameObject SpawnRisingBuildingPreview(GameObject prefab, Vector3 position, Quaternion rotation)
+    {
+        GameObject obj = Instantiate(prefab, position, rotation);
+
+        DisableGameplayComponents(obj);
+        SetLayerRecursively(obj, indicatorsLayer);
+
+        return obj;
+    }
+
     // 프리뷰 표시 종료: 셀 커서를 숨기고 프리뷰 오브젝트를 파괴한다.
     public void StopShowingPreview()
     {

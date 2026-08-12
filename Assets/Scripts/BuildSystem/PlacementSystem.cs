@@ -377,6 +377,19 @@ public class PlacementSystem : MonoBehaviour
         Bounds bounds = meshFilter.sharedMesh.bounds;
         return (bounds.extents.y - bounds.center.y) * prefab.transform.localScale.y;
     }
+
+    // 건물 프리팹의 전체 높이(로컬 메쉬 바운드 기준) - 건설 상승 애니메이션에서 건물을 땅속에 얼마나
+    // 파묻어 시작할지 계산하는 데 쓰인다 (doc/0527). GetGroundOffsetY와 마찬가지로 루트의 MeshFilter만 본다.
+    public static float GetBuildingHeight(GameObject prefab)
+    {
+        if (prefab == null)
+            return 2f;
+
+        if (!prefab.TryGetComponent<MeshFilter>(out var meshFilter) || meshFilter.sharedMesh == null)
+            return 2f;
+
+        return meshFilter.sharedMesh.bounds.size.y * prefab.transform.localScale.y;
+    }
     // 건물이 들어설 영역에 유닛/장애물 등 blockingLayers에 속한 콜라이더가 있는지 물리 박스 검사로 확인한다.
     // 그리드 셀 점유 체크(StructureData)와 별개로, 실제 3D 공간상의 충돌까지 추가로 막기 위한 검사다.
     // ignoreObject: 이 오브젝트(및 그 자식) 콜라이더는 장애물로 치지 않는다 - 건설 위치에 도착해서

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using DG.Tweening;
 
 // 건물 기반(파운데이션) 오브젝트. PlacementSystem이 일꾼 도착 시 이 프리팹을 생성하고 Initialize()로
 // 지어질 건물 종류/건설시간을 넘겨준다. 담당 일꾼(builder)이 붙어있는 동안에만 건설시간이 줄어들고,
@@ -28,6 +29,9 @@ public class BaseStructure : MonoBehaviour, IDestructible
     private HealthManager healthManager; // 같은 오브젝트에 붙어있는 HealthManager (체력 표시/증가를 여기에 위임)
     private RTSUnitController rtsController;
     private System.Action onCancelledByPlayer; // 플레이어가 직접 취소했을 때 그리드 예약을 풀어주는 콜백(PlacementSystem 제공)
+
+    private GameObject risingBuilding; // 지면 아래에서 서서히 떠오르는 완공될 건물 프리뷰 (doc/0527)
+    private Tween risingTween;
 
     private void Awake()
     {
@@ -73,6 +77,8 @@ public class BaseStructure : MonoBehaviour, IDestructible
 
             if (data.Prefab.TryGetComponent<BuildingController>(out var controller))
                 icon = controller.GetIcon();
+
+            SpawnRisingBuilding(data.Prefab, buildTime);
         }
 
         healthPerSecond = buildTime > 0f ? finalMaxHealth / buildTime : finalMaxHealth;
@@ -87,13 +93,41 @@ public class BaseStructure : MonoBehaviour, IDestructible
         GetComponent<BuildingAudio>()?.PlayConstructLoop();
     }
 
+    // 완공될 건물을 미리(진짜 머티리얼로) 생성해 지면 아래 파묻어두고, 건설시간에 맞춰 서서히
+    // 지면 위 최종 위치까지 떠오르게 한다 (doc/0527). Update()의 건설 일시정지 로직과 Pause()/Play()로
+    // 맞물려, 건설이 멈추면 상승도 함께 멈춘다.
+    private void SpawnRisingBuilding(GameObject finishedPrefab, float buildTime)
+    {
+        // PlacementSystem이 이 오브젝트를 Instantiate한 직후 같은 프레임에 바로 Initialize()를 호출하므로,
+        // 이 오브젝트 자신의 Start()는 아직 실행되지 않은 상태다. PreviewSystem은 씬에 항상 먼저 존재하는
+        // 매니저이므로 Start()를 기다리지 않고 여기서 바로 조회한다 (doc/0528).
+        PreviewSystem previewSystem = FindFirstObjectByType<PreviewSystem>();
+        if (previewSystem == null)
+            return;
+
+        Vector3 finalPos = groundPosition + Vector3.up * PlacementSystem.GetGroundOffsetY(finishedPrefab);
+        float buriedDepth = PlacementSystem.GetBuildingHeight(finishedPrefab);
+        Vector3 startPos = finalPos + Vector3.down * buriedDepth;
+
+        risingBuilding = previewSystem.SpawnRisingBuildingPreview(finishedPrefab, startPos, transform.rotation);
+        risingTween = risingBuilding.transform.DOMoveY(finalPos.y, buildTime).SetEase(Ease.Linear);
+    }
+
     private void Update()
     {
         if (builder == null)
+        {
+            risingTween?.Pause();
             return; // 담당 일꾼이 없음(교체 대기 중이거나 방금 사망) - 건설 일시정지
+        }
 
         if (!TerritoryManager.IsInsideAlliedTerritory(transform.position))
+        {
+            risingTween?.Pause();
             return; // 영토를 잃으면 건설 진행(및 그에 딸린 체력 회복)도 함께 일시정지
+        }
+
+        risingTween?.Play();
 
         remainingBuildTime -= Time.deltaTime;
 
@@ -235,5 +269,14 @@ public class BaseStructure : MonoBehaviour, IDestructible
     public void Die()
     {
         CancelConstruction();
+    }
+
+    // 완공/취소/파괴 등 어떤 경로로 사라지든, 상승 중이던 건물 프리뷰와 트윈을 한 곳에서 정리한다.
+    private void OnDestroy()
+    {
+        risingTween?.Kill();
+
+        if (risingBuilding != null)
+            Destroy(risingBuilding);
     }
 }
