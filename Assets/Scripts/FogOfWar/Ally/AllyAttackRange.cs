@@ -14,4 +14,8 @@ public class AllyAttackRange : EnemyAttackRange
     {
         targetTags = new[] { "Enemy" };
     }
+
+    // 건물보다 적 유닛을 항상 우선한다 - 건물을 공격 중이었어도 사거리 안에 적 유닛이 들어오면
+    // 즉시 그쪽으로 교체(doc/0565).
+    protected override bool PrioritizeUnitTargets => true;
 }

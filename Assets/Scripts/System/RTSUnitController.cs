@@ -1276,6 +1276,23 @@ public class RTSUnitController : MonoBehaviour
             resourceManager.AddPopulationDirect(data.population);
     }
 
+    // 구조된 OC 유닛(enemyDataUnitID로 OC 테이블 조회)의 인구수를 현재 사용량에 반영한다.
+    // UnitController.Rescue()가 구조되는 순간 호출한다 - population 필드는 NTA와 동일한 UnitData 스키마를 그대로 쓴다.
+    public void AddPopulationForRescuedUnit(int enemyDataUnitID)
+    {
+        UnitData data = GetEnemyUnitData(enemyDataUnitID);
+        if (data != null)
+            resourceManager.AddPopulationDirect(data.population);
+    }
+
+    // 구조됐던 OC 유닛이 죽었을 때 그만큼의 인구수를 반환한다 (enemyDataUnitID로 OC 테이블 조회).
+    public void ReleasePopulationForRescuedUnit(int enemyDataUnitID)
+    {
+        UnitData data = GetEnemyUnitData(enemyDataUnitID);
+        if (data != null)
+            resourceManager.ReleasePopulation(data.population);
+    }
+
     // 여러 건물이 섞여 선택됐을 때 패널/생산 대기열/리프트 버튼에 쓸 "대표 건물"을 우선순위
     // (MainBase > Tier1 > Tier2 > Tier3 > SupplyDepot > Lab)로 고른다. 우선순위 태그의 건물이 하나도
     // 없으면(이론상 발생 안 함) 선택된 첫 번째 건물을 그대로 쓴다.

@@ -25,6 +25,9 @@ public class HealthManager : MonoBehaviour
     // 체력바가 안개(Y≈1의 물리적 Plane)보다 훨씬 높이 떠 있어서 깊이 테스트로는 절대 안 가려지는 문제의
     // 대안 - 안개 상태를 직접 조회해서 Update()에서 렌더러를 켜고 끈다 (doc/0358).
     private csFogWar fogWar;
+    // 적 유닛이면 발견 여부(discovered)까지 반영한 판정을 우선 쓴다 (doc/0567) - 그 외(아군/건물 등)는 null로 남아
+    // 기존 위치 기반 안개 판정을 그대로 쓴다.
+    private EnemyUnitController enemyUnitController;
 
     // 체력 변화 시 UI(체력바 등)가 갱신될 수 있도록 이벤트로 알림
     public event System.Action<int, int> OnHealthChanged; // (currentHp, maxHealth)
@@ -40,6 +43,7 @@ public class HealthManager : MonoBehaviour
     {
         currentHp = maxHealth;
         fogWar = EffectPlayer.GetFogWar(); // 스폰마다 씬 전체를 재탐색하지 않도록 EffectPlayer의 캐시 재사용 (doc/0498 Tier 4-1)
+        enemyUnitController = GetComponent<EnemyUnitController>();
 
         OnHealthChanged += UpdateHealthSlider;
         UpdateHealthSlider(currentHp, maxHealth);
@@ -52,7 +56,10 @@ public class HealthManager : MonoBehaviour
         if (healthSlider == null || currentHp >= maxHealth)
             return;
 
-        healthSlider.gameObject.SetActive(FogVisibility.IsRevealed(fogWar, transform.position));
+        bool visible = enemyUnitController != null
+            ? enemyUnitController.IsEffectivelyVisible()
+            : FogVisibility.IsRevealed(fogWar, transform.position);
+        healthSlider.gameObject.SetActive(visible);
     }
 
     // 체력이 바뀔 때마다(OnHealthChanged) 체력바 슬라이더 값을 함께 갱신한다. 슬라이더가 연결 안 돼 있으면 아무 것도 안 함.

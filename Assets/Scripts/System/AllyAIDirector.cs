@@ -24,10 +24,10 @@ public class AllyWaveComposition
 // 진영만 존재하므로 EnemyAIDirector의 EnemyFaction 분기도 두지 않는다.
 public class AllyAIDirector : MonoBehaviour
 {
-    [Header("스폰 (여러 곳 지정 가능 - 라운드로빈으로 고르게 분산)")]
+    [Header("스폰 (여러 곳 지정 가능 - 생산 대기열이 가장 덜 찬 곳에 자동 분산, doc/0570)")]
     [SerializeField] private List<Transform> spawnPoints;
 
-    [Header("배치형 방어 유닛 (씬에 미리 세워둔 고정 수비 유닛 - 죽으면 같은 자리에 같은 종류로 즉시 재생산. 건물 재건은 범위 밖, doc/0552)")]
+    [Header("배치형 방어 유닛 (씬에 미리 세워둔 고정 수비 유닛 - 죽으면 같은 자리에 같은 종류로 1회 재생산, 그 대체 유닛까지 죽으면 더 생산 안 함. 건물 재건은 범위 밖, doc/0552, doc/0558)")]
     [SerializeField] private List<AllyController> defenseUnits;
 
     [Header("공격 웨이브 타이밍 (점점 강해지는 패턴)")]
@@ -84,27 +84,48 @@ public class AllyAIDirector : MonoBehaviour
     // 구성을 계속 반복한다(EnemyAIDirector.waveIndex와 동일한 패턴).
     private int waveIndex;
 
-    // NextSpawnPoint()가 라운드로빈으로 순환할 때 쓰는 위치 - 스폰마다 1씩 증가시켜 한 곳에 몰리지
-    // 않고 spawnPoints 전체에 고르게 나눠 생산한다.
-    private int nextSpawnPointIndex;
-
     private RTSUnitController rtsController;
 
     // 배치형 방어 유닛 슬롯 - Start() 시점의 위치/방향/종류를 기억해뒀다가, 그 유닛이 죽으면(current ==
-    // null) 같은 자리에 같은 종류로 다시 세운다(doc/0552, EnemyAIDirector.DefenseSlot과 동일한 패턴).
+    // null) 같은 자리에 같은 종류로 다시 세운다(doc/0552, EnemyAIDirector.DefenseSlot과 동일한 패턴) -
+    // 단, 대체 생산은 슬롯당 1회뿐이라 그 대체 유닛까지 죽으면 더 이상 채우지 않는다(doc/0558).
     private class DefenseSlot
     {
         public int unitID;
         public Vector3 position;
         public Quaternion rotation;
         public AllyController current;
+        public bool respawned; // 원본이 죽어 이미 한 번 대체 생산됐는지 - true면 그 대체 유닛이 죽어도 더 생산하지 않음(doc/0558)
     }
 
     private readonly List<DefenseSlot> defenseSlots = new List<DefenseSlot>();
 
+    // 생산 대기열 항목 - 완성되면 garrison에 추가된다(EnemyAIDirector.EnemyProductionOrder와 동일한
+    // 패턴, doc/0570 - 유닛별 생산시간을 지키도록).
+    private class AllyProductionOrder
+    {
+        public int unitID;
+        public float remainTime;
+        public float totalTime;
+    }
+
+    // 스폰 지점 하나의 런타임 생산 대기열(EnemyAIDirector.SpawnQueue와 동일한 패턴 - 아군 OC 스폰
+    // 지점엔 생산 건물 파괴 개념이 없어 그 부분만 뺌, doc/0570).
+    private class AllySpawnQueue
+    {
+        public Transform spawnPoint;
+        public readonly List<AllyProductionOrder> orders = new List<AllyProductionOrder>();
+    }
+
+    private readonly List<AllySpawnQueue> spawnQueues = new List<AllySpawnQueue>();
+
     private void Start()
     {
         rtsController = FindFirstObjectByType<RTSUnitController>();
+
+        foreach (Transform sp in spawnPoints)
+            if (sp != null)
+                spawnQueues.Add(new AllySpawnQueue { spawnPoint = sp });
 
         foreach (AllyController unit in defenseUnits)
         {
@@ -127,28 +148,92 @@ public class AllyAIDirector : MonoBehaviour
         StartCoroutine(ReinforceRoutine());
     }
 
+    // 스폰 지점마다 독립된 생산 대기열을 매 프레임 진행한다(EnemyAIDirector.Update()와 동일한 패턴,
+    // doc/0570).
+    private void Update()
+    {
+        foreach (AllySpawnQueue sq in spawnQueues)
+        {
+            if (sq.orders.Count == 0)
+                continue;
+
+            AllyProductionOrder front = sq.orders[0];
+            front.remainTime -= Time.deltaTime;
+            if (front.remainTime > 0f)
+                continue;
+
+            sq.orders.RemoveAt(0);
+
+            AllyController unit = SpawnUnit(front.unitID, sq.spawnPoint);
+            if (unit != null)
+                garrison.Add(unit);
+        }
+    }
+
     // ======================
     // 1. 시간에 맞춰 점점 강해지는 공격 웨이브
     // ======================
     private IEnumerator AttackWaveRoutine()
     {
-        for (int i = 0; i < waveTimes.Count; i++)
-        {
-            float wait = i == 0 ? waveTimes[0] : waveTimes[i] - waveTimes[i - 1];
-            yield return CountdownSeconds(wait);
-            yield return LaunchWave();
-        }
-
-        // 리스트를 다 쓰면 끝내지 않고 마지막 두 항목의 간격으로 계속 반복한다(EnemyAIDirector와 동일).
-        float repeatInterval = Mathf.Max(1f, waveTimes.Count >= 2
-            ? waveTimes[^1] - waveTimes[^2]
-            : waveTimes[0]);
-
         while (true)
         {
-            yield return CountdownSeconds(repeatInterval);
-            yield return LaunchWave();
+            yield return CountdownSeconds(WaveIntervalFor(waveIndex));
+
+            yield return WaitUntilTargetExists(); // doc/0565 - 공격할 건물이 없으면 보류(생산은 계속)
+            yield return WaitUntilReady(CurrentWaveComposition());
+            yield return LaunchWave(); // doc/0560: 별동대가 전멸할 때까지 여기서 대기
         }
+    }
+
+    // 공격할 적대 건물이 하나도 없으면 계속 폴링 대기한다(그동안도 ReinforceRoutine은 별개 코루틴이라
+    // 계속 생산됨) - 대상이 생기는 즉시(플레이어가 새로 짓거나 파괴됐던 건물이 다시 있는 등) 재개된다.
+    // TakeSquad()는 LaunchWave() 안에서 이 대기가 끝난 뒤에야 불리므로, 보류 중엔 병력이 garrison에
+    // 그대로 남아 낭비되지 않는다(doc/0565).
+    private IEnumerator WaitUntilTargetExists()
+    {
+        while (PickAttackTarget() == null)
+            yield return new WaitForSeconds(1f);
+    }
+
+    // waveTimes[index] 기준 이번 사이클의 대기 시간 - 리스트를 넘어서면 마지막 두 항목 간격을 반복한다
+    // (EnemyAIDirector.WaveIntervalFor와 동일한 패턴, doc/0560). 이 간격은 미션 시작 시각이 아니라
+    // "이전 웨이브가 전멸한 시점" 기준으로 잰다.
+    private float WaveIntervalFor(int index)
+    {
+        if (waveTimes.Count == 0)
+            return 0f;
+        if (index == 0)
+            return waveTimes[0];
+        if (index < waveTimes.Count)
+            return waveTimes[index] - waveTimes[index - 1];
+
+        return Mathf.Max(1f, waveTimes.Count >= 2 ? waveTimes[^1] - waveTimes[^2] : waveTimes[0]);
+    }
+
+    // 시각이 지나도 구성이 안 갖춰지면 계속 폴링 대기한다(그동안 ReinforceRoutine이 계속 채움) -
+    // EnemyAIDirector.WaitUntilReady/IsComposeReady와 동일한 패턴(doc/0560 신규 추가).
+    private IEnumerator WaitUntilReady(List<AllyUnitGroup> composition)
+    {
+        while (!IsComposeReady(composition))
+            yield return new WaitForSeconds(1f);
+    }
+
+    private bool IsComposeReady(List<AllyUnitGroup> composition)
+    {
+        garrison.RemoveAll(u => u == null);
+
+        foreach (AllyUnitGroup group in composition)
+        {
+            int available = 0;
+            foreach (AllyController unit in garrison)
+                if (unit != null && !deployed.Contains(unit) && unit.GetAllyUnitID() == group.unitID)
+                    available++;
+
+            if (available < group.count)
+                return false;
+        }
+
+        return true;
     }
 
     // seconds초를 매 프레임 카운트다운하며 nextWaveCountdown을 계속 갱신한다 - 인스펙터에서 다음 웨이브
@@ -178,9 +263,9 @@ public class AllyAIDirector : MonoBehaviour
         if (assembleBeforeAttack)
             yield return AssembleAtRally(squad);
 
-        // 목표 파괴 시 재조준/전멸 시 종료 감시는 별도 코루틴 - 여기서 기다리면 이 부대가 다 죽을
-        // 때까지 AttackWaveRoutine의 다음 웨이브 스케줄이 막혀버린다(EnemyAIDirector와 동일한 이유).
-        StartCoroutine(RunWaveSquad(squad));
+        // doc/0560: fire-and-forget이던 것을 직접 대기로 바꿔 AttackWaveRoutine이 전멸까지 기다리게 한다
+        // (EnemyAIDirector와 동일한 이유로 구 결정 번복).
+        yield return RunWaveSquad(squad);
     }
 
     // 이번 웨이브에 보낼 구성 - attackWaves[waveIndex], 리스트를 넘어서면 마지막 구성을 계속 반복한다.
@@ -208,12 +293,15 @@ public class AllyAIDirector : MonoBehaviour
             if (target == null)
             {
                 target = PickAttackTarget();
-                if (target == null)
-                    yield break; // 적대 세력 건물이 하나도 안 남음 - 더 공격할 곳이 없음
-
-                foreach (AllyController unit in squad)
-                    if (unit != null)
-                        unit.AttackMoveTo(target.transform.position);
+                if (target != null)
+                {
+                    foreach (AllyController unit in squad)
+                        if (unit != null)
+                            unit.AttackMoveTo(target.transform.position);
+                }
+                // doc/0565: 목표가 없어도 포기(yield break)하지 않는다 - 다음 프레임에 다시 찾는다.
+                // 부대가 전멸하기 전까진 이 코루틴이 끝나지 않아야 "전멸해야 다음 웨이브"(doc/0560)
+                // 규칙이 "목표를 다 잃으면"에서 새지 않는다.
             }
 
             yield return null;
@@ -314,14 +402,16 @@ public class AllyAIDirector : MonoBehaviour
         }
     }
 
-    // defenseSlots 중 유닛이 죽어서 비어있는(current == null) 자리마다 같은 종류를 같은 위치/방향으로
-    // 즉시 다시 세운다(doc/0552, EnemyAIDirector.RespawnDeadDefenseUnits와 동일한 패턴) - garrison과
-    // 달리 별도 웨이브 큐 없이 바로 Instantiate한다(자리를 지키는 게 목적이라 집결/이동이 필요 없음).
+    // defenseSlots 중 유닛이 죽어서 비어있고(current == null) 아직 대체 생산을 한 번도 안 한(!respawned)
+    // 자리마다 같은 종류를 같은 위치/방향으로 즉시 다시 세운다(doc/0552, EnemyAIDirector와 동일한
+    // 패턴) - garrison과 달리 별도 웨이브 큐 없이 바로 Instantiate한다(자리를 지키는 게 목적이라
+    // 집결/이동이 필요 없음). 대체 생산은 슬롯당 딱 1번뿐이라, 그 대체 유닛까지 죽으면
+    // (respawned == true) 더 이상 채우지 않는다(doc/0558).
     private void RespawnDeadDefenseUnits()
     {
         foreach (DefenseSlot slot in defenseSlots)
         {
-            if (slot.current != null)
+            if (slot.current != null || slot.respawned)
                 continue;
 
             UnitData data = rtsController != null ? rtsController.GetEnemyUnitData(slot.unitID) : null;
@@ -331,62 +421,105 @@ public class AllyAIDirector : MonoBehaviour
             GameObject spawned = Instantiate(data.AllyPrefab, slot.position, slot.rotation);
             if (spawned.TryGetComponent<AllyController>(out AllyController unit))
                 slot.current = unit;
+            slot.respawned = true;
         }
     }
 
-    // composition이 요구하는 유닛 종류별 개수에 garrison이 못 미치면 그 종류로 스폰해서 채운다. 스폰이
-    // 실패하면(OC Unit Data SO에 해당 unitID의 AllyPrefab이 비어있음 등) 그 종류는 포기하고 다음 종류로
-    // 넘어간다 - 안 그러면 무한 루프에 빠진다(EnemyAIDirector.FillPool과 동일한 가드).
+    // composition이 요구하는 유닛 종류별 개수(보유 + 이미 생산 대기열에 들어간 수)가 못 미치면 부족한
+    // 만큼 생산을 주문한다(EnemyAIDirector.FillPool과 동일한 패턴, doc/0570) - 즉시 Instantiate하지
+    // 않고, 스폰 지점 중 대기열이 가장 덜 찬 곳에 자동 분산된다(LeastLoadedQueue).
     private void FillPool(List<AllyUnitGroup> composition)
     {
+        garrison.RemoveAll(u => u == null);
+
         foreach (AllyUnitGroup group in composition)
         {
-            int have = garrison.FindAll(u => u != null && u.GetAllyUnitID() == group.unitID).Count;
+            int have = garrison.FindAll(u => u != null && u.GetAllyUnitID() == group.unitID).Count
+                + PendingCount(group.unitID);
 
-            while (have < group.count)
+            for (int i = have; i < group.count; i++)
+                EnqueueProduction(group.unitID);
+        }
+    }
+
+    // 이미 생산 대기열에 들어가 있어 완성을 기다리는 중인 unitID 개수(EnemyAIDirector.PendingCount와
+    // 동일한 패턴) - 안 세면 ReinforceRoutine이 돌 때마다 같은 부족분을 중복 주문하게 된다.
+    private int PendingCount(int unitID)
+    {
+        int count = 0;
+        foreach (AllySpawnQueue sq in spawnQueues)
+            foreach (AllyProductionOrder order in sq.orders)
+                if (order.unitID == unitID)
+                    count++;
+        return count;
+    }
+
+    private void EnqueueProduction(int unitID)
+    {
+        if (rtsController == null)
+            return;
+
+        UnitData data = rtsController.GetEnemyUnitData(unitID);
+        if (data == null || data.AllyPrefab == null)
+            return;
+
+        AllySpawnQueue sq = LeastLoadedQueue();
+        if (sq == null)
+            return; // 스폰 지점이 하나도 없음
+
+        sq.orders.Add(new AllyProductionOrder
+        {
+            unitID = unitID,
+            remainTime = data.productionTime,
+            totalTime = data.productionTime,
+        });
+    }
+
+    // 남은 생산 시간의 합이 가장 적은 스폰 지점을 고른다(EnemyAIDirector.LeastLoadedQueue와 동일한
+    // 패턴, doc/0570) - 유닛마다 생산 시간이 달라서 개수가 아니라 시간 합으로 비교해야 실제로 고르게
+    // 분산된다.
+    private AllySpawnQueue LeastLoadedQueue()
+    {
+        AllySpawnQueue best = null;
+        float bestLoad = float.MaxValue;
+
+        foreach (AllySpawnQueue sq in spawnQueues)
+        {
+            float load = QueueLoad(sq);
+            if (load < bestLoad)
             {
-                AllyController unit = SpawnUnit(group.unitID);
-                if (unit == null)
-                    break;
-
-                garrison.Add(unit);
-                have++;
+                bestLoad = load;
+                best = sq;
             }
         }
+
+        return best;
+    }
+
+    private float QueueLoad(AllySpawnQueue sq)
+    {
+        float total = 0f;
+        for (int i = 0; i < sq.orders.Count; i++)
+            total += i == 0 ? sq.orders[i].remainTime : sq.orders[i].totalTime;
+        return total;
     }
 
     // unitID로 OC 로스터 DB(OC Unit Data SO)를 조회해 아군 전용 프리팹(UnitData.AllyPrefab)을 자동으로
     // 얻는다 - EnemyAIDirector가 GetEnemyUnitData(id).Prefab으로 적대 프리팹을 얻는 것과 동일한 패턴
     // (doc/0543). 미션 제작자가 unitID별로 프리팹을 director 인스펙터에 직접 연결할 필요가 없다 - 웨이브
     // 구성표(attackWaves)에 unitID만 적어두면 이 조회로 자동 스폰된다.
-    private AllyController SpawnUnit(int unitID)
+    private AllyController SpawnUnit(int unitID, Transform spawnPoint)
     {
         UnitData data = rtsController != null ? rtsController.GetEnemyUnitData(unitID) : null;
-        Transform spawnPoint = NextSpawnPoint();
         if (data == null || data.AllyPrefab == null || spawnPoint == null)
             return null;
 
         GameObject spawned = Instantiate(data.AllyPrefab, spawnPoint.position, spawnPoint.rotation);
-        return spawned.TryGetComponent<AllyController>(out AllyController unit) ? unit : null;
-    }
-
-    // spawnPoints를 라운드로빈으로 순환하며 다음 스폰 지점을 고른다 - 한 곳에 몰리지 않고 여러 생산
-    // 건물에 고르게 나눠 생산한다(EnemyAIDirector가 생산 대기열로 하는 것의 축소판 - 이 director는
-    // 생산 시간 시뮬레이션 없이 즉시 스폰하므로 자리만 분산하면 충분함).
-    private Transform NextSpawnPoint()
-    {
-        if (spawnPoints.Count == 0)
+        if (!spawned.TryGetComponent<AllyController>(out AllyController unit))
             return null;
 
-        for (int i = 0; i < spawnPoints.Count; i++)
-        {
-            nextSpawnPointIndex = (nextSpawnPointIndex + 1) % spawnPoints.Count;
-            Transform candidate = spawnPoints[nextSpawnPointIndex];
-            if (candidate != null)
-                return candidate;
-        }
-
-        return null;
+        unit.MoveTo(rallyPoint != null ? rallyPoint.position : DefaultRallyPosition()); // 생산되자마자 집결지로 (EnemyAIDirector와 동일한 패턴, doc/0545, doc/0564)
+        return unit;
     }
 
     // garrison에서 composition이 요구하는 유닛 종류별 개수만큼(아직 원정 안 나간 것만) 뽑아 deployed에

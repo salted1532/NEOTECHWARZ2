@@ -65,6 +65,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `UnitController` | 유닛의 이동/전투/순찰/자원 채취 상태머신 (지상+공중 유닛 공통) | [doc](Docs/UnitController.md) |
 | `AttackRange` | 사거리 내 적 감지 및 자동 공격/추격 | [doc](Docs/AttackRange.md) |
 | `TurretController` | 차량형 유닛의 포탑 오브젝트가 몸체와 별개로 `AttackRange` 감지 대상을 향해 조준(이동 중에도 계속 조준), DOTween 반동 연출 | [doc](Docs/TurretController.md) |
+| `MeleeBodySlamAttack` | 근접 유닛(Ripfang 등)의 몸이 공격 순간 대상 쪽으로 짧게 튀어나갔다 돌아오는 DOTween "몸통박치기" 연출 — `TurretController.FireRecoil()`과 동일한 훅 구조 | [doc](Docs/MeleeBodySlamAttack.md) |
 | `UnitAnimatorDriver` | 유닛의 이동/공격 상태를 Animator 파라미터(IsMoving/Fire)에 반영, Animator 없는 유닛은 조용히 무시 | [doc](Docs/UnitAnimatorDriver.md) |
 | `Projectile` | 투사체 인스턴스 자신이 이동/명중을 처리(발사자 사망 후에도 끊기지 않도록 소유권 이전, doc/0319) | [doc](Docs/Projectile.md) |
 | `DamageOverTimeEffect` | 대상에 붙어 일정 시간 주기적으로 데미지를 주는 범용 DoT 컴포넌트, 재요청 시 스택 대신 지속시간만 갱신 | [doc](Docs/DamageOverTimeEffect.md) |
@@ -104,6 +105,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `AllyController` | 아군 OC(구조된 유닛 등) 컨트롤러 — `EnemyUnitController` 로직을 상속 없이 복제, 피아식별 방향만 반대(doc/0452) | [doc](Docs/AllyController.md) |
 | `AllyBuildingController` | 아군 OC 건물 컨트롤러 — 껍데기라 AI가 없어 `EnemyBuildingController`를 이름만 다르게 그대로 상속 | [doc](Docs/AllyBuildingController.md) |
 | `AllyAttackRange` | 아군 OC 유닛의 자식 오브젝트, 사거리 내 "적대 세력"(외계종족) 자동 감지/교전 — `EnemyAttackRange` 상속, 대상 태그만 교체 | [doc](Docs/AllyAttackRange.md) |
+| `EnemyAIDirector` | 적 기지마다 배치하는 AI 관제소 — 시간에 맞춘 공격 웨이브(웨이브당 3패턴 무작위), 점령지 탈환 별동대, 기지 피격 시 병력 소집, 보충 생산을 진영(OC/Spore Brood)별로 수행 | [doc](Docs/EnemyAIDirector.md) |
+| `AllyAIDirector` | `EnemyAIDirector`의 아군 OC판 — 점점 강해지는 고정 5단계 웨이브 + 보충 생산(점령지/기지방어 소집은 범위 밖) | [doc](Docs/AllyAIDirector.md) |
 | `CaptureSystem` | 거점 점령 — 트리거 범위 내 아군/적 유닛 수에 따라 부호 있는 점령치를 밀당, 양쪽 다 있으면 교착, 완전 점령을 되돌리려면 1배속으로 30초+30초, 한 번도 완전 점령된 적 없는 상태에서 반대 진영 진행치를 지우는 중이면 2배속, 방치 시 완전 점령이면 원래 소유자 쪽으로 회복·중립 진행중이면 0으로 감쇠(3초 후 바 자동 숨김), 점령 타이머가 안개에 가려진 위치면 숨겨짐 | [doc](Docs/CaptureSystem.md) |
 | `TerritoryZone` | 인스펙터에서 핀(꼭짓점) 개수만 늘리면 자동 생성되는 다각형 영토 범위(오목 다각형도 판정 가능), 소유자에 따라 외곽선 색이 흰색/초록/빨강으로 자동 전환 | [doc](doc/0133-territoryzone-implementation.md) |
 | `TerritoryManager` | 씬의 모든 `TerritoryZone`을 등록해 특정 좌표가 아군 영토 안인지 한 번에 질의(여러 영토가 겹치면 합집합) | [doc](doc/0141-territory-restriction-implementation-design.md) |
@@ -336,6 +339,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 씬 간 이동 연결 — 메인화면 → 미션 선택 → 각 스테이지, 스테이지 내 옵션 패널에서 이전/다음 미션 이동 및 메인화면 복귀
 - [x] 외계종족(스포어 브루드) 신규 진영 구현 — 유닛 3종(Ripfang/Spitter/Skitterwing) + 건물 3종(Hive Core/Spawning Pit/Bio-Reactor)
 - [x] 아군 OC(구조 가능한 유닛) 구현 — NTA(플레이어) 유닛의 강제공격 대상은 되지만 자동 공격 대상으로는 인식되지 않음, `EnemyUnitController`/`EnemyBuildingController`와 별개로 `AllyController`/`AllyBuildingController`/`AllyAttackRange`가 피아식별만 반대로 동일 로직을 담당(doc/0452)
+- [x] Enemy AI 구현(스크립트로 동작하는 "적 지휘관") — `EnemyAIDirector`가 적 기지마다 배치되어 시간에 맞춘 공격 웨이브(웨이브당 3가지 구성 패턴 중 무작위), 점령지에 별동대를 보내 탈환 시도, 기지 피격 시 주변 유휴 병력 소집, 웨이브/별동대로 나가거나 전사한 병력의 보충 생산까지 자율 수행 — OC/Spore Brood 진영별로 다른 유닛(프리팹)이 생산되고 웨이브 집결 여부(OC는 집결 후 출발/Spore Brood는 즉시 개별 출발) 등 작동 방식도 다르게 구성 가능(doc/0532~0552, 웨이브별 패턴 상세는 [`Docs/EnemyAIDirector.md`](Docs/EnemyAIDirector.md) 참고)
+- [x] 아군 OC 조종 스크립트(`AllyAIDirector`) — `EnemyAIDirector`와 동일한 설계를 아군 OC 쪽에 적용, 점점 강해지는 고정 5단계 웨이브를 적대 세력(Hive Core 최우선 목표) 쪽으로 보내고 보충 생산(점령지 탈환/기지방어 소집은 범위 밖, doc/0543, [`Docs/AllyAIDirector.md`](Docs/AllyAIDirector.md) 참고)
 - [x] 버전/변경 이력 관리 — `doc/0001-`부터 번호순으로 세션별 요청·코드 변경 내역을 전부 기록(사실상의 패치노트 로그, 아래 "개발 프로세스 메모" 참고)
 
 ### 로컬라이제이션(다국어)
@@ -349,8 +354,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 
 ## 로드맵 (미구현)
 
-- [ ] Enemy AI 구현(스크립트로 동작하는 진짜 "적 지휘관") — 지금은 적 유닛/건물이 씬에 미리 배치되고 `EnemyUnitController`의 기초 AI(사거리 내 자동 교전/이동/공격-이동)만 동작함. 시간에 맞춰 공격 병력을 모아 보내는 타이머 기반 웨이브(예: 5/10/15분 간격), 점령지에 별동대를 보내 탈환을 노리는 로직 등 전략적 판단을 내리는 AI 디렉터가 필요 — `EnemyController`(적 진영 조종 스크립트)와 아군 OC 조종 스크립트 별도 제작 예정
-- [ ] 외계종족 전용 공격/사망 이펙트 — 현재는 기존 이펙트를 재사용 중, 외계종족만의 별도 비주얼 준비 예정
+- [ ] 외계종족 전용 공격/사망 이펙트 — 현재는 기존 이펙트를 재사용 중(Ripfang/Spitter/Skitterwing 프리팹의 `hitEffects`가 NTA/OC 유닛과 동일한 총기·폭발·레이저·화염 파티클 GUID를 그대로 참조), 외계종족만의 별도 비주얼 준비 예정
+- [ ] UI 창 크기/위치 조절 기능 — 설정창에서 UI 크기·위치를 조절해 저장하면(유저 데이터) 인게임에도 그대로 적용되는 기능, 미착수
 - [ ] 서브 스테이지 구성 — 메인 스테이지 0~5 사이/주변에 약 4개 서브 스테이지 기획 및 구현 예정(기획 단계)
 - [ ] 스테이지 사이 브리핑룸 구현 — 미션 시작 전 현재 상황(스토리)/목표를 텍스트+음성으로 안내하고 캐릭터 얼굴을 보여주는 연출
 - [ ] 건물 고유 스킬 추가 — 유닛 고급 특성(스킬 선택)처럼 건물 전용 고유 스킬은 아직 기획/구현 전

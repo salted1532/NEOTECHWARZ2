@@ -17,6 +17,7 @@
 | `UnitRange` | 실제 공격 사거리 |
 | `targetTags` | 감지 대상 태그 목록(protected, 하위 클래스가 재정의 가능) — 기본값은 플레이어 진영 + 아군 OC("AllyOC"), `AllyAttackRange`는 `["Enemy"]`로 재정의 |
 | `engagedTarget` | 한 번 교전을 시작한 대상 — 감지 반경+완충 밖으로 완전히 벗어나기 전까지 계속 우선시(멈칫거림 방지, doc/0388) |
+| `PrioritizeUnitTargets`(protected virtual, 기본 false) | 켜면 사거리 안 유닛(건물 제외)을 항상 최우선(건물 교전 중이어도 즉시 교체) — `AllyAttackRange`가 `true`로 재정의(doc/0565), `EnemyUnitController`(적 AI)는 기존 그대로 |
 | `unreachableTarget` | `ChaseTarget()`이 도달 불가로 포기한 대상 — 감지 범위를 완전히 벗어나기 전까지 후보에서 제외(doc/0398) |
 | `DetectionRangeMargin` | 감지 콜라이더 반경이 `UnitRange + margin` 이상이 되도록 보장하는 안전장치(doc/0239) |
 
@@ -27,8 +28,9 @@
 | `Awake()` | 부모의 `IAttackRangeUnit` 캐싱, 감지 콜라이더 반경 보정 |
 | `EnsureDetectionRadius()` | `UnitRange`가 바뀔 때마다 함께 호출해 감지 콜라이더 최소 반경 유지 |
 | `Update()` | 매 프레임 대상 조회 → 사거리 안이면 `Attack()`, 밖이지만 Idle이면 `ChaseTarget()` → 도달 불가 판정되면 `unreachableTarget`으로 기록 |
-| `GetEngagedOrClosestTarget()` | 이미 물고 있던 대상을 우선(멈칫거림 방지), 없으면 `GetClosestTarget()` |
-| `GetClosestTarget()` | 감지된 대상 중 최근접(공격 불가 도메인/도달 불가 대상은 후보 제외) |
+| `GetEngagedOrClosestTarget()` | `PrioritizeUnitTargets`가 켜져 있으면 사거리 내 유닛을 최우선으로 먼저 확인(doc/0565), 아니면 이미 물고 있던 대상을 우선(멈칫거림 방지), 없으면 `GetClosestTarget()` |
+| `GetClosestTarget(requireUnit)` | 감지된 대상 중 최근접(공격 불가 도메인/도달 불가 대상은 후보 제외) — `requireUnit`이면 건물도 후보에서 제외(doc/0565) |
+| `IsUnitTarget(target)` | 대상이 유닛인지(건물이 아닌지) — `UnitController`/`AllyController`/`EnemyUnitController` 중 하나면 유닛(doc/0565) |
 | `GetTrackingTarget()` | 포탑(`TurretController`)이 조준 대상을 물어볼 때 사용 |
 | `CanEngage(target)` | 대상이 공격 도메인(지상/공중)에 맞는지, 은신 유닛은 감지 자체를 못 함(doc/0323) |
 | `HasTargetInRange` / `HasTargetInAttackRange` | 각각 "감지 콜라이더 안(교전 판정용)" / "실제 사거리 안(애니메이션 Fire 파라미터용, doc/0253)" |

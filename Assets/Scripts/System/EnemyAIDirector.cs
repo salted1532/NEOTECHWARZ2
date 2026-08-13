@@ -50,11 +50,11 @@ public class EnemyAIDirector : MonoBehaviour
     [Header("<공통> 스폰 (여러 곳 지정 가능, doc/0544)")]
     [SerializeField] private List<EnemySpawnPoint> spawnPoints;
 
-    [Header("<공통> 기지 방어")]
-    [SerializeField] private List<EnemyBuildingController> homeBuildings; // 메인기지/미션 오브젝트 등 방어 트리거로 삼을 건물들(doc/0535)
-    [SerializeField] private float defenseRadius = 15f; // 공격받은 건물 기준, 방어하러 부를 유닛을 찾는 반경(doc/0535)
+    [Header("<공통> 기지 방어 - 모든 적 건물이 공격받으면 주변 유닛을 부른다. 이 리스트는 그중 defenseRadius의 2배 반경을 쓸 메인기지/미션 오브젝트만 지정(doc/0575)")]
+    [SerializeField] private List<EnemyBuildingController> homeBuildings;
+    [SerializeField] private float defenseRadius = 15f; // 공격받은 건물 기준, 방어하러 부를 유닛을 찾는 반경 - homeBuildings는 이 값의 2배(doc/0535, doc/0575)
 
-    [Header("<공통> 배치형 방어 유닛 (씬에 미리 세워둔 고정 수비 유닛 - 죽으면 같은 자리에 같은 종류로 즉시 재생산. 건물 재건은 범위 밖, doc/0552)")]
+    [Header("<공통> 배치형 방어 유닛 (씬에 미리 세워둔 고정 수비 유닛 - 죽으면 같은 자리에 같은 종류로 1회 재생산, 그 대체 유닛까지 죽으면 더 생산 안 함. 건물 재건은 범위 밖, doc/0552, doc/0558)")]
     [SerializeField] private List<EnemyUnitController> defenseUnits;
 
     [Header("<공통> 공격 웨이브 타이밍")]
@@ -209,9 +209,15 @@ public class EnemyAIDirector : MonoBehaviour
     private int waveIndex;
 
     // OnDamaged 이벤트엔 "어느 건물이 맞았는지"가 안 실려오므로, 건물별로 그 건물을 캡처한 델리게이트를
-    // 만들어 구독하고 여기 보관해뒀다가 OnDisable에서 정확히 그 델리게이트로 해지한다(doc/0535).
+    // 만들어 구독하고 여기 보관해뒀다가 해지할 때 정확히 그 델리게이트로 뗀다(doc/0535). homeBuildings뿐
+    // 아니라 씬의 모든 적 건물(EnemyBuildingController.ActiveBuildings)을 대상으로 하며, 건물이 나중에
+    // 생기거나 파괴돼도 OnActiveBuildingsChanged로 계속 맞춰준다(doc/0575).
     private readonly Dictionary<EnemyBuildingController, System.Action<int, Vector3, AttackEffectType, bool>> baseDefenseHandlers
         = new Dictionary<EnemyBuildingController, System.Action<int, Vector3, AttackEffectType, bool>>();
+
+    // 건물별로 지원 소집을 이미 한 번 내렸는지 - 같은 건물이 계속 공격받아도 소집은 최초 1회만
+    // 내린다(doc/0576). 건물이 파괴되면 SyncBuildingDefenseHandlers에서 함께 제거한다.
+    private readonly HashSet<EnemyBuildingController> defenseRequested = new HashSet<EnemyBuildingController>();
 
     // 생산 대기열 항목 - 완성되면 destinationPool(garrison 또는 raidGarrison)에 추가된다(doc/0544).
     private class EnemyProductionOrder
@@ -237,7 +243,8 @@ public class EnemyAIDirector : MonoBehaviour
     private readonly List<SpawnQueue> spawnQueues = new List<SpawnQueue>();
 
     // 배치형 방어 유닛 슬롯 - Start() 시점의 위치/방향/종류를 기억해뒀다가, 그 유닛이 죽으면(current ==
-    // null) 같은 자리에 같은 종류로 다시 세운다(doc/0552). 생산 대기열(EnqueueProduction)은 spawnPoint
+    // null) 같은 자리에 같은 종류로 다시 세운다(doc/0552) - 단, 대체 생산은 슬롯당 1회뿐이라 그 대체
+    // 유닛까지 죽으면 더 이상 채우지 않는다(doc/0558). 생산 대기열(EnqueueProduction)은 spawnPoint
     // 기준이라 임의의 방어 위치엔 안 맞으므로, 이 슬롯은 즉시 Instantiate하는 별도의 단순한 경로를 쓴다.
     private class DefenseSlot
     {
@@ -245,15 +252,50 @@ public class EnemyAIDirector : MonoBehaviour
         public Vector3 position;
         public Quaternion rotation;
         public EnemyUnitController current;
+        public bool respawned; // 원본이 죽어 이미 한 번 대체 생산됐는지 - true면 그 대체 유닛이 죽어도 더 생산하지 않음(doc/0558)
     }
 
     private readonly List<DefenseSlot> defenseSlots = new List<DefenseSlot>();
 
     private void OnEnable()
     {
-        foreach (EnemyBuildingController building in homeBuildings)
+        EnemyBuildingController.OnActiveBuildingsChanged += SyncBuildingDefenseHandlers;
+        SyncBuildingDefenseHandlers();
+    }
+
+    private void OnDisable()
+    {
+        EnemyBuildingController.OnActiveBuildingsChanged -= SyncBuildingDefenseHandlers;
+
+        foreach (var pair in baseDefenseHandlers)
+            if (pair.Key != null && pair.Key.GetHealthManager() != null)
+                pair.Key.GetHealthManager().OnDamaged -= pair.Value;
+
+        baseDefenseHandlers.Clear();
+    }
+
+    // ActiveBuildings(씬 전체 적 건물)와 baseDefenseHandlers를 맞춘다 - 파괴된 건물의 핸들러는 떼어내고,
+    // 아직 구독하지 않은 새 건물엔 핸들러를 붙인다(doc/0575). ActiveBuildings는 각 건물이 자기 Start()
+    // 끝에서 등록하므로(healthManager 캐싱 이후), 여기서 걸리는 건물은 항상 GetHealthManager()가 준비돼
+    // 있다.
+    private void SyncBuildingDefenseHandlers()
+    {
+        List<EnemyBuildingController> stale = new List<EnemyBuildingController>();
+        foreach (var pair in baseDefenseHandlers)
+            if (pair.Key == null || !EnemyBuildingController.ActiveBuildings.Contains(pair.Key))
+                stale.Add(pair.Key);
+
+        foreach (EnemyBuildingController building in stale)
         {
-            if (building == null || building.GetHealthManager() == null)
+            if (building != null && building.GetHealthManager() != null)
+                building.GetHealthManager().OnDamaged -= baseDefenseHandlers[building];
+            baseDefenseHandlers.Remove(building);
+            defenseRequested.Remove(building);
+        }
+
+        foreach (EnemyBuildingController building in EnemyBuildingController.ActiveBuildings)
+        {
+            if (building == null || baseDefenseHandlers.ContainsKey(building) || building.GetHealthManager() == null)
                 continue;
 
             EnemyBuildingController capturedBuilding = building;
@@ -263,15 +305,6 @@ public class EnemyAIDirector : MonoBehaviour
             baseDefenseHandlers[building] = handler;
             building.GetHealthManager().OnDamaged += handler;
         }
-    }
-
-    private void OnDisable()
-    {
-        foreach (var pair in baseDefenseHandlers)
-            if (pair.Key != null && pair.Key.GetHealthManager() != null)
-                pair.Key.GetHealthManager().OnDamaged -= pair.Value;
-
-        baseDefenseHandlers.Clear();
     }
 
     private void Start()
@@ -351,10 +384,9 @@ public class EnemyAIDirector : MonoBehaviour
     // ======================
     private IEnumerator AttackWaveRoutine()
     {
-        for (int i = 0; i < waveTimes.Count; i++)
+        while (true)
         {
-            float wait = i == 0 ? waveTimes[0] : waveTimes[i] - waveTimes[i - 1];
-            yield return CountdownSeconds(wait, v => nextWaveCountdown = v);
+            yield return CountdownSeconds(WaveIntervalFor(waveIndex), v => nextWaveCountdown = v);
 
             // 카운트다운이 끝난 뒤에 확인한다 - Start() 직후(0프레임째)엔 플레이어 건물이 아직 자기
             // Start()에서 BuildingList에 등록되기 전이라(스크립트 실행 순서 미보장) 여기서 즉시 확인하면
@@ -363,24 +395,23 @@ public class EnemyAIDirector : MonoBehaviour
                 yield break; // 더 공격할 대상이 없음 - 웨이브 스케줄 보류(doc/0547)
 
             yield return WaitUntilReady(garrison, CurrentWaveComposition());
-            yield return LaunchWave();
+            yield return LaunchWave(); // doc/0560: 별동대가 전멸할 때까지 여기서 대기 (구 doc/0534 결정 번복)
         }
+    }
 
-        // 리스트를 다 쓰면 끝내지 않고 마지막 두 항목의 간격으로 계속 반복한다(doc/0532 결정 사항 #2).
-        float repeatInterval = Mathf.Max(1f, waveTimes.Count >= 2
-            ? waveTimes[^1] - waveTimes[^2]
-            : waveTimes[0]);
+    // waveTimes[index] 기준 이번 사이클의 대기 시간 - 리스트를 넘어서면 마지막 두 항목 간격을 반복한다
+    // (doc/0532 결정 사항 #2와 동일한 간격 규칙). doc/0560부터는 이 간격을 미션 시작 시각이 아니라
+    // "이전 웨이브가 전멸한 시점" 기준으로 다시 잰다.
+    private float WaveIntervalFor(int index)
+    {
+        if (waveTimes.Count == 0)
+            return 0f;
+        if (index == 0)
+            return waveTimes[0];
+        if (index < waveTimes.Count)
+            return waveTimes[index] - waveTimes[index - 1];
 
-        while (true)
-        {
-            yield return CountdownSeconds(repeatInterval, v => nextWaveCountdown = v);
-
-            if (IsPlayerDefeated())
-                yield break;
-
-            yield return WaitUntilReady(garrison, CurrentWaveComposition());
-            yield return LaunchWave();
-        }
+        return Mathf.Max(1f, waveTimes.Count >= 2 ? waveTimes[^1] - waveTimes[^2] : waveTimes[0]);
     }
 
     // 플레이어 건물이 하나도 안 남았는지 - 더 공격/점령할 대상 자체가 없다는 신호로 쓴다(doc/0547).
@@ -435,9 +466,9 @@ public class EnemyAIDirector : MonoBehaviour
         if (AssembleBeforeAttack)
             yield return AssembleAtRally(squad);
 
-        // 목표 파괴 시 재조준/전멸 시 종료 감시는 별도 코루틴 - 여기서 기다리면 이 부대가 다 죽을 때까지
-        // AttackWaveRoutine의 다음 웨이브 스케줄이 막혀버린다(doc/0534).
-        StartCoroutine(RunWaveSquad(squad));
+        // doc/0560: fire-and-forget이던 것을 직접 대기로 바꿔 AttackWaveRoutine이 전멸까지 기다리게 한다
+        // (구 doc/0534 결정 번복 - "전멸해야 다음 웨이브 타이머가 돈다" 요청 반영).
+        yield return RunWaveSquad(squad);
     }
 
     // waveIndex별로 무작위로 고른 패턴을 캐싱해둔다 - CurrentWaveComposition()이 한 웨이브 주기 동안
@@ -587,14 +618,12 @@ public class EnemyAIDirector : MonoBehaviour
         }
     }
 
-    // Ally가 뺏어간 곳을 Neutral보다 우선(doc/0532).
+    // 점령지 후보(자기 진영 소유가 아닌 곳) 중 우선순위 없이 무작위로 하나(doc/0561 - 기존 Ally 우선 →
+    // Neutral 순 우선순위를 없앰). 이미 자기 진영(Enemy) 소유인 곳은 보내도 효과가 없어 계속 제외.
     private CaptureSystem PickRaidTarget()
     {
-        CaptureSystem allyOwned = raidTargets.Find(t => t != null && t.CurrentOwner == CaptureOwner.Ally);
-        if (allyOwned != null)
-            return allyOwned;
-
-        return raidTargets.Find(t => t != null && t.CurrentOwner == CaptureOwner.Neutral);
+        List<CaptureSystem> candidates = raidTargets.FindAll(t => t != null && t.CurrentOwner != CaptureOwner.Enemy);
+        return candidates.Count > 0 ? candidates[Random.Range(0, candidates.Count)] : null;
     }
 
     // ======================
@@ -602,25 +631,32 @@ public class EnemyAIDirector : MonoBehaviour
     // ======================
     // 탐색 중심은 "공격받은 건물의 위치"(this director가 스폰했는지와 무관하게 미션 씬에 미리 배치해둔
     // 유닛도 포함), 실제로 보내는 목적지는 "공격이 들어온 위치"(attackerPosition) - 건물 앞에 서 있지
-    // 않고 공격자 쪽으로 달려가 반격한다(doc/0535).
+    // 않고 공격자 쪽으로 달려가 반격한다(doc/0535). homeBuildings로 지정한 건물은 defenseRadius의 2배
+    // 반경까지 소집하고, 그 외 모든 적 건물은 defenseRadius 그대로 쓴다(doc/0575). 건물 하나당 소집은
+    // 최초 1회만 - 그 뒤로 계속 공격받아도 다시 명령을 내리지 않는다(doc/0576).
     private void HandleBaseAttacked(EnemyBuildingController building, Vector3 attackerPosition, bool isEnemyAttacker)
     {
         if (isEnemyAttacker)
             return; // 플레이어에게 맞았을 때만 반응
 
-        foreach (EnemyUnitController unit in FindNearbyEnemyUnits(building.transform.position))
+        if (!defenseRequested.Add(building))
+            return; // 이 건물은 이미 한 번 소집했음
+
+        float radius = homeBuildings.Contains(building) ? defenseRadius * 2f : defenseRadius;
+
+        foreach (EnemyUnitController unit in FindNearbyEnemyUnits(building.transform.position, radius))
             if (!deployed.Contains(unit) && unit.IsIdle())
                 unit.AttackMoveTo(attackerPosition);
     }
 
-    // center 반경 defenseRadius 안의 살아있는 적 유닛을 전부 찾는다. EnemyUnitController엔 전역
-    // 레지스트리가 없지만, 전투 유닛은 이미 콜라이더를 갖고 있어(선택/사거리 판정용) 물리 쿼리로 충분하다
-    // - 이 director가 스폰했는지 여부와 무관하게 미션 씬에 프리팹으로 미리 배치해둔 유닛도 잡힌다(doc/0535).
-    private List<EnemyUnitController> FindNearbyEnemyUnits(Vector3 center)
+    // center 반경 radius 안의 살아있는 적 유닛을 전부 찾는다. EnemyUnitController엔 전역 레지스트리가
+    // 없지만, 전투 유닛은 이미 콜라이더를 갖고 있어(선택/사거리 판정용) 물리 쿼리로 충분하다 - 이
+    // director가 스폰했는지 여부와 무관하게 미션 씬에 프리팹으로 미리 배치해둔 유닛도 잡힌다(doc/0535).
+    private List<EnemyUnitController> FindNearbyEnemyUnits(Vector3 center, float radius)
     {
         List<EnemyUnitController> found = new List<EnemyUnitController>();
 
-        foreach (Collider hit in Physics.OverlapSphere(center, defenseRadius))
+        foreach (Collider hit in Physics.OverlapSphere(center, radius))
             if (hit.TryGetComponent<EnemyUnitController>(out EnemyUnitController unit) && !found.Contains(unit))
                 found.Add(unit);
 
@@ -665,14 +701,15 @@ public class EnemyAIDirector : MonoBehaviour
     // ======================
     // 5. 배치형 방어 유닛 재생산 (건물 재건은 범위 밖, doc/0552)
     // ======================
-    // defenseSlots 중 유닛이 죽어서 비어있는(current == null) 자리마다 같은 종류를 같은 위치/방향으로
-    // 즉시 다시 세운다 - garrison/raidGarrison과 달리 별도 큐 없이 바로 Instantiate한다(자리를 지키는
-    // 게 목적이라 집결/이동이 필요 없음).
+    // defenseSlots 중 유닛이 죽어서 비어있고(current == null) 아직 대체 생산을 한 번도 안 한(!respawned)
+    // 자리마다 같은 종류를 같은 위치/방향으로 즉시 다시 세운다 - garrison/raidGarrison과 달리 별도 큐
+    // 없이 바로 Instantiate한다(자리를 지키는 게 목적이라 집결/이동이 필요 없음). 대체 생산은 슬롯당
+    // 딱 1번뿐이라, 그 대체 유닛까지 죽으면(respawned == true) 더 이상 채우지 않는다(doc/0558).
     private void RespawnDeadDefenseUnits()
     {
         foreach (DefenseSlot slot in defenseSlots)
         {
-            if (slot.current != null)
+            if (slot.current != null || slot.respawned)
                 continue;
 
             UnitData data = rtsController != null ? rtsController.GetEnemyUnitData(slot.unitID) : null;
@@ -682,6 +719,7 @@ public class EnemyAIDirector : MonoBehaviour
             GameObject spawned = Instantiate(data.Prefab, slot.position, slot.rotation);
             if (spawned.TryGetComponent<EnemyUnitController>(out EnemyUnitController unit))
                 slot.current = unit;
+            slot.respawned = true;
         }
     }
 

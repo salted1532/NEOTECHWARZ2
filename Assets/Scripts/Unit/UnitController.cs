@@ -158,7 +158,8 @@ public class UnitController : MonoBehaviour, IDestructible
     [SerializeField]
     private float moveSpeed = 10f;
     [SerializeField]
-    private float arriveDistance = 0.5f;
+    private float arriveDistance = 2f; // 랠리 포인트/다중 선택 이동 등 여러 유닛이 같은 좌표로 몰릴 때
+                                        // 밀려난 유닛도 도착 판정을 통과하도록 넉넉하게 (doc/0571, doc/0573)
     private Vector3 targetPosition;
     [SerializeField]
     private bool isMovingAirUnit = false;
@@ -225,6 +226,9 @@ public class UnitController : MonoBehaviour, IDestructible
     private GameObject DepositGas;
 
     [SerializeField] private float gatherInteractRange = 2f; // 장애물 특성상 arriveDistance보다 넉넉하게
+
+    [SerializeField] private float patrolInteractRange = 2f; // 다수 유닛이 같은 순찰 지점에 몰릴 때 서로 밀려나도
+                                                               // 도착 판정을 통과하도록 stoppingDistance보다 넉넉하게 (doc/0559)
 
     private Transform depositTargetTransform; // Gathering 단계에서만 쓰던 지역변수를 필드로 승격
 
@@ -444,7 +448,9 @@ public class UnitController : MonoBehaviour, IDestructible
                 friendlyTarget == null &&
                 followTarget == null &&
                 !navMeshAgent.pathPending &&
-                navMeshAgent.remainingDistance <= arriveDistance)
+                // remainingDistance(경로 기반) 대신 실제 목적지까지의 직선 거리로 비교 - 여러 유닛이
+                // 몰려 회피로 우회하면 remainingDistance가 실제 거리보다 크게 튈 수 있다 (doc/0559/0563과 동일 이유).
+                (transform.position - navMeshAgent.destination).sqrMagnitude <= arriveDistance * arriveDistance)
             {
                 arrived = true;
                 // ResetPath() 미호출 이유는 EnemyUnitController와 동일 (doc/0387) - AttackRange의
@@ -1492,10 +1498,14 @@ public class UnitController : MonoBehaviour, IDestructible
         if (!patrolling)
             return;
 
+        // navMeshAgent.remainingDistance/stoppingDistance 대신 목적지까지의 실제 거리로 판정한다 - 다수
+        // 유닛이 같은 순찰 지점으로 몰리면 회피로 밀려난 유닛은 stoppingDistance(유닛마다 제각각, 대체로 1)
+        // 안으로 영원히 못 들어와 순찰이 멈추는 문제가 있었다 (doc/0559). gatherInteractRange와 같은 패턴.
         bool arrivedGround =
             !isAirUnit &&
             !navMeshAgent.pathPending &&
-            navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance;
+            (transform.position - (goingToEnd ? endPoint : startPoint)).sqrMagnitude
+                <= patrolInteractRange * patrolInteractRange;
 
         // 수평(X/Z) 거리만 본다 - 고도는 Update()에서 매 프레임 발밑 지형을 따라 계속 조정되는 값이라
         // targetPosition.y와 정확히 일치한다는 보장이 없어서, 3D 거리로 비교하면 도착 판정이 영원히 안 날 수 있다.
@@ -2006,7 +2016,18 @@ public class UnitController : MonoBehaviour, IDestructible
 
         rtsController?.UnitList.Remove(this);
         rtsController?.selectedUnitList.Remove(this); // 선택된 채로 죽었을 때 UI(Info_panel/Squad_panel 등)가 유령 참조를 들고 있지 않도록
-        rtsController?.ReleaseUnitPopulation(unitID); // 죽은 유닛이 차지하던 인구수를 현재 인구수에서 반환
+        // 죽은 유닛이 차지하던 인구수를 현재 인구수에서 반환. 구조 가능한 OC 유닛(enemyDataUnitID>0)은 구조된
+        // 뒤(!isRescueUnit)에만 Rescue()에서 추가됐었으므로 그때만 반환 - 구조 전에 죽으면 애초에 추가된 적이
+        // 없어 반환하면 인구수가 음수로 샌다.
+        if (enemyDataUnitID > 0)
+        {
+            if (!isRescueUnit)
+                rtsController?.ReleasePopulationForRescuedUnit(enemyDataUnitID);
+        }
+        else
+        {
+            rtsController?.ReleaseUnitPopulation(unitID);
+        }
 
         Destroy(gameObject);
     }
@@ -2051,6 +2072,8 @@ public class UnitController : MonoBehaviour, IDestructible
             return; // 이미 구조됨 - 중복 호출 방지
 
         isRescueUnit = false;
+
+        rtsController?.AddPopulationForRescuedUnit(enemyDataUnitID); // NTA 유닛과 같은 UnitData.population 필드를 OC 테이블에서 가져와 반영
 
         if (preRescueMarker != null)
             preRescueMarker.SetActive(false);

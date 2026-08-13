@@ -79,7 +79,10 @@ public class UnitEffects : MonoBehaviour
         bool moving = (unitController != null && unitController.IsCurrentlyMoving())
             || (enemyUnitController != null && enemyUnitController.IsCurrentlyMoving())
             || (allyController != null && allyController.IsCurrentlyMoving());
-        SetMoveTrail(moving && FogVisibility.IsRevealed(fogWar, transform.position));
+        bool visible = enemyUnitController != null
+            ? enemyUnitController.IsEffectivelyVisible() // 발견 여부(discovered)까지 반영 (doc/0567)
+            : FogVisibility.IsRevealed(fogWar, transform.position);
+        SetMoveTrail(moving && visible);
     }
 
     private void SetMoveTrail(bool moving)
@@ -102,6 +105,9 @@ public class UnitEffects : MonoBehaviour
     // 별도로(콜라이더 기준 정밀 위치) 처리하므로, 여기서는 발사 쪽(총구) 이펙트만 다룬다.
     public void PlayAttack()
     {
+        if (enemyUnitController != null && !enemyUnitController.IsEffectivelyVisible())
+            return; // 반쯤 밝은 곳의 미발견 적은 공격 이펙트도 숨긴다 (doc/0567)
+
         activeAttackEffects.RemoveAll(effect => effect == null); // 이미 자기 수명 다해 파괴된 이전 인스턴스 정리
         activeAttackEffects.AddRange(EffectPlayer.SpawnAtPoints(muzzlePrefab, firePoints, transform));
     }
@@ -121,11 +127,17 @@ public class UnitEffects : MonoBehaviour
     // 아군사격이든 적 공격이든 똑같이 재생돼야 한다(doc/0292, 경고음만 구분하는 UnitAudio와 다름).
     private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType, bool isEnemyAttacker)
     {
+        if (enemyUnitController != null && !enemyUnitController.IsEffectivelyVisible())
+            return; // 반쯤 밝은 곳의 미발견 적은 피격 이펙트도 숨긴다 (doc/0567)
+
         EffectPlayer.PlayHit(transform, bodyCollider, attackerPosition, hitEffects.GetPrefab(attackType));
     }
 
     private void HandleDeath()
     {
+        if (enemyUnitController != null && !enemyUnitController.IsEffectivelyVisible())
+            return; // 반쯤 밝은 곳의 미발견 적은 사망 이펙트도 숨긴다 (doc/0567)
+
         // attachToPoint: false - 이 유닛은 곧바로 Destroy(gameObject)될 예정이라, 부모로 붙이면 이펙트가
         // 재생을 채 끝내기도 전에 같이 파괴돼버린다.
         EffectPlayer.SpawnAtPoints(deathPrefab, deathPoints, transform, attachToPoint: false);

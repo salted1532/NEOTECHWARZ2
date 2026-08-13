@@ -53,6 +53,12 @@ public class EnemyAttackRange : MonoBehaviour
 
     private readonly List<GameObject> targetsInRange = new List<GameObject>();
 
+    // 하위 클래스가 켜면(AllyAttackRange, doc/0565) 사거리 안에 유닛(건물 제외)이 있을 때 항상 그
+    // 유닛을 최우선으로 삼는다 - 건물을 공격/추격 중이었어도 즉시 교체한다(플레이어 쪽
+    // AttackRange.GetEngagedOrClosestEnemy와 동일한 doc/0460 패턴). 기본값 false로 두어
+    // EnemyUnitController(적 AI)의 기존 동작(건물/유닛 동일 우선순위)은 그대로 유지한다.
+    protected virtual bool PrioritizeUnitTargets => false;
+
     // 지정 공격 명령이 없는 이 컨트롤러에서는 AttackMoveTick이 "교전 중이라 정지된 것인지" 판단할 때 조회한다.
     public bool HasTargetInRange
     {
@@ -62,8 +68,10 @@ public class EnemyAttackRange : MonoBehaviour
             {
                 // 도달 불가로 이미 포기한 대상은 "교전 중"으로 치지 않는다 - 안 그러면 그 대상이 넓은
                 // 감지 콜라이더 안에 계속 머무는 동안 AttackMoveTick()이 교전 중으로 착각해서 공격-이동
-                // 재개를 영원히 막는다 (doc/0398).
-                if (target != null && target != unreachableTarget)
+                // 재개를 영원히 막는다 (doc/0398). CanEngage()로 도메인(지상/공중)도 걸러야 한다 -
+                // 안 그러면 지상 전용 유닛이 공격도 못 하는 공중 유닛을 "교전 중"으로 착각해 공격-이동
+                // 재개가 영구히 막힌다(doc/0568).
+                if (target != null && target != unreachableTarget && CanEngage(target))
                     return true;
             }
 
@@ -172,6 +180,15 @@ public class EnemyAttackRange : MonoBehaviour
     // 있던 대상은 완전히 멀어지기 전까지는 그대로 우선시한다(doc/0388).
     private GameObject GetEngagedOrClosestTarget()
     {
+        if (PrioritizeUnitTargets)
+        {
+            // 사거리 내 실제 유닛(건물 제외)이 있으면 항상 최우선 - 건물을 물고 있던 중이었어도
+            // 즉시 교체한다(doc/0565, 플레이어 쪽 AttackRange.GetEngagedOrClosestEnemy와 동일한 doc/0460 패턴).
+            GameObject priorityUnit = GetClosestTarget(requireUnit: true);
+            if (priorityUnit != null)
+                return engagedTarget = priorityUnit;
+        }
+
         if (engagedTarget != null && CanEngage(engagedTarget))
         {
             float loseSightRange = UnitRange + DetectionRangeMargin + EngagedTargetLoseSightMargin;
@@ -186,7 +203,8 @@ public class EnemyAttackRange : MonoBehaviour
     // 감지된 대상 중 자신과의 거리(제곱 거리)가 가장 짧은 대상을 찾아 반환한다. 이 유닛이 공격할 수 없는
     // 도메인(지상 전용 유닛에게 공중 대상, 혹은 그 반대)의 대상은 아예 후보에서 제외한다 - 그래야 공격-이동
     // 중에 상대하지 못할 대상을 스쳐 지나가도 멈추거나 쫓아가지 않고 원래 목적지로 계속 이동한다.
-    private GameObject GetClosestTarget()
+    // requireUnit이 true면 건물을 후보에서 제외한다(doc/0565, PrioritizeUnitTargets 전용).
+    private GameObject GetClosestTarget(bool requireUnit = false)
     {
         GameObject closest = null;
         float closestSqrDist = float.MaxValue;
@@ -202,6 +220,9 @@ public class EnemyAttackRange : MonoBehaviour
             if (!CanEngage(target))
                 continue;
 
+            if (requireUnit && !IsUnitTarget(target))
+                continue;
+
             float sqrDist = (target.transform.position - transform.position).sqrMagnitude;
             if (sqrDist < closestSqrDist)
             {
@@ -212,6 +233,15 @@ public class EnemyAttackRange : MonoBehaviour
 
         return closest;
     }
+
+    // target이 "유닛"인지(건물이 아닌지) - 아군 OC가 볼 수 있는 EnemyUnitController(외계종족/적대 OC
+    // 유닛), 적 AI가 볼 수 있는 UnitController(플레이어 유닛)/AllyController(아군 OC 유닛) 셋 중
+    // 하나면 유닛으로 친다. 나머지(BuildingController/EnemyBuildingController 계열)는 건물로 취급한다
+    // (doc/0565).
+    private static bool IsUnitTarget(GameObject target) =>
+        target.GetComponent<UnitController>() != null ||
+        target.GetComponent<AllyController>() != null ||
+        target.GetComponent<EnemyUnitController>() != null;
 
     // 대상이 이 유닛의 공격 도메인(지상/공중)에 해당하는지 확인한다. 플레이어 유닛이면 그 유닛의
     // IsAirUnit(), 건물이면 이/착륙 상태(IsLifted)를 기준으로 판정한다 (EnemyUnitController.IsAirborne와

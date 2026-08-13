@@ -355,7 +355,8 @@ public class UserControl : MonoBehaviour
         {
             EnemyUnitController enemy = enemyHit.transform.GetComponent<EnemyUnitController>();
 
-            if (enemy != null && IsRevealedByFog(enemy.transform.position))
+            // 발견 여부(discovered)까지 반영한 EnemyUnitController 자체 판정을 쓴다 (doc/0567)
+            if (enemy != null && enemy.IsEffectivelyVisible())
             {
                 if (UsercurrentState == OrderState.Attack)
                 {
@@ -615,8 +616,8 @@ public class UserControl : MonoBehaviour
 
             if (enemy != null)
             {
-                // 안개에 가려진 적은 추격 공격 대신 그 지점으로 이동만 시킨다 (보이지 않는 대상을 특정해서 명령할 수 없음)
-                if (IsRevealedByFog(enemy.transform.position))
+                // 안개에 가려진(발견 여부 포함, doc/0567) 적은 추격 공격 대신 그 지점으로 이동만 시킨다 (보이지 않는 대상을 특정해서 명령할 수 없음)
+                if (enemy.IsEffectivelyVisible())
                 {
                     rtsUnitController.AttackSelectedUnits(enemy);
                     enemy.FlashMarker(); // 어느 적이 공격 대상인지 마커 깜빡임으로 표시
@@ -1144,8 +1145,18 @@ public class UserControl : MonoBehaviour
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out RaycastHit enemyHit, Mathf.Infinity, layerEnemy) && IsRevealedByFog(enemyHit.transform.position))
-            return CursorTarget.Enemy;
+        if (Physics.Raycast(ray, out RaycastHit enemyHit, Mathf.Infinity, layerEnemy))
+        {
+            // layerEnemy엔 적 유닛/건물이 섞여있다 - 유닛이면 발견 여부(discovered)까지 반영한 자체 판정을,
+            // 건물이면 기존 위치 기반 안개 판정을 쓴다 (doc/0567).
+            EnemyUnitController hoveredEnemyUnit = enemyHit.transform.GetComponent<EnemyUnitController>();
+            bool hoveredVisible = hoveredEnemyUnit != null
+                ? hoveredEnemyUnit.IsEffectivelyVisible()
+                : IsRevealedByFog(enemyHit.transform.position);
+
+            if (hoveredVisible)
+                return CursorTarget.Enemy;
+        }
 
         if (Physics.Raycast(ray, Mathf.Infinity, layerUnit | layerBuilding))
             return CursorTarget.Ally;

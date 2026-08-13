@@ -28,4 +28,26 @@ public static class FogVisibility
         }
         return false;
     }
+
+    // "지금 실제로 시야 안(Revealed)"인지만 본다 - IsRevealed와 달리 PreviouslyRevealed(반쯤 밝음)는 false.
+    // EnemyUnitController가 "발견됨(discovered)" 판정에 쓴다 (doc/0567).
+    public static bool IsCurrentlyVisible(csFogWar fogWar, Vector3 worldPosition, int margin = 1)
+    {
+        if (fogWar == null) return true; // 안개가 없는 씬에서는 항상 보이는 것으로 취급
+
+        Vector2Int center = fogWar.WorldToLevel(worldPosition);
+
+        for (int x = -margin; x <= margin; x++)
+        {
+            for (int y = -margin; y <= margin; y++)
+            {
+                Vector2Int cell = new Vector2Int(center.x + x, center.y + y);
+                if (!fogWar.CheckLevelGridRange(cell)) continue;
+
+                if (fogWar.shadowcaster.fogField[cell.x][cell.y] == Shadowcaster.LevelColumn.ETileVisibility.Revealed)
+                    return true;
+            }
+        }
+        return false;
+    }
 }

@@ -68,7 +68,8 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
     private bool isMovingAirUnit;
     private Vector3 targetPosition;
     [SerializeField] private float moveSpeed = 10f; // 공중 유닛 전용 (지상 유닛은 NavMeshAgent 자체 속도를 사용)
-    [SerializeField] private float arriveDistance = 0.5f;
+    [SerializeField] private float arriveDistance = 2f; // 별동대 등 여러 유닛이 같은 집결지로 몰릴 때
+                                                          // 밀려난 유닛도 도착 판정을 통과하도록 넉넉하게 (doc/0563, doc/0573)
     [SerializeField] private float airCruiseAltitude = 5f;
     [SerializeField] private LayerMask airGroundLayer; // 공중 유닛이 발밑 지면 높이를 재는 레이어 (UnitController와 동일한 용도)
 
@@ -189,13 +190,24 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
             {
                 isMovingAirUnit = false;
                 currentState = AllyState.Idle;
-                attackMoveDestination = null;
+
+                // 추격(ChaseTarget) 중엔 targetPosition이 일시적으로 적 위치로 바뀌어 있을 수 있다 -
+                // 실제 attackMoveDestination에 도착했을 때만 지워야, 전투가 끝난 뒤 AttackMoveTick이
+                // 원래 목적지로 이동을 재개할 수 있다(doc/0575).
+                if (attackMoveDestination == null ||
+                    (transform.position - attackMoveDestination.Value).sqrMagnitude <= arriveDistance * arriveDistance)
+                {
+                    attackMoveDestination = null;
+                }
             }
         }
 
         if (!isAirUnit)
         {
-            if (!arrived && !navMeshAgent.pathPending && navMeshAgent.remainingDistance <= arriveDistance)
+            // remainingDistance(경로 기반) 대신 실제 목적지까지의 직선 거리로 비교 - 여러 유닛이 몰려
+            // 회피로 우회하면 remainingDistance가 실제 거리보다 크게 튈 수 있다 (doc/0559와 동일 이유).
+            if (!arrived && !navMeshAgent.pathPending &&
+                (transform.position - navMeshAgent.destination).sqrMagnitude <= arriveDistance * arriveDistance)
             {
                 arrived = true;
                 // ResetPath()는 호출하지 않는다 - NavMeshAgent는 도착하면(또는 도달 불가능한 대상이라
@@ -209,7 +221,15 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
                 // 한다(doc/0399). MoveAgentTo가 다음 명령 때 항상 isStopped = false로 풀어준다.
                 navMeshAgent.isStopped = true;
                 currentState = AllyState.Idle;
-                attackMoveDestination = null;
+
+                // 추격(ChaseTarget) 중엔 navMeshAgent.destination이 일시적으로 적 위치로 바뀌어 있을
+                // 수 있다 - 실제 attackMoveDestination에 도착했을 때만 지워야, 전투가 끝난 뒤
+                // AttackMoveTick이 원래 목적지로 이동을 재개할 수 있다(doc/0575).
+                if (attackMoveDestination == null ||
+                    (transform.position - attackMoveDestination.Value).sqrMagnitude <= arriveDistance * arriveDistance)
+                {
+                    attackMoveDestination = null;
+                }
             }
         }
 

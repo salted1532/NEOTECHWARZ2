@@ -1228,8 +1228,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbc15c7ac28d2bd43bfac507572f77ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AllyAIDirector
-  spawnPoint: {fileID: 0}
-  unitPrefabs: []
+  spawnPoints: []
+  defenseUnits: []
   waveTimes: []
   attackWaves:
   - units:
@@ -1267,6 +1267,10 @@ MonoBehaviour:
   assembleBeforeAttack: 1
   reinforceCheckInterval: 20
   garrison: []
+  currentSquad: []
+  allAllyUnits: []
+  allAllyBuildings: []
+  nextWaveCountdown: 0
 --- !u!1 &876784959510490857
 GameObject:
   m_ObjectHideFlags: 0
@@ -15695,7 +15699,8 @@ MonoBehaviour:
   faction: 0
   spawnPoints: []
   homeBuildings: []
-  defenseRadius: 15
+  defenseRadius: 40
+  defenseUnits: []
   waveTimes:
   - 300
   attackWavesOC:
