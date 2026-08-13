@@ -118,6 +118,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `ProductionSlot` | 커맨드/생산 대기열의 버튼 슬롯 하나, 자기 단축키 자동 감지 + 눌림 효과 재현 | [doc](Docs/ProductionSlot.md) |
 | `TooltipUI` | 버튼/스탯 호버 시 툴팁 표시 | [doc](Docs/TooltipUI.md) |
 | `TooltipContentFitter` | 툴팁 배경 크기를 실제 표시 중인 제목/설명 텍스트 분량에 맞춰 매번 다시 계산 | [doc](Docs/TooltipContentFitter.md) |
+| `CylinderBoxColliderGenerator` | `BoxCollider` 여러 개를 원형으로 배치해 원기둥 콜라이더를 근사하는 에디터 유틸리티(컨텍스트 메뉴로 생성/제거) | [doc](Docs/CylinderBoxColliderGenerator.md) |
 | `ControlGroupPanel` | 부대(컨트롤 그룹) 선택 버튼을 그룹 생성/전멸에 맞춰 자동 생성·파괴, `HorizontalLayoutGroup`으로 정렬 | [doc](Docs/ControlGroupPanel.md) |
 | `HealthBarBillboard` | 체력바 UI가 카메라의 X(피치) 각도만 따라 회전(Y/Z 고정)하도록 하는 빌보드 컴포넌트 | [doc](Docs/HealthBarBillboard.md) |
 | `EffectPlayer` | 이펙트 프리팹(파티클/사운드) 스폰·자동 파괴 공용 정적 헬퍼 — 단발/다중지점/지속형 재생 지원 | [doc](doc/0105-effect-system-integration-design.md) |
@@ -141,6 +142,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `GlobalVoiceBankSO` | 유닛/건물에 안 묶이는 전역 나레이션(자원/인구 부족, 피격 경고, 업그레이드 완료) 에셋 | [doc](Docs/GlobalVoiceBankSO.md) |
 | `SoundSettingsPanel` | 볼륨 슬라이더/뮤트 토글 UI 로직 (SoundManager API 연결, 실제 Canvas 배치는 미완료) | [doc](Docs/SoundSettingsPanel.md) |
 | `MainMenuController` | 메인 메뉴(MainScene) Play/Option/Exit 버튼 연결, 버튼 호버 시 커서 전환 | [doc](Docs/MainMenuController.md) |
+| `GraphicsSettingsPanel` | `OptionPanel`의 해상도 드롭다운 — 지원 해상도 목록 구성, 선택 시 `Screen.SetResolution` + `PlayerPrefs` 저장/복원 | [doc](Docs/GraphicsSettingsPanel.md) |
 | `MainMenuFlyby` | 메인화면 배경 장식(우주선 등) — 대각선 비행 후 시작점 텔레포트, 랜덤 대기 반복 | [doc](Docs/MainMenuFlyby.md) |
 | `SceneMenuController` | 게임플레이 씬의 옵션 패널 표시/숨김, "메인화면으로"·스테이지 이동 처리 | [doc](Docs/SceneMenuController.md) |
 | `MissionSelectManager` | 미션 선택 씬의 스테이지 버튼 연결(인스펙터 리스트), 호버 툴팁, 해금 상태는 PlayerPrefs로 관리 | [doc](Docs/MissionSelectManager.md) |
@@ -162,6 +164,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [`Docs/SporeBrood.md`](Docs/SporeBrood.md) — 외계 종족 "스포어 브루드" 컨셉 + 유닛 3종/건물 3종 수치(설계 제안 [`doc/0441`](doc/0441-alien-monster-faction-design-proposal.md)의 구현 상태 확인 포함).
 - [`Docs/ResourceSystem.md`](Docs/ResourceSystem.md) — 자원 "아이로나이트 광석(Ore)"/"페트로나이트(Gas)" 컨셉·명칭과 채취/저장 시스템 개요.
 - [`Docs/Campaign.md`](Docs/Campaign.md) — 캠페인 세계관/스토리 설정, 스테이지 0~5 시놉시스.
+- [`Docs/EnemyAIDirector.md`](Docs/EnemyAIDirector.md#웨이브별-공격-패턴) — 적 OC/Spore Brood 진영별 공격 웨이브 구성표(웨이브당 3패턴)와 점령 별동대 구성 수치.
+- [`Docs/AllyAIDirector.md`](Docs/AllyAIDirector.md#공격-웨이브-구성-attackwaves-점점-강해지는-고정-5단계) — 아군 OC의 점점 강해지는 고정 5단계 공격 웨이브 구성 수치.
 
 ## 주요 기능
 
@@ -221,7 +225,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 유닛 스탯 자가 동기화 — 유닛이 스폰 시 `Start()`에서 자기 `unitID`로 `UnitDataSO`를 직접 조회해 체력/공격력/사거리/공격속도/아이콘/장갑·크기 타입을 스스로 적용, 생산 큐를 거쳤든 씬에 직접 배치됐든 항상 적용됨
 - [x] 신규 유닛 2종 추가 — Sharpshooter(저격수, 병영), SkyLancer(스카이랜서, 공장), 둘 다 특정 장갑 타입 상대 고유 추가 데미지 보유
 - [x] 유닛 이동속도 전체 1.5배 증가
-- [x] 카메라 줌 아웃 범위 증가
+- [x] 카메라 줌 아웃 범위 증가(추가로 한 차례 더 확장), 카메라 맵 이동 가능 범위 확장
 - [x] 건물 클릭 히트박스 조정 — 실제로 클릭되길 기대하는 위치에서 더 확실하게 선택되도록 콜라이더/판정 보정
 - [x] 도달/추격 로직 정비(도달 가능/불가 2모드 통일) — 목적지가 도달 가능하면 매 프레임 실시간으로 추적(이동→재탐색→경로갱신 무한반복), 도달 불가능(경사로 없는 언덕 등)하면 가장 가까운 위치로 이동 후 도착 시점에만 재탐색해서 도달 가능 여부를 다시 확인 — 강제공격/이동(따라가기)/적 강제공격 전부 동일한 두 모드로 통일, 도중에 목적지가 도달 가능한 위치로 바뀌면 자동으로 실시간 추적 모드로 전환됨
 - [x] 올라갈 수 없는 언덕(경사로가 연결되지 않아 NavMesh가 길을 못 찾는 경우) 이동/추격 예외처리 — 도달 불가로 판정되면 갈 수 있는 가장 가까운 위치까지만 이동
@@ -230,6 +234,8 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 고급유닛 스킬 사용이 공격 명령보다 우선순위 — 전투 중이더라도 스킬 사용 명령(지정 유닛/위치)을 내리면 사거리 내 여부와 무관하게 나머지를 무시하고 스킬을 사용하러 이동
 - [x] 일꾼 자원 채취/반납 로직 개선 — 자신이 캐던 자원을 기억해뒀다가 건물 우클릭 시 반납 후 그 자원으로 복귀, 다른 자원을 우클릭하면 자원을 들고 있을 때만 먼저 반납하고 새로 지정한 자원으로 이동
 - [x] 메인기지 착륙 시 자원을 보유 중인 모든 일꾼에게 자동으로 리턴 명령(각자 기준 가장 가까운 메인기지 재탐색) 하달
+- [x] 다수 유닛 순찰(P) 정체 버그 수정 — 2~3마리 선택 시 1마리만 순찰하고 나머지는 첫 목적지 도착 후 멈추던 문제, 유닛별 순찰 상태가 서로 간섭하던 게 원인(doc/0559)
+- [x] 집결지/랠리 도착 후 다른 유닛에게 밀려도 계속 비비적거리며 미세하게 움직이던 문제 해결 — 도착 판정 후에는 재이동 명령을 반복하지 않도록 정지(doc/0563, doc/0571)
 
 ### 데미지 시스템
 - [x] 장갑 타입(경장갑/중장갑) × 크기 타입(소형/중형/대형) × 공격 방식(소총/폭발/레이저/화염) 3축 분류
@@ -265,6 +271,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 인구수 한도 200 상한(`ResourceManager.maxPopulationCap`)
 - [x] 유닛 사망 시 인구수 반환(`RTSUnitController.ReleaseUnitPopulation`) — 생산 취소(광물/가스+인구수 전액 환불)와 별개로, 이미 생산된 유닛이 죽을 때는 인구수만 반환
 - [x] 인구수 한도 초과분 누적치 보존(`ResourceManager.rawMaxPopulation`) — 캡(200)보다 많이 지어도 내부 누적치는 그대로 유지, 일부가 파괴돼도 남은 누적치가 캡을 넘으면 표시 한도는 캡 값 그대로 유지
+- [x] 구조된 유닛(OC 구조 미션)도 구조되는 즉시 인구수에 반영(doc/0560)
 
 ### 이펙트 / 모션 연출
 - [x] 공격(총구) / 이동(트레일) / 피격(공격 타입별 4종: 총기·폭발·레이저·화염) / 사망 이펙트 — `UnitEffects`, 공용 헬퍼 `EffectPlayer`
@@ -275,6 +282,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 공중 유닛/리프트 중인 건물 호버링(둥실거림) 애니메이션 — `HoverBob`(DOTween)
 - [x] 지상 차량 유닛 이동 중 흔들림 애니메이션 — `VehicleShake`(DOTween)
 - [x] 레이더 접시/터렛 등 지속 회전 연출 — `AutoRotate`(DOTween)
+- [x] 외계종족(Ripfang/Spitter/Skitterwing) 전용 공격/사망 이펙트·사운드 추가 — 기존 NTA/OC 유닛과 공유하던 총기·폭발·레이저·화염 파티클을 종족 전용 비주얼로 교체
 - [x] 마우스 커서 상태 전환(기본/선택/이동/공격) — `UserControl`
 - [x] ESC로 대기 중인 명령(공격/이동/순찰/랠리/건물이동) 취소 — `UserControl`
 
@@ -289,6 +297,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 3rd-party 플러그인 `csFogWar`(`AssetFolder/AOSFogWar/`) 연동 — `FogRevealerAgent`를 유닛/건물 프리팹에 부착해 시야 소스로 등록/해제(기존 컨트롤러는 안 건드리는 어댑터 방식)
 - [x] 아군이 점령한 `TerritoryZone` 내부는 시야 소스가 없어도 항상 밝게 강제 반영(`TerritoryFogReveal`), 점령이 풀리면 자연히 다시 안개가 낌
 - [x] 유닛/건물 전체(9종+6종) 및 `BaseStructure`(건설 중 건물)까지 시야 소스로 연결 완료
+- [x] 반쯤 밝혀진(PreviouslyRevealed, 유닛이 한 번 지나간) 지역 처리 — 그 지역에서 한 번이라도 발견된 적은 계속 표시되지만, 아직 발견된 적 없는 새 적 유닛은 숨겨짐. 발견된 적도 다시 완전히 어두운 지역으로 이동하면 발견 상태가 풀려 다시 숨겨짐(doc/0567)
 
 ### 그래픽 / 비주얼
 - [x] URP Volume 포스트프로세싱 — Bloom(붉은끼 tint), Color Adjustments(대비/노출 보정), Tonemapping은 현재 None
@@ -318,6 +327,18 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 부대지정 단축키(컨트롤 그룹) — `Ctrl+숫자` 저장, `Shift+숫자` 병합 추가, 숫자만 눌러 선택
 - [x] 미니맵에 자원 노드(광물/가스) 표시
 - [x] 유닛/건물 아이콘 이미지 개선
+- [x] 해상도 변경 기능 — `OptionPanel` 드롭다운으로 지원 해상도 중 선택, `PlayerPrefs`로 다음 실행에도 유지(`GraphicsSettingsPanel`, doc/0501)
+- [x] 건설 가능/불가능 버튼 가시성 개선 + 건설 아이콘과 생산 유닛 아이콘, 선택 시 표시되는 아이콘을 각각 분리
+- [x] 스킬 툴바 텍스트 번역 누락 수정, 스킬 툴팁 설명 줄바꿈 수정
+- [x] IFV 레인저 단축키(R) 미작동, 가디언 드론 단축키(G→D) 오배정 수정
+- [x] 건물 건설 중 체력 1 상태에서 조기 완공되던 버그 수정
+- [x] Victory 텍스트 줄바꿈 오류 수정
+- [x] 연구소(Lab) 다중 보유 시 공격력/방어력 업그레이드 진행 상태가 서로 따로 놀던 버그 수정 — 한 연구소가 특정 항목을 연구 중이면 다른 연구소에서는 그 항목이 잠기고, 레벨 표시도 전역 값과 항상 일치하도록 수정
+- [x] 공격력/방어력 업그레이드 시 "+N"으로 상승량을 옆에 텍스트 표시
+- [x] 구조된 유닛이 Squad Panel에 "유닛"이라는 이름으로 표기되던 버그, 컨트롤+클릭 시 다른 종류 유닛까지 함께 선택되던 버그 수정
+- [x] 유닛 생산 시(건물이 공중에 떠 있어) 착륙 불가 상태면 경고 문구 표시(한글/영어 번역 지원)
+- [x] 자원 노드가 작아질수록(고갈에 가까워질수록) 내부 라이트도 함께 축소되어 더 적게 빛나도록 조정
+- [x] 명령 실패 시 경고음 추가
 
 ### 사운드
 - [x] `SoundManager` 싱글턴 — 주음량/배경음악/효과음/음성 4개 카테고리 볼륨·뮤트 관리, `PlayerPrefs` 영속화(설정 UI가 실제로 값을 저장하기 전까지는 인스펙터 기본값 유지), `AudioSource` 풀 순환 재사용(SFX 16개/Voice 4개)
@@ -340,7 +361,20 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 - [x] 외계종족(스포어 브루드) 신규 진영 구현 — 유닛 3종(Ripfang/Spitter/Skitterwing) + 건물 3종(Hive Core/Spawning Pit/Bio-Reactor)
 - [x] 아군 OC(구조 가능한 유닛) 구현 — NTA(플레이어) 유닛의 강제공격 대상은 되지만 자동 공격 대상으로는 인식되지 않음, `EnemyUnitController`/`EnemyBuildingController`와 별개로 `AllyController`/`AllyBuildingController`/`AllyAttackRange`가 피아식별만 반대로 동일 로직을 담당(doc/0452)
 - [x] Enemy AI 구현(스크립트로 동작하는 "적 지휘관") — `EnemyAIDirector`가 적 기지마다 배치되어 시간에 맞춘 공격 웨이브(웨이브당 3가지 구성 패턴 중 무작위), 점령지에 별동대를 보내 탈환 시도, 기지 피격 시 주변 유휴 병력 소집, 웨이브/별동대로 나가거나 전사한 병력의 보충 생산까지 자율 수행 — OC/Spore Brood 진영별로 다른 유닛(프리팹)이 생산되고 웨이브 집결 여부(OC는 집결 후 출발/Spore Brood는 즉시 개별 출발) 등 작동 방식도 다르게 구성 가능(doc/0532~0552, 웨이브별 패턴 상세는 [`Docs/EnemyAIDirector.md`](Docs/EnemyAIDirector.md) 참고)
+  - [x] 공격 웨이브는 예정 시각이 지나도 유닛 구성이 안 갖춰지면 계속 생산만 하다가, 구성이 갖춰진 시점에 출발 — 그 웨이브가 전멸해야 다음 웨이브 타이머(기본 300초)가 다시 돌며 생산 재개(doc/0560)
+  - [x] 점령 별동대는 점령지 후보 리스트 중 무작위로 하나 골라 탈환 시도(doc/0561)
+  - [x] 점령 별동대가 이동 중 플레이어 유닛과 조우해 전투가 벌어져도, 전투가 끝나면(또는 사거리 밖 공중 유닛처럼 도달 불가 대상은 무시하고) 다시 원래 점령지로 이동 재개(doc/0575)
+  - [x] 기지 피격 시 병력 소집은 건물당 최초 1회만 — `homeBuildings`로 지정한 메인기지/미션 오브젝트는 일반 건물의 2배 반경(`defenseRadius`)까지 소집(doc/0575, doc/0576)
+  - [x] 배치형 방어 유닛은 죽으면 같은 자리에 같은 종류로 1회만 재생산, 그 대체 유닛까지 죽으면 더 이상 생산하지 않음(doc/0552)
+  - [x] 외계종족/적 OC 유닛이 건물을 공격 중이어도 사거리 안에 플레이어 유닛이 들어오면 유닛을 우선 공격 대상으로 전환(doc/0561)
+  - [x] 스테이지 4·5의 점령 별동대는 OC(적대 세력) 유닛으로 구성
 - [x] 아군 OC 조종 스크립트(`AllyAIDirector`) — `EnemyAIDirector`와 동일한 설계를 아군 OC 쪽에 적용, 점점 강해지는 고정 5단계 웨이브를 적대 세력(Hive Core 최우선 목표) 쪽으로 보내고 보충 생산(점령지 탈환/기지방어 소집은 범위 밖, doc/0543, [`Docs/AllyAIDirector.md`](Docs/AllyAIDirector.md) 참고)
+  - [x] 유닛 생산 시 집결지(rally point)로 자동 이동(doc/0564)
+  - [x] 공격할 적대 건물이 없으면 웨이브 유닛은 미리 생산해두고 공격 명령만 보류(오류 없이 대기), 대상이 생기면 바로 출발(doc/0565)
+  - [x] 건물 공격 중에도 사거리 내 적 유닛이 있으면 유닛을 우선 공격(doc/0565)
+  - [x] `EnemyAIDirector`와 동일하게 유닛별 `productionTime`을 지키며 생산 — 이전엔 즉시 스폰이었던 것을 생산 대기열 방식으로 통일(doc/0570)
+- [x] 적/아군 OC 유닛 생산 시간 전체 1.5배 조정 — 별동대·방어 병력이 전사했을 때 보충 병력이 너무 빨리 채워지는 문제 완화(`OC Unit Data SO`/`Spore Brood Unit Data SO`의 `productionTime` 값 일괄 조정, 아군 OC도 같은 SO를 공유해 자동 적용, doc/0577)
+- [x] 스키터윙(Skitterwing) 공격력 12로 하향 조정(doc/0566)
 - [x] 버전/변경 이력 관리 — `doc/0001-`부터 번호순으로 세션별 요청·코드 변경 내역을 전부 기록(사실상의 패치노트 로그, 아래 "개발 프로세스 메모" 참고)
 
 ### 로컬라이제이션(다국어)
@@ -354,7 +388,6 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 
 ## 로드맵 (미구현)
 
-- [ ] 외계종족 전용 공격/사망 이펙트 — 현재는 기존 이펙트를 재사용 중(Ripfang/Spitter/Skitterwing 프리팹의 `hitEffects`가 NTA/OC 유닛과 동일한 총기·폭발·레이저·화염 파티클 GUID를 그대로 참조), 외계종족만의 별도 비주얼 준비 예정
 - [ ] UI 창 크기/위치 조절 기능 — 설정창에서 UI 크기·위치를 조절해 저장하면(유저 데이터) 인게임에도 그대로 적용되는 기능, 미착수
 - [ ] 서브 스테이지 구성 — 메인 스테이지 0~5 사이/주변에 약 4개 서브 스테이지 기획 및 구현 예정(기획 단계)
 - [ ] 스테이지 사이 브리핑룸 구현 — 미션 시작 전 현재 상황(스토리)/목표를 텍스트+음성으로 안내하고 캐릭터 얼굴을 보여주는 연출
