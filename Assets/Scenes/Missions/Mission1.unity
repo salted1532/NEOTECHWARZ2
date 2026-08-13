@@ -187,6 +187,22 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1632023661}
   m_SourcePrefab: {fileID: 100100000, guid: 78fe924d2053b004ea76bc750be7f871, type: 3}
+--- !u!114 &24142412 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 792355666913702207, guid: 78fe924d2053b004ea76bc750be7f871, type: 3}
+  m_PrefabInstance: {fileID: 24142411}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632023652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBuildingController
+--- !u!4 &24142413 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1456719043182467793, guid: 78fe924d2053b004ea76bc750be7f871, type: 3}
+  m_PrefabInstance: {fileID: 24142411}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &26706428
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -959,6 +975,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5601079116767776864, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601079116767776864, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5745679446702802143, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -1015,6 +1039,14 @@ PrefabInstance:
       propertyPath: previousStageSceneName
       value: Mission0
       objectReference: {fileID: 0}
+    - target: {fileID: 6462343330317572003, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 53.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 6462343330317572003, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 30.25
+      objectReference: {fileID: 0}
     - target: {fileID: 6508179456033489367, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -1039,6 +1071,58 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: raidInterval
+      value: 450
+      objectReference: {fileID: 0}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: raidTargets.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: spawnPoints.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: homeBuildings.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: 'raidTargets.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1532191983}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: 'raidTargets.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1230709522}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: 'homeBuildings.Array.data[0]'
+      value: 
+      objectReference: {fileID: 24142412}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: spawnPoints.Array.data[0].point
+      value: 
+      objectReference: {fileID: 24142413}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: spawnPoints.Array.data[1].point
+      value: 
+      objectReference: {fileID: 1201978121}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: spawnPoints.Array.data[2].point
+      value: 
+      objectReference: {fileID: 1075258552}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: spawnPoints.Array.data[0].productionBuilding
+      value: 
+      objectReference: {fileID: 24142412}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: spawnPoints.Array.data[1].productionBuilding
+      value: 
+      objectReference: {fileID: 1201978120}
+    - target: {fileID: 6857753714740432429, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: spawnPoints.Array.data[2].productionBuilding
+      value: 
+      objectReference: {fileID: 1075258551}
     - target: {fileID: 7555572131848590869, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: m_LocalPosition.z
       value: -113.93
@@ -1423,60 +1507,6 @@ MonoBehaviour:
   m_Script: {fileID: 533369121}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerritoryZonePin
---- !u!21 &586355328
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Universal Render Pipeline/Unlit
-  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
-    - _AlphaToMask: 0
-    - _Blend: 0
-    - _BlendOp: 0
-    - _Cull: 2
-    - _Cutoff: 0.5
-    - _DstBlend: 0
-    - _DstBlendAlpha: 0
-    - _QueueOffset: 0
-    - _SampleGI: 0
-    - _SrcBlend: 1
-    - _SrcBlendAlpha: 1
-    - _Surface: 0
-    - _XRMotionVectorsPass: 1
-    - _ZWrite: 1
-    m_Colors:
-    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
-    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1001 &588495796
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1741,6 +1771,60 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2b9940fdf7738ca4c8946e5fd0c34770, type: 3}
+--- !u!21 &906114234
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Universal Render Pipeline/Unlit
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddPrecomputedVelocity: 0
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _BlendOp: 0
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
+    - _QueueOffset: 0
+    - _SampleGI: 0
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _Surface: 0
+    - _XRMotionVectorsPass: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1 &906973600
 GameObject:
   m_ObjectHideFlags: 0
@@ -2013,60 +2097,6 @@ Material:
     - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!21 &1062621676
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Universal Render Pipeline/Unlit
-  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
-    - _AlphaToMask: 0
-    - _Blend: 0
-    - _BlendOp: 0
-    - _Cull: 2
-    - _Cutoff: 0.5
-    - _DstBlend: 0
-    - _DstBlendAlpha: 0
-    - _QueueOffset: 0
-    - _SampleGI: 0
-    - _SrcBlend: 1
-    - _SrcBlendAlpha: 1
-    - _Surface: 0
-    - _XRMotionVectorsPass: 1
-    - _ZWrite: 1
-    m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1001 &1075258550
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2132,6 +2162,22 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
+--- !u!114 &1075258551 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3566054540396190834, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
+  m_PrefabInstance: {fileID: 1075258550}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBuildingController
+--- !u!4 &1075258552 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1456719043182467793, guid: 0baf58526e8d2064ea6ff7ff1722f9a0, type: 3}
+  m_PrefabInstance: {fileID: 1075258550}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1082253509
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2493,6 +2539,22 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bd7f823a68eadbb45a7fc8eb5edda1ac, type: 3}
+--- !u!114 &1201978120 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1773150309627259052, guid: bd7f823a68eadbb45a7fc8eb5edda1ac, type: 3}
+  m_PrefabInstance: {fileID: 1201978119}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBuildingController
+--- !u!4 &1201978121 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1456719043182467793, guid: bd7f823a68eadbb45a7fc8eb5edda1ac, type: 3}
+  m_PrefabInstance: {fileID: 1201978119}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1230709519
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2548,7 +2610,7 @@ PrefabInstance:
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 1062621676}
+      objectReference: {fileID: 906114234}
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Positions.Array.data[0].x
       value: -97.091156
@@ -2670,6 +2732,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a9d479cb2961de48b5700ee6f252238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerritoryZone
+--- !u!114 &1230709522 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1949417275165920072, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+  m_PrefabInstance: {fileID: 1230709519}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95da88c511c797941ad3a8a18631202c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CaptureSystem
 --- !u!1001 &1242841504
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3083,7 +3156,7 @@ PrefabInstance:
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 586355328}
+      objectReference: {fileID: 1647340168}
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Positions.Array.data[0].x
       value: -97.258224
@@ -3205,6 +3278,17 @@ PrefabInstance:
       addedObject: {fileID: 477610250}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+--- !u!114 &1532191983 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1949417275165920072, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+  m_PrefabInstance: {fileID: 1532191982}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95da88c511c797941ad3a8a18631202c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CaptureSystem
 --- !u!1 &1632023652 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7636683964052424660, guid: 78fe924d2053b004ea76bc750be7f871, type: 3}
@@ -3270,6 +3354,60 @@ MonoBehaviour:
   m_Script: {fileID: 796631463}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerritoryZonePin
+--- !u!21 &1647340168
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Universal Render Pipeline/Unlit
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddPrecomputedVelocity: 0
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _BlendOp: 0
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
+    - _QueueOffset: 0
+    - _SampleGI: 0
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _Surface: 0
+    - _XRMotionVectorsPass: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
+    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1001 &1660026442
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -17,7 +17,7 @@ MonoBehaviour:
     <description>k__BackingField: "\uB0A0\uCE74\uB85C\uC6B4 \uD131\uC73C\uB85C \uBB3C\uC5B4\uB72F\uB294
       \uC800\uBE44\uC6A9 \uB3CC\uACA9 \uAC1C\uCCB4. \uBB34\uB9AC\uB85C \uCC0D\uC5B4
       \uB20C\uB7EC\uC57C \uD558\uB294 \uC804\uC704."
-    <infoDescription>k__BackingField: "Cheap swarming melee brute."
+    <infoDescription>k__BackingField: Cheap swarming melee brute.
     <ID>k__BackingField: 10
     <tier>k__BackingField: 0
     <armorType>k__BackingField: 0
@@ -35,8 +35,10 @@ MonoBehaviour:
     <productionTime>k__BackingField: 10
     <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: -1417138829, guid: 25df4e3ff0c74fb4585c7702328b7f7c, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
-    <soundBank>k__BackingField: {fileID: 0}
+    <AllyPrefab>k__BackingField: {fileID: 0}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: 0fb6e3c63dbfe1f4c9efa58e69fcf250, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
     <traitA>k__BackingField:
@@ -62,7 +64,7 @@ MonoBehaviour:
   - <unitName>k__BackingField: "\uC2A4\uD53C\uD130 (Spitter)"
     <description>k__BackingField: "\uBD80\uC2DD\uC131 \uCCB4\uC561\uC744 \uBC49\uC5B4\uB0B4\uB294
       \uC6D0\uAC70\uB9AC \uC800\uACA9 \uAC1C\uCCB4."
-    <infoDescription>k__BackingField: "Fragile acid-spitting attacker."
+    <infoDescription>k__BackingField: Fragile acid-spitting attacker.
     <ID>k__BackingField: 11
     <tier>k__BackingField: 0
     <armorType>k__BackingField: 0
@@ -80,8 +82,10 @@ MonoBehaviour:
     <productionTime>k__BackingField: 20
     <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: -1417138829, guid: 25df4e3ff0c74fb4585c7702328b7f7c, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
-    <soundBank>k__BackingField: {fileID: 0}
+    <AllyPrefab>k__BackingField: {fileID: 0}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: 774412da8d055b348b84a2d26b6638ff, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
     <traitA>k__BackingField:
@@ -107,7 +111,7 @@ MonoBehaviour:
   - <unitName>k__BackingField: "\uC2A4\uD0A4\uD130\uC719 (Skitterwing)"
     <description>k__BackingField: "\uD558\uB298\uC744 \uB4A4\uB36E\uB294 \uAE30\uC0DD
       \uBE44\uD589\uCCB4. \uCE58\uACE0 \uBE60\uC9C0\uB294 \uACAC\uC81C\uD615."
-    <infoDescription>k__BackingField: "The Brood's only flier."
+    <infoDescription>k__BackingField: The Brood's only flier.
     <ID>k__BackingField: 12
     <tier>k__BackingField: 0
     <armorType>k__BackingField: 0
@@ -125,8 +129,10 @@ MonoBehaviour:
     <productionTime>k__BackingField: 26
     <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 1817726432, guid: 2e774e34e8c41bc4aaee21325e4cbfa9, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 36d8789558a8b45499e9f06db02f8c3b, type: 3}
-    <soundBank>k__BackingField: {fileID: 0}
+    <AllyPrefab>k__BackingField: {fileID: 0}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: dc84a32af4a4f2a4290bd1473df7dc2b, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
     <traitA>k__BackingField:

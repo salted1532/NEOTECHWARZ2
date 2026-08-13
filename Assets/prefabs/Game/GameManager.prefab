@@ -1184,6 +1184,89 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &869772596677979795
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 459060648170306285}
+  - component: {fileID: 5023175559717076084}
+  m_Layer: 0
+  m_Name: AllyAIDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &459060648170306285
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 869772596677979795}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1614006513235649969}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5023175559717076084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 869772596677979795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbc15c7ac28d2bd43bfac507572f77ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AllyAIDirector
+  spawnPoint: {fileID: 0}
+  unitPrefabs: []
+  waveTimes: []
+  attackWaves:
+  - units:
+    - unitID: 2
+      count: 10
+  - units:
+    - unitID: 2
+      count: 8
+    - unitID: 4
+      count: 3
+  - units:
+    - unitID: 2
+      count: 8
+    - unitID: 3
+      count: 3
+    - unitID: 5
+      count: 2
+  - units:
+    - unitID: 2
+      count: 6
+    - unitID: 6
+      count: 3
+    - unitID: 7
+      count: 2
+  - units:
+    - unitID: 6
+      count: 3
+    - unitID: 8
+      count: 2
+    - unitID: 9
+      count: 1
+  rallyPoint: {fileID: 703635669853830798}
+  rallyRadius: 3
+  rallyTimeout: 15
+  assembleBeforeAttack: 1
+  reinforceCheckInterval: 20
+  garrison: []
 --- !u!1 &876784959510490857
 GameObject:
   m_ObjectHideFlags: 0
@@ -1259,6 +1342,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &888064685536062640
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 703635669853830798}
+  m_Layer: 0
+  m_Name: AllyRallyPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &703635669853830798
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888064685536062640}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1614006513235649969}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &893783937507763636
 GameObject:
   m_ObjectHideFlags: 0
@@ -3944,6 +4058,37 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &2252128157847827658
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6462343330317572003}
+  m_Layer: 0
+  m_Name: EnemyRallyPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6462343330317572003
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2252128157847827658}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1614006513235649969}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2360879184729991461
 GameObject:
   m_ObjectHideFlags: 0
@@ -3987,6 +4132,10 @@ Transform:
   - {fileID: 2241731853389081612}
   - {fileID: 8732777014121625636}
   - {fileID: 8352963090054976051}
+  - {fileID: 2809033999084995707}
+  - {fileID: 6462343330317572003}
+  - {fileID: 459060648170306285}
+  - {fileID: 703635669853830798}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2414880822824420121
@@ -15499,6 +15648,280 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &7634753241228708696
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2809033999084995707}
+  - component: {fileID: 6857753714740432429}
+  m_Layer: 0
+  m_Name: EnemyAIDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2809033999084995707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7634753241228708696}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1614006513235649969}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6857753714740432429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7634753241228708696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74200e79d523742449591740680ce2eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAIDirector
+  faction: 0
+  spawnPoints: []
+  homeBuildings: []
+  defenseRadius: 15
+  waveTimes:
+  - 300
+  attackWavesOC:
+  - variants:
+    - units:
+      - unitID: 2
+        count: 5
+    - units:
+      - unitID: 2
+        count: 3
+      - unitID: 3
+        count: 2
+    - units:
+      - unitID: 2
+        count: 2
+      - unitID: 4
+        count: 2
+      - unitID: 3
+        count: 1
+  - variants:
+    - units:
+      - unitID: 2
+        count: 4
+      - unitID: 4
+        count: 2
+    - units:
+      - unitID: 2
+        count: 3
+      - unitID: 3
+        count: 3
+    - units:
+      - unitID: 2
+        count: 2
+      - unitID: 4
+        count: 1
+      - unitID: 5
+        count: 1
+      - unitID: 3
+        count: 2
+  - variants:
+    - units:
+      - unitID: 2
+        count: 4
+      - unitID: 3
+        count: 2
+      - unitID: 5
+        count: 1
+    - units:
+      - unitID: 2
+        count: 3
+      - unitID: 4
+        count: 2
+      - unitID: 5
+        count: 2
+    - units:
+      - unitID: 3
+        count: 3
+      - unitID: 5
+        count: 2
+      - unitID: 4
+        count: 2
+  - variants:
+    - units:
+      - unitID: 2
+        count: 3
+      - unitID: 6
+        count: 2
+      - unitID: 7
+        count: 1
+    - units:
+      - unitID: 5
+        count: 2
+      - unitID: 6
+        count: 2
+      - unitID: 4
+        count: 2
+    - units:
+      - unitID: 2
+        count: 2
+      - unitID: 7
+        count: 2
+      - unitID: 6
+        count: 1
+      - unitID: 3
+        count: 1
+  - variants:
+    - units:
+      - unitID: 6
+        count: 2
+      - unitID: 8
+        count: 1
+      - unitID: 9
+        count: 1
+    - units:
+      - unitID: 6
+        count: 1
+      - unitID: 8
+        count: 2
+      - unitID: 7
+        count: 1
+    - units:
+      - unitID: 9
+        count: 1
+      - unitID: 6
+        count: 1
+      - unitID: 5
+        count: 2
+  attackWavesSporeBrood:
+  - variants:
+    - units:
+      - unitID: 10
+        count: 7
+    - units:
+      - unitID: 10
+        count: 5
+      - unitID: 11
+        count: 2
+    - units:
+      - unitID: 10
+        count: 4
+      - unitID: 11
+        count: 2
+      - unitID: 12
+        count: 1
+  - variants:
+    - units:
+      - unitID: 10
+        count: 5
+      - unitID: 11
+        count: 3
+    - units:
+      - unitID: 10
+        count: 6
+      - unitID: 12
+        count: 2
+    - units:
+      - unitID: 11
+        count: 4
+      - unitID: 12
+        count: 2
+      - unitID: 10
+        count: 2
+  - variants:
+    - units:
+      - unitID: 11
+        count: 4
+      - unitID: 12
+        count: 2
+    - units:
+      - unitID: 10
+        count: 4
+      - unitID: 11
+        count: 2
+    - units:
+      - unitID: 10
+        count: 2
+      - unitID: 11
+        count: 2
+      - unitID: 12
+        count: 2
+  - variants:
+    - units:
+      - unitID: 10
+        count: 6
+      - unitID: 11
+        count: 4
+    - units:
+      - unitID: 10
+        count: 5
+      - unitID: 12
+        count: 3
+      - unitID: 11
+        count: 2
+    - units:
+      - unitID: 11
+        count: 5
+      - unitID: 12
+        count: 3
+      - unitID: 10
+        count: 2
+  - variants:
+    - units:
+      - unitID: 10
+        count: 5
+      - unitID: 11
+        count: 4
+      - unitID: 12
+        count: 3
+    - units:
+      - unitID: 10
+        count: 6
+      - unitID: 11
+        count: 3
+      - unitID: 12
+        count: 3
+    - units:
+      - unitID: 11
+        count: 5
+      - unitID: 12
+        count: 4
+      - unitID: 10
+        count: 3
+  rallyPoint: {fileID: 6462343330317572003}
+  rallyRadius: 3
+  rallyTimeout: 15
+  reinforceCheckInterval: 20
+  raidTargets: []
+  raidInterval: 450
+  raidSquadCompositionOC:
+  - unitID: 2
+    count: 2
+  - unitID: 3
+    count: 1
+  raidSquadCompositionSporeBrood:
+  - unitID: 10
+    count: 2
+  - unitID: 11
+    count: 1
+  assembleBeforeAttackOC: 1
+  assembleBeforeAttackSporeBrood: 0
+  garrison: []
+  raidGarrison: []
+  nextWaveCountdown: 0
+  nextRaidCountdown: 0
+  allEnemyUnits: []
+  allEnemyBuildings: []
 --- !u!1 &7670819309726756623
 GameObject:
   m_ObjectHideFlags: 0

@@ -166,6 +166,10 @@ public class EnemyBuildingController : MonoBehaviour, IDestructible
     public Sprite GetIcon() => icon;
     public string GetDescription() => infoDescription;
 
+    // OC/Spore Brood Building Data SO의 ID 그대로 - AllyAIDirector가 특정 건물 종류(예: Hive Core)를
+    // 우선 공격 대상으로 지목할 때 이름 대신 ID로 비교한다(doc/0543, GetEnemyUnitID()와 동일한 패턴).
+    public int GetBuildingID() => enemyBuildingID;
+
     // 공격 명령(우클릭/A 모드)을 받았을 때 "어느 건물이 대상인지" 피드백으로 마커를 짧게 깜빡인다
     // (EnemyUnitController.FlashMarker/BuildingController.FlashMarker와 동일한 패턴, doc/0248).
     public void FlashMarker()

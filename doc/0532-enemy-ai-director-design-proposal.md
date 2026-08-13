@@ -1,7 +1,16 @@
-# 0532 - Enemy AI Director 설계안 (검토 요청, 구현 전)
+# 0532 - Enemy AI Director 설계안 → 구현 완료
 
 ## 날짜
-2026-08-12
+2026-08-12 (최초 작성) / 2026-08-13 (수정 + 구현)
+
+## 수정 요청 (2026-08-13)
+"0532에서 적이 시간에 맞춰서 공격병력을 모아서 공격을 하는 위치에 대한 설명이 없는거 같은데 + 점령지의
+위치 등 위치 정보에 대해 어떻게 처리할지도 생각해서 수정해줘"
+
+→ 최초안은 "웨이브 시각이 되면 garrison에서 뽑아 attackTarget으로 보낸다"까지만 있었고, **어디서
+모여서 출발하는지**(집결지)가 빠져 있었음. 또 director가 다루는 위치 정보(스폰/집결/공격 목표/점령지)가
+타입도 제각각이고 왜 그렇게 골랐는지 설명이 없었음. 아래 "집결지(rallyPoint)" 관련 내용과 "위치 정보
+처리" 절을 추가로 반영.
 
 ## 요청 내용
 "Enemy AI 구현(스크립트로 동작하는) Enemy Controller를 조종하는 스크립 제작"
@@ -49,6 +58,11 @@
   `AttackMoveTo()` 시키면 끝 - 새 점령 로직 불필요.
 - `EnemyBuildingController.ActiveBuildings`(static list) - 참고용 패턴. 이번엔 director가 "자기가 만든
   유닛"만 추적하면 되므로 전역 리스트는 새로 안 만들고 director 인스턴스 안에 로컬 리스트로 둔다(아래 참고).
+- `BuildingController.RallyPosition` / `SetRallyPosition()` / `GetRallyPos()`(`BuildingController.cs:32-33,
+  444-458`, doc/0529~0531) - 플레이어 건물이 이미 "생산된 유닛이 모이는 위치(집결지)"를 갖고 있고, 기본값은
+  `transform.position + (0,0,-5)`(건물 바로 앞), 미션 제작자/플레이어가 씬에서 옮길 수 있다. 이번 요청에서
+  빠져 있던 "공격병력이 모이는 위치"가 정확히 이 개념 - 새로 발명하지 않고 같은 패턴(기본값 = 스폰 지점
+  근처, 인스펙터에서 재배치 가능)을 director에도 적용한다.
 
 ## 설계 개요
 
@@ -64,6 +78,10 @@ EnemyAIDirector
 ├─ [기지 방어] EnemyBuildingController homeBuilding (공격받으면 방어 소집 트리거)
 ├─ [공격 웨이브] List<float> waveTimes (초, 미션 시작 후 경과 시각 - ex: 300/600/900),
 │               int waveSize, Transform attackTarget (보통 플레이어 본진)
+├─ [집결지] Transform rallyPoint (assembleBeforeAttack == true일 때만 사용 - 웨이브 병력이 출발 전
+│           모이는 위치. 기본값은 spawnPoint 근처, BuildingController 랠리 포인트와 동일한 발상),
+│           float rallyRadius(도착 판정 거리, 기본 3), float rallyTimeout(뒤처지는 유닛을 무한정
+│           기다리지 않고 그냥 출발하는 최대 대기 시간, 기본 15초)
 ├─ [수비대 유지] int garrisonTarget, float reinforceCheckInterval
 ├─ [점령지 탈환] List<CaptureSystem> raidTargets, float raidInterval, int raidSquadSize
 └─ [진영별 동작 차이] bool assembleBeforeAttack 등 튜닝값 (아래 "진영별 차이" 참고)
@@ -74,10 +92,21 @@ EnemyAIDirector
 
 ### 4가지 요청 동작 → 구현 매핑
 
-1. **시간에 맞춰 공격 웨이브** (`AttackWaveRoutine`, 코루틴)
-   `waveTimes` 리스트를 순서대로 대기 → 매 웨이브마다 `garrison`에서 `waveSize`만큼(모자라면 새로
-   스폰) 뽑아 `attackTarget` 방향으로 `AttackMoveTo()`. 이동 중 자동교전 되므로 도중에 만나는 아군과도
-   알아서 싸운다.
+1. **시간에 맞춰 공격 웨이브** (`AttackWaveRoutine`, 코루틴) - **집결 위치 포함**
+   `waveTimes` 리스트를 순서대로 대기 → 리스트를 다 쓰면 끝내지 않고 **마지막 두 항목의 간격
+   (`waveTimes[last] - waveTimes[last-1]`)으로 계속 반복**(사용자 확정 - "결정 사항" #2). 매 웨이브마다
+   `garrison`에서 `waveSize`만큼(모자라면 새로 스폰) 뽑아 `waveSquad`로 지정. 이후 `assembleBeforeAttack`
+   값에 따라 두 갈래:
+   - **OC (`assembleBeforeAttack == true`)**: `waveSquad` 전원에게 `MoveTo(rallyPoint)`(자동교전 없는
+     이동 - 집결 중에 옆에서 싸움 걸려서 대열이 흩어지는 것 방지). 매 프레임 `rallyRadius` 안에 들어온
+     인원을 세다가, **전원 도착** 또는 **`rallyTimeout` 경과** 중 먼저 오는 시점에 `waveSquad` 전체를
+     `AttackMoveTo(attackTarget)`으로 한꺼번에 출발시킨다("뭉쳐서 진군하는" 인간형 군대 느낌).
+   - **Spore Brood (`assembleBeforeAttack == false`)**: 집결 단계 없이, 스폰/차출되는 즉시 개별적으로
+     `AttackMoveTo(attackTarget)`(이미 "진영별 차이" 표에 있던 내용 - `rallyPoint`는 이 진영에선 안 쓰임).
+
+   두 경우 모두 이동 중 자동교전 되므로 도중에 만나는 아군과도 알아서 싸운다. `rallyPoint`의 기본 위치는
+   `spawnPoint` 바로 앞(예: +Z 5m, `BuildingController`의 기본 랠리 오프셋과 동일한 발상) - 미션 제작자가
+   씬에서 직접 옮기면 "본진 앞 공터에서 집결" 대신 "고갯길 어귀에서 집결" 같은 지형 활용도 가능하다.
 
 2. **점령지 탈환 별동대** (`RaidRoutine`, 코루틴)
    `raidInterval`마다 `raidTargets` 중 `CurrentOwner != Enemy`인 곳을 하나 골라(Ally가 뺏어간 곳을
@@ -95,6 +124,37 @@ EnemyAIDirector
    추가. 웨이브/별동대로 나간 병력도 죽으면 자연히 이 루틴이 다시 채워준다(별도 분기 불필요 - "죽어서
    빈 자리"와 "원정 나가서 빈 자리"를 구분하지 않고 그냥 목표 인원수만 유지).
 
+### 위치 정보 처리 (신규 추가)
+director가 다루는 위치는 성격이 서로 달라서, 하나의 타입으로 통일하지 않고 **"누가 그 위치를 소유하고
+있는가"** 기준으로 고른다 - 이미 이 프로젝트에 있는 두 가지 관례를 그대로 따른다(스폰류는
+`UnitSpawner`/`BuildingController`처럼 `Transform`, 이미 존재하는 게임플레이 오브젝트는 그 컴포넌트
+자체를 참조).
+
+| 필드 | 타입 | 왜 이 타입인가 |
+|---|---|---|
+| `spawnPoint` | `Transform` | 미션 씬에 미리 놓아두는 고정 마커. 기존 `UnitSpawner` 패턴과 동일. |
+| `rallyPoint` | `Transform` | 마찬가지로 미션 씬의 고정 마커 - 단, **이 director가 직접 소유하는 좌표가
+아니라 "이 지점으로 모여라"라는 지시일 뿐**이라 `BuildingController.RallyPosition`처럼 `Vector3`
+필드로 둘 수도 있었지만, 미션 제작자가 씬 뷰에서 드래그해 옮기는 워크플로우(현재 캠페인 전체가 "미션별로
+손으로 세팅") 상 `Transform`이 다루기 더 쉬워서 `Transform`으로 통일. `GetRallyPos()`처럼 접근자 뒤에
+숨길 필요도 없음 - director 하나만 이 값을 읽으므로 캡슐화 이점이 없다. |
+| `attackTarget` | `Transform` | 위와 동일한 이유(고정 마커). 확인 필요 사항 #1에서 "동적으로 찾아야
+하는지"를 별도로 묻고 있음 - 그 경우엔 `Transform` 필드를 없애고 매 웨이브 시점에 계산하는 함수로 대체. |
+| `raidTargets` | `List<CaptureSystem>` | 점령지는 **이미 존재하는 컴포넌트**(`CaptureSystem`)이고
+`transform.position`으로 위치를, `CurrentOwner`로 소유 상태를 동시에 제공한다. 별도 `Vector3`/`Transform`
+필드로 위치만 복사해두면 점령지가 옮겨지거나(현재는 없지만) 사라졌을 때 참조가 어긋날 수 있어서, 좌표를
+따로 들지 않고 항상 `raidTargets[i].transform.position`을 그 자리에서 읽는다. |
+| 피격 위치(항목 3) | `Vector3` (필드 아님, 콜백 파라미터) | `HealthManager.OnDamaged(int, Vector3
+attackerPosition, ...)`가 이미 위치를 실어서 넘겨준다 - 저장할 필요 없이 이벤트 핸들러 안에서 바로
+`AttackMoveTo(attackerPosition)`에 쓰고 버림. |
+| `homeBuilding` | `EnemyBuildingController` | 위치가 목적이 아니라 "이 건물의 `OnDamaged` 이벤트를
+구독하기 위한" 참조. 위치가 필요하면(예: 수비 실패 후 복귀 지점) `homeBuilding.transform.position`을
+그때그때 읽으면 되고 별도 좌표 필드 불필요. |
+
+**원칙**: 미션 제작자가 씬에서 손으로 배치/재배치하는 지점(스폰/집결/공격 목표)은 `Transform`, 이미
+위치를 들고 있는 게임플레이 오브젝트(점령지, 피격 이벤트, 기지 건물)는 별도 좌표를 복사하지 않고 그
+오브젝트/이벤트 파라미터를 그대로 참조한다 - 위치를 이중으로 저장하는 필드가 하나도 없다.
+
 ### 진영별 차이 (OC vs Spore Brood)
 클래스를 두 개로 나누지 않고, `EnemyFaction` enum 하나로 값/분기를 나눈다 - 실제로 갈라지는 부분이
 "판단 로직 몇 줄" 수준이라 상속 구조까지는 과함(나중에 진짜 알고리즘 자체가 갈라지면 그때 분리):
@@ -102,7 +162,7 @@ EnemyAIDirector
 | 항목 | OC (인간형) | Spore Brood (외계, 무리형) |
 |---|---|---|
 | 유닛/건물 프리팹 | `attackUnitIDs`가 OC ID 대역 참조 | Spore Brood ID 대역 참조 (같은 필드, 값만 다름) |
-| `assembleBeforeAttack` | true - 웨이브 인원이 다 모일 때까지 스폰 지점에서 대기 후 한꺼번에 출발 | false - 스폰되는 즉시 개별적으로 `AttackMoveTo` (물량으로 끊임없이 밀어붙이는 느낌) |
+| `assembleBeforeAttack` | true - `rallyPoint`에 웨이브 인원이 다 모일 때까지(또는 `rallyTimeout`까지) 대기 후 한꺼번에 출발 | false - `rallyPoint` 안 쓰고 스폰되는 즉시 개별적으로 `AttackMoveTo` (물량으로 끊임없이 밀어붙이는 느낌) |
 | `reinforceCheckInterval` | 상대적으로 느림(예: 20초) | 빠름(예: 8초) - 유충 번식 컨셉 |
 | `raidSquadSize` | 소규모 정예(예: 2~3) | 다수(예: 4~6) |
 
@@ -118,19 +178,300 @@ EnemyAIDirector
   유닛 이동도 개별 NavMeshAgent 방식).
 - 난이도 자동 스케일링(플레이어 병력 규모에 따라 웨이브 크기 조절 등) - 필요해지면 나중에 추가.
 
-## 확인이 필요한 부분 (설계 결정 전 확인 요청)
-1. **`attackTarget`(공격 웨이브 목적지)**: 매 미션마다 인스펙터에서 플레이어 본진 위치를 직접 지정하는
-   방식으로 충분한지, 아니면 "현재 발견된 플레이어 건물 중 가장 가까운 곳"처럼 동적으로 찾아야 하는지?
-2. **웨이브 반복 여부**: `waveTimes`(예: 300/600/900)를 다 쓰고 나면 웨이브가 끝나는 건지, 아니면 마지막
-   간격을 계속 반복해야 하는지? (제안: `List<float> waveTimes` + 선택적 `loopIntervalAfterLast`(0이면
-   반복 안 함) 필드로 둘 다 지원)
-3. **한 미션에 두 진영이 동시에 존재할 수 있는지**(예: OC와 Spore Brood가 같은 스테이지에 같이 등장) -
-   가능하다면 director를 진영별로 각각 배치하면 되므로 설계엔 영향 없지만 확인 차 여쭤봄.
-4. **원정 나간 병력(웨이브/별동대)이 임무 실패 시 복귀하는지, 아니면 그 자리에서 다음 명령(자동교전 등)을
-   기다리며 소멸하는지** - 제안 설계는 "보내고 끝"(복귀 로직 없음, 죽으면 보충 루틴이 채움)인데 이걸로
-   충분한지?
+## 결정 사항 (2026-08-13, 사용자 확인 완료)
+이전 초안의 열린 질문 6가지 전부 답변받아 아래로 확정. **이 문서 기준으로 구현 진행.**
 
-## 영향받는 파일 (구현 단계에서, 아직 미착수)
-- 신규: `Assets\Scripts\System\EnemyAIDirector.cs` (또는 더 적합한 폴더가 있다면 지정 요청)
+1. **`attackTarget`**: 인스펙터 고정 지정 - 동적 탐색(가장 가까운 플레이어 건물) 안 함. 설계 변경 없음.
+2. **웨이브 반복**: `waveTimes`를 다 쓰면 끝나는 게 아니라 **항상 마지막 간격으로 계속 반복**. 사용자가
+   "반복 안 함" 옵션을 원하지 않았으므로 별도 `loopIntervalAfterLast` 토글 필드는 안 만들고, 리스트 소진
+   후 `waveTimes[last] - waveTimes[last-1]` 간격으로 무한 반복하는 것으로 고정(설정 불필요 = 필드도 불필요).
+3. **다중 진영**: 한 미션엔 항상 하나의 진영만 등장. `EnemyFaction faction` 필드가 director 하나당
+   하나의 값만 갖는 현재 설계 그대로 - 여러 진영이 필요해지면 그때 director를 더 배치하면 되므로 지금
+   구조를 바꿀 이유 없음.
+4. **원정 실패 시**: 복귀 로직 없음 - "보내고 끝", 죽으면 `ReinforceRoutine`이 채움. 설계 변경 없음.
+5. **`rallyPoint` 기본값**: 제안값 그대로(`spawnPoint` 앞 +Z 5m, `rallyRadius` 3, `rallyTimeout` 15초) 사용.
+6. **별동대 집결**: 집결 없이 차출 즉시 개별 출발. 설계 변경 없음(위 "4가지 요청 동작 → 구현 매핑" 2번
+   그대로).
+
+## 영향받는 파일 (구현 완료, 2026-08-13)
+- 신규: `Assets\Scripts\System\EnemyAIDirector.cs`
 - 변경 없음: `EnemyUnitController.cs`, `EnemyBuildingController.cs`, `RTSUnitController.cs`,
-  `CaptureSystem.cs` - 전부 기존 public API로 충분해서 손댈 필요 없음(위 "재사용 가능한 기존 기능" 참고)
+  `CaptureSystem.cs` - 설계대로 기존 public API만 사용해서 손댈 필요 없었음
+
+## 구현 코드 (신규 파일이라 기존 코드 없음)
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+// 어떤 진영(OC/Spore Brood)의 유닛을 이 director의 attackUnitIDs로 표시하는지 구분하는 용도.
+// 실제 동작 차이는 이 값으로 분기하지 않고 전부 인스펙터 필드(assembleBeforeAttack 등)로 미션마다
+// 직접 세팅한다(doc/0532 "진영별 차이" 참고) - 여기선 식별용 라벨일 뿐.
+public enum EnemyFaction { OC, SporeBrood }
+
+// 미션 씬에 적 기지 하나당 하나씩 배치하는 "AI 관제소". 시간에 맞춰 공격 웨이브를 보내고, 점령지에
+// 별동대를 보내고, 기지가 공격받으면 병력을 소집하고, 죽은 유닛을 보충 생산한다 (doc/0532 설계안).
+public class EnemyAIDirector : MonoBehaviour
+{
+    [Header("진영")]
+    [SerializeField] private EnemyFaction faction;
+
+    [Header("스폰")]
+    [SerializeField] private Transform spawnPoint;
+    [SerializeField] private List<int> attackUnitIDs; // GetEnemyUnitData(id)로 조회할 enemyUnitID 목록
+
+    [Header("기지 방어")]
+    [SerializeField] private EnemyBuildingController homeBuilding;
+
+    [Header("공격 웨이브")]
+    [SerializeField] private List<float> waveTimes; // 미션 시작 후 경과 시각(초), 오름차순 - ex: 300/600/900
+    [SerializeField] private int waveSize = 4;
+    [SerializeField] private Transform attackTarget;
+
+    [Header("집결지 (assembleBeforeAttack일 때만 사용)")]
+    [SerializeField] private Transform rallyPoint; // 비워두면 spawnPoint 위치를 그대로 집결지로 사용
+    [SerializeField] private float rallyRadius = 3f;
+    [SerializeField] private float rallyTimeout = 15f;
+
+    [Header("수비대 유지")]
+    [SerializeField] private int garrisonTarget = 6;
+    [SerializeField] private float reinforceCheckInterval = 20f;
+
+    [Header("점령지 탈환")]
+    [SerializeField] private List<CaptureSystem> raidTargets;
+    [SerializeField] private float raidInterval = 45f;
+    [SerializeField] private int raidSquadSize = 3;
+
+    [Header("진영별 동작 차이")]
+    [SerializeField] private bool assembleBeforeAttack = true; // OC: true, Spore Brood: false 권장(doc/0532)
+
+    private RTSUnitController rtsController;
+
+    // 이 director가 스폰한 유닛 전체(원정 나간 유닛도 죽기 전까진 계속 포함 - ReinforceRoutine이 목표
+    // 인원수를 유지하는 기준). null(죽은 유닛)은 각 루틴에서 그때그때 정리한다.
+    private readonly List<EnemyUnitController> garrison = new List<EnemyUnitController>();
+
+    // 웨이브/별동대로 이미 내보낸 유닛 - "보내고 끝"(doc/0532 결정 사항 #4)이라 돌아오지 않으므로,
+    // 다음 웨이브/별동대 차출이나 기지 방어 소집 대상에서 제외해 같은 유닛을 두 번 부리지 않는다.
+    private readonly HashSet<EnemyUnitController> deployed = new HashSet<EnemyUnitController>();
+
+    private void OnEnable()
+    {
+        if (homeBuilding != null && homeBuilding.GetHealthManager() != null)
+            homeBuilding.GetHealthManager().OnDamaged += HandleBaseAttacked;
+    }
+
+    private void OnDisable()
+    {
+        if (homeBuilding != null && homeBuilding.GetHealthManager() != null)
+            homeBuilding.GetHealthManager().OnDamaged -= HandleBaseAttacked;
+    }
+
+    private void Start()
+    {
+        rtsController = FindFirstObjectByType<RTSUnitController>();
+
+        while (garrison.Count < garrisonTarget)
+            SpawnUnit();
+
+        if (waveTimes.Count > 0)
+            StartCoroutine(AttackWaveRoutine());
+        if (raidTargets.Count > 0)
+            StartCoroutine(RaidRoutine());
+        StartCoroutine(ReinforceRoutine());
+    }
+
+    // ======================
+    // 1. 시간에 맞춰 공격 웨이브
+    // ======================
+    private IEnumerator AttackWaveRoutine()
+    {
+        for (int i = 0; i < waveTimes.Count; i++)
+        {
+            float wait = i == 0 ? waveTimes[0] : waveTimes[i] - waveTimes[i - 1];
+            yield return new WaitForSeconds(wait);
+            yield return LaunchWave();
+        }
+
+        // 리스트를 다 쓰면 끝내지 않고 마지막 두 항목의 간격으로 계속 반복한다(doc/0532 결정 사항 #2).
+        float repeatInterval = waveTimes.Count >= 2
+            ? waveTimes[^1] - waveTimes[^2]
+            : waveTimes[0];
+
+        WaitForSeconds repeatWait = new WaitForSeconds(Mathf.Max(1f, repeatInterval));
+        while (true)
+        {
+            yield return repeatWait;
+            yield return LaunchWave();
+        }
+    }
+
+    private IEnumerator LaunchWave()
+    {
+        List<EnemyUnitController> squad = TakeSquad(waveSize);
+        if (squad.Count == 0)
+            yield break;
+
+        if (assembleBeforeAttack)
+            yield return AssembleAtRally(squad);
+
+        foreach (EnemyUnitController unit in squad)
+            if (unit != null)
+                unit.AttackMoveTo(attackTarget.position);
+    }
+
+    private IEnumerator AssembleAtRally(List<EnemyUnitController> squad)
+    {
+        Vector3 rally = rallyPoint != null ? rallyPoint.position : spawnPoint.position;
+
+        foreach (EnemyUnitController unit in squad)
+            if (unit != null)
+                unit.MoveTo(rally);
+
+        float elapsed = 0f;
+        while (elapsed < rallyTimeout)
+        {
+            bool allArrived = true;
+            foreach (EnemyUnitController unit in squad)
+            {
+                if (unit == null)
+                    continue;
+                if (Vector3.Distance(unit.transform.position, rally) > rallyRadius)
+                {
+                    allArrived = false;
+                    break;
+                }
+            }
+
+            if (allArrived)
+                yield break;
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    // ======================
+    // 2. 점령지 탈환 별동대
+    // ======================
+    private IEnumerator RaidRoutine()
+    {
+        WaitForSeconds wait = new WaitForSeconds(raidInterval);
+        while (true)
+        {
+            yield return wait;
+
+            CaptureSystem target = PickRaidTarget();
+            if (target == null)
+                continue;
+
+            List<EnemyUnitController> squad = TakeSquad(raidSquadSize);
+            foreach (EnemyUnitController unit in squad)
+                if (unit != null)
+                    unit.AttackMoveTo(target.transform.position);
+        }
+    }
+
+    // Ally가 뺏어간 곳을 Neutral보다 우선(doc/0532).
+    private CaptureSystem PickRaidTarget()
+    {
+        CaptureSystem allyOwned = raidTargets.Find(t => t != null && t.CurrentOwner == CaptureOwner.Ally);
+        if (allyOwned != null)
+            return allyOwned;
+
+        return raidTargets.Find(t => t != null && t.CurrentOwner == CaptureOwner.Neutral);
+    }
+
+    // ======================
+    // 3. 공격받으면 주변 병력 소집
+    // ======================
+    private void HandleBaseAttacked(int damage, Vector3 attackerPosition, AttackEffectType type, bool isEnemyAttacker)
+    {
+        if (isEnemyAttacker)
+            return; // 플레이어에게 맞았을 때만 반응
+
+        garrison.RemoveAll(u => u == null);
+
+        foreach (EnemyUnitController unit in garrison)
+            if (!deployed.Contains(unit) && unit.IsIdle())
+                unit.AttackMoveTo(attackerPosition);
+    }
+
+    // ======================
+    // 4. 죽은 유닛 보충 생산
+    // ======================
+    private IEnumerator ReinforceRoutine()
+    {
+        WaitForSeconds wait = new WaitForSeconds(reinforceCheckInterval);
+        while (true)
+        {
+            yield return wait;
+
+            garrison.RemoveAll(u => u == null);
+            deployed.RemoveWhere(u => u == null);
+
+            while (garrison.Count < garrisonTarget)
+                SpawnUnit();
+        }
+    }
+
+    private void SpawnUnit()
+    {
+        if (attackUnitIDs.Count == 0 || rtsController == null)
+            return;
+
+        int id = attackUnitIDs[Random.Range(0, attackUnitIDs.Count)];
+        UnitData data = rtsController.GetEnemyUnitData(id);
+        if (data == null || data.Prefab == null)
+            return;
+
+        GameObject spawned = Instantiate(data.Prefab, spawnPoint.position, spawnPoint.rotation);
+        if (spawned.TryGetComponent<EnemyUnitController>(out EnemyUnitController unit))
+            garrison.Add(unit);
+    }
+
+    // ======================
+    // 공용
+    // ======================
+
+    // garrison 중 아직 원정 나가지 않은(deployed에 없는) 유닛을 앞에서부터 최대 size개 뽑아 deployed에
+    // 등록한다 - 뽑힌 유닛은 이후 재사용(다른 웨이브/별동대/기지 방어 소집)되지 않는다.
+    private List<EnemyUnitController> TakeSquad(int size)
+    {
+        garrison.RemoveAll(u => u == null);
+
+        List<EnemyUnitController> squad = new List<EnemyUnitController>();
+        foreach (EnemyUnitController unit in garrison)
+        {
+            if (squad.Count >= size)
+                break;
+            if (deployed.Contains(unit))
+                continue;
+
+            squad.Add(unit);
+            deployed.Add(unit);
+        }
+
+        return squad;
+    }
+}
+```
+
+## 설계안 대비 구현 시 추가된 부분
+설계 문서엔 없었지만 코딩 중 발견해 추가한 것 하나: **`deployed`(HashSet) 추적**.
+`AttackMoveTo()`는 자동교전을 위해 이동 중에도 `currentState`를 `Idle`로 유지한다(`EnemyUnitController.cs:251`
+주석 참고) - 즉 웨이브로 이미 내보낸 유닛도 `IsIdle()`이 계속 `true`를 반환해서, 이 추적이 없으면
+①다음 웨이브가 같은 유닛을 다시 뽑아가거나 ②기지가 공격받았을 때 이미 원정 나간 유닛까지 방어 소집에
+잡혀버림. "보내고 끝"(결정 사항 #4)이라는 확정된 설계 의도를 실제로 지키려면 필요한 구현 디테일이라
+별도 재확인 없이 반영함 - `garrison`엔 계속 남아있고(그래야 `ReinforceRoutine`이 인원수를 유지) `deployed`에만
+추가로 표시되는 방식.
+
+## 컴파일 확인
+`npx uloop-cli compile` 결과 에러 0개(경고 39개는 전부 기존 코드에 이미 있던 `FindFirstObjectByType`
+obsolete 경고 - 이 프로젝트 전체가 아직 이 API를 쓰고 있어서 새 파일도 같은 컨벤션을 따름, 별도 수정 안 함).
+
+## 남은 작업
+씬에 실제로 `EnemyAIDirector`를 배치하고 인스펙터 필드(`spawnPoint`/`attackTarget`/`rallyPoint`/
+`raidTargets`/`homeBuilding`/`attackUnitIDs` 등)를 채우는 건 미션 제작 단계 - 스크립트만으로는 아무 씬
+오브젝트에도 아직 붙어있지 않음.

@@ -1847,6 +1847,22 @@ public class UnitController : MonoBehaviour, IDestructible
                 break;
 
             case GatherState.MovingToBase:
+                if (depositTargetTransform == null)
+                {
+                    // 반납하러 가던 건물이 이동 중 파괴됨 - 아래 "이륙 중" 케이스와 동일한 재탐색
+                    // 패턴으로 다른 메인기지가 있으면 갈아타고, 없으면 화물을 든 채 멈춘다(doc/0547).
+                    Transform alt = FindNearestDepositBuilding();
+                    if (alt == null)
+                    {
+                        CancelGathering();
+                        return;
+                    }
+
+                    depositTargetTransform = alt;
+                    MoveToDepositTargetOrWait();
+                    break;
+                }
+
                 BuildingController depositBuilding = depositTargetTransform.GetComponent<BuildingController>();
                 if (depositBuilding != null && depositBuilding.IsLifted())
                 {

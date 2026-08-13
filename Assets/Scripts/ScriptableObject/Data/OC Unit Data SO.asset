@@ -16,7 +16,7 @@ MonoBehaviour:
   - <unitName>k__BackingField: Nanobot Repair
     <description>k__BackingField: "OC\uC758 \uC790\uC6D0 \uCC44\uC9D1/\uAC74\uC124
       \uB2F4\uB2F9 \uB098\uB178\uBD07."
-    <infoDescription>k__BackingField: "Resource and construction nanobot."
+    <infoDescription>k__BackingField: Resource and construction nanobot.
     <ID>k__BackingField: 1
     <tier>k__BackingField: 0
     <armorType>k__BackingField: 0
@@ -27,12 +27,16 @@ MonoBehaviour:
     <attackSpeed>k__BackingField: 0.6
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 0
+    <attackDelivery>k__BackingField: 0
     <mineral>k__BackingField: 50
     <gas>k__BackingField: 0
     <population>k__BackingField: 1
     <productionTime>k__BackingField: 12
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 1681573470, guid: 885f9e16e04753a41ab883c39f8f6e55, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 611672d581903da42a55e939a7f7ffcf, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 6124019018197211514, guid: c16734e5562d9f5489d00894cab2dc94, type: 3}
     <soundBank>k__BackingField: {fileID: 11400000, guid: ce4b906746514dbca8a33f13c7d3d233, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
@@ -43,6 +47,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -50,10 +57,13 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: Cyborg Soldier
     <description>k__BackingField: "NTA Assault Trooper \uB300\uC751. \uAE30\uBCF8
       \uBCF4\uBCD1."
-    <infoDescription>k__BackingField: "Standard cyborg infantry."
+    <infoDescription>k__BackingField: Standard cyborg infantry.
     <ID>k__BackingField: 2
     <tier>k__BackingField: 1
     <armorType>k__BackingField: 0
@@ -64,12 +74,16 @@ MonoBehaviour:
     <attackSpeed>k__BackingField: 0.6
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 1
+    <attackDelivery>k__BackingField: 0
     <mineral>k__BackingField: 50
     <gas>k__BackingField: 0
     <population>k__BackingField: 1
     <productionTime>k__BackingField: 15
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 938008983, guid: 5850a4f05024b5c48a939e96842117b9, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: cab405265e7fc204d90546245ab45377, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 3316618371407788158, guid: 0022e1c8a1d66824da11e336c2bc0ac5, type: 3}
     <soundBank>k__BackingField: {fileID: 11400000, guid: 474c855a0c734252ab443f96ef11898a, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
@@ -80,6 +94,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -87,9 +104,12 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: Striker
     <description>k__BackingField: "NTA Scout Drone \uB300\uC751. \uC815\uCC30 \uC720\uB2DB."
-    <infoDescription>k__BackingField: "Light laser skirmisher."
+    <infoDescription>k__BackingField: Light laser skirmisher.
     <ID>k__BackingField: 3
     <tier>k__BackingField: 1
     <armorType>k__BackingField: 0
@@ -100,12 +120,16 @@ MonoBehaviour:
     <attackSpeed>k__BackingField: 1.2
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 0
+    <attackDelivery>k__BackingField: 0
     <mineral>k__BackingField: 75
     <gas>k__BackingField: 0
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 19
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: -2060869605, guid: 134833144307e9048b69b1fe011ec766, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 2b9940fdf7738ca4c8946e5fd0c34770, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 3904233730634825791, guid: ae48d4b4be46b534f937316bec4f3fd0, type: 3}
     <soundBank>k__BackingField: {fileID: 11400000, guid: 3c38163496eb42b58830b05402f31408, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
@@ -116,6 +140,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -123,10 +150,13 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: Railgunner
     <description>k__BackingField: "NTA Sharpshooter \uB300\uC751. \uACE0\uBE44\uC6A9
       \uC800\uACA9\uC218."
-    <infoDescription>k__BackingField: "Anti-armor railgun specialist."
+    <infoDescription>k__BackingField: Anti-armor railgun specialist.
     <ID>k__BackingField: 4
     <tier>k__BackingField: 1
     <armorType>k__BackingField: 0
@@ -137,13 +167,16 @@ MonoBehaviour:
     <attackSpeed>k__BackingField: 1
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 1
+    <attackDelivery>k__BackingField: 0
     <mineral>k__BackingField: 125
     <gas>k__BackingField: 75
     <population>k__BackingField: 1
     <productionTime>k__BackingField: 50
     <requiredBuildingID>k__BackingField: 6
     <Icon>k__BackingField: {fileID: -828701542, guid: e5bbd889137f6ce43ad64472acb013ce, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 94753b86b161f24459d09f803a3a0a3d, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 6343201284338754031, guid: 90590bd04f8253a41bdb09bb2cf236fd, type: 3}
     <soundBank>k__BackingField: {fileID: 11400000, guid: 1402de568fa14f99b93ca482581f801b, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
@@ -154,6 +187,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -161,10 +197,13 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: Brute Mech
     <description>k__BackingField: "NTA Ranger IFV \uB300\uC751\uC774\uC9C0\uB9CC
       \uADFC\uC811\uACF5\uACA9 \uC720\uB2DB\uC73C\uB85C \uCC28\uBCC4\uD654 (doc/0230)."
-    <infoDescription>k__BackingField: "Close-range flame mech."
+    <infoDescription>k__BackingField: Close-range flame mech.
     <ID>k__BackingField: 5
     <tier>k__BackingField: 2
     <armorType>k__BackingField: 1
@@ -175,12 +214,16 @@ MonoBehaviour:
     <attackSpeed>k__BackingField: 0.8
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 0
+    <attackDelivery>k__BackingField: 0
     <mineral>k__BackingField: 100
     <gas>k__BackingField: 50
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 25
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: -22076815, guid: 192fd523055562d40a66ca57d3bb4120, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 31e87cd81a6d0154c86d0659332efc12, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 5684131733987368698, guid: 13721a74df0f2a24688bece113844859, type: 3}
     <soundBank>k__BackingField: {fileID: 11400000, guid: ff25fbc655844fb8b388cb8f1c08a5b9, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
@@ -191,6 +234,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -198,9 +244,12 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: Heavy Assault Tank
     <description>k__BackingField: "NTA Pulsar Tank \uB300\uC751. \uC911\uC804\uCC28."
-    <infoDescription>k__BackingField: "Heavy explosive-shell tank."
+    <infoDescription>k__BackingField: Heavy explosive-shell tank.
     <ID>k__BackingField: 6
     <tier>k__BackingField: 2
     <armorType>k__BackingField: 1
@@ -211,12 +260,16 @@ MonoBehaviour:
     <attackSpeed>k__BackingField: 1.5
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 0
+    <attackDelivery>k__BackingField: 0
     <mineral>k__BackingField: 150
     <gas>k__BackingField: 100
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 31
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: 838862320, guid: 1c533b3cf9b739b44b04e2a72b09fffe, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: fc3ecb8ca7e726943bafff1f59b3423d, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 8596934217383359214, guid: 82c41dc065858ce4c8591d7d20971aff, type: 3}
     <soundBank>k__BackingField: {fileID: 11400000, guid: d3fa61afa0f14fd7abf56860b22fa3d9, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
@@ -227,6 +280,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -234,10 +290,13 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: Ironhawk
     <description>k__BackingField: "NTA SkyLancer \uB300\uC751. \uB300\uACF5 \uC804\uBB38
       \uACE0\uAE09\uC720\uB2DB(\uD2B9\uC131 2\uD0DD1)."
-    <infoDescription>k__BackingField: "Anti-air fighter."
+    <infoDescription>k__BackingField: Anti-air fighter.
     <ID>k__BackingField: 7
     <tier>k__BackingField: 2
     <armorType>k__BackingField: 1
@@ -248,12 +307,16 @@ MonoBehaviour:
     <attackSpeed>k__BackingField: 1
     <canAttackGround>k__BackingField: 0
     <canAttackAir>k__BackingField: 1
+    <attackDelivery>k__BackingField: 0
     <mineral>k__BackingField: 100
     <gas>k__BackingField: 50
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 40
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: -766761618, guid: f68ab43e24d0d694a9ddad6b0e56b026, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 153e9bbd53c092846bcf46e1e1343f06, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 725156099865741716, guid: 1f1e4c688bfd14b4d9a7af0bceaa0da5, type: 3}
     <soundBank>k__BackingField: {fileID: 11400000, guid: 9cba1b3854da4c77bdbc2eae14c3afdd, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 1
@@ -265,6 +328,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 5
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: "\uC9C0\uC0C1\uD3ED\uACA9"
       <description>k__BackingField: "\uC6D0\uC73C\uB85C \uB41C \uBC94\uC704\uB97C
@@ -275,10 +341,13 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 1
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 10
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: Raven
     <description>k__BackingField: "NTA Firehawk \uB300\uC751. \uACBD\uB7C9 \uACE0\uC18D
       \uACF5\uC911\uC720\uB2DB."
-    <infoDescription>k__BackingField: "Laser gunship."
+    <infoDescription>k__BackingField: Laser gunship.
     <ID>k__BackingField: 8
     <tier>k__BackingField: 3
     <armorType>k__BackingField: 0
@@ -289,12 +358,16 @@ MonoBehaviour:
     <attackSpeed>k__BackingField: 1.2
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 1
+    <attackDelivery>k__BackingField: 0
     <mineral>k__BackingField: 150
     <gas>k__BackingField: 100
     <population>k__BackingField: 2
     <productionTime>k__BackingField: 37
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: -1210435973, guid: 4b97d928fac1d4947aab2389f2581109, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: aba89c0f10e6bd04bb6f012d1e93b9f7, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 5220832507910011219, guid: 597f50ba48c40444cb0e675350e86f40, type: 3}
     <soundBank>k__BackingField: {fileID: 11400000, guid: 5179813b3a58436d85091364788e7293, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
@@ -305,6 +378,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -312,10 +388,13 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
   - <unitName>k__BackingField: Strike Drone
     <description>k__BackingField: "NTA Guardian Drone \uB300\uC751. \uCD5C\uC0C1\uC704
       \uACF5\uC911 \uC288\uD37C\uC720\uB2DB."
-    <infoDescription>k__BackingField: "Heaviest OC bomber."
+    <infoDescription>k__BackingField: Heaviest OC bomber.
     <ID>k__BackingField: 9
     <tier>k__BackingField: 3
     <armorType>k__BackingField: 1
@@ -326,12 +405,16 @@ MonoBehaviour:
     <attackSpeed>k__BackingField: 1.2
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 1
+    <attackDelivery>k__BackingField: 0
     <mineral>k__BackingField: 400
     <gas>k__BackingField: 300
     <population>k__BackingField: 6
     <productionTime>k__BackingField: 63
+    <requiredBuildingID>k__BackingField: 0
     <Icon>k__BackingField: {fileID: -1146578028, guid: fbdc0795762dfbe459306215e32768c6, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 0}
     <Prefab>k__BackingField: {fileID: 4698038001367890631, guid: 1dae83340f356d64fb61db34071b4f1d, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 8898957771350781280, guid: 94a369ac2980a334292a37521a3847e4, type: 3}
     <soundBank>k__BackingField: {fileID: 11400000, guid: f5eb18591e2d4acdbe496341c9f32316, type: 2}
     <shortcutKey>k__BackingField: 0
     <hasTraitChoice>k__BackingField: 0
@@ -342,6 +425,9 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
     <traitB>k__BackingField:
       <skillName>k__BackingField: 
       <description>k__BackingField: 
@@ -349,3 +435,6 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 0
       <shortcutKey>k__BackingField: 0
       <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0

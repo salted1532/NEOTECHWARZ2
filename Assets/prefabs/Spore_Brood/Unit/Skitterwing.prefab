@@ -69,6 +69,47 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackRange
   UnitRange: 18
+  targetTags:
+  - Worker
+  - AttackUnit
+  - MainBase
+  - Tier1
+  - Tier2
+  - Tier3
+  - SupplyDepot
+  - Lab
+  - AllyOC
+--- !u!1 &1639527035512103312
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 313929921921294076}
+  m_Layer: 6
+  m_Name: FirePos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &313929921921294076
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639527035512103312}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.6140001, z: 1.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2406533709525597571}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2151467041808487892
 GameObject:
   m_ObjectHideFlags: 0
@@ -426,6 +467,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 313929921921294076}
   - {fileID: 1080794338207437358}
   - {fileID: 1216003839379842826}
   - {fileID: 7939471783475269243}
@@ -608,8 +650,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
   muzzlePrefab: {fileID: 1207662428487738, guid: a39d0b77105f90e4483a0152c6d69ff3, type: 3}
   firePoints:
-  - {fileID: 0}
-  moveTrailPrefab: {fileID: 100002, guid: 6eb61d053ef59c741b08db039096149c, type: 3}
+  - {fileID: 313929921921294076}
+  moveTrailPrefab: {fileID: 0}
   moveTrailPoints:
   - {fileID: 0}
   moveTrailRotationFollowSpeed: 6
@@ -636,8 +678,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c286447ac98c8842b6da1f784de305d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LaserBeamAttack
-  laserBeamPrefab: {fileID: 1844130978594048, guid: b9b15cdfa2b104c41b2ccb74ccf58ad6, type: 3}
-  firePoint: {fileID: 0}
+  laserBeamPrefab: {fileID: 1844130978594048, guid: efc31c56453e5b54caab534165289e1b, type: 3}
+  firePoint: {fileID: 313929921921294076}
   beamDuration: 0.2
 --- !u!114 &-7693280399064156052
 MonoBehaviour:

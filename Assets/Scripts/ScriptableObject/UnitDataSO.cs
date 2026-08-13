@@ -132,6 +132,12 @@ public class UnitData
     [field: SerializeField]
     public GameObject Prefab { get; private set; }
 
+    // 아군 OC 전용 프리팹(AllyController가 붙은 Prefab Variant) - AllyAIDirector가 unitID로 자동
+    // 스폰할 때 이 필드를 쓴다(doc/0543). Prefab(적대 EnemyUnitController 변형)과는 별개 - 아군 프리팹이
+    // 아직 없는 유닛 종류는 비워둬도 되고, 그 경우 AllyAIDirector는 해당 unitID를 조용히 건너뛴다.
+    [field: SerializeField]
+    public GameObject AllyPrefab { get; private set; }
+
     // 이 유닛 종류의 공격/생성/사망 SFX + 선택/이동/공격명령/생성/사망 음성을 모아둔 에셋 (비워두면 조용함).
     // 유닛이 늘어나도 코드 수정 없이 새 UnitSoundBankSO 에셋만 만들어 연결하면 된다 (doc/0255).
     [field: SerializeField]
