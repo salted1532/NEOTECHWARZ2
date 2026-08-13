@@ -89,6 +89,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible, IAttackRangeUni
     private UnitAudio unitAudio;             // 공격 SFX 재생용 (없을 수 있는 옵셔널 컴포넌트)
     private LaserBeamAttack laserBeamAttack; // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트
     private ProjectileAttack projectileAttack; // 투사체 발사 유닛만 붙어있는 옵셔널 컴포넌트
+    private MeleeBodySlamAttack meleeBodySlamAttack; // 근접 유닛(Ripfang 등) 몸 파츠에만 붙어있는 옵셔널 컴포넌트
 
     private void Awake()
     {
@@ -99,6 +100,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible, IAttackRangeUni
         unitAudio = GetComponent<UnitAudio>();
         laserBeamAttack = GetComponent<LaserBeamAttack>();
         TryGetComponent(out projectileAttack);
+        meleeBodySlamAttack = GetComponentInChildren<MeleeBodySlamAttack>(); // 몸 모델(자식 오브젝트)에 붙는 컴포넌트라 turretController와 동일하게 자식까지 탐색
 
         if (!isAirUnit)
         {
@@ -445,6 +447,7 @@ public class EnemyUnitController : MonoBehaviour, IDestructible, IAttackRangeUni
             unitAudio?.PlayAttackSFX();
             laserBeamAttack?.Fire(target.transform); // 레이저 공격 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
             turretController?.FireRecoil(); // 포탑 유닛만 붙어있는 옵셔널 컴포넌트 (UnitController.Attack()과 동일한 훅 지점)
+            meleeBodySlamAttack?.Slam(); // 근접 유닛만 붙어있는 옵셔널 컴포넌트 - 몸통박치기 애니메이션
         }
 
         alreadyAttacked = true;

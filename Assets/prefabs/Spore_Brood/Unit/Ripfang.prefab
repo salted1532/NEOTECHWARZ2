@@ -69,6 +69,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackRange
   UnitRange: 12
+  targetTags:
+  - Worker
+  - AttackUnit
+  - MainBase
+  - Tier1
+  - Tier2
+  - Tier3
+  - SupplyDepot
+  - Lab
+  - AllyOC
 --- !u!1 &692453425245354230
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,6 +628,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7436004497743716613}
+  - component: {fileID: 8730630244502332623}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -634,8 +645,8 @@ Transform:
   m_GameObject: {fileID: 2752558877854893780}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1714105847622965542}
@@ -658,6 +669,24 @@ Transform:
   - {fileID: 1993246750921618971}
   m_Father: {fileID: 2406533709525597571}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8730630244502332623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2752558877854893780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1781884718022104b903d3c5c3774781, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeBodySlamAttack
+  bodyPart: {fileID: 7436004497743716613}
+  lungeDistance: 0.6
+  lungeDuration: 0.08
+  lungeReturnDuration: 0.15
+  lungeEase: 6
+  lungeReturnEase: 27
 --- !u!1 &3861308579626577649
 GameObject:
   m_ObjectHideFlags: 0
@@ -683,7 +712,7 @@ Transform:
   m_GameObject: {fileID: 3861308579626577649}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.864, z: 1.25}
+  m_LocalPosition: {x: 0, y: -0.636, z: 0.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1084,9 +1113,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 3
+  m_Height: 2
   m_Direction: 2
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: -0.5, z: 0}
 --- !u!54 &5120757288759665380
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1124,7 +1153,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 5.25
+  m_Speed: 9
   m_Acceleration: 16
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -1152,15 +1181,15 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 49a178a278581a04cacb00ceb865dadd, type: 3}
   minimapIcon: {fileID: 249500097125250774}
   minimapFogVisibilityMargin: 1
-  enemyName: 립팽 (Ripfang)
+  enemyName: "\uB9BD\uD33D (Ripfang)"
   enemyUnitID: 10
   attackDamage: 5
   armor: 0
-  attackType: 0
+  attackType: 2
   armorType: 0
   sizeType: 0
   canAttackGround: 1
-  canAttackAir: 1
+  canAttackAir: 0
   attackDelivery: 0
   bonusVersusArmorType: 0
   bonusVersusArmorPercent: 0
@@ -1200,7 +1229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a7355074cd8b5c42b9ef69b23ad8b4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitEffects
-  muzzlePrefab: {fileID: 100006, guid: caec3b9681e55cb46afeb40d817c75d5, type: 3}
+  muzzlePrefab: {fileID: 0}
   firePoints:
   - {fileID: 6427180926210184788}
   moveTrailPrefab: {fileID: 100000, guid: facfb523f81e2dc4fa90851bdfb1884e, type: 3}
