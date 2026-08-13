@@ -2129,6 +2129,7 @@ public class UnitController : MonoBehaviour, IDestructible
             attackRange.EnsureDetectionRadius(); // 감지 반경이 새 사거리보다 좁아지지 않도록 보장 (doc/0239 안전장치)
         }
 
+        healthManager?.SetArmor(data.armor);
         healthManager?.InitializeHealth(data.hp);
     }
 

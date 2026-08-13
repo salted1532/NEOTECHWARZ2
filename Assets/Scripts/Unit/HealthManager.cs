@@ -20,6 +20,7 @@ public class HealthManager : MonoBehaviour
 
     private int currentHp;
     private bool isDead;
+    private int armor; // 받는 피해를 고정으로 깎는 값 - UnitData.armor를 ApplyUnitData()가 SetArmor()로 반영(doc/0556)
 
     // 체력바가 안개(Y≈1의 물리적 Plane)보다 훨씬 높이 떠 있어서 깊이 테스트로는 절대 안 가려지는 문제의
     // 대안 - 안개 상태를 직접 조회해서 Update()에서 렌더러를 켜고 끈다 (doc/0358).
@@ -86,15 +87,21 @@ public class HealthManager : MonoBehaviour
         if (isDead || damage <= 0)
             return;
 
-        currentHp = Mathf.Max(0, currentHp - damage);
+        // 방어력만큼 경감하되, 공격 1회당 최소 1피해는 항상 들어간다(방어력이 아무리 높아도 완전 무적은 없음, doc/0556).
+        int mitigated = Mathf.Max(1, damage - armor);
+
+        currentHp = Mathf.Max(0, currentHp - mitigated);
         OnHealthChanged?.Invoke(currentHp, maxHealth);
-        OnDamaged?.Invoke(damage, attackerPosition, attackType, isEnemyAttacker);
+        OnDamaged?.Invoke(mitigated, attackerPosition, attackType, isEnemyAttacker);
 
         if (currentHp <= 0)
         {
             Die();
         }
     }
+
+    // 유닛 스폰 시 UnitData.armor 값을 반영한다(UnitController/EnemyUnitController/AllyController.ApplyUnitData 공통, doc/0556).
+    public void SetArmor(int value) => armor = Mathf.Max(0, value);
 
     // 체력을 회복시킨다 (최대 체력을 넘지 않도록 제한).
     public void Heal(int amount)

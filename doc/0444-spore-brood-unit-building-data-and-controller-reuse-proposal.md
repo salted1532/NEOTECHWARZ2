@@ -68,11 +68,15 @@ A안으로 감(YAGNI) — 지금 5스테이지는 "OC 부재, 외계종족 단�
 
 `doc/0441` 표 그대로:
 
-| ID | unitName | tier | armorType | sizeType | hp | attackDamge | attackRange | attackSpeed | canAttackGround | canAttackAir | attackDelivery | mineral | gas | population | productionTime | Prefab |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 10 | 립팽 (Ripfang) | 0 | Light | Small | 60 | 9 | 2 | 0.5 | ✔ | ✘ | Hitscan | 45 | 0 | 1 | 10 | Ripfang.prefab |
-| 11 | 스피터 (Spitter) | 0 | Light | Medium | 50 | 11 | 13 | 1.1 | ✔ | ✔ | Projectile | 80 | 20 | 2 | 20 | Spitter.prefab |
-| 12 | 스키터윙 (Skitterwing) | 0 | Light | Medium | 65 | 8 | 11 | 0.9 | ✔ | ✔ | Projectile | 95 | 35 | 2 | 26 | Raven.prefab |
+| ID | unitName | tier | armorType | sizeType | armor | hp | attackDamge | attackRange | attackSpeed | canAttackGround | canAttackAir | attackDelivery | mineral | gas | population | productionTime | Prefab |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 10 | 립팽 (Ripfang) | 0 | Light | Small | 1 | 40 | 6 | 2 | 0.3 | ✔ | ✘ | Hitscan | 45 | 0 | 1 | 10 | Ripfang.prefab |
+| 11 | 스피터 (Spitter) | 0 | Light | Medium | 1 | 80 | 10 | 13 | 1.6 | ✔ | ✔ | Projectile | 80 | 20 | 2 | 20 | Spitter.prefab |
+| 12 | 스키터윙 (Skitterwing) | 0 | Light | Medium | 1 | 120 | 18 | 11 | 0.8 | ✔ | ✔ | Projectile | 95 | 35 | 2 | 26 | Raven.prefab |
+
+> **2026-08-13 갱신(doc/0556)**: `armor`(방어력, 최소 1피해 보장 방식) 스탯 신설 + 3종 전부 1로 설정,
+> hp/attackDamge/attackSpeed 재조정. 위 표는 최초 제안(0441) 값이 아니라 최신 값으로 갱신됨 - 최초
+> 제안 당시 값이 궁금하면 git 히스토리 참고.
 
 Icon / soundBank는 아직 제작된 아이콘·사운드뱅크 에셋이 없어 비워둠(0441 "남은 작업" 항목, 비워두면
 조용함/기본 문구만 표시 — 기존 패턴과 동일). requiredBuildingID는 0(생산 건물 티어 구분 없음 — 셋 다

@@ -84,6 +84,11 @@ public class UnitData
     [field: SerializeField]
     public SizeType sizeType { get; private set; }
 
+    // 방어력 - 받는 피해에서 고정으로 깎이는 값(공격 1회당 최소 1피해는 항상 들어감, HealthManager.GetDamage 참고).
+    // 기본 0(기존 유닛 전부 무변화, doc/0556).
+    [field: SerializeField]
+    public int armor { get; private set; }
+
     [field: SerializeField]
     public int hp { get; private set; }
 
