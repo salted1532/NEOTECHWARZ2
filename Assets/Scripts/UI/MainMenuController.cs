@@ -117,9 +117,15 @@ public class MainMenuController : MonoBehaviour
     // 개발자용 - 미션 해금 진행 상황(doc/0472)과 SoundManager 볼륨/뮤트 설정(doc/0288)까지, 이
     // 프로젝트가 PlayerPrefs에 저장하는 값 전부를 지운다. 정식 버전 출시 전 이 버튼/메소드를
     // playerPrefsResetButton과 함께 제거할 것.
+    //
+    // 리셋 직후 씬을 다시 로드하는 이유: SoundManager/GraphicsSettingsPanel 등은 값을 Awake()에서
+    // PlayerPrefs로부터 읽어 필드에 캐싱해두므로, DeleteAll()만으로는 이미 로드된 필드(볼륨 슬라이더
+    // 등 화면에 보이는 값)가 갱신되지 않는다 - 씬을 재로드해 Awake()를 다시 태워서 기본값을 즉시
+    // 반영한다.
     private void ResetPlayerPrefs()
     {
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

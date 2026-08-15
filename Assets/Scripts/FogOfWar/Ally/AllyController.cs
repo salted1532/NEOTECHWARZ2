@@ -73,6 +73,10 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
     [SerializeField] private float airCruiseAltitude = 5f;
     [SerializeField] private LayerMask airGroundLayer; // 공중 유닛이 발밑 지면 높이를 재는 레이어 (UnitController와 동일한 용도)
 
+    [Header("공중 유닛 분리 (겹침 방지 - UnitController.SeparateFromOverlappingAirUnits와 동일한 패턴, doc/0591)")]
+    [SerializeField] private float airUnitRadius = 0.6f;    // 기본값 0.6 = UnitController와 동일
+    [SerializeField] private float airSeparationSpeed = 4f; // 밀려나는 속도(초당)
+
     private enum AllyState { Idle, Move, Attack }
     private AllyState currentState = AllyState.Idle;
 
@@ -116,6 +120,8 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
             targetPosition = AirTargetPosition(transform.position);
             isMovingAirUnit = true;
         }
+
+        UnitSilhouette.Apply(gameObject); // 언덕/건물에 가려져도 위치를 알 수 있도록 실루엣 머티리얼 추가 (doc/0592)
     }
 
     private void OnEnable()
@@ -235,6 +241,57 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
 
         AttackMoveTick();
         UpdateFogVisibility();
+
+        if (isAirUnit)
+            SeparateFromOverlappingAirUnits();
+    }
+
+    // 이동 중이 아닌 공중 유닛끼리만 서로 겹친 만큼 수평으로 밀어낸다
+    // (UnitController.SeparateFromOverlappingAirUnits와 동일한 패턴, doc/0591). AllyController엔
+    // UnitList 같은 전역 캐시가 없어 Physics.OverlapSphere로 주변을 직접 찾는다
+    // (EnemyAIDirector.FindNearbyEnemyUnits와 동일한 기법) - 매 프레임 호출이라 NonAlloc으로 GC 할당을 피한다.
+    private const float AirSeparationQueryRadius = 5f; // 기본 airUnitRadius(0.6) 두 개 합보다 훨씬 넉넉한 탐색 반경
+    private static readonly Collider[] airSeparationHits = new Collider[16];
+
+    private void SeparateFromOverlappingAirUnits()
+    {
+        if (isMovingAirUnit)
+            return;
+
+        Vector3 push = Vector3.zero;
+        int hitCount = Physics.OverlapSphereNonAlloc(transform.position, AirSeparationQueryRadius, airSeparationHits);
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            if (!airSeparationHits[i].TryGetComponent(out AllyController other) ||
+                other == this || !other.isAirUnit || other.isMovingAirUnit)
+                continue;
+
+            Vector3 diff = transform.position - other.transform.position;
+            diff.y = 0f; // 고도는 건드리지 않고 수평으로만 분리
+            float dist = diff.magnitude;
+
+            float requiredDist = airUnitRadius + other.airUnitRadius;
+            if (dist < requiredDist)
+            {
+                float overlap = requiredDist - dist;
+                Vector3 pushDir = dist > 0.001f ? diff.normalized : StackedNudgeDirection();
+                push += pushDir * overlap;
+            }
+        }
+
+        if (push.sqrMagnitude > 0.0001f)
+        {
+            Vector3 step = push.normalized * Mathf.Min(push.magnitude, airSeparationSpeed * Time.deltaTime);
+            transform.position += step;
+        }
+    }
+
+    // UnitController.StackedNudgeDirection과 동일 - 완전히 같은 좌표(dist≈0)로 겹쳤을 때 diff가 0벡터라
+    // 미는 방향을 못 정하는 경우, 유닛 고유의(항상 같은) 방향으로라도 밀어서 겹침을 깬다.
+    private Vector3 StackedNudgeDirection()
+    {
+        return Quaternion.Euler(0f, GetHashCode() % 360, 0f) * Vector3.forward;
     }
 
     // 미니맵 마커 토글(doc/0356, 마커가 Y40대라 안개 Plane 깊이 테스트로는 안 가려지는 문제의 대안)과
@@ -258,7 +315,11 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
     public void MoveTo(Vector3 destination)
     {
         arrived = false;
-        attackMoveDestination = null;
+        // attackMoveDestination을 null로 비우면 안 된다 - 순수 이동 중이어도 자동교전(EnemyAttackRange)은
+        // currentState와 무관하게 사거리 안 상대를 그대로 공격하고 navMeshAgent.isStopped를 켜는데,
+        // "교전 끝나면 여기로 복귀"(AttackMoveTick)가 이 값이 null이면 절대 작동하지 않아 이동이 영영
+        // 재개되지 않았다(doc/0584) - AttackMoveTo()와 똑같이 목적지를 채워서 같은 복귀 경로를 태운다.
+        attackMoveDestination = destination;
         currentState = AllyState.Move;
 
         unitEffects?.StopAttackEffects(); // 공격 중이었다면 이동 명령으로 전환되므로 재생 중인 공격 이펙트를 즉시 정지
@@ -320,7 +381,14 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
                 (lastMoveAgentToDestination.Value - pos).sqrMagnitude > RedundantDestinationEpsilon * RedundantDestinationEpsilon;
 
             if (!targetMoved)
+            {
+                // 포기하는 순간 navMeshAgent.isStopped를 켜지 않으면, SetDestination에 남아있는 원본(도달
+                // 불가능한) 좌표까지의 거리가 영원히 arriveDistance보다 커서 Update()의 도착 판정이 절대
+                // isStopped를 true로 못 만든다 - 그러면 AttackMoveTick()이 "교전 후 정지"를 감지 못 해
+                // attackMoveDestination이 멀쩡히 남아있어도 원래 목적지로 재발령을 영영 못 한다(doc/0581).
+                navMeshAgent.isStopped = true;
                 return true; // 대상도 그 자리 그대로 - 도달 불가로 최종 판정, 포기
+            }
 
             MoveAgentTo(pos); // 새 위치 기준으로 가장 가까운 위치로 다시 이동
             return false;
@@ -418,13 +486,27 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
     // 공격
     // ======================
 
+    // 공격-이동 목적지 건물 근처(같은 위치)가 아니면, 스쳐 지나가며 마주친 건물로 취급한다 - 이동을
+    // 멈추지 않고 계속 목적지로 걸어가면서 사거리 안에 있는 동안은 계속 공격한다(doc/0588). 유닛은
+    // 항상 멈춰서 싸운다(금방 끝나고, 위협이라 자리 잡고 처리하는 게 맞음) - 건물만 대상.
+    private bool IsIncidentalBuilding(GameObject target)
+    {
+        if (attackMoveDestination == null || target.GetComponent<EnemyUnitController>() != null)
+            return false;
+
+        float sqrDist = (target.transform.position - attackMoveDestination.Value).sqrMagnitude;
+        return sqrDist > arriveDistance * arriveDistance;
+    }
+
     // 사거리 안의 대상을 공격한다 (AllyAttackRange가 매 프레임 호출). target은 외계종족/OC 등 적대 세력
     // (EnemyUnitController) - HealthManager를 갖고 있다.
     public void Attack(Vector3 end, GameObject target)
     {
         if (!isAirUnit)
         {
-            navMeshAgent.isStopped = true;
+            // 스쳐 지나가는 건물이면 멈추지 않는다 - navMeshAgent.destination은 이미 attackMoveDestination
+            // (진짜 목적지)을 가리키고 있으므로, isStopped만 false로 두면 알아서 계속 그 쪽으로 걸어간다.
+            navMeshAgent.isStopped = !IsIncidentalBuilding(target);
         }
         else
         {

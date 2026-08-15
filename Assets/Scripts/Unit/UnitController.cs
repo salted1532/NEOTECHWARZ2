@@ -304,6 +304,15 @@ public class UnitController : MonoBehaviour, IDestructible
     private BaseStructure attachedStructure;
     private bool isConstructing;
 
+    // ===== 건설 중 파운데이션 표면 배회 (doc/0589) - 파운데이션은 NavMeshObstacle로 카빙되어 있어
+    // NavMeshAgent 경로탐색을 쓸 수 없으므로, 공중 유닛과 동일한 방식(MoveTowards 직접 이동)으로 처리한다. =====
+    private bool constructionWanderWaiting;
+    private float constructionWanderWaitRemaining;
+    private Vector3 constructionWanderTarget;
+    private bool hasConstructionWanderTarget;
+    private const float ConstructionWanderWaitSeconds = 2f;
+    private const float ConstructionWanderArriveDistance = 0.3f;
+
     // ===== 특성(트레이트) 스킬 - 고급유닛만 해당 (doc/0228) =====
     // RTSUnitController.ChooseTrait()를 거쳐서만 채워짐 (유닛 종류 전체가 공유하는 선택이라 유닛 스스로 정하지 않음)
     private RTSUnitController.TraitChoice currentTrait = RTSUnitController.TraitChoice.None;
@@ -347,6 +356,7 @@ public class UnitController : MonoBehaviour, IDestructible
             isMovingAirUnit = true;
         }
 
+        UnitSilhouette.Apply(gameObject); // 언덕/건물에 가려져도 위치를 알 수 있도록 실루엣 머티리얼 추가 (doc/0592)
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -476,6 +486,7 @@ public class UnitController : MonoBehaviour, IDestructible
         FollowTick();
         FollowBuildingTick();
         BuildTick();
+        ConstructionWanderTick();
 
         if (isAirUnit)
             SeparateFromOverlappingAirUnits();
@@ -1138,6 +1149,14 @@ public class UnitController : MonoBehaviour, IDestructible
         isConstructing = true;
 
         structure.AttachBuilder(this);
+
+        // 파운데이션은 NavMeshObstacle로 카빙되어 있어 정상 경로탐색이 불가능하다 - 공중 유닛과 동일한
+        // 방식(MoveTowards 직접 이동)으로 전환한다 (doc/0589).
+        if (!isAirUnit)
+            navMeshAgent.enabled = false;
+
+        hasConstructionWanderTarget = false;
+        constructionWanderWaiting = false;
     }
 
     // 건설이 끝나거나(완공) 다른 일꾼으로 교체되어 담당에서 풀렸을 때 BaseStructure가 호출한다.
@@ -1145,9 +1164,83 @@ public class UnitController : MonoBehaviour, IDestructible
     {
         isConstructing = false;
         attachedStructure = null;
+
+        hasConstructionWanderTarget = false;
+        constructionWanderWaiting = false;
+
+        if (!isAirUnit && !navMeshAgent.enabled)
+        {
+            // 배회 중 NavMesh 밖(파운데이션 표면, 카빙된 영역)에 있었을 수 있으므로, 에이전트를 다시
+            // 켜기 전에 검증된 지점(원래 건설 도착 지점)으로 복귀시킨다 (doc/0589).
+            transform.position = buildDestination;
+            navMeshAgent.enabled = true;
+        }
     }
 
     public bool IsConstructing() => isConstructing;
+
+    // 건설 중인 일꾼이 파운데이션 표면 위 무작위 지점을 배회하게 한다 - 도착하면 2초 대기 후 다음
+    // 지점으로. 파운데이션이 NavMeshObstacle로 카빙되어 있어 NavMeshAgent 경로탐색을 쓸 수 없으므로,
+    // 공중 유닛과 동일하게 에이전트를 끄고 직접 좌표를 옮긴다 (doc/0589).
+    private void ConstructionWanderTick()
+    {
+        if (!isConstructing || attachedStructure == null)
+            return;
+
+        FaceConstructionStructure();
+
+        if (constructionWanderWaiting)
+        {
+            constructionWanderWaitRemaining -= Time.deltaTime;
+            if (constructionWanderWaitRemaining > 0f)
+                return;
+
+            constructionWanderWaiting = false;
+            hasConstructionWanderTarget = false;
+        }
+
+        if (!hasConstructionWanderTarget)
+        {
+            constructionWanderTarget = PickRandomConstructionSurfacePoint();
+            hasConstructionWanderTarget = true;
+            return;
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, constructionWanderTarget, moveSpeed * Time.deltaTime);
+
+        if ((transform.position - constructionWanderTarget).sqrMagnitude <= ConstructionWanderArriveDistance * ConstructionWanderArriveDistance)
+        {
+            constructionWanderWaiting = true;
+            constructionWanderWaitRemaining = ConstructionWanderWaitSeconds;
+        }
+    }
+
+    // attachedStructure의 콜라이더(파운데이션 표면) 범위 안에서 무작위 지점을 하나 고른다 - 높이(Y)는
+    // 일꾼의 현재 지면 높이를 그대로 유지한다.
+    private Vector3 PickRandomConstructionSurfacePoint()
+    {
+        if (attachedStructure != null && attachedStructure.TryGetComponent<Collider>(out var col))
+        {
+            Bounds b = col.bounds;
+            return new Vector3(Random.Range(b.min.x, b.max.x), transform.position.y, Random.Range(b.min.z, b.max.z));
+        }
+
+        return transform.position;
+    }
+
+    // 건설 중인 일꾼이 배회/대기 중이든 항상 건물 쪽을 바라보게 한다 - 공중 유닛 이동 방향 회전과
+    // 동일한 패턴(doc/0589, doc/0590).
+    private void FaceConstructionStructure()
+    {
+        Vector3 dir = attachedStructure.transform.position - transform.position;
+        dir.y = 0f;
+
+        if (dir.sqrMagnitude > 0.001f)
+        {
+            Quaternion rot = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
+        }
+    }
 
     // 명시적 공격 명령을 매 프레임 갱신한다.
     // - 지정 대상과 한 번도 접촉(사거리 진입)한 적이 없다면, 아무리 멀어도 "시야 이탈"로 보지 않고
@@ -2053,6 +2146,10 @@ public class UnitController : MonoBehaviour, IDestructible
     {
         if (isAirUnit)
             return isMovingAirUnit;
+
+        // 건설 중엔 navMeshAgent가 꺼져있어(doc/0589) 그 프로퍼티들을 읽으면 안 되므로 배회 상태로 판정한다.
+        if (isConstructing)
+            return hasConstructionWanderTarget && !constructionWanderWaiting;
 
         return navMeshAgent != null && !navMeshAgent.isStopped && navMeshAgent.velocity.sqrMagnitude > 0.01f;
     }

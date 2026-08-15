@@ -77,6 +77,10 @@ public class AttackRange : MonoBehaviour
     {
         enemiesInRange.RemoveAll(enemy => enemy == null); // 이미 죽어서 destroy된 대상 정리
 
+        if (unitController.IsConstructing())
+            return; // 건설 중인 일꾼은 자동교전(추격/공격)으로 현장을 이탈하지 않는다 - 명시적 명령
+            // 13곳(doc/0458)은 이미 isConstructing으로 막혀있었는데 자동교전 루프만 빠져있었다(doc/0587).
+
         if (unitController.HasPendingSkillOrder)
             return; // 스킬 사용 명령이 우선 - 사거리 밖 적 자동교전으로 이동을 가로채지 않는다 (doc/0383)
 

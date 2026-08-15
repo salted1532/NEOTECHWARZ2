@@ -269,7 +269,11 @@ public class SoundManager : MonoBehaviour
             return false;
 
         if (activeGlobalVoiceSources.TryGetValue(set, out AudioSource activeSource)
-            && activeSource != null && activeSource.isPlaying)
+            && activeSource != null && activeSource.isPlaying
+            // voicePool은 여러 카테고리가 공유하므로, 저장해둔 소스가 재생 중이어도 그 사이 다른
+            // 카테고리가 그 소스를 가로채 재생 중일 수 있다 - 그 경우까지 "이미 재생 중"으로 오판해서
+            // 새 요청을 조용히 스킵해버리는 버그가 있었다(doc/0583). 소스의 현재 소유 카테고리까지 같이 확인한다.
+            && sourceCurrentSet.TryGetValue(activeSource, out SoundClipSet currentOwner) && currentOwner == set)
             return false;
 
         if (minInterval > 0f
@@ -367,10 +371,14 @@ public class SoundManager : MonoBehaviour
         pooled.StartedAt = Time.time;
         source.Play();
 
+        // limitSpam 여부와 무관하게 항상 기록 - PlayGlobalVoice의 dedup 체크가 "이 소스가 지금 어떤
+        // 카테고리를 재생 중인지"를 알아야 하기 때문(doc/0583). 예전엔 limitSpam=true일 때만 기록해서
+        // 나레이션류(PlayGlobalVoice) 호출에는 반영이 안 됐었다.
+        sourceCurrentSet[source] = set;
+
         if (limitSpam)
         {
             lastSfxStartTime[set] = Time.time;
-            sourceCurrentSet[source] = set;
         }
 
         return source;

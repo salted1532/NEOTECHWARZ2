@@ -49,7 +49,7 @@ public class EnemyAttackRange : MonoBehaviour
     // 플레이어/아군 대신 외계종족을 자동교전 대상으로 삼는 용도로 상속해서 쓴다.
     [SerializeField]
     protected string[] targetTags =
-        { "Worker", "AttackUnit", "MainBase", "Tier1", "Tier2", "Tier3", "SupplyDepot", "Lab", "AllyOC" };
+        { "Worker", "AttackUnit", "MainBase", "Tier1", "Tier2", "Tier3", "SupplyDepot", "Lab", "AllyOC", "UnderConstruction" };
 
     private readonly List<GameObject> targetsInRange = new List<GameObject>();
 
