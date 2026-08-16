@@ -1,0 +1,153 @@
+{
+  "ExportTimestamp": "2026-08-16 10:52:20",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "Mission4",
+    "nodeCount": 14,
+    "maxDepth": 5
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "Mission4",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 14,
+        "maxDepth": 5
+      },
+      "roots": [
+        {
+          "name": "Lab",
+          "isActive": true,
+          "components": [],
+          "siblingIndex": 82,
+          "tag": "Lab",
+          "layer": 9,
+          "children": [
+            {
+              "name": "MiniMapIcon",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 9,
+              "children": []
+            },
+            {
+              "name": "TakeOffPos",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "LandingPos",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            },
+            {
+              "name": "DestroyPos",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 9,
+              "children": []
+            },
+            {
+              "name": "HealthBar",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "Canvas",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 6,
+                  "children": [
+                    {
+                      "name": "Slider",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 6,
+                      "children": [
+                        {
+                          "name": "Background",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 6,
+                          "children": []
+                        },
+                        {
+                          "name": "Fill Area",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 1,
+                          "tag": "Untagged",
+                          "layer": 6,
+                          "children": [
+                            {
+                              "name": "Fill",
+                              "isActive": true,
+                              "components": [],
+                              "siblingIndex": 0,
+                              "tag": "Untagged",
+                              "layer": 6,
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Marker",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": [
+                {
+                  "name": "Circle Select",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "struct_Research_Lab_A_yup",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 0,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
