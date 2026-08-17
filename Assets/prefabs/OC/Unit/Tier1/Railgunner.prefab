@@ -405,6 +405,8 @@ MonoBehaviour:
   airGroundLayer:
     serializedVersion: 2
     m_Bits: 0
+  airUnitRadius: 0.6
+  airSeparationSpeed: 4
   timeBetweenAttacks: 1
 --- !u!114 &7893471312712258934
 MonoBehaviour:
@@ -703,8 +705,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Banana Man
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    - target: {fileID: 1607647523653966500, guid: b86238a05e7805944913facf7e441daf, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 1607647523653966500, guid: b86238a05e7805944913facf7e441daf, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 594429788317541278, guid: b86238a05e7805944913facf7e441daf, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 532696864729194525, guid: b86238a05e7805944913facf7e441daf, type: 3}
       insertIndex: -1

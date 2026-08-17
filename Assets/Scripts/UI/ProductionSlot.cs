@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,6 +11,8 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 {
     [SerializeField] private Button button;
     [SerializeField] private Image iconImage;
+    [SerializeField] private TMP_Text shortcutKeyText; // 슬롯 단축키 표시용 (예: KeyCode.Y → "Y") - 비워두면 자식에서 자동 탐색
+    [SerializeField] private TMP_Text healthText; // Squad_panel 전용: "현재체력/최대체력" 표시 - 비워두면 자식에서 자동 탐색
 
     // 쿨다운 중인 스킬 버튼 위에 겹쳐서 시계처럼 줄어드는 원형 오버레이 (doc/0323 후속) - 비워두면 아무 효과도 없음.
     // 인스펙터에서 Image Type을 Filled/Fill Method를 Radial 360으로 설정해두면 SetCooldownFill()이 fillAmount만 갱신한다.
@@ -20,6 +23,7 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     private UIController.CommandButtonData data;
     private bool hasData;
     private KeyCode shortcut = KeyCode.None; // 이 슬롯을 대신 "누르는" 키보드 단축키 (없으면 KeyCode.None)
+    private HealthManager boundHealth; // Squad_panel에서 이 슬롯이 지금 구독 중인 유닛/건물의 체력 (없으면 null)
 
     // 슬롯 6/7처럼 여러 시스템(스킬/일꾼 Build/랠리)이 겸용하는 슬롯에서, 새 데이터를 쓰기 전에
     // 이미 다른 버튼이 남아있는지 확인하는 진단용 (doc/0368).
@@ -45,6 +49,31 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
         if (iconImage == null)
             iconImage = GetComponentInChildren<Image>(true);
+
+        // 슬롯 종류마다 있는 TMP_Text 자식이 다르므로(OrderButtons=shortcut_key_Text, Squad=health_Text)
+        // 타입 검색이 아니라 이름으로 찾아야 서로 잘못 연결되지 않는다.
+        if (shortcutKeyText == null)
+        {
+            Transform t = transform.Find("shortcut_key_Text");
+            if (t != null) shortcutKeyText = t.GetComponent<TMP_Text>();
+        }
+
+        if (healthText == null)
+        {
+            Transform t = transform.Find("health_Text");
+            if (t != null) healthText = t.GetComponent<TMP_Text>();
+        }
+
+        if (shortcutKeyText != null)
+            shortcutKeyText.color = Color.yellow;
+
+        // 체력이 커져서(예: 10000/10000) 박스 폭을 넘으면 줄바꿈되는 대신, TMP 자동 크기 조절로 한 줄에 맞게 폰트를 줄인다.
+        if (healthText != null)
+        {
+            healthText.enableAutoSizing = true;
+            healthText.fontSizeMax = healthText.fontSize;
+            healthText.fontSizeMin = 1f;
+        }
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OnClick);
@@ -72,12 +101,52 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             iconImage.enabled = data.Icon != null;
         }
 
+        if (shortcutKeyText != null)
+            shortcutKeyText.text = shortcut != KeyCode.None ? shortcut.ToString() : string.Empty;
+
         if (button != null)
         {
             button.interactable =
                 data.Interactable &&
                 data.Callback != null;
         }
+    }
+
+    /// <summary>
+    /// Squad_panel 전용: 이 슬롯의 체력 텍스트를 지정한 HealthManager에 구독시킨다 (null이면 구독 해제만 함).
+    /// 이미 같은 대상을 구독 중이면 아무 것도 하지 않는다.
+    /// </summary>
+    public void BindHealth(HealthManager health)
+    {
+        if (boundHealth == health)
+            return;
+
+        if (boundHealth != null)
+            boundHealth.OnHealthChanged -= UpdateHealthText;
+
+        boundHealth = health;
+
+        if (boundHealth != null)
+        {
+            boundHealth.OnHealthChanged += UpdateHealthText;
+            UpdateHealthText(boundHealth.GetHealth(), boundHealth.GetMaxHealth());
+        }
+        else if (healthText != null)
+        {
+            healthText.text = string.Empty;
+        }
+    }
+
+    // 비율(현재/최대) 기준 3구간: >2/3 초록, 2/3~1/3 노랑, ≤1/3 빨강.
+    private void UpdateHealthText(int currentHp, int maxHealth)
+    {
+        if (healthText == null)
+            return;
+
+        healthText.text = $"{currentHp}/{maxHealth}";
+
+        float ratio = maxHealth > 0 ? (float)currentHp / maxHealth : 0f;
+        healthText.color = ratio > 2f / 3f ? Color.green : ratio > 1f / 3f ? Color.yellow : Color.red;
     }
 
     /// <summary>
@@ -88,6 +157,7 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         callback = null;
         hasData = false;
         shortcut = KeyCode.None;
+        BindHealth(null); // 재사용/비활성화 시 이전 유닛의 체력 구독을 반드시 해제 (안 그러면 죽은/교체된 유닛 이벤트가 계속 이 슬롯을 갱신함)
 
         // 비활성화(SetActive(false))로는 OnPointerExit이 호출되지 않아 isHovered가 true로 남는다.
         // 이 슬롯이 나중에 다른 커맨드로 재활용(SetData)되면, 마우스가 실제로 그 위에 없는데도
@@ -104,6 +174,9 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
             iconImage.sprite = null;
             iconImage.enabled = false;
         }
+
+        if (shortcutKeyText != null)
+            shortcutKeyText.text = string.Empty;
 
         if (button != null)
             button.interactable = false;

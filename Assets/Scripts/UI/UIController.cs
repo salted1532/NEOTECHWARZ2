@@ -989,6 +989,7 @@ public class UIController : MonoBehaviour
                         () => squadOnCtrlClickUnit(unit),
                         GetUnitDisplayName(unit),
                         LocalizationManager.GetText("squad.unittooltip"))));
+                squadSlots[i].BindHealth(unit.GetHealthManager());
             }
             else
             {
@@ -1070,6 +1071,7 @@ public class UIController : MonoBehaviour
                         () => squadOnCtrlClickBuilding(building),
                         LocalizationManager.GetText("squad.buildingtitle"),
                         LocalizationManager.GetText("squad.buildingtooltip"))));
+                squadSlots[i].BindHealth(building.GetHealthManager());
             }
             else
             {
