@@ -734,7 +734,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -55.47405}
   m_SizeDelta: {x: -100, y: -100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &171665192
@@ -3340,26 +3340,52 @@ MonoBehaviour:
     missionNumber: 0
     missionName: Boot Camp
     sceneName: Mission0
+    isSubMission: 0
   - button: {fileID: 44041237}
     missionNumber: 1
     missionName: Border Conflict
     sceneName: Mission1
+    isSubMission: 0
   - button: {fileID: 1012813691}
     missionNumber: 2
     missionName: Unknown Signal
     sceneName: Mission2
+    isSubMission: 0
   - button: {fileID: 754913981}
     missionNumber: 3
     missionName: Invasion
     sceneName: Mission3
+    isSubMission: 0
   - button: {fileID: 1080224196}
     missionNumber: 4
     missionName: United Front
     sceneName: Mission4
+    isSubMission: 0
   - button: {fileID: 627274879}
     missionNumber: 5
     missionName: Final Offensive
     sceneName: Mission5
+    isSubMission: 0
+  - button: {fileID: 916184145}
+    missionNumber: 1
+    missionName: Flanking Strike
+    sceneName: Sub_Mission1
+    isSubMission: 1
+  - button: {fileID: 146840135}
+    missionNumber: 2
+    missionName: Wreckage Search
+    sceneName: Sub_Mission2
+    isSubMission: 1
+  - button: {fileID: 1670081005}
+    missionNumber: 3
+    missionName: Search & Rescue Detachment
+    sceneName: Sub_Mission3
+    isSubMission: 1
+  - button: {fileID: 225882557}
+    missionNumber: 4
+    missionName: Last Line of Defense
+    sceneName: Sub_Mission4
+    isSubMission: 1
   backToMainMenuButton: {fileID: 26228417}
   mainMenuSceneName: MainScene
   unlockAllMissionButton: {fileID: 1297760229}

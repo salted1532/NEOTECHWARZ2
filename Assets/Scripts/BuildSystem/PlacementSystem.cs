@@ -44,6 +44,8 @@ public class PlacementSystem : MonoBehaviour
     [Header("시작 위치")]
     [Tooltip("게임 시작 시 메인기지(커맨드센터)를 그리드에 맞춰 즉시 생성할 위치. 빈 오브젝트를 씬에 배치해서 연결.")]
     [SerializeField] private GameObject startPoint;
+    [Tooltip("게임 시작 시 startPoint 위치에 메인기지를 자동 스폰할지 여부. 유닛 조종만 있는 미션 등에서는 꺼둔다.")]
+    [SerializeField] private bool spawnStartingMainBase = true;
 
     // ===== 건물 리프트 이동(착륙 위치 선택) =====
     private BuildingController relocatingBuilding; // 현재 착륙 위치를 고르는 중인 건물(없으면 null)
@@ -69,7 +71,7 @@ public class PlacementSystem : MonoBehaviour
     // 다른 배치와 동일하게 그리드에 등록한다(리프트 이동을 위한 gridPosition도 함께 설정됨).
     private void SpawnStartingMainBase()
     {
-        if (startPoint == null)
+        if (!spawnStartingMainBase || startPoint == null)
             return;
 
         int index = database.buildingData.FindIndex(d => d.ID == RTSUnitController.BuildingID.CommandCenter);

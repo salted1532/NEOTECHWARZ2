@@ -13,9 +13,10 @@ using UnityEngine.UI;
 public class MissionSelectEntry
 {
     public Button button;
-    public int missionNumber;
+    public int missionNumber; // 서브미션은 같이 병행되는 본편 미션 번호를 그대로 써서 해금 상태를 공유한다
     public string missionName;
     public string sceneName; // SceneManager.LoadScene에 넘길 씬 이름 (예: "Mission0")
+    public bool isSubMission; // true면 이름/툴팁 부제 조회 시 "missionselect.name.sub{missionNumber}" 등 서브미션 전용 키를 쓴다
 }
 
 public class MissionSelectManager : MonoBehaviour
@@ -154,8 +155,12 @@ public class MissionSelectManager : MonoBehaviour
             // &lt;/&gt;는 이 프로젝트의 TMP 설정에서 디코딩되지 않고 글자 그대로 찍혀서(doc/0490
             // 확인) 리터럴 "<"/">"로 되돌림 - "Boot Camp>" 같은 유효하지 않은 태그는 TMP가 그냥
             // 일반 텍스트로 그려주므로 실제로는 이스케이프 없이도 안전하다.
-            string missionName = LocalizationManager.GetTextOrFallback($"missionselect.name.{entry.missionNumber}", entry.missionName);
-            TooltipUI.Instance?.Show(rect, $"<{missionName}>", LocalizationManager.GetText("missionselect.tooltip.subtitle", entry.missionNumber));
+            string nameKey = entry.isSubMission ? $"missionselect.name.sub{entry.missionNumber}" : $"missionselect.name.{entry.missionNumber}";
+            string subtitleKey = entry.isSubMission ? "missionselect.tooltip.subtitle.sub" : "missionselect.tooltip.subtitle";
+            string missionName = LocalizationManager.GetTextOrFallback(nameKey, entry.missionName);
+            string subtitle = LocalizationManager.GetText(subtitleKey, entry.missionNumber);
+            string planetName = LocalizationManager.GetText($"missionselect.planet.{entry.missionNumber}");
+            TooltipUI.Instance?.Show(rect, $"<{missionName}>", $"{subtitle} · {planetName}");
         });
         trigger.triggers.Add(enterEntry);
 

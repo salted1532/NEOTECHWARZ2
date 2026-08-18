@@ -40,6 +40,18 @@ public class EnemySpawnPoint
     public EnemyBuildingController productionBuilding;
 }
 
+// spawnPoints/rallyPoint를 방향(레인) 단위로 묶은 세트. 웨이브가 waveIndex 순서대로 이 레인들을
+// 라운드로빈으로 골라 그 레인 전용 스폰 지점에서 생산하고 그 레인 전용 rallyPoint에 집결한다(doc/0610).
+[System.Serializable]
+public class AttackLane
+{
+    public List<EnemySpawnPoint> spawnPoints; // 이 레인 전용 스폰 지점(+생산 건물) - 비워두면 이 레인은 생산 불가
+    public Transform rallyPoint; // 이 레인 전용 집결지 - 비워두면 spawnPoints[0] 위치를 집결지로 사용
+
+    [Header("<디버그> 이 레인의 현재 웨이브 병력")]
+    public List<EnemyUnitController> garrison = new List<EnemyUnitController>();
+}
+
 // 미션 씬에 적 기지 하나당 하나씩 배치하는 "AI 관제소". 시간에 맞춰 공격 웨이브를 보내고, 점령지에
 // 별동대를 보내고, 기지가 공격받으면 병력을 소집하고, 죽은 유닛을 보충 생산한다 (doc/0532 설계안).
 public class EnemyAIDirector : MonoBehaviour
@@ -134,6 +146,9 @@ public class EnemyAIDirector : MonoBehaviour
     [SerializeField] private Transform rallyPoint; // 비워두면 spawnPoints[0] 위치를 집결지로 사용(doc/0544)
     [SerializeField] private float rallyRadius = 3f;
     [SerializeField] private float rallyTimeout = 15f;
+
+    [Header("<공통> 공격 방향(레인) - 2개 이상 두면 웨이브가 waveIndex 순서대로 이 레인들을 번갈아가며(라운드로빈) 사용해 그 레인 전용 스폰 지점에서 생산하고 그 레인 전용 rallyPoint에 집결한 뒤 출발한다. 비워두면 위 spawnPoints/rallyPoint/garrison으로 구성된 단일 레인 1개로 그대로 동작한다(doc/0610).")]
+    [SerializeField] private List<AttackLane> attackLanes;
 
     [Header("<공통> 수비대 유지")]
     [SerializeField] private float reinforceCheckInterval = 20f;
@@ -249,7 +264,16 @@ public class EnemyAIDirector : MonoBehaviour
         public bool IsAvailable => !hasProductionBuilding || spawnPoint.productionBuilding != null;
     }
 
-    private readonly List<SpawnQueue> spawnQueues = new List<SpawnQueue>();
+    // 레인(AttackLane) 하나의 런타임 상태 - 그 레인 소속 스폰 지점들의 생산 대기열만 담는다. 웨이브
+    // 병력 풀(garrison)은 AttackLane 자신에 있는 직렬화 필드를 그대로 쓴다(인스펙터에서 레인별로
+    // 바로 확인 가능, doc/0610).
+    private class LaneRuntime
+    {
+        public AttackLane config;
+        public readonly List<SpawnQueue> spawnQueues = new List<SpawnQueue>();
+    }
+
+    private readonly List<LaneRuntime> lanes = new List<LaneRuntime>();
 
     // 배치형 방어 유닛 슬롯 - Start() 시점의 위치/방향/종류를 기억해뒀다가, 그 유닛이 죽으면(current ==
     // null) 같은 자리에 같은 종류로 다시 세운다(doc/0552) - 단, 대체 생산은 슬롯당 1회뿐이라 그 대체
@@ -321,12 +345,26 @@ public class EnemyAIDirector : MonoBehaviour
     {
         rtsController = FindFirstObjectByType<RTSUnitController>();
 
-        foreach (EnemySpawnPoint sp in spawnPoints)
-        {
-            if (sp == null || sp.point == null)
-                continue;
+        // attackLanes를 안 쓰면(기본값) 기존 spawnPoints/rallyPoint/garrison 3개를 그대로 묶어 레인
+        // 1개로 취급한다 - 이 프로젝트의 다른 모든 미션(레인 미설정)이 지금과 100% 동일하게 동작하도록
+        // 하는 하위 호환 경로(doc/0610).
+        List<AttackLane> configuredLanes = attackLanes.Count > 0
+            ? attackLanes
+            : new List<AttackLane> { new AttackLane { spawnPoints = spawnPoints, rallyPoint = rallyPoint, garrison = garrison } };
 
-            spawnQueues.Add(new SpawnQueue { spawnPoint = sp, hasProductionBuilding = sp.productionBuilding != null });
+        foreach (AttackLane lane in configuredLanes)
+        {
+            LaneRuntime rt = new LaneRuntime { config = lane };
+
+            foreach (EnemySpawnPoint sp in lane.spawnPoints)
+            {
+                if (sp == null || sp.point == null)
+                    continue;
+
+                rt.spawnQueues.Add(new SpawnQueue { spawnPoint = sp, hasProductionBuilding = sp.productionBuilding != null });
+            }
+
+            lanes.Add(rt);
         }
 
         // Start() 시점(이 director가 아직 아무것도 생산하기 전)에 씬에 이미 존재하는 적 유닛은 전부
@@ -347,8 +385,10 @@ public class EnemyAIDirector : MonoBehaviour
         }
         RefreshDefenseUnitsDebugList();
 
-        FillPool(garrison, CurrentWaveComposition());
-        FillPool(raidGarrison, RaidSquadComposition);
+        LaneRuntime firstLane = CurrentLane();
+        if (firstLane != null)
+            FillPool(firstLane.config.garrison, CurrentWaveComposition(), firstLane.spawnQueues);
+        FillPool(raidGarrison, RaidSquadComposition, AllSpawnQueues());
 
         if (waveTimes.Count > 0)
             StartCoroutine(AttackWaveRoutine());
@@ -365,48 +405,51 @@ public class EnemyAIDirector : MonoBehaviour
         attackTargetCandidates.Clear();
         attackTargetCandidates.AddRange(GetMainBaseCandidates());
 
-        foreach (SpawnQueue sq in spawnQueues)
+        foreach (LaneRuntime rt in lanes)
         {
-            if (!sq.IsAvailable)
+            foreach (SpawnQueue sq in rt.spawnQueues)
             {
-                // 생산 건물이 파괴돼 취소되는 주문 중 방어 슬롯용이 있으면 pendingProduction을 풀어줘야
-                // ReplenishDeadDefenseSlots가 다음 주기에 다른 스폰 지점으로 다시 주문한다(doc/0582).
-                foreach (EnemyProductionOrder order in sq.orders)
-                    if (order.targetSlot != null)
-                        order.targetSlot.pendingProduction = false;
-
-                sq.orders.Clear();
-                continue;
-            }
-
-            if (sq.orders.Count == 0)
-                continue;
-
-            EnemyProductionOrder front = sq.orders[0];
-            front.remainTime -= Time.deltaTime;
-            if (front.remainTime > 0f)
-                continue;
-
-            sq.orders.RemoveAt(0);
-
-            UnitData data = rtsController != null ? rtsController.GetEnemyUnitData(front.unitID) : null;
-            if (data == null || data.Prefab == null)
-                continue;
-
-            GameObject spawned = Instantiate(data.Prefab, sq.spawnPoint.point.position, sq.spawnPoint.point.rotation);
-            if (spawned.TryGetComponent<EnemyUnitController>(out EnemyUnitController unit))
-            {
-                if (front.targetSlot != null) // 방어 슬롯용 - 원래 있던 위치로 이동(doc/0582)
+                if (!sq.IsAvailable)
                 {
-                    front.targetSlot.current = unit;
-                    front.targetSlot.respawned = true;
-                    front.targetSlot.pendingProduction = false;
-                    unit.MoveTo(front.targetSlot.position);
+                    // 생산 건물이 파괴돼 취소되는 주문 중 방어 슬롯용이 있으면 pendingProduction을 풀어줘야
+                    // ReplenishDeadDefenseSlots가 다음 주기에 다른 스폰 지점으로 다시 주문한다(doc/0582).
+                    foreach (EnemyProductionOrder order in sq.orders)
+                        if (order.targetSlot != null)
+                            order.targetSlot.pendingProduction = false;
+
+                    sq.orders.Clear();
+                    continue;
                 }
-                else
+
+                if (sq.orders.Count == 0)
+                    continue;
+
+                EnemyProductionOrder front = sq.orders[0];
+                front.remainTime -= Time.deltaTime;
+                if (front.remainTime > 0f)
+                    continue;
+
+                sq.orders.RemoveAt(0);
+
+                UnitData data = rtsController != null ? rtsController.GetEnemyUnitData(front.unitID) : null;
+                if (data == null || data.Prefab == null)
+                    continue;
+
+                GameObject spawned = Instantiate(data.Prefab, sq.spawnPoint.point.position, sq.spawnPoint.point.rotation);
+                if (spawned.TryGetComponent<EnemyUnitController>(out EnemyUnitController unit))
                 {
-                    front.destinationPool.Add(unit);
-                    unit.MoveTo(DefaultRallyPosition()); // 생산되자마자 집결지로 - 웨이브/별동대 공통(doc/0545)
+                    if (front.targetSlot != null) // 방어 슬롯용 - 원래 있던 위치로 이동(doc/0582)
+                    {
+                        front.targetSlot.current = unit;
+                        front.targetSlot.respawned = true;
+                        front.targetSlot.pendingProduction = false;
+                        unit.MoveTo(front.targetSlot.position);
+                    }
+                    else
+                    {
+                        front.destinationPool.Add(unit);
+                        unit.MoveTo(LaneRallyPosition(rt)); // 생산되자마자 그 레인의 집결지로 - 웨이브/별동대 공통(doc/0545, doc/0610)
+                    }
                 }
             }
         }
@@ -427,10 +470,19 @@ public class EnemyAIDirector : MonoBehaviour
             if (IsPlayerDefeated())
                 yield break; // 더 공격할 대상이 없음 - 웨이브 스케줄 보류(doc/0547)
 
-            yield return WaitUntilReady(garrison, CurrentWaveComposition());
-            yield return LaunchWave(); // doc/0560: 별동대가 전멸할 때까지 여기서 대기 (구 doc/0534 결정 번복)
+            // waveIndex % 레인 개수로 이번 웨이브가 쓸 레인을 라운드로빈으로 고른다(doc/0610) - 레인이
+            // 1개(기존 미션)면 항상 그 레인 하나만 고르므로 지금과 동일하게 동작한다.
+            LaneRuntime lane = CurrentLane();
+            if (lane == null)
+                yield break; // 레인 구성이 하나도 없음(스폰 지점 미설정) - 더 진행 불가
+
+            yield return WaitUntilReady(lane.config.garrison, CurrentWaveComposition());
+            yield return LaunchWave(lane); // doc/0560: 별동대가 전멸할 때까지 여기서 대기 (구 doc/0534 결정 번복)
         }
     }
+
+    // 이번 웨이브가 쓸 레인 - waveIndex 순서대로 lanes를 라운드로빈으로 순회한다(doc/0610).
+    private LaneRuntime CurrentLane() => lanes.Count > 0 ? lanes[waveIndex % lanes.Count] : null;
 
     // waveTimes[index] 기준 이번 사이클의 대기 시간 - 리스트를 넘어서면 마지막 두 항목 간격을 반복한다
     // (doc/0532 결정 사항 #2와 동일한 간격 규칙). doc/0560부터는 이 간격을 미션 시작 시각이 아니라
@@ -487,17 +539,17 @@ public class EnemyAIDirector : MonoBehaviour
         return true;
     }
 
-    private IEnumerator LaunchWave()
+    private IEnumerator LaunchWave(LaneRuntime lane)
     {
         List<UnitGroup> composition = CurrentWaveComposition();
         waveIndex++;
 
-        List<EnemyUnitController> squad = TakeSquad(garrison, composition);
+        List<EnemyUnitController> squad = TakeSquad(lane.config.garrison, composition);
         if (squad.Count == 0)
             yield break;
 
         if (AssembleBeforeAttack)
-            yield return AssembleAtRally(squad);
+            yield return AssembleAtRally(squad, LaneRallyPosition(lane));
 
         // doc/0560: fire-and-forget이던 것을 직접 대기로 바꿔 AttackWaveRoutine이 전멸까지 기다리게 한다
         // (구 doc/0534 결정 번복 - "전멸해야 다음 웨이브 타이머가 돈다" 요청 반영).
@@ -587,21 +639,19 @@ public class EnemyAIDirector : MonoBehaviour
         return candidates;
     }
 
-    // 인스펙터에 rallyPoint를 안 넣었을 때의 기본 집결지 - 첫 스폰 지점, 그마저 없으면 이 오브젝트의
-    // 위치(doc/0544, spawnPoint가 리스트로 바뀌며 갱신).
-    private Vector3 DefaultRallyPosition()
+    // 그 레인의 집결지 - 레인에 rallyPoint를 안 넣었을 때의 기본값은 그 레인의 첫 스폰 지점, 그마저
+    // 없으면 이 오브젝트의 위치(doc/0544의 규칙을 레인 단위로 그대로 적용, doc/0610).
+    private Vector3 LaneRallyPosition(LaneRuntime lane)
     {
-        if (rallyPoint != null)
-            return rallyPoint.position;
-        if (spawnPoints.Count > 0 && spawnPoints[0].point != null)
-            return spawnPoints[0].point.position;
+        if (lane.config.rallyPoint != null)
+            return lane.config.rallyPoint.position;
+        if (lane.config.spawnPoints.Count > 0 && lane.config.spawnPoints[0].point != null)
+            return lane.config.spawnPoints[0].point.position;
         return transform.position;
     }
 
-    private IEnumerator AssembleAtRally(List<EnemyUnitController> squad)
+    private IEnumerator AssembleAtRally(List<EnemyUnitController> squad, Vector3 rally)
     {
-        Vector3 rally = DefaultRallyPosition();
-
         foreach (EnemyUnitController unit in squad)
             if (unit != null)
                 unit.MoveTo(rally);
@@ -717,19 +767,24 @@ public class EnemyAIDirector : MonoBehaviour
         {
             yield return wait;
 
-            garrison.RemoveAll(u => u == null);
+            foreach (LaneRuntime rt in lanes)
+                rt.config.garrison.RemoveAll(u => u == null);
             raidGarrison.RemoveAll(u => u == null);
             currentRaidSquad.RemoveAll(u => u == null);
             deployed.RemoveWhere(u => u == null);
 
-            // 다음에 나갈 웨이브(아직 발사 안 한 waveIndex)의 구성을 미리 갖춰둔다 - 웨이브가 실제로
-            // 발사되는 순간 그제서야 생산을 시작하면 시간이 안 맞으므로 항상 선제적으로 채워둔다.
-            FillPool(garrison, CurrentWaveComposition());
+            // 다음에 나갈 웨이브(아직 발사 안 한 waveIndex)가 쓸 레인만 미리 채워둔다 - 웨이브가 실제로
+            // 발사되는 순간 그제서야 생산을 시작하면 시간이 안 맞으므로 항상 선제적으로 채워둔다. 아직
+            // 차례가 안 된 다른 레인은 건드리지 않는다(doc/0610).
+            LaneRuntime nextLane = CurrentLane();
+            if (nextLane != null)
+                FillPool(nextLane.config.garrison, CurrentWaveComposition(), nextLane.spawnQueues);
 
             // 별동대는 전멸했을 때만 다음 편성을 미리 생산한다(doc/0549) - 살아있는 동안은 생산하지
             // 않음(스폰 지점 생산 대기열을 garrison과 공유하므로, 안 쓰는 예비 별동대에 낭비하지 않음).
+            // 레인 개념과 무관하게 모든 레인의 스폰 지점을 합친 전체 풀에서 생산한다(doc/0610).
             if (currentRaidSquad.Count == 0)
-                FillPool(raidGarrison, RaidSquadComposition);
+                FillPool(raidGarrison, RaidSquadComposition, AllSpawnQueues());
 
             ReplenishDeadDefenseSlots();
 
@@ -778,18 +833,19 @@ public class EnemyAIDirector : MonoBehaviour
     }
 
     // composition이 요구하는 유닛 종류별 개수(보유 + 이미 생산 대기열에 들어간 수)가 못 미치면 부족한
-    // 만큼 생산을 주문한다(doc/0544) - 예전처럼 즉시 Instantiate하지 않고, 스폰 지점 중 대기열이 가장
-    // 덜 찬 곳에 자동 분산된다(LeastLoadedQueue).
-    private void FillPool(List<EnemyUnitController> pool, List<UnitGroup> composition)
+    // 만큼 생산을 주문한다(doc/0544) - 예전처럼 즉시 Instantiate하지 않고, queues 중 대기열이 가장
+    // 덜 찬 곳에 자동 분산된다(LeastLoadedQueue). queues는 웨이브 풀이면 그 레인 소속만, 별동대/방어
+    // 슬롯 풀이면 전체 레인을 합친 것을 넘긴다(doc/0610).
+    private void FillPool(List<EnemyUnitController> pool, List<UnitGroup> composition, List<SpawnQueue> queues)
     {
         pool.RemoveAll(u => u == null);
 
         foreach (UnitGroup group in composition)
         {
-            int have = AvailableCount(pool, group.unitID) + PendingCount(group.unitID, pool);
+            int have = AvailableCount(pool, group.unitID) + PendingCount(group.unitID, pool, queues);
 
             for (int i = have; i < group.count; i++)
-                EnqueueProduction(group.unitID, pool);
+                EnqueueProduction(group.unitID, pool, queues);
         }
     }
 
@@ -807,26 +863,26 @@ public class EnemyAIDirector : MonoBehaviour
 
     // 이미 생산 대기열에 들어가 있어 완성을 기다리는 중인, 같은 목적지(pool) 행 unitID 개수 - 이걸
     // 안 세면 ReinforceRoutine이 돌 때마다 같은 부족분을 중복 주문하게 된다.
-    private int PendingCount(int unitID, List<EnemyUnitController> destinationPool)
+    private int PendingCount(int unitID, List<EnemyUnitController> destinationPool, List<SpawnQueue> queues)
     {
         int count = 0;
-        foreach (SpawnQueue sq in spawnQueues)
+        foreach (SpawnQueue sq in queues)
             foreach (EnemyProductionOrder order in sq.orders)
                 if (order.unitID == unitID && order.destinationPool == destinationPool)
                     count++;
         return count;
     }
 
-    private void EnqueueProduction(int unitID, List<EnemyUnitController> destinationPool) =>
-        EnqueueOrder(unitID, destinationPool, null);
+    private void EnqueueProduction(int unitID, List<EnemyUnitController> destinationPool, List<SpawnQueue> queues) =>
+        EnqueueOrder(unitID, destinationPool, null, queues);
 
     // 방어 슬롯 대체 생산 주문(doc/0582) - 쓸 수 있는 스폰 지점이 없으면 주문을 못 넣고 false를
     // 반환하므로, 호출부(ReplenishDeadDefenseSlots)가 pendingProduction을 세우지 않고 다음 주기에
-    // 다시 시도한다.
+    // 다시 시도한다. 레인과 무관하게 전체 스폰 지점을 대상으로 한다(doc/0610).
     private bool EnqueueDefenseProduction(DefenseSlot slot) =>
-        EnqueueOrder(slot.unitID, null, slot);
+        EnqueueOrder(slot.unitID, null, slot, AllSpawnQueues());
 
-    private bool EnqueueOrder(int unitID, List<EnemyUnitController> destinationPool, DefenseSlot targetSlot)
+    private bool EnqueueOrder(int unitID, List<EnemyUnitController> destinationPool, DefenseSlot targetSlot, List<SpawnQueue> queues)
     {
         if (rtsController == null)
             return false;
@@ -835,7 +891,7 @@ public class EnemyAIDirector : MonoBehaviour
         if (data == null || data.Prefab == null)
             return false;
 
-        SpawnQueue sq = LeastLoadedQueue();
+        SpawnQueue sq = LeastLoadedQueue(queues);
         if (sq == null)
             return false; // 쓸 수 있는 스폰 지점이 하나도 없음(전부 파괴됐거나 애초에 없음)
 
@@ -850,14 +906,24 @@ public class EnemyAIDirector : MonoBehaviour
         return true;
     }
 
+    // 모든 레인의 스폰 지점 생산 대기열을 합친 목록 - 레인 개념과 무관한 별동대/방어 슬롯 생산에
+    // 쓴다(doc/0610). 레인이 1개(기존 미션)면 기존 spawnQueues와 동일한 목록이 된다.
+    private List<SpawnQueue> AllSpawnQueues()
+    {
+        List<SpawnQueue> all = new List<SpawnQueue>();
+        foreach (LaneRuntime rt in lanes)
+            all.AddRange(rt.spawnQueues);
+        return all;
+    }
+
     // 사용 가능한(IsAvailable) 스폰 지점 중 남은 생산 시간의 합이 가장 적은 곳을 고른다(doc/0544) -
     // 유닛마다 생산 시간이 달라서 개수가 아니라 시간 합으로 비교해야 실제로 고르게 분산된다.
-    private SpawnQueue LeastLoadedQueue()
+    private SpawnQueue LeastLoadedQueue(List<SpawnQueue> queues)
     {
         SpawnQueue best = null;
         float bestLoad = float.MaxValue;
 
-        foreach (SpawnQueue sq in spawnQueues)
+        foreach (SpawnQueue sq in queues)
         {
             if (!sq.IsAvailable)
                 continue;
