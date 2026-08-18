@@ -179,6 +179,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Worker Drone (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -195,6 +199,10 @@ PrefabInstance:
     - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_Name
       value: Cyborg Soldier (Rescue) (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6563818054817573819, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -260,60 +268,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e55b8c94a329a95478dc0d84b9da84fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitController
---- !u!21 &78622185
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Universal Render Pipeline/Unlit
-  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
-    - _AlphaToMask: 0
-    - _Blend: 0
-    - _BlendOp: 0
-    - _Cull: 2
-    - _Cutoff: 0.5
-    - _DstBlend: 0
-    - _DstBlendAlpha: 0
-    - _QueueOffset: 0
-    - _SampleGI: 0
-    - _SrcBlend: 1
-    - _SrcBlendAlpha: 1
-    - _Surface: 0
-    - _XRMotionVectorsPass: 1
-    - _ZWrite: 1
-    m_Colors:
-    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
-    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1001 &109882372
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -374,6 +328,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (31)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -390,6 +348,10 @@ PrefabInstance:
     - target: {fileID: 788987118284955716, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
       propertyPath: m_Name
       value: Heavy Assault Tank (Rescue) (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 788987118284955716, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4385558407966090285, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
       propertyPath: m_AnchorMax.x
@@ -515,6 +477,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ripfang (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -579,6 +545,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
       propertyPath: m_Name
       value: Spitter (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -645,6 +615,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ripfang (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -709,6 +683,10 @@ PrefabInstance:
     - target: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
       propertyPath: m_Name
       value: Spawning Pit (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -791,6 +769,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (27)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -855,6 +837,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
       propertyPath: m_Name
       value: Spitter
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -921,6 +907,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spawning Pit (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -986,6 +976,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (11)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1042,6 +1036,10 @@ PrefabInstance:
     - target: {fileID: 5591001881842621956, guid: 2018f98e4c9b8af4db70b06ea1f9b92e, type: 3}
       propertyPath: m_Name
       value: Beacon (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591001881842621956, guid: 2018f98e4c9b8af4db70b06ea1f9b92e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1113,6 +1111,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Worker Drone (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1178,6 +1180,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1227,6 +1233,60 @@ MonoBehaviour:
   m_Script: {fileID: 1237408612}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerritoryZonePin
+--- !u!21 &319133763
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Universal Render Pipeline/Unlit
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddPrecomputedVelocity: 0
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _BlendOp: 0
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
+    - _QueueOffset: 0
+    - _SampleGI: 0
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _Surface: 0
+    - _XRMotionVectorsPass: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
+    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1001 &330907164
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1278,6 +1338,10 @@ PrefabInstance:
     - target: {fileID: 7636683964052424660, guid: de4ee2a279dcb914b9bf5c3524d5df45, type: 3}
       propertyPath: m_Name
       value: SupplyDepot
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: de4ee2a279dcb914b9bf5c3524d5df45, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8329755037710321731, guid: de4ee2a279dcb914b9bf5c3524d5df45, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1347,6 +1411,10 @@ PrefabInstance:
     - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_Name
       value: Cyborg Soldier (Rescue) (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6563818054817573819, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1472,6 +1540,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Worker Drone (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1537,6 +1609,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Worker Drone
       objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1553,6 +1629,10 @@ PrefabInstance:
     - target: {fileID: 2836215906356739008, guid: 3baafe24560c6574bbe17a6d79a8a800, type: 3}
       propertyPath: m_Name
       value: Mission_Sub3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2836215906356739008, guid: 3baafe24560c6574bbe17a6d79a8a800, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3717143254002185794, guid: 3baafe24560c6574bbe17a6d79a8a800, type: 3}
       propertyPath: m_LocalScale.x
@@ -1649,7 +1729,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 1
   m_VoxelSize: 0.0312
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 6228d6e3b93ac75428daf207b8ad961d, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 13136037553854845b78f99255b80abb, type: 2}
   m_BuildHeightMesh: 1
 --- !u!1 &477608888
 GameObject:
@@ -1755,6 +1835,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (12)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1819,6 +1903,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
       propertyPath: m_Name
       value: Spitter (18)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1885,6 +1973,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ripfang (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1949,6 +2041,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
       propertyPath: m_Name
       value: Ripfang (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2015,6 +2111,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (32)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2080,6 +2180,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (21)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2096,6 +2200,10 @@ PrefabInstance:
     - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_Name
       value: Cyborg Soldier (Rescue)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6563818054817573819, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2173,6 +2281,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Heavy Assault Tank (Rescue)
       objectReference: {fileID: 0}
+    - target: {fileID: 788987118284955716, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4385558407966090285, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -2248,6 +2360,10 @@ PrefabInstance:
     - target: {fileID: 6966058185439994461, guid: 0a307cf172aae0148823bb16bcb6cf05, type: 3}
       propertyPath: m_Name
       value: Resource (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6966058185439994461, guid: 0a307cf172aae0148823bb16bcb6cf05, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7743585502521440122, guid: 0a307cf172aae0148823bb16bcb6cf05, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2354,6 +2470,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2418,6 +2538,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
       propertyPath: m_Name
       value: Spitter (17)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2487,6 +2611,10 @@ PrefabInstance:
     - target: {fileID: 2360879184729991461, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: m_Name
       value: GameManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 2360879184729991461, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5601079116767776864, guid: b2e95921e88a13d45a9b298421d751c2, type: 3}
       propertyPath: m_AnchorMax.x
@@ -2723,6 +2851,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2787,6 +2919,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
       propertyPath: m_Name
       value: Spitter (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2907,6 +3043,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ripfang (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2971,6 +3111,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
       propertyPath: m_Name
       value: Spitter (30)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3037,6 +3181,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3053,6 +3201,10 @@ PrefabInstance:
     - target: {fileID: 6966058185439994461, guid: 0a307cf172aae0148823bb16bcb6cf05, type: 3}
       propertyPath: m_Name
       value: Resource
+      objectReference: {fileID: 0}
+    - target: {fileID: 6966058185439994461, guid: 0a307cf172aae0148823bb16bcb6cf05, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7743585502521440122, guid: 0a307cf172aae0148823bb16bcb6cf05, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3159,65 +3311,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (16)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb2127b886270d14d838337de828a057, type: 3}
---- !u!21 &1192506979
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Universal Render Pipeline/Unlit
-  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AddPrecomputedVelocity: 0
-    - _AlphaClip: 0
-    - _AlphaToMask: 0
-    - _Blend: 0
-    - _BlendOp: 0
-    - _Cull: 2
-    - _Cutoff: 0.5
-    - _DstBlend: 0
-    - _DstBlendAlpha: 0
-    - _QueueOffset: 0
-    - _SampleGI: 0
-    - _SrcBlend: 1
-    - _SrcBlendAlpha: 1
-    - _Surface: 0
-    - _XRMotionVectorsPass: 1
-    - _ZWrite: 1
-    m_Colors:
-    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
-    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1001 &1214571962
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3278,6 +3380,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ripfang (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3294,6 +3400,10 @@ PrefabInstance:
     - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_Name
       value: Cyborg Soldier (Rescue) (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6563818054817573819, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3446,6 +3556,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Capture_Point (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 3927116910094325800, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5255209892118076139, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -3493,7 +3607,7 @@ PrefabInstance:
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 78622185}
+      objectReference: {fileID: 1462555329}
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Positions.Array.data[0].x
       value: -96.62891
@@ -3643,6 +3757,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Heavy Assault Tank (Rescue) (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 788987118284955716, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4385558407966090285, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -3767,6 +3885,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (19)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3783,6 +3905,10 @@ PrefabInstance:
     - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_Name
       value: Cyborg Soldier (Rescue) (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6563818054817573819, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3859,6 +3985,10 @@ PrefabInstance:
     - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_Name
       value: Cyborg Soldier (Rescue) (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6563818054817573819, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4082,6 +4212,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (14)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4147,11 +4281,69 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb2127b886270d14d838337de828a057, type: 3}
+--- !u!21 &1462555329
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Universal Render Pipeline/Unlit
+  m_Shader: {fileID: 4800000, guid: 650dd9526735d5b46b79224bc6e94025, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddPrecomputedVelocity: 0
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _BlendOp: 0
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
+    - _QueueOffset: 0
+    - _SampleGI: 0
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _Surface: 0
+    - _XRMotionVectorsPass: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _BaseColor: {r: 0, g: 1, b: 0, a: 1}
+    - _Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1001 &1465501999
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4211,6 +4403,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
       propertyPath: m_Name
       value: Ripfang (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4277,6 +4473,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4341,6 +4541,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
       propertyPath: m_Name
       value: Spitter (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4407,6 +4611,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (22)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4463,6 +4671,10 @@ PrefabInstance:
     - target: {fileID: 5591001881842621956, guid: 2018f98e4c9b8af4db70b06ea1f9b92e, type: 3}
       propertyPath: m_Name
       value: Beacon
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591001881842621956, guid: 2018f98e4c9b8af4db70b06ea1f9b92e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4534,6 +4746,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (15)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4550,6 +4766,10 @@ PrefabInstance:
     - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_Name
       value: Cyborg Soldier (Rescue) (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6563818054817573819, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4674,6 +4894,10 @@ PrefabInstance:
     - target: {fileID: 7636683964052424660, guid: a164bfa8ec4caed49b451fd8aea4f7ac, type: 3}
       propertyPath: m_Name
       value: Hive_Core
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: a164bfa8ec4caed49b451fd8aea4f7ac, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4800,6 +5024,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ripfang (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4864,6 +5092,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
       propertyPath: m_Name
       value: Ripfang (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4930,6 +5162,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spawning Pit (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4994,6 +5230,10 @@ PrefabInstance:
     - target: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
       propertyPath: m_Name
       value: Spawning Pit (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5076,6 +5316,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5132,6 +5376,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_Name
       value: Assault Trooper (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8207024150470454005, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_AnchorMax.x
@@ -5197,6 +5445,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_Name
       value: Assault Trooper (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8207024150470454005, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_AnchorMax.x
@@ -5271,6 +5523,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ripfang
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5336,6 +5592,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (29)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5392,6 +5652,10 @@ PrefabInstance:
     - target: {fileID: 5591001881842621956, guid: 2018f98e4c9b8af4db70b06ea1f9b92e, type: 3}
       propertyPath: m_Name
       value: Beacon (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591001881842621956, guid: 2018f98e4c9b8af4db70b06ea1f9b92e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5463,6 +5727,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (25)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5527,6 +5795,10 @@ PrefabInstance:
     - target: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
       propertyPath: m_Name
       value: Spawning Pit (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5609,6 +5881,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (28)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5673,6 +5949,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
       propertyPath: m_Name
       value: Spitter (24)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5739,6 +6019,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spawning Pit
       objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: 3497fd9e3c839994c8699c0d5d693eaf, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5795,6 +6079,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_Name
       value: Assault Trooper (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8207024150470454005, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_AnchorMax.x
@@ -5869,6 +6157,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ripfang (11)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5885,6 +6177,10 @@ PrefabInstance:
     - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_Name
       value: Cyborg Soldier (Rescue) (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1677892880684437072, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6563818054817573819, guid: ef86a9be241a70c4fb3e1820282e6c4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6010,6 +6306,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (20)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6066,6 +6366,10 @@ PrefabInstance:
     - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_Name
       value: Assault Trooper
+      objectReference: {fileID: 0}
+    - target: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8207024150470454005, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
       propertyPath: m_AnchorMax.x
@@ -6184,6 +6488,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (23)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6248,6 +6556,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
       propertyPath: m_Name
       value: Ripfang (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: 2df5cb07a6bdaf84ca0b2e25749eff29, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6351,6 +6663,10 @@ PrefabInstance:
     - target: {fileID: 788987118284955716, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
       propertyPath: m_Name
       value: Heavy Assault Tank (Rescue) (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 788987118284955716, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4385558407966090285, guid: 4897b47a5cc9afb4496080065dc21f2c, type: 3}
       propertyPath: m_AnchorMax.x
@@ -6476,6 +6792,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spitter (26)
       objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6508,6 +6828,10 @@ PrefabInstance:
     - target: {fileID: 3927116910094325800, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Name
       value: Capture_Point
+      objectReference: {fileID: 0}
+    - target: {fileID: 3927116910094325800, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5255209892118076139, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_IsActive
@@ -6548,7 +6872,7 @@ PrefabInstance:
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 1192506979}
+      objectReference: {fileID: 319133763}
     - target: {fileID: 7863367502308364975, guid: b2cdc310dd059af468ce3ea77671cac6, type: 3}
       propertyPath: m_Positions.Array.data[0].x
       value: -102.0218
@@ -6746,6 +7070,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tier1
       objectReference: {fileID: 0}
+    - target: {fileID: 7636683964052424660, guid: bfa5dd8a4e68b7643b799cd39793440d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6810,6 +7138,10 @@ PrefabInstance:
     - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
       propertyPath: m_Name
       value: Spitter (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4698038001367890631, guid: bb2127b886270d14d838337de828a057, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

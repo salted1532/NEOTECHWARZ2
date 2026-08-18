@@ -44,7 +44,17 @@ public class SubStage4Objectives : MonoBehaviour
         bool timeSurvived = elapsedSeconds >= defenseDurationSeconds;
         bool minimumMet = aliveCount >= minimumSurvivingUnits;
 
-        ObjectiveTextUtil.SetObjectiveText(holdTheLineText, LocalizationManager.GetText("objective.substage4.main1"), Mathf.FloorToInt(elapsedSeconds), Mathf.FloorToInt(defenseDurationSeconds));
+        // 남은 시간을 "20분"(초 단위가 0일 때) / "19분 30초" 형식으로 표시 - 원시 초(elapsed/target)
+        // 대신 카운트다운으로 보여달라는 요청(doc/0611).
+        float remainingSeconds = Mathf.Max(0f, defenseDurationSeconds - elapsedSeconds);
+        int remainingMinutes = Mathf.FloorToInt(remainingSeconds / 60f);
+        int remainingWholeSeconds = Mathf.FloorToInt(remainingSeconds % 60f);
+        string timeText = remainingWholeSeconds == 0
+            ? LocalizationManager.GetText("objective.substage4.timeremaining.minutesonly", remainingMinutes)
+            : LocalizationManager.GetText("objective.substage4.timeremaining", remainingMinutes, remainingWholeSeconds);
+        string holdTheLineContent = $"{LocalizationManager.GetText("objective.substage4.main1")} - {timeText}";
+
+        ObjectiveTextUtil.SetObjectiveText(holdTheLineText, holdTheLineContent, timeSurvived);
         ObjectiveTextUtil.SetObjectiveText(minimumSurvivorsText, LocalizationManager.GetText("objective.substage4.sub1"), minimumMet);
 
         if (timeSurvived)

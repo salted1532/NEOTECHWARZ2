@@ -358,6 +358,16 @@ public class AllyController : MonoBehaviour, IDestructible, IAttackRangeUnit
             return false;
         }
 
+        // PrioritizeUnitTargets 등으로 교전 대상이 완전히 다른 위치로 바뀌었는데 chaseIsUnreachable이
+        // 이전 대상 기준으로 true인 채 남아있으면, 새 대상이 실제로는 도달 가능해도 "이미 포기한 상태"로
+        // 취급돼 아래에서 MoveAgentTo가 다시 안 불리고(hasPath만 있으면 재탐색 안 함) navMeshAgent.isStopped가
+        // 다른 곳(Attack())에서 true로 남은 채 영원히 멈춰버린다 - 새 목표면 이전 판정을 재사용하지 않는다.
+        if (chaseIsUnreachable && lastMoveAgentToDestination.HasValue &&
+            (lastMoveAgentToDestination.Value - pos).sqrMagnitude > RedundantDestinationEpsilon * RedundantDestinationEpsilon)
+        {
+            chaseIsUnreachable = false;
+        }
+
         if (chaseIsUnreachable)
         {
             // 도달 불가 모드: 가장 가까운 위치로 이동하는 동안은(아직 도착 전) 재탐색하지 않는다 (doc/0391).
