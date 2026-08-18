@@ -35,7 +35,7 @@ public class CameraControl : MonoBehaviour
 
     private float currentRotationAngle = 0f; // 기준(정면) 각도로부터 현재까지 회전한 누적 각도
 
-    private int currentTerrainTier = 0; // 화면 중앙이 보고 있는 지형의 높이 단. 0=지상, 1=언덕(Layer1), 2=언덕 위 언덕(Layer2)
+    private int currentTerrainTier = 0; // 화면 중앙이 보고 있는 지형의 높이 단. 0=지상, 1=언덕(Layer1), 2=언덕 위 언덕(Layer2), 3=Layer3
     private int pendingTerrainTier = 0; // 방금 raycast로 샘플링된 단(아직 확정 전) - 디바운스 판정용
     private float pendingTierTimer = 0f; // pendingTerrainTier가 currentTerrainTier와 다른 채로 유지된 시간
 
@@ -184,8 +184,8 @@ public class CameraControl : MonoBehaviour
     }
 
     // 화면 정중앙 레이가 맞은 지형의 높이 단을 태그로 판정한다. 실제 지형 메시/콜라이더는
-    // Layer1/Layer2 태그가 붙은 오브젝트의 자식(타일 프리팹)에 있을 수 있어, 맞은 콜라이더에서부터
-    // 부모 방향으로 올라가며 태그를 찾는다. Layer2(언덕 위 언덕) > Layer1(언덕) > 태그 없음(지상) 순.
+    // Layer1/Layer2/Layer3 태그가 붙은 오브젝트의 자식(타일 프리팹)에 있을 수 있어, 맞은 콜라이더에서부터
+    // 부모 방향으로 올라가며 태그를 찾는다. Layer3 > Layer2(언덕 위 언덕) > Layer1(언덕) > 태그 없음(지상) 순.
     private int SampleTerrainTier()
     {
         if (groundLayer == 0)
@@ -212,6 +212,8 @@ public class CameraControl : MonoBehaviour
 
         for (Transform t = hit.transform; t != null; t = t.parent)
         {
+            if (t.CompareTag("Layer3"))
+                return 3;
             if (t.CompareTag("Layer2"))
                 return 2;
             if (t.CompareTag("Layer1"))

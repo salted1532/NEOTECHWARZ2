@@ -25,14 +25,14 @@ Assets/
 │  ├─ BuildSystem/      # 건물 배치 시스템 (그리드, 미리보기, 입력)
 │  ├─ Camera/           # RTS 카메라/미니맵 이동·조작(명령까지 확장), 지형 티어별 줌 범위 보정, 미니맵 시야 사각형 표시, 공격받은 위치 미니맵 마커(MinimapAlertController), 미니맵 위 미션 목표 오브젝트 마커(MinimapObjectiveMarker/MinimapObjectiveOverlay)
 │  ├─ CaptureSystem/    # 거점 점령(밀당식 Ally↔Neutral↔Enemy 순환, 완전 점령 되돌리기/재점령 2배속/방치 시 감쇠) + 다각형 영토 판정(TerritoryZone/TerritoryManager)
-│  ├─ Effects/          # 공격/이동/피격/사망/건물 이착륙/건설 이펙트 재생 시스템(EffectPlayer 등), 스킬 범위 표시(RadiusIndicator), 안개에 가려진 위치면 스폰 자체를 건너뜀
+│  ├─ Effects/          # 공격/이동/피격/사망/건물 이착륙/건설 이펙트 재생 시스템(EffectPlayer 등), 스킬 범위 표시(RadiusIndicator), 안개에 가려진 위치면 스폰 자체를 건너뜀, 언덕/건물에 가려진 아군 유닛 실루엣 표시(UnitSilhouette)
 │  ├─ FogOfWar/         # 전장의 안개(csFogWar) 연동 어댑터 — 유닛/건물 시야 소스 등록(FogRevealerAgent), 점령 영토 강제 시야 확보(TerritoryFogReveal), 안개 상태 조회 공용 헬퍼(FogVisibility)
 │  │  ├─ Enemy/         # 적(외계종족) 유닛/건물 컨트롤러(EnemyUnitController/EnemyBuildingController/EnemyAttackRange) — 마커·미니맵 아이콘·체력 데이터 + 기초 AI(자동 교전/이동/공격-이동), 안개에 가려지면 미니맵 마커 숨김·선택 자동 해제
 │  │  └─ Ally/          # 아군 OC(플레이어에게 적대적이지 않은 구조 유닛) 컨트롤러(AllyController/AllyBuildingController/AllyAttackRange) — Enemy 쪽 로직을 상속 없이 복제해 피아식별만 반대로 유지(doc/0452)
 │  ├─ Localization/     # 언어별(en/ko) JSON 텍스트 조회 싱글턴(LocalizationManager), 정적 UI 라벨 자동 번역 컴포넌트(LocalizedText)
 │  ├─ Resource/         # 자원 노드 및 자원 관리 (`ResourceController.cs`는 미사용 빈 스텁)
 │  ├─ ScriptableObject/ # 유닛/건물 데이터 정의(SO) — NTA(UnitDataSO/BuildingDataSO) + OC/스포어 브루드(EnemyUnitDataSO/EnemyBuildingDataSO, 같은 UnitData/BuildingData 구조 재사용)
-│  ├─ System/           # RTS 유닛 통합 컨트롤 시스템, 캠페인 스테이지별 목표 스크립트(Stage0~5Objectives/StageManager/ObjectiveTextUtil/MissionItem), 연구 보너스 전역 관리(UpgradeManager)
+│  ├─ System/           # RTS 유닛 통합 컨트롤 시스템, 캠페인 스테이지별 목표 스크립트(Stage0~5Objectives/SubStage1~4Objectives/StageManager/ObjectiveTextUtil/MissionItem), 다중 비콘 구조 시스템(RescueBeaconSystem), 연구 보너스 전역 관리(UpgradeManager)
 │  ├─ UI/               # 생산 슬롯, 인게임 UI 컨트롤러, 툴팁, 메인 메뉴(MainMenuController/MainMenuFlyby/SceneMenuController), 미션 선택 화면(MissionSelectManager), 승리 패널(VictoryPanelController), 부대지정 UI(ControlGroupPanel)
 │  ├─ Unit/             # 유닛 컨트롤러, 공격 범위, 체력 관리, 포탑(TurretController), 투사체(Projectile), 지속 피해(DamageOverTimeEffect), 은신 비주얼(StealthVisual)
 │  │  └─ Skills/         # 고급유닛 액티브 스킬(SharpshooterSkill/SkyLancerSkill/GuardianDroneSkill)
@@ -70,6 +70,7 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `Projectile` | 투사체 인스턴스 자신이 이동/명중을 처리(발사자 사망 후에도 끊기지 않도록 소유권 이전, doc/0319) | [doc](Docs/Projectile.md) |
 | `DamageOverTimeEffect` | 대상에 붙어 일정 시간 주기적으로 데미지를 주는 범용 DoT 컴포넌트, 재요청 시 스택 대신 지속시간만 갱신 | [doc](Docs/DamageOverTimeEffect.md) |
 | `StealthVisual` | 살아있는 유닛의 머티리얼을 일시적으로 반투명 흰색으로 바꿨다가 원본으로 복원하는 은신 비주얼 컴포넌트 | [doc](Docs/StealthVisual.md) |
+| `UnitSilhouette` | 언덕/건물에 가려진 내 부대(NTA+아군 OC) 유닛에 전용 깊이 카메라로 판정한 실루엣(#19FF00) 머티리얼을 추가 슬롯으로 덧그려 위치를 계속 보여주는 정적 헬퍼 — 적 유닛엔 의도적으로 미적용(안개 노출 방지) | [doc](doc/0598-silhouette-system-overview.md) |
 | `RadiusIndicator` | `LineRenderer` 기반으로 원형 범위를 잠깐 바닥에 그려 보여주는 범용 스킬 이펙트(텍스처/머티리얼 불필요) | [doc](Docs/RadiusIndicator.md) |
 | `SharpshooterSkill` | 저격수 액티브 스킬 2종(저격 즉시데미지 / 은신) — `IUnitSkill` 구현, 특성(trait) 시스템에 연결 | [doc](Docs/SharpshooterSkill.md) |
 | `SkyLancerSkill` | 스카이랜서 스킬 2종(공중 강화 패시브 화염 도트 / 지상 폭격 범위 데미지) | [doc](Docs/SkyLancerSkill.md) |
@@ -150,11 +151,13 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 | `ObjectiveTextUtil` | 스테이지 목표 체크리스트 텍스트 표시 공용 헬퍼 — 완료 시 취소선, 생존형 목표는 실패 확정 후 고정 | [doc](Docs/ObjectiveTextUtil.md) |
 | `StageManager` | 스테이지 승리/패배 "결과"만 담당하는 최소 골격 싱글턴 — 판정은 각 `Stage0~5Objectives`가 직접 하고 결과만 보고 | [doc](Docs/StageManager.md) |
 | `Stage0Objectives` ~ `Stage5Objectives` | 스테이지별 목표 체크리스트 — 거점 점령/생산·건설, 적 전초기지 파괴, 유물·연구데이터 확보·운반, 생존자 구조, 에너지 코어 파괴 등 목표 성격에 맞는 감지 방식(매 프레임 폴링/이벤트 기반/생존형) | [doc](Docs/Stage0Objectives.md) 외 |
+| `SubStage1Objectives` ~ `SubStage4Objectives` | 서브미션 1~4 목표 체크리스트 — 서브1(레이더 기지 파괴+정찰병 전멸 시 패배), 서브2(유물 파편 회수), 서브3(다중 지점 구조), 서브4(20분 방어 생존, 실패 시 패배) — `Stage0~5Objectives`와 동일 패턴, 이 프로젝트 최초의 패배 조건(`StageManager.ReportDefeat`) 호출부 포함 | [doc](doc/0606-submission1-4-objectives-scripts.md) |
+| `RescueBeaconSystem` | 여러 비콘 각각에 등록해둔 조종불가(`isRescueUnit`) 유닛 리스트를, 비콘에 (미등록) 아군 유닛이 닿으면 한꺼번에 `UnitController.Rescue()`로 조종 가능하게 전환 — Mission3의 단일 비콘 구조 메커니즘을 여러 비콘으로 일반화 | [doc](doc/0609-submission1-multi-beacon-rescue-system-proposal.md) |
 | `MinimapObjectiveMarker` | 미션 목표 오브젝트에 붙이면 미니맵에 아이콘 표시, 오브젝트 비활성화/파괴 시 자동으로 사라짐(doc/0349) | [doc](Docs/MinimapObjectiveMarker.md) |
 | `MinimapObjectiveOverlay` | 씬의 `MinimapObjectiveMarker`들을 미니맵 위에 아이콘으로 렌더링하는 싱글턴 | [doc](Docs/MinimapObjectiveOverlay.md) |
 | `VictoryPanelController` | `StageManager.OnVictory` 구독, 승리 패널 표시 + "메인화면/다음 스테이지/계속하기" 버튼 처리 | [doc](Docs/VictoryPanelController.md) |
 
-> 문서 칸이 `doc/NNNN-...` 형식인 스크립트(`DamageMultiplierTableSO`, `TerritoryZone`~`TerritoryFogReveal`, `EffectPlayer`~`AutoRotate` 등)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
+> 문서 칸이 `doc/NNNN-...` 형식인 스크립트(`DamageMultiplierTableSO`, `TerritoryZone`~`TerritoryFogReveal`, `EffectPlayer`~`AutoRotate`, `UnitSilhouette`, `SubStage1~4Objectives`, `RescueBeaconSystem` 등)는 아직 `Docs/` 폴더에 필드/메소드 상세 문서가 없어 관련 `doc/` 세션 로그로 대신 링크했습니다.
 
 ### 유닛/건물 수치 문서
 
@@ -375,6 +378,14 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
   - [x] `EnemyAIDirector`와 동일하게 유닛별 `productionTime`을 지키며 생산 — 이전엔 즉시 스폰이었던 것을 생산 대기열 방식으로 통일(doc/0570)
 - [x] 적/아군 OC 유닛 생산 시간 전체 1.5배 조정 — 별동대·방어 병력이 전사했을 때 보충 병력이 너무 빨리 채워지는 문제 완화(`OC Unit Data SO`/`Spore Brood Unit Data SO`의 `productionTime` 값 일괄 조정, 아군 OC도 같은 SO를 공유해 자동 적용, doc/0577)
 - [x] 스키터윙(Skitterwing) 공격력 12로 하향 조정(doc/0566)
+- [x] `EnemyAIDirector` 공격 레인(`AttackLane`) — 스폰 지점(+생산 건물)과 전용 집결지를 방향별로 세트로 묶어, 웨이브가 `waveIndex` 순서로 레인을 라운드로빈 선택해 여러 방향에서 번갈아 공격 가능(doc/0610, 동작 방식 Q&A는 doc/0611)
+- [x] 아군 OC/적 AI 공격 별동대가 진격 중 적 건물·유닛을 마주친 뒤 멈춰서 반격도 안 하던 교착 버그 수정 — `ChaseTarget()`의 도달불가 판정 플래그(`chaseIsUnreachable`)가 대상이 바뀌어도 이전 대상 기준으로 남아있던 게 원인, `AllyController`/`EnemyUnitController` 동일 반영(doc/0612)
+- [x] `PlacementSystem`에 `startPoint` 메인기지 자동 스폰 온오프 인스펙터 필드(`spawnStartingMainBase`, 기본값 켜짐) 추가 — 유닛 조종 전용 서브미션처럼 메인기지가 필요 없는 씬에서 끌 수 있음(doc/0608)
+- [x] 서브 스테이지(서브미션 1~4) 기획/스토리 확정 — `Docs/Campaign.md`에 스토리·목표·브리핑 대사·행성 이름 반영(doc/0602~0604), 미션 선택 화면에 버튼 연결 + 툴팁에 행성 이름 표시(doc/0605, 0607)
+- [x] 서브미션 1~4 목표 체크리스트 스크립트(`SubStage1Objectives`~`SubStage4Objectives`) 작성 — `Stage0~5Objectives`와 동일 패턴으로 신규 작성(doc/0606), 각 씬에 실제 오브젝트(레이더 기지/비콘/방어부대 등)를 배치·연결하는 작업은 아직 별도
+- [x] 다중 비콘 조종 가능 전환 시스템(`RescueBeaconSystem`) — Mission3 구조 메커니즘을 여러 비콘에 대해 동시에 지원하도록 일반화(doc/0609)
+- [x] 서브미션4 "남은시간" 카운트다운 표시 — 분:초 단위로 실시간 갱신되는 방어선 사수 타이머 문구 추가(doc/0611)
+- [x] 언덕/건물 뒤에 가려진 아군 유닛(NTA+아군 OC) 실루엣 표시 — 전용 깊이 카메라로 가려짐을 판정해 초록색(#19FF00) 실루엣만 덧그림, 적 유닛은 안개 노출 방지를 위해 의도적으로 미적용(doc/0592~0598)
 - [x] 버전/변경 이력 관리 — `doc/0001-`부터 번호순으로 세션별 요청·코드 변경 내역을 전부 기록(사실상의 패치노트 로그, 아래 "개발 프로세스 메모" 참고)
 
 ### 로컬라이제이션(다국어)
@@ -389,7 +400,10 @@ Docs/                    # 스크립트별 코드 문서(역할/필드/메소드
 ## 로드맵 (미구현)
 
 - [ ] UI 창 크기/위치 조절 기능 — 설정창에서 UI 크기·위치를 조절해 저장하면(유저 데이터) 인게임에도 그대로 적용되는 기능, 미착수
-- [ ] 서브 스테이지 구성 — 미션 1~4에 각각 병행 서브미션 1개씩(측면 기습/잔해 수색/구조대 파견/최후의 저지선), 스토리·목표·브리핑 대사는 `Docs/Campaign.md`에 확정, 씬/스크립트 구현은 아직 착수 전(doc/0602)
+- [ ] 서브 스테이지(서브미션 1~4) 씬 배선 — 기획/스토리(doc/0602~0604), 목표 스크립트(`SubStage1~4Objectives`, doc/0606), 미션 선택 버튼(doc/0607)까지는 완료. 각 씬에 실제 오브젝트(레이더 기지/비콘/방어부대 등) 배치·연결은 아직 미착수(맵 자체는 서브미션4까지 제작 완료)
+- [ ] 일꾼의 "건물 우클릭 수리" 기능 — 미착수
+- [ ] 유닛 체력 회복(치유) 유닛 추가 — 미착수
+- [ ] (보류) 외계종족 공중 유닛 자동공격 미작동 — 원인 파악 보류 중
 - [ ] 스테이지 사이 브리핑룸 구현 — 미션 시작 전 현재 상황(스토리)/목표를 텍스트+음성으로 안내하고 캐릭터 얼굴을 보여주는 연출
 - [ ] 건물 고유 스킬 추가 — 유닛 고급 특성(스킬 선택)처럼 건물 전용 고유 스킬은 아직 기획/구현 전
 - [ ] 건물 선택 사운드 — 유닛별 사망/건물 이착륙·파괴 사운드는 완료, 건물 선택 사운드만 남음
