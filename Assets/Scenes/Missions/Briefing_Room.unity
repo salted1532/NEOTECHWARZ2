@@ -1227,7 +1227,7 @@ MonoBehaviour:
     speaker1Key: adrian
     speaker2Key: adjutant
     speaker3Key: 
-    mapImage: {fileID: 0}
+    mapImage: {fileID: 1924065843, guid: f23a195d3a6944448896a964d2fc057e, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.adrian
@@ -1243,7 +1243,7 @@ MonoBehaviour:
     speaker1Key: adjutant
     speaker2Key: selena
     speaker3Key: adrian
-    mapImage: {fileID: 0}
+    mapImage: {fileID: -1503578243, guid: ccc3e6844b1672d4a8549cfa1d63d410, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.adjutant
@@ -1265,7 +1265,7 @@ MonoBehaviour:
     speaker1Key: adjutant
     speaker2Key: adrian
     speaker3Key: soldier
-    mapImage: {fileID: 0}
+    mapImage: {fileID: 8582662, guid: 2d6371bae383c7b4f8967c8855d86195, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.adjutant
@@ -1284,7 +1284,7 @@ MonoBehaviour:
     speaker1Key: adjutant
     speaker2Key: soldier
     speaker3Key: adrian
-    mapImage: {fileID: 0}
+    mapImage: {fileID: -1146797173, guid: 4d078fbc9dc25514fab04ed409afa0d8, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.adjutant
@@ -1303,7 +1303,7 @@ MonoBehaviour:
     speaker1Key: selena
     speaker2Key: adrian
     speaker3Key: adjutant
-    mapImage: {fileID: 0}
+    mapImage: {fileID: 305612871, guid: 61fb7f3a82eea60459763ddb1a26db8c, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.selena
@@ -1331,7 +1331,7 @@ MonoBehaviour:
     speaker1Key: adjutant
     speaker2Key: selena
     speaker3Key: adrian
-    mapImage: {fileID: 0}
+    mapImage: {fileID: 544778911, guid: 2b9ee3cc880f86d4095babb0de83d6b5, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.adjutant
@@ -1359,7 +1359,7 @@ MonoBehaviour:
     speaker1Key: adrian
     speaker2Key: soldier
     speaker3Key: adjutant
-    mapImage: {fileID: 0}
+    mapImage: {fileID: -1546890122, guid: e825d088eccc0d8469b096cd37211f80, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.adrian
@@ -1378,7 +1378,7 @@ MonoBehaviour:
     speaker1Key: soldier
     speaker2Key: adrian
     speaker3Key: soldier
-    mapImage: {fileID: 0}
+    mapImage: {fileID: -721404275, guid: 15cfeeca3b8847f468645a6db2eb308f, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.scout
@@ -1397,7 +1397,7 @@ MonoBehaviour:
     speaker1Key: adjutant
     speaker2Key: adrian
     speaker3Key: soldier
-    mapImage: {fileID: 0}
+    mapImage: {fileID: -1984070647, guid: 50280d36559421540b4d7733163bed74, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.adjutant
@@ -1416,7 +1416,7 @@ MonoBehaviour:
     speaker1Key: selena
     speaker2Key: adrian
     speaker3Key: soldier
-    mapImage: {fileID: 0}
+    mapImage: {fileID: -2109308123, guid: 8d3a7e11bb20b0b4884e19a9becc4f46, type: 3}
     lines:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.selena
@@ -1443,8 +1443,7 @@ MonoBehaviour:
   charsPerSecond: 30
   pauseBetweenLines: 0.6
   portraitFadeDuration: 0.25
-  mainObjectiveColor: {r: 0.95, g: 0.3, b: 0.3, a: 1}
-  subObjectiveColor: {r: 0.95, g: 0.85, b: 0.25, a: 1}
+  briefingStartDelay: 1
 --- !u!1 &1584739985
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,11 +4,18 @@ using UnityEngine;
 // 스테이지 목표 체크리스트 텍스트 표시 공통 헬퍼(Stage0~5Objectives 공유). 완료 시 <s>(취소선)로
 // 감싸고, 미완료면 그대로 표시한다. 매 프레임 다시 호출되는 것을 전제로 하므로 "한 번 완료되면
 // 고정"하지 않는다 - 조건이 다시 깨지면 취소선도 자동으로 사라진다.
+//
+// "(주목표)"/"(서브)" 접두어는 색으로도 구분한다(주목표=빨강, 서브=노랑) - 브리핑룸
+// (BriefingRoomController)도 같은 팔레트를 이 헬퍼로 재사용한다(doc/0625).
 public static class ObjectiveTextUtil
 {
+    private static readonly Color MainColor = new(0.95f, 0.3f, 0.3f);
+    private static readonly Color SubColor = new(0.95f, 0.85f, 0.25f);
+
     public static void SetObjectiveText(TextMeshProUGUI text, string description, bool complete)
     {
         if (text == null) return;
+        description = ColorizeBracketPrefix(description);
         text.text = complete ? $"<s>{description}</s>" : description;
     }
 
@@ -18,6 +25,7 @@ public static class ObjectiveTextUtil
     {
         if (text == null) return;
         bool complete = current >= target;
+        description = ColorizeBracketPrefix(description);
         string content = $"{description} ({Mathf.Min(current, target)}/{target})";
         text.text = complete ? $"<s>{content}</s>" : content;
     }
@@ -27,6 +35,26 @@ public static class ObjectiveTextUtil
     public static void SetSurvivalObjectiveText(TextMeshProUGUI text, string description, bool failed)
     {
         if (text == null) return;
+        description = ColorizeBracketPrefix(description);
         text.text = failed ? $"<s>{description}</s>{LocalizationManager.GetText("objective.fail.suffix")}" : description;
+    }
+
+    // "(주목표) 내용" / "(Main) content"처럼 괄호로 감싼 접두어에 색을 입힌다. 주목표=빨강,
+    // 서브=노랑, 접두어가 없거나 둘 다 아니면 원문 그대로 둔다.
+    public static string ColorizeBracketPrefix(string text)
+    {
+        int closeIndex = text.IndexOf(')');
+        if (closeIndex < 0)
+            return text;
+
+        string prefix = text.Substring(0, closeIndex + 1);
+        bool isMain = prefix.Contains("주목표") || prefix.Contains("Main");
+        bool isSub = prefix.Contains("서브") || prefix.Contains("Sub");
+        if (!isMain && !isSub)
+            return text;
+
+        Color color = isMain ? MainColor : SubColor;
+        string rest = text.Substring(closeIndex + 1);
+        return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{prefix}</color>{rest}";
     }
 }

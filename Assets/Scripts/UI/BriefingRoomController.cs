@@ -75,9 +75,8 @@ public class BriefingRoomController : MonoBehaviour
     [SerializeField] private float pauseBetweenLines = 0.6f;
     [SerializeField] private float portraitFadeDuration = 0.25f;
 
-    [Header("미션정보 목표 색상")]
-    [SerializeField] private Color mainObjectiveColor = new(0.95f, 0.3f, 0.3f); // (주목표)
-    [SerializeField] private Color subObjectiveColor = new(0.95f, 0.85f, 0.25f); // (서브)
+    [Header("시작 연출")]
+    [SerializeField] private float briefingStartDelay = 1f; // 씬 진입 후 이 시간만큼 대기했다가 브리핑 시작 (doc/0623)
 
     private readonly HashSet<int> revealedSlots = new();
 
@@ -90,10 +89,15 @@ public class BriefingRoomController : MonoBehaviour
         startMissionButton?.onClick.AddListener(StartMission);
 
         if (entry != null)
-        {
-            StartCoroutine(PlayDialogue(entry));
-            StartCoroutine(TypeText(missionInfoText, BuildMissionInfoText(entry)));
-        }
+            StartCoroutine(StartBriefingAfterDelay(entry));
+    }
+
+    private IEnumerator StartBriefingAfterDelay(BriefingEntry entry)
+    {
+        yield return new WaitForSeconds(briefingStartDelay);
+
+        StartCoroutine(PlayDialogue(entry));
+        StartCoroutine(TypeText(missionInfoText, BuildMissionInfoText(entry)));
     }
 
     // 미션정보 패널은 별도 텍스트를 새로 안 쓰고, 실제 미션의 목표 표시에 쓰이는
@@ -109,10 +113,10 @@ public class BriefingRoomController : MonoBehaviour
         return string.Join("\n", lines);
     }
 
+    // 색칠은 ObjectiveTextUtil.ColorizeBracketPrefix()를 재사용한다 - 인게임 목표 체크리스트와
+    // 같은 팔레트(주목표=빨강, 서브=노랑)를 쓰기 위함 (doc/0625).
     private void AppendObjectiveLines(List<string> lines, string stagePrefix, string kind)
     {
-        Color color = kind == "main" ? mainObjectiveColor : subObjectiveColor;
-
         for (int i = 1; i <= 8; i++)
         {
             string key = $"objective.{stagePrefix}.{kind}{i}";
@@ -120,21 +124,8 @@ public class BriefingRoomController : MonoBehaviour
             if (value == key) // 키가 없으면 GetText가 키 자체를 돌려준다 - 그 지점에서 목록이 끝난 것
                 break;
 
-            lines.Add(ColorizeBracketPrefix(value, color));
+            lines.Add(ObjectiveTextUtil.ColorizeBracketPrefix(value));
         }
-    }
-
-    // "(주목표) 내용" / "(Main) content"처럼 괄호로 감싼 접두어만 색칠한다. 언어별로 괄호 안 문구가
-    // 달라도 첫 ')'까지만 잘라 태그를 씌우면 되므로 언어별 분기가 필요 없다.
-    private string ColorizeBracketPrefix(string text, Color color)
-    {
-        int closeIndex = text.IndexOf(')');
-        if (closeIndex < 0)
-            return text;
-
-        string prefix = text.Substring(0, closeIndex + 1);
-        string rest = text.Substring(closeIndex + 1);
-        return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{prefix}</color>{rest}";
     }
 
     private BriefingEntry FindSelectedEntry()
@@ -165,14 +156,6 @@ public class BriefingRoomController : MonoBehaviour
         if (speakerPortraitImage2 != null) speakerPortraitImage2.sprite = FindPortrait(entry.speaker2Key);
         if (speakerPortraitImage3 != null) speakerPortraitImage3.sprite = FindPortrait(entry.speaker3Key);
         if (mapImage != null) mapImage.sprite = entry.mapImage;
-
-        // 그 미션의 첫 화자는 대기 없이 바로 보이게 시작한다.
-        if (entry.lines.Count > 0)
-        {
-            int firstSlot = entry.lines[0].speakerSlot;
-            SetPortraitAlpha(GetSlotImage(firstSlot), 1f);
-            revealedSlots.Add(firstSlot);
-        }
     }
 
     private IEnumerator PlayDialogue(BriefingEntry entry)
@@ -181,6 +164,9 @@ public class BriefingRoomController : MonoBehaviour
             yield break;
 
         var log = new StringBuilder();
+
+        yield return TypeAnnouncement(log, "briefing.start");
+        yield return new WaitForSeconds(pauseBetweenLines);
 
         foreach (BriefingLine line in entry.lines)
         {
@@ -217,26 +203,34 @@ public class BriefingRoomController : MonoBehaviour
 
         // 마지막 대사 다음에 "브리핑 끝." 안내문을 타이핑하고, 다 끝나면 인물 이미지를 페이드아웃한다
         // (doc/0621). 텍스트 로그 자체는 지우지 않고 그대로 남겨둔다.
-        string endingLogSoFar = log.ToString();
-        string ending = LocalizationManager.GetText("briefing.end");
+        yield return TypeAnnouncement(log, "briefing.end");
 
-        dialogueText.text = endingLogSoFar;
+        yield return new WaitForSeconds(pauseBetweenLines);
+        FadeOutAllPortraits();
+    }
+
+    // "브리핑 시작."/"브리핑 끝." 같이 화자 없이 로그에 한 줄 타이핑해 넣는 공용 헬퍼 (doc/0624).
+    private IEnumerator TypeAnnouncement(StringBuilder log, string localizationKey)
+    {
+        string logSoFar = log.ToString();
+        string announcement = LocalizationManager.GetText(localizationKey);
+
+        dialogueText.text = logSoFar;
         dialogueText.ForceMeshUpdate();
-        int beforeEndingVisible = dialogueText.textInfo.characterCount;
+        int beforeVisible = dialogueText.textInfo.characterCount;
 
-        dialogueText.text = endingLogSoFar + ending;
+        dialogueText.text = logSoFar + announcement;
         dialogueText.ForceMeshUpdate();
-        int afterEndingVisible = dialogueText.textInfo.characterCount;
+        int afterVisible = dialogueText.textInfo.characterCount;
 
-        for (int visible = beforeEndingVisible + 1; visible <= afterEndingVisible; visible++)
+        for (int visible = beforeVisible + 1; visible <= afterVisible; visible++)
         {
             dialogueText.maxVisibleCharacters = visible;
             ScrollToBottom();
             yield return new WaitForSeconds(1f / charsPerSecond);
         }
 
-        yield return new WaitForSeconds(pauseBetweenLines);
-        FadeOutAllPortraits();
+        log.Append(announcement).Append("\n\n");
     }
 
     private IEnumerator TypeText(TextMeshProUGUI target, string content)
