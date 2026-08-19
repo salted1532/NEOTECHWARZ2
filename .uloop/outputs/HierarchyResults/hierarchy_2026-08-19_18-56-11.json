@@ -1,0 +1,264 @@
+{
+  "ExportTimestamp": "2026-08-19 18:56:11",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "Briefing_Room",
+    "nodeCount": 17,
+    "maxDepth": 2
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "Briefing_Room",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 17,
+        "maxDepth": 2
+      },
+      "componentsLut": [
+        "RectTransform",
+        "Canvas",
+        "CanvasScaler",
+        "GraphicRaycaster",
+        "CanvasRenderer",
+        "Image",
+        "TextMeshProUGUI",
+        "Button"
+      ],
+      "roots": [
+        {
+          "name": "Canvas",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 5,
+          "children": [
+            {
+              "name": "speakerPortraitImage",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "speakerPortraitImage2",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "speakerPortraitImage3",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "dialogueText",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    6
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "missionInfoPanel",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    6
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "mapImage",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    5
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Go_Back",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                7
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    6
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Start_Mission",
+              "isActive": true,
+              "componentsIdx": [
+                0,
+                4,
+                5,
+                7
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 5,
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    0,
+                    4,
+                    6
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

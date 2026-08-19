@@ -36,6 +36,9 @@ public class MissionSelectManager : MonoBehaviour
     [Header("개발자용 - 정식 버전 출시 전 이 버튼과 연결을 제거할 것")]
     [SerializeField] private Button unlockAllMissionButton;
 
+    [Header("브리핑룸")]
+    [SerializeField] private string briefingRoomSceneName = "Briefing_Room"; // 미션 씬으로 바로 가지 않고 이 씬을 거친다 (doc/0616)
+
     // MainScene(MainMenuController)이나 미션 플레이(UserControl)에서 바꾼 커서가 Cursor.SetCursor의
     // 전역 상태 때문에 씬을 넘어와도 남아있던 문제(doc/0473) - MainMenuController와 동일한 패턴으로
     // 이 씬 진입 시 기본 커서로 되돌리고, 버튼 호버 시에만 다시 바꾼다.
@@ -105,8 +108,13 @@ public class MissionSelectManager : MonoBehaviour
 
     private void LoadMission(MissionSelectEntry entry)
     {
-        if (!string.IsNullOrEmpty(entry.sceneName))
-            SceneManager.LoadScene(entry.sceneName);
+        if (string.IsNullOrEmpty(entry.sceneName))
+            return;
+
+        BriefingSelection.MissionNumber = entry.missionNumber;
+        BriefingSelection.IsSubMission = entry.isSubMission;
+        BriefingSelection.TargetSceneName = entry.sceneName;
+        SceneManager.LoadScene(briefingRoomSceneName);
     }
 
     private void BackToMainMenu()

@@ -205,6 +205,7 @@ GameObject:
   - component: {fileID: 259728045}
   - component: {fileID: 259728047}
   - component: {fileID: 259728046}
+  - component: {fileID: 259728048}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -331,6 +332,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 259728044}
   m_CullTransparentMesh: 1
+--- !u!114 &259728048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 259728044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b21f21ae842ea245bd2716532ff75e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  target: {fileID: 259728046}
+  legacyTarget: {fileID: 0}
+  key: briefing.button.start
 --- !u!1 &275058073
 GameObject:
   m_ObjectHideFlags: 0
@@ -558,6 +574,101 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 358701078}
   m_CullTransparentMesh: 1
+--- !u!1 &458699001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 458699003}
+  - component: {fileID: 458699002}
+  m_Layer: 0
+  m_Name: LocalizationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &458699002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458699001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 530b499be34fb964da7a8099927b60fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizationManager
+--- !u!4 &458699003
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458699001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &721365642
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 721365643}
+  - component: {fileID: 721365644}
+  m_Layer: 0
+  m_Name: Viewport
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &721365643
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721365642}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 760553130}
+  m_Father: {fileID: 768639473}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &721365644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721365642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &760553129
 GameObject:
   m_ObjectHideFlags: 0
@@ -569,6 +680,7 @@ GameObject:
   - component: {fileID: 760553130}
   - component: {fileID: 760553132}
   - component: {fileID: 760553131}
+  - component: {fileID: 760553133}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -588,13 +700,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 768639473}
+  m_Father: {fileID: 721365643}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -187.45685, y: 88.25}
-  m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &760553131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -681,7 +793,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -3.334015, y: -2.3938293, z: -381.84482, w: -180.08887}
+  m_margin: {x: 10, y: 6, z: 10, w: 6}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -695,6 +807,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 760553129}
   m_CullTransparentMesh: 1
+--- !u!114 &760553133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 760553129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &768639472
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,6 +832,7 @@ GameObject:
   - component: {fileID: 768639473}
   - component: {fileID: 768639475}
   - component: {fileID: 768639474}
+  - component: {fileID: 768639476}
   m_Layer: 5
   m_Name: dialogueText
   m_TagString: Untagged
@@ -725,7 +852,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 760553130}
+  - {fileID: 721365643}
   m_Father: {fileID: 1476063232}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
@@ -771,6 +898,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 768639472}
   m_CullTransparentMesh: 1
+--- !u!114 &768639476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 768639472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ScrollRect
+  m_Content: {fileID: 760553130}
+  m_Horizontal: 0
+  m_Vertical: 1
+  m_MovementType: 2
+  m_Elasticity: 0.1
+  m_Inertia: 1
+  m_DecelerationRate: 0.135
+  m_ScrollSensitivity: 20
+  m_Viewport: {fileID: 721365643}
+  m_HorizontalScrollbar: {fileID: 0}
+  m_VerticalScrollbar: {fileID: 0}
+  m_HorizontalScrollbarVisibility: 0
+  m_VerticalScrollbarVisibility: 0
+  m_HorizontalScrollbarSpacing: 0
+  m_VerticalScrollbarSpacing: 0
+  m_OnValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1346596762
 GameObject:
   m_ObjectHideFlags: 0
@@ -935,6 +1092,7 @@ GameObject:
   - component: {fileID: 1476063231}
   - component: {fileID: 1476063230}
   - component: {fileID: 1476063229}
+  - component: {fileID: 1476063233}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1033,6 +1191,260 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1476063233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1476063228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09dc9cba28eec2d478a4b3794645f8fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BriefingRoomController
+  characterRoster:
+  - characterKey: adrian
+    displayName: "\uC544\uB4DC\uB9AC\uC548 \uCF5C\uB9B0\uC2A4"
+    portrait: {fileID: 1913480204, guid: d94345e0837be734ea9c3320593895e4, type: 3}
+    labelColor: {r: 0.35, g: 0.65, b: 1, a: 1}
+  - characterKey: selena
+    displayName: "\uC140\uB808\uB098 \uCE74\uD130"
+    portrait: {fileID: -1374208595, guid: 70dd621a5ef52f74e81d43ebf09e5fe3, type: 3}
+    labelColor: {r: 1, g: 0.35, b: 0.35, a: 1}
+  - characterKey: adjutant
+    displayName: "\uBD80\uAD00"
+    portrait: {fileID: 1669710751, guid: 0d6f6fd12515faa4c908b7ced5f9c80d, type: 3}
+    labelColor: {r: 0.35, g: 0.65, b: 1, a: 1}
+  - characterKey: soldier
+    displayName: "\uB098\uBA38\uC9C0 \uBCD1\uC0AC(\uC815\uCC30\uBCD1/\uB300\uC7A5
+      \uACC4\uC5F4 \uACF5\uC6A9)"
+    portrait: {fileID: -1810695617, guid: 146aa46b113b1c640896d4d5d22cdfa4, type: 3}
+    labelColor: {r: 0.35, g: 0.65, b: 1, a: 1}
+  briefingEntries:
+  - missionNumber: 0
+    isSubMission: 0
+    speaker1Key: adrian
+    speaker2Key: adjutant
+    speaker3Key: 
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.0.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.0.1
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.0.2
+  - missionNumber: 1
+    isSubMission: 0
+    speaker1Key: adjutant
+    speaker2Key: selena
+    speaker3Key: adrian
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.1.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.selena
+      textKey: briefing.line.1.1
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.1.2
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.1.3
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.1.4
+  - missionNumber: 2
+    isSubMission: 0
+    speaker1Key: adjutant
+    speaker2Key: adrian
+    speaker3Key: soldier
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.2.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.2.1
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.scout
+      textKey: briefing.line.2.2
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.2.3
+  - missionNumber: 3
+    isSubMission: 0
+    speaker1Key: adjutant
+    speaker2Key: soldier
+    speaker3Key: adrian
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.3.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.scout
+      textKey: briefing.line.3.1
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.3.2
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.3.3
+  - missionNumber: 4
+    isSubMission: 0
+    speaker1Key: selena
+    speaker2Key: adrian
+    speaker3Key: adjutant
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.selena
+      textKey: briefing.line.4.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.4.1
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.selena
+      textKey: briefing.line.4.2
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.4.3
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.4.4
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.selena
+      textKey: briefing.line.4.5
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.4.6
+  - missionNumber: 5
+    isSubMission: 0
+    speaker1Key: adjutant
+    speaker2Key: selena
+    speaker3Key: adrian
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.5.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.selena
+      textKey: briefing.line.5.1
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.5.2
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.5.3
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.5.4
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.5.5
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.5.6
+  - missionNumber: 1
+    isSubMission: 1
+    speaker1Key: adrian
+    speaker2Key: soldier
+    speaker3Key: adjutant
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.sub1.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.detachment_leader
+      textKey: briefing.line.sub1.1
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.sub1.2
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.detachment_leader
+      textKey: briefing.line.sub1.3
+  - missionNumber: 2
+    isSubMission: 1
+    speaker1Key: soldier
+    speaker2Key: adrian
+    speaker3Key: soldier
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.scout
+      textKey: briefing.line.sub2.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.sub2.1
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.detachment_leader
+      textKey: briefing.line.sub2.2
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.sub2.3
+  - missionNumber: 3
+    isSubMission: 1
+    speaker1Key: adjutant
+    speaker2Key: adrian
+    speaker3Key: soldier
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.adjutant
+      textKey: briefing.line.sub3.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.sub3.1
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.rescue_leader
+      textKey: briefing.line.sub3.2
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.sub3.3
+  - missionNumber: 4
+    isSubMission: 1
+    speaker1Key: selena
+    speaker2Key: adrian
+    speaker3Key: soldier
+    mapImage: {fileID: 0}
+    lines:
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.selena
+      textKey: briefing.line.sub4.0
+    - speakerSlot: 2
+      speakerLabelKey: briefing.speaker.adrian
+      textKey: briefing.line.sub4.1
+    - speakerSlot: 3
+      speakerLabelKey: briefing.speaker.defense_leader
+      textKey: briefing.line.sub4.2
+    - speakerSlot: 1
+      speakerLabelKey: briefing.speaker.selena
+      textKey: briefing.line.sub4.3
+  speakerPortraitImage: {fileID: 1756962411}
+  speakerPortraitImage2: {fileID: 301887540}
+  speakerPortraitImage3: {fileID: 2079694411}
+  mapImage: {fileID: 45052456}
+  dialogueText: {fileID: 760553131}
+  dialogueScrollRect: {fileID: 768639476}
+  missionInfoText: {fileID: 1641291330}
+  goBackButton: {fileID: 1913188045}
+  startMissionButton: {fileID: 1765899178}
+  missionSelectSceneName: MissionSelect
+  charsPerSecond: 30
+  pauseBetweenLines: 0.6
+  portraitFadeDuration: 0.25
+  mainObjectiveColor: {r: 0.95, g: 0.3, b: 0.3, a: 1}
+  subObjectiveColor: {r: 0.95, g: 0.85, b: 0.25, a: 1}
 --- !u!1 &1584739985
 GameObject:
   m_ObjectHideFlags: 0
@@ -1426,7 +1838,7 @@ GameObject:
   - component: {fileID: 1765899179}
   - component: {fileID: 1765899178}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: Start_Mission
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1545,6 +1957,7 @@ GameObject:
   - component: {fileID: 1911640275}
   - component: {fileID: 1911640277}
   - component: {fileID: 1911640276}
+  - component: {fileID: 1911640278}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1671,6 +2084,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1911640274}
   m_CullTransparentMesh: 1
+--- !u!114 &1911640278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911640274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b21f21ae842ea245bd2716532ff75e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  target: {fileID: 1911640276}
+  legacyTarget: {fileID: 0}
+  key: briefing.button.back
 --- !u!1 &1913188043
 GameObject:
   m_ObjectHideFlags: 0
@@ -1684,7 +2112,7 @@ GameObject:
   - component: {fileID: 1913188046}
   - component: {fileID: 1913188045}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Go_Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2081,3 +2509,4 @@ SceneRoots:
   - {fileID: 1916120813}
   - {fileID: 1476063232}
   - {fileID: 2130051892}
+  - {fileID: 458699003}

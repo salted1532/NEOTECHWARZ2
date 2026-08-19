@@ -1,0 +1,330 @@
+{
+  "ExportTimestamp": "2026-08-19 18:50:04",
+  "Context": {
+    "sceneType": "editor",
+    "sceneName": "Briefing_Room",
+    "nodeCount": 20,
+    "maxDepth": 2
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "Briefing_Room",
+      "stats": {
+        "rootCount": 4,
+        "nodeCount": 20,
+        "maxDepth": 2
+      },
+      "componentsLut": [
+        "Transform",
+        "Camera",
+        "AudioListener",
+        "Light",
+        "UniversalAdditionalLightData",
+        "RectTransform",
+        "Canvas",
+        "CanvasScaler",
+        "GraphicRaycaster",
+        "CanvasRenderer",
+        "Image",
+        "TextMeshProUGUI",
+        "Button",
+        "EventSystem",
+        "InputSystemUIInputModule"
+      ],
+      "roots": [
+        {
+          "name": "Main Camera",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            1,
+            2
+          ],
+          "siblingIndex": 0,
+          "tag": "MainCamera",
+          "layer": 0,
+          "path": "Main Camera",
+          "children": []
+        },
+        {
+          "name": "Directional Light",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            3,
+            4
+          ],
+          "siblingIndex": 1,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "Directional Light",
+          "children": []
+        },
+        {
+          "name": "Canvas",
+          "isActive": true,
+          "componentsIdx": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "siblingIndex": 2,
+          "tag": "Untagged",
+          "layer": 5,
+          "path": "Canvas",
+          "children": [
+            {
+              "name": "speakerPortraitImage",
+              "isActive": true,
+              "componentsIdx": [
+                5,
+                9,
+                10
+              ],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/speakerPortraitImage",
+              "children": [
+                {
+                  "name": "Image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    5,
+                    9,
+                    10
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/speakerPortraitImage/Image",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "speakerPortraitImage2",
+              "isActive": true,
+              "componentsIdx": [
+                5,
+                9,
+                10
+              ],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/speakerPortraitImage2",
+              "children": [
+                {
+                  "name": "Image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    5,
+                    9,
+                    10
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/speakerPortraitImage2/Image",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "speakerPortraitImage3",
+              "isActive": true,
+              "componentsIdx": [
+                5,
+                9,
+                10
+              ],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/speakerPortraitImage3",
+              "children": [
+                {
+                  "name": "Image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    5,
+                    9,
+                    10
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/speakerPortraitImage3/Image",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "dialogueText",
+              "isActive": true,
+              "componentsIdx": [
+                5,
+                9,
+                10
+              ],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/dialogueText",
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    5,
+                    9,
+                    11
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/dialogueText/Text (TMP)",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "missionInfoPanel",
+              "isActive": true,
+              "componentsIdx": [
+                5,
+                9,
+                10
+              ],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/missionInfoPanel",
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    5,
+                    9,
+                    11
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/missionInfoPanel/Text (TMP)",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "mapImage",
+              "isActive": true,
+              "componentsIdx": [
+                5,
+                9,
+                10
+              ],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/mapImage",
+              "children": [
+                {
+                  "name": "Image",
+                  "isActive": true,
+                  "componentsIdx": [
+                    5,
+                    9,
+                    10
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/mapImage/Image",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Go_Back",
+              "isActive": true,
+              "componentsIdx": [
+                5,
+                9,
+                10,
+                12
+              ],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Go_Back",
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    5,
+                    9,
+                    11
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/Go_Back/Text (TMP)",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Start_Mission",
+              "isActive": true,
+              "componentsIdx": [
+                5,
+                9,
+                10,
+                12
+              ],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "Canvas/Start_Mission",
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "componentsIdx": [
+                    5,
+                    9,
+                    11
+                  ],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "Canvas/Start_Mission/Text (TMP)",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "EventSystem",
+          "isActive": true,
+          "componentsIdx": [
+            0,
+            13,
+            14
+          ],
+          "siblingIndex": 3,
+          "tag": "Untagged",
+          "layer": 0,
+          "path": "EventSystem",
+          "children": []
+        }
+      ]
+    }
+  ]
+}
