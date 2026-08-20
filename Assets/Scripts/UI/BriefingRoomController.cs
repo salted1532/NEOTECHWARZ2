@@ -38,6 +38,7 @@ public class BriefingLine
     public int speakerSlot; // 1, 2, 3 - speaker1/2/3Key 중 어느 슬롯인지
     public string speakerLabelKey; // 예: "briefing.speaker.adrian" (7개 고정 키, 재사용)
     public string textKey; // 그 줄의 대사, 예: "briefing.line.1.0"
+    public AudioClip voiceClip; // TTS로 뽑은 이 줄의 음성 (doc/0630). 없으면 텍스트만 타이핑되고 무음.
 }
 
 [System.Serializable]
@@ -61,12 +62,16 @@ public class BriefingRoomController : MonoBehaviour
     [SerializeField] private Image speakerPortraitImage;
     [SerializeField] private Image speakerPortraitImage2;
     [SerializeField] private Image speakerPortraitImage3;
+    [SerializeField] private GameObject talkingIndicator1; // speakerPortraitImage 자식 "Taking" - 그 슬롯이 말하는 중일 때만 켜짐 (doc/0632)
+    [SerializeField] private GameObject talkingIndicator2;
+    [SerializeField] private GameObject talkingIndicator3;
     [SerializeField] private Image mapImage;
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private ScrollRect dialogueScrollRect; // dialogueText를 담은 Content의 스크롤뷰 - 로그가 넘치면 최신 줄로 자동 스크롤
     [SerializeField] private TextMeshProUGUI missionInfoText;
     [SerializeField] private Button goBackButton;
     [SerializeField] private Button startMissionButton;
+    [SerializeField] private AudioSource voiceAudioSource; // 대사 줄 음성 재생 전용 (doc/0630)
 
     [SerializeField] private string missionSelectSceneName = "MissionSelect";
 
@@ -145,6 +150,9 @@ public class BriefingRoomController : MonoBehaviour
         SetPortraitAlpha(speakerPortraitImage, 0f);
         SetPortraitAlpha(speakerPortraitImage2, 0f);
         SetPortraitAlpha(speakerPortraitImage3, 0f);
+        SetTalkingIndicator(1, false);
+        SetTalkingIndicator(2, false);
+        SetTalkingIndicator(3, false);
 
         if (dialogueText != null) dialogueText.text = string.Empty;
         if (missionInfoText != null) missionInfoText.text = string.Empty;
@@ -171,6 +179,8 @@ public class BriefingRoomController : MonoBehaviour
         foreach (BriefingLine line in entry.lines)
         {
             RevealPortraitIfNeeded(line.speakerSlot);
+            PlayLineVoice(line.voiceClip);
+            SetTalkingIndicator(line.speakerSlot, true);
 
             string characterKey = GetSpeakerCharacterKey(entry, line.speakerSlot);
             Color labelColor = FindCharacter(characterKey)?.labelColor ?? Color.white;
@@ -198,6 +208,17 @@ public class BriefingRoomController : MonoBehaviour
             }
 
             log.Append(prefix).Append(content).Append("\n\n");
+
+            // 음성이 있는 줄은 텍스트 타이핑이 먼저 끝나도 음성이 다 끝날 때까지 기다렸다가 다음 줄로
+            // 넘어간다 - 사람이 말하는 속도에 맞춰 진행되도록 (doc/0631). 음성이 없는 줄(아직 클립 미준비)은
+            // 지금처럼 고정 pauseBetweenLines만 대기.
+            if (line.voiceClip != null)
+            {
+                yield return new WaitWhile(() =>
+                    voiceAudioSource != null && voiceAudioSource.isPlaying && voiceAudioSource.clip == line.voiceClip);
+            }
+
+            SetTalkingIndicator(line.speakerSlot, false);
             yield return new WaitForSeconds(pauseBetweenLines);
         }
 
@@ -207,6 +228,21 @@ public class BriefingRoomController : MonoBehaviour
 
         yield return new WaitForSeconds(pauseBetweenLines);
         FadeOutAllPortraits();
+    }
+
+    // 클립이 아직 없는 인물(부관 외)은 조용히 건너뛴다 - 텍스트 타이핑은 그대로 진행 (doc/0630).
+    // 볼륨/뮤트는 새로 만들지 않고 SoundManager의 기존 Voice 설정을 그대로 읽어서 적용한다.
+    private void PlayLineVoice(AudioClip clip)
+    {
+        if (voiceAudioSource == null || clip == null)
+            return;
+
+        voiceAudioSource.Stop();
+        voiceAudioSource.clip = clip;
+        voiceAudioSource.volume = SoundManager.Instance != null && SoundManager.Instance.IsVoiceMuted()
+            ? 0f
+            : (SoundManager.Instance != null ? SoundManager.Instance.GetMasterVolume() * SoundManager.Instance.GetVoiceVolume() : 1f);
+        voiceAudioSource.Play();
     }
 
     // "브리핑 시작."/"브리핑 끝." 같이 화자 없이 로그에 한 줄 타이핑해 넣는 공용 헬퍼 (doc/0624).
@@ -315,6 +351,20 @@ public class BriefingRoomController : MonoBehaviour
             3 => speakerPortraitImage3,
             _ => null,
         };
+    }
+
+    private void SetTalkingIndicator(int slot, bool active)
+    {
+        GameObject indicator = slot switch
+        {
+            1 => talkingIndicator1,
+            2 => talkingIndicator2,
+            3 => talkingIndicator3,
+            _ => null,
+        };
+
+        if (indicator != null)
+            indicator.SetActive(active);
     }
 
     private string GetSpeakerCharacterKey(BriefingEntry entry, int slot)
