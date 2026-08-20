@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 // 사운드 전담 싱글턴. 주음량/배경음악/효과음/음성 4개 카테고리의 볼륨·뮤트를 관리하고,
 // 실제 재생은 미리 만들어둔 AudioSource 풀을 순환 재사용해서 처리한다 (doc/0255).
@@ -30,6 +32,9 @@ public class SoundManager : MonoBehaviour
 
     [Header("인터페이스(버튼 클릭) 소리 - 위치 없는 SFX")]
     [SerializeField] private SoundClipSet uiClickSFX;
+
+    [Header("인터페이스(버튼 마우스 호버) 소리 - 위치 없는 SFX (doc/0650, 인게임 밖 UI 버튼 전용)")]
+    [SerializeField] private SoundClipSet uiHoverSFX;
 
     [Header("나레이션 (유닛/건물에 안 묶이는 전역 음성)")]
     [SerializeField] private GlobalVoiceBankSO globalVoiceBank;
@@ -204,6 +209,26 @@ public class SoundManager : MonoBehaviour
         PlayFromPool(sfxPool, set, sfxVolume, sfxMuted, spatialBlend: 0f, transform.position, limitSpam: true);
 
     public void PlayUIClick() => PlaySFX2D(uiClickSFX);
+
+    public void PlayUIHover() => PlaySFX2D(uiHoverSFX);
+
+    // 버튼에 마우스 호버 사운드를 붙이는 공용 헬퍼(doc/0650). Button에는 onClick과 달리 호버용 기본
+    // 이벤트가 없어서 EventTrigger(PointerEnter)를 코드로 붙인다 - 인스펙터/프리팹은 안 건드림.
+    // 인게임 명령/생산/스쿼드 버튼(ProductionSlot.cs)에는 의도적으로 붙이지 않는다 - 옵션창/메인메뉴/
+    // 미션선택/승리화면/브리핑룸처럼 "인게임 밖" UI에서만 호출한다.
+    public static void AddHoverSound(Button button)
+    {
+        if (button == null)
+            return;
+
+        EventTrigger trigger = button.GetComponent<EventTrigger>();
+        if (trigger == null)
+            trigger = button.gameObject.AddComponent<EventTrigger>();
+
+        EventTrigger.Entry entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+        entry.callback.AddListener(_ => Instance?.PlayUIHover());
+        trigger.triggers.Add(entry);
+    }
 
     // 선택 확인음(selectSFX)/명령 확인음(orderSFX) - 재생 중이면 새 요청을 버리고, 끝난 뒤에 들어오는
     // 요청부터 다시 재생한다 (doc/0285). doc/0284의 동시 4개 허용 스팸 방지(limitSpam)와 달리 이 둘은

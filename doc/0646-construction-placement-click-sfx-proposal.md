@@ -36,3 +36,11 @@ SoundManager.Instance?.PlaySFX(data.soundBank?.placementSFX, spawnPos);
 
 ## 후속 - 클립 연결 (2026-08-20)
 `Assets/Sound/NTA/Building/BuildingPlace_Sound.mp3`를 `NTA Building Sound Bank SO.asset`의 `placementSFX`에 연결(건물별 뱅크가 아니라 NTA 전체가 공유하는 단일 뱅크라 모든 NTA 건물에 공통 적용됨). `AssetDatabase.LoadAssetAtPath` + 리플렉션으로 재로드해 클립이 실제로 물렸는지 확인 완료(`clipCount: 1`). OC 건물 사운드 뱅크(`OC Building Sound Bank SO.asset`)는 클립이 없어 요청 범위 밖으로 비워둠 - 필요하면 같은 방식으로 후속 추가.
+
+## 후속 - 클립 v2로 교체 (2026-08-20)
+
+> 건설사운드랑 버튼사운드는 2가 붙은 사운드 클립으로 교체해 연결해줘
+
+`BuildingPlace_Sound.mp3`를 `BuildingPlace_Sound2.mp3`(guid `9f1e91000cc00314f99418417d6bc816`)로
+교체 - `NTA Building Sound Bank SO.asset`의 `placementSFX`만 갱신하면 되므로 doc/0646 때와 동일하게
+NTA 전체 건물에 공통 적용됨. 리플렉션으로 재로드해 `placementSFX → BuildingPlace_Sound2` 확인 완료(PASS).

@@ -123,6 +123,24 @@ ErrorCount: 0` 확인(WarningCount 49는 전부 이 변경과 무관한 기존 �
 
 `uloop get-logs --log-type Error`로 확인한 결과 에러 0건.
 
+## 후속: 클립 v2로 교체 (2026-08-20)
+
+> 건설사운드랑 버튼사운드는 2가 붙은 사운드 클립으로 교체해 연결해줘
+
+사용자가 `Button_Sound.mp3`를 `Button_Sound2.mp3`(guid `a91e8f5b6f89f23479980f194130ff9a`)로 교체.
+`uiClickSFX`가 있는 4곳(`GameManager.prefab`, `MainScene.unity`, `Briefing_Room.unity`,
+`MissionSelect.unity`) 전부 새 guid로 갱신. `GameManager.prefab`은 리플렉션으로 재로드해
+`uiClickSFX → Button_Sound2` 확인 완료(PASS). (건설 배치음 교체는 doc/0646 참고.)
+
+## 후속: 클립 v3로 교체 (2026-08-20)
+
+> 버튼 클릭 사운드 다시 갱신좀 해줘 Button_Sound3로 변경좀 해줘
+
+`Button_Sound2.mp3`를 `Button_Sound3.mp3`(guid `131ae421394fd874f8247d7cb1c3813a`)로 교체.
+`uiClickSFX`가 있는 4곳(`GameManager.prefab`, `MainScene.unity`, `Briefing_Room.unity`,
+`MissionSelect.unity`) 전부 새 guid로 갱신. `npx uloop-cli compile --wait-for-domain-reload true`
+결과 `Success: true, ErrorCount: 0`.
+
 ## 변경된 파일 (전체)
 - `Assets/Scripts/UI/ProductionSlot.cs`
 - `Assets/Scripts/UI/MainMenuController.cs`

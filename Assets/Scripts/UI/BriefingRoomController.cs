@@ -97,6 +97,10 @@ public class BriefingRoomController : MonoBehaviour
         goBackButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
         startMissionButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
 
+        // 버튼 마우스 호버 사운드 (doc/0650)
+        SoundManager.AddHoverSound(goBackButton);
+        SoundManager.AddHoverSound(startMissionButton);
+
         if (entry != null)
             StartCoroutine(StartBriefingAfterDelay(entry));
     }

@@ -2358,7 +2358,12 @@ MonoBehaviour:
   sfxMaxConcurrentPerSet: 4
   uiClickSFX:
     <clips>k__BackingField:
-    - {fileID: 8300000, guid: 48d646b459e7da1479de2823f2145966, type: 3}
+    - {fileID: 8300000, guid: 131ae421394fd874f8247d7cb1c3813a, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  uiHoverSFX:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 68525ea2fee8c5e4abb9e7095721216d, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   globalVoiceBank: {fileID: 0}

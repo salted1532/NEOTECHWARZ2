@@ -60,6 +60,7 @@ public class MissionSelectManager : MonoBehaviour
 
             entry.button.onClick.AddListener(() => LoadMission(entry));
             entry.button.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick()); // 버튼 클릭 공통 사운드(doc/0648)
+            SoundManager.AddHoverSound(entry.button); // 버튼 마우스 호버 사운드 (doc/0650)
             SetupHoverTooltip(entry);
         }
 
@@ -71,6 +72,10 @@ public class MissionSelectManager : MonoBehaviour
         // 버튼 클릭 공통 사운드(doc/0648)
         backToMainMenuButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
         unlockAllMissionButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+
+        // 버튼 마우스 호버 사운드 (doc/0650)
+        SoundManager.AddHoverSound(backToMainMenuButton);
+        SoundManager.AddHoverSound(unlockAllMissionButton);
 
         hoverableButtons = missions.Select(entry => entry.button)
             .Append(backToMainMenuButton)

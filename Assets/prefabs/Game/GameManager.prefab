@@ -250,7 +250,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 63.56164, y: -14.589043}
+  m_AnchoredPosition: {x: 61.5, y: -14}
   m_SizeDelta: {x: 100, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &574277196319477636
@@ -271,10 +271,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.3, g: 0.9, b: 0.3, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -290,15 +290,15 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 1306938879
+  m_fontColor: {r: 0.3, g: 0.9, b: 0.3, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+    topLeft: {r: 0.3, g: 0.9, b: 0.3, a: 1}
+    topRight: {r: 0.3, g: 0.9, b: 0.3, a: 1}
+    bottomLeft: {r: 0.3, g: 0.9, b: 0.3, a: 1}
+    bottomRight: {r: 0.3, g: 0.9, b: 0.3, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
@@ -2713,8 +2713,8 @@ MonoBehaviour:
   LevelDataToLoad: {fileID: 0}
   saveDataOnScan: 1
   levelNameToSave: Default
-  levelDimensionX: 96
-  levelDimensionY: 96
+  levelDimensionX: 128
+  levelDimensionY: 128
   unitScale: 4
   scanSpacingPerUnit: 0.25
   rayStartHeight: 0
@@ -5081,7 +5081,12 @@ MonoBehaviour:
   sfxMaxConcurrentPerSet: 4
   uiClickSFX:
     <clips>k__BackingField:
-    - {fileID: 8300000, guid: 48d646b459e7da1479de2823f2145966, type: 3}
+    - {fileID: 8300000, guid: 131ae421394fd874f8247d7cb1c3813a, type: 3}
+    <volumeScale>k__BackingField: 1
+    <pitchVariance>k__BackingField: 0
+  uiHoverSFX:
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 68525ea2fee8c5e4abb9e7095721216d, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   globalVoiceBank: {fileID: 11400000, guid: e864e84a128f65b48a7506b17632af6a, type: 2}
@@ -19447,7 +19452,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 56
+  m_fontSize: 36
   m_fontSizeBase: 56
   m_fontWeight: 400
   m_enableAutoSizing: 1

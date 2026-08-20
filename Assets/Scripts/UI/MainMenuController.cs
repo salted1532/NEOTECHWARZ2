@@ -55,6 +55,13 @@ public class MainMenuController : MonoBehaviour
         optionCloseButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
         playerPrefsResetButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
 
+        // 버튼 마우스 호버 사운드 (doc/0650)
+        SoundManager.AddHoverSound(playButton);
+        SoundManager.AddHoverSound(optionButton);
+        SoundManager.AddHoverSound(exitButton);
+        SoundManager.AddHoverSound(optionCloseButton);
+        SoundManager.AddHoverSound(playerPrefsResetButton);
+
         mainMenuPanel?.SetActive(true);  // 꺼진 채로 저장돼있어도 시작하면 항상 켜지도록
         optionsPanel?.SetActive(false);
 
