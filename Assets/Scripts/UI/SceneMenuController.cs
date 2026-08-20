@@ -12,9 +12,12 @@ public class SceneMenuController : MonoBehaviour
     [SerializeField] private Button optionButton;       // 옵션 패널 열기
     [SerializeField] private Button optionCloseButton;   // 옵션 패널의 X(닫기) 버튼
     [SerializeField] private Button mainMenuButton;      // "메인화면으로 나가기"
+    [SerializeField] private Button missionSelectButton; // "미션 선택 화면으로"
+    [SerializeField] private Button restartButton;       // "미션 재시작"
 
     [Header("씬 이동")]
     [SerializeField] private string mainSceneName = "MainScene";
+    [SerializeField] private string missionSelectSceneName = "MissionSelect";
 
     [Header("옵션 패널 (레이아웃/사운드 슬라이더는 직접 제작 후 연결)")]
     [SerializeField] private GameObject optionsPanel;
@@ -24,6 +27,15 @@ public class SceneMenuController : MonoBehaviour
         optionButton?.onClick.AddListener(OpenOptionsPanel);
         optionCloseButton?.onClick.AddListener(CloseOptionsPanel);
         mainMenuButton?.onClick.AddListener(OnMainMenuClicked);
+        missionSelectButton?.onClick.AddListener(OnMissionSelectClicked);
+        restartButton?.onClick.AddListener(OnRestartClicked);
+
+        // 버튼 클릭 공통 사운드(doc/0648)
+        optionButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        optionCloseButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        mainMenuButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        missionSelectButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        restartButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
 
         optionsPanel?.SetActive(false);
     }
@@ -47,5 +59,19 @@ public class SceneMenuController : MonoBehaviour
         Time.timeScale = 1f; // 옵션(퍼즈) 상태로 나가면 다음 씬까지 멈춰있지 않도록 안전하게 복구
         UserControl.IsPaused = false;
         SceneManager.LoadScene(mainSceneName);
+    }
+
+    private void OnMissionSelectClicked()
+    {
+        Time.timeScale = 1f;
+        UserControl.IsPaused = false;
+        SceneManager.LoadScene(missionSelectSceneName);
+    }
+
+    private void OnRestartClicked()
+    {
+        Time.timeScale = 1f;
+        UserControl.IsPaused = false;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

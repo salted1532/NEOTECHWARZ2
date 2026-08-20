@@ -64,7 +64,10 @@ public class ControlGroupPanel : MonoBehaviour
 
         Button button = buttonObj.GetComponent<Button>();
         if (button != null)
+        {
             button.onClick.AddListener(() => rtsController.SelectControlGroup(groupIndex));
+            button.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick()); // 버튼 클릭 공통 사운드(doc/0648)
+        }
 
         groupButtons[groupIndex] = buttonObj;
     }

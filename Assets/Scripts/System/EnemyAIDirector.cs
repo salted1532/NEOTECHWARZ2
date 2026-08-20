@@ -443,12 +443,12 @@ public class EnemyAIDirector : MonoBehaviour
                         front.targetSlot.current = unit;
                         front.targetSlot.respawned = true;
                         front.targetSlot.pendingProduction = false;
-                        unit.MoveTo(front.targetSlot.position);
+                        unit.AttackMoveTo(front.targetSlot.position);
                     }
                     else
                     {
                         front.destinationPool.Add(unit);
-                        unit.MoveTo(LaneRallyPosition(rt)); // 생산되자마자 그 레인의 집결지로 - 웨이브/별동대 공통(doc/0545, doc/0610)
+                        unit.AttackMoveTo(LaneRallyPosition(rt)); // 생산되자마자 그 레인의 집결지로 - 웨이브/별동대 공통(doc/0545, doc/0610)
                     }
                 }
             }

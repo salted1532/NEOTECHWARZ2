@@ -29,6 +29,11 @@ public class Stage0Objectives : MonoBehaviour
     private float enemyScanTimer;
     private bool enemiesCleared;
 
+    // 서브목표 성공 사운드 - 조건이 나중에 다시 깨져도(체크리스트는 재평가되지만) 최초 달성 순간에만
+    // 1회 재생한다(doc/0643).
+    private bool enemiesClearedSfxPlayed;
+    private bool oreSecuredSfxPlayed;
+
     private void Start()
     {
         StageManager.Instance.WireObjectiveTexts(this);
@@ -64,6 +69,18 @@ public class Stage0Objectives : MonoBehaviour
 
         if (zoneCaptured && troopersReady && barracksBuilt)
             StageManager.Instance?.ReportVictory();
+
+        PlayMissionSuccessSfxOnce(enemiesCleared, ref enemiesClearedSfxPlayed);
+        PlayMissionSuccessSfxOnce(oreSecured, ref oreSecuredSfxPlayed);
+    }
+
+    private void PlayMissionSuccessSfxOnce(bool objectiveComplete, ref bool alreadyPlayed)
+    {
+        if (!objectiveComplete || alreadyPlayed)
+            return;
+
+        alreadyPlayed = true;
+        SoundManager.Instance?.PlayMissionSuccessVoice();
     }
 
     private int CountAliveUnits(int unitID)

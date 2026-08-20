@@ -152,6 +152,9 @@ public class CaptureSystem : MonoBehaviour
         CurrentOwner = newOwner;
         ApplyEffect(newOwner);
 
+        if (newOwner == CaptureOwner.Ally)
+            SoundManager.Instance?.PlayTerritoryCapturedVoice(); // 거점 점령 나레이션(doc/0642)
+
         Debug.Log($"점령 상태 변경: {newOwner}");
     }
 

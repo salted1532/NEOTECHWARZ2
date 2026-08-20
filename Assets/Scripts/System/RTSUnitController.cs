@@ -1735,7 +1735,7 @@ public class RTSUnitController : MonoBehaviour
 
         BuildingData data = GetBuildingData(BuildingID.SupplyDepot);
         int populationAdded = data != null ? data.maxpopulationamount : 0;
-        return $"Current Population : {GetPopulation()}/{GetMaxPopulation()}\nPopulation Capacity Added : +{populationAdded}";
+        return LocalizationManager.GetText("building.nta.2.populationInfo", GetPopulation(), GetMaxPopulation(), populationAdded);
     }
 
     #endregion

@@ -202,6 +202,8 @@ public class ProductionSlot : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void OnClick()
     {
+        SoundManager.Instance?.PlayUIClick(); // 생산/건설/스킬/부대선택 등 모든 슬롯 버튼 공통(doc/0648)
+
         bool ctrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
         bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 

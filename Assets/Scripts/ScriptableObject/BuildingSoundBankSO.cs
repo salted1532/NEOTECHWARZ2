@@ -16,4 +16,6 @@ public class BuildingSoundBankSO : ScriptableObject
     public SoundClipSet landingSFX { get; private set; } // 착륙 완료 시
     [field: SerializeField]
     public SoundClipSet selectVoice { get; private set; } // "건물 음성" - 선택 시 재생
+    [field: SerializeField]
+    public SoundClipSet placementSFX { get; private set; } // 건설모드 배치 클릭으로 프리뷰(고스트)가 그 자리에 고정되는 순간 (doc/0646)
 }

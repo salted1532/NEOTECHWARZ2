@@ -180,6 +180,7 @@ public class PlacementSystem : MonoBehaviour
 
         // 클릭한 자리에 일꾼이 도착할 때까지 남아있을 고정 고스트를 생성
         GameObject ghost = preview.SpawnConstructionGhost(data.Prefab, spawnPos);
+        SoundManager.Instance?.PlaySFX(data.soundBank?.placementSFX, spawnPos); // 프리뷰가 이 자리에 고정되는 순간 (doc/0646)
 
         worker.GetComponent<UnitAudio>()?.PlayOrderVoice(); // 건설 위치로 이동을 시작하므로 이동 명령 음성 재생
         worker.GetComponent<UnitAudio>()?.PlayOrderSFX();

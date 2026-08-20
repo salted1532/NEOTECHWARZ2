@@ -26,6 +26,9 @@ public class SubStage2Objectives : MonoBehaviour
     private float recoveryTeamScanTimer;
     private bool recoveryTeamEliminated;
 
+    // 서브목표 성공 사운드 - 최초 달성 순간 1회만 재생한다(doc/0643).
+    private bool recoveryTeamEliminatedSfxPlayed;
+
     private void Start()
     {
         StageManager.Instance.WireObjectiveTexts(this);
@@ -51,6 +54,17 @@ public class SubStage2Objectives : MonoBehaviour
 
         if (fragmentDelivered)
             StageManager.Instance?.ReportVictory();
+
+        PlayMissionSuccessSfxOnce(recoveryTeamEliminated, ref recoveryTeamEliminatedSfxPlayed);
+    }
+
+    private void PlayMissionSuccessSfxOnce(bool objectiveComplete, ref bool alreadyPlayed)
+    {
+        if (!objectiveComplete || alreadyPlayed)
+            return;
+
+        alreadyPlayed = true;
+        SoundManager.Instance?.PlayMissionSuccessVoice();
     }
 
     private void UpdateCarry()

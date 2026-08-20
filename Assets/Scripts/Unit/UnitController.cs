@@ -2133,7 +2133,11 @@ public class UnitController : MonoBehaviour, IDestructible
     // 자동교전(AttackMoveTo/FollowUnit/FollowBuilding/패시브 대기 중 사거리 내 적 발견)은 UnitcurrentState를
     // 계속 Idle로 유지하므로(각 명령 지점 주석 참고), 상태값만으로는 "실제로 쏘는 중"을 놓친다 - AttackRange의
     // 실시간 교전 여부도 함께 확인해야 두리번 애니메이션 등이 전투 중을 정확히 인식한다 (doc/0451).
-    public bool IsAttack() => UnitcurrentState == UnitState.Attack || (attackRange != null && attackRange.HasEnemyInRange);
+    // HasEnemyInRange 체크는 Idle 상태에서만 반영한다 - Move 상태(이동/후퇴 명령)까지 넓게 봤더니, 감지
+    // 범위(사거리+5 마진) 안에 적이 남아있는 동안은 이동 명령을 내려도 Fire 애니메이션이 안 풀리고
+    // 공격 모션인 채로 이동해버렸다(doc/0644). Attack 상태는 그대로 항상 true.
+    public bool IsAttack() => UnitcurrentState == UnitState.Attack
+        || (UnitcurrentState == UnitState.Idle && attackRange != null && attackRange.HasEnemyInRange);
     // AttackRange.Update()의 자동교전 게이트 전용 - IsAttack()과 달리 실제 명령 상태만 본다. IsAttack()은
     // 애니메이션용으로 사거리 내 적 존재 여부까지 넓게 판정해서(doc/0451), 이동 명령(Move) 중에도 직전까지
     // 싸우던 적이 감지 범위 안에 남아있으면 true가 되어 MoveTo() 등으로 공격을 끊으려 해도 AttackRange가

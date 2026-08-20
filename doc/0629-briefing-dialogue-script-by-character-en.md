@@ -1,5 +1,7 @@
 # Briefing Room — English Dialogue Script by Character (for TTS)
 
+> 정본은 `Docs/BriefingRoomDialogueScript.md`로 이전됨(doc/0634). 이 파일은 세션 로그로 보존.
+
 Same lines as [[0628-briefing-room-english-dialogue-script-for-tts]], regrouped by speaker instead
 of by mission, so each character's full line set can be diffed/copy-pasted in one pass. Lines are
 in mission playback order within each character block.

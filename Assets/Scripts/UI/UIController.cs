@@ -1045,6 +1045,7 @@ public class UIController : MonoBehaviour
 
             int page = i;
             squadPageButtons[i].onClick.AddListener(() => SelectSquadPage(page));
+            squadPageButtons[i].onClick.AddListener(() => SoundManager.Instance?.PlayUIClick()); // 버튼 클릭 공통 사운드(doc/0648)
         }
     }
 

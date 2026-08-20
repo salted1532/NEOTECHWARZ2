@@ -25,7 +25,8 @@ public class VictoryPanelController : MonoBehaviour
 
     [Header("씬 이동")]
     [SerializeField] private string mainSceneName = "MainScene";
-    [SerializeField] private string nextStageSceneName = "SampleScene"; // 다음 스테이지 씬이 아직 없어 일단 SampleScene으로 연결
+    [SerializeField] private string nextStageSceneName = "SampleScene"; // 다음 스테이지 씬 이름 - BriefingSelection.TargetSceneName으로 넘겨서 브리핑룸을 거친 뒤 이 씬으로 이동한다
+    [SerializeField] private string briefingRoomSceneName = "Briefing_Room"; // MissionSelectManager와 동일 컨벤션 (doc/0616)
 
     [Header("연출")]
     [SerializeField] private float victoryDelay = 3f;
@@ -35,6 +36,12 @@ public class VictoryPanelController : MonoBehaviour
         mainMenuButton?.onClick.AddListener(OnMainMenuClicked);
         nextStageButton?.onClick.AddListener(OnNextStageClicked);
         returnToGameButton?.onClick.AddListener(OnReturnToGameClicked);
+
+        // 버튼 클릭 공통 사운드(doc/0648)
+        mainMenuButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        nextStageButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        returnToGameButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+
         victoryPanel?.SetActive(false);
     }
 
@@ -70,6 +77,7 @@ public class VictoryPanelController : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(victoryDelay);
         victoryPanel?.SetActive(true);
+        SoundManager.Instance?.PlayVictoryScreenVoice(); // 승리화면 표시 사운드(doc/0645)
         Time.timeScale = 0f;
         UserControl.IsPaused = true;
     }
@@ -81,6 +89,9 @@ public class VictoryPanelController : MonoBehaviour
         SceneManager.LoadScene(mainSceneName);
     }
 
+    // 씬을 바로 로드하지 않고 MissionSelectManager.LoadMission()과 같은 경로(BriefingSelection →
+    // Briefing_Room)를 태워 다음 스테이지 브리핑을 거치게 한다 (doc/0635) - 이전엔 씬을 직접 로드해서
+    // 브리핑룸이 스킵됐음.
     private void OnNextStageClicked()
     {
         if (string.IsNullOrEmpty(nextStageSceneName))
@@ -88,7 +99,11 @@ public class VictoryPanelController : MonoBehaviour
 
         Time.timeScale = 1f;
         UserControl.IsPaused = false;
-        SceneManager.LoadScene(nextStageSceneName);
+
+        BriefingSelection.MissionNumber = missionNumber + 1;
+        BriefingSelection.IsSubMission = false;
+        BriefingSelection.TargetSceneName = nextStageSceneName;
+        SceneManager.LoadScene(briefingRoomSceneName);
     }
 
     private void OnReturnToGameClicked()

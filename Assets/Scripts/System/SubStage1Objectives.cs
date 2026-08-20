@@ -22,6 +22,9 @@ public class SubStage1Objectives : MonoBehaviour
     private float scoutScanTimer;
     private bool scoutsEliminated;
 
+    // 서브목표 성공 사운드 - 최초 달성 순간 1회만 재생한다(doc/0643).
+    private bool scoutsEliminatedSfxPlayed;
+
     private void Start()
     {
         StageManager.Instance.WireObjectiveTexts(this);
@@ -47,6 +50,8 @@ public class SubStage1Objectives : MonoBehaviour
         ObjectiveTextUtil.SetObjectiveText(destroyRadarBaseText, LocalizationManager.GetText("objective.substage1.main1"), radarBaseDestroyed);
         ObjectiveTextUtil.SetObjectiveText(eliminateScoutsText, LocalizationManager.GetText("objective.substage1.sub1"), scoutsEliminated);
 
+        PlayMissionSuccessSfxOnce(scoutsEliminated, ref scoutsEliminatedSfxPlayed);
+
         if (radarBaseDestroyed)
         {
             StageManager.Instance?.ReportVictory();
@@ -56,5 +61,14 @@ public class SubStage1Objectives : MonoBehaviour
         bool squadWiped = squadDeployed && rtsController != null && rtsController.UnitList.Count == 0;
         if (squadWiped)
             StageManager.Instance?.ReportDefeat();
+    }
+
+    private void PlayMissionSuccessSfxOnce(bool objectiveComplete, ref bool alreadyPlayed)
+    {
+        if (!objectiveComplete || alreadyPlayed)
+            return;
+
+        alreadyPlayed = true;
+        SoundManager.Instance?.PlayMissionSuccessVoice();
     }
 }

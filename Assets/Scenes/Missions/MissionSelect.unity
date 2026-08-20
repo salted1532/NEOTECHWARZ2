@@ -1196,9 +1196,9 @@ MonoBehaviour:
   m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 23
+  m_fontSizeMax: 36
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -1232,7 +1232,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 12, y: 8, z: 12, w: 8}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -1773,7 +1773,8 @@ MonoBehaviour:
   sfxRetriggerInterval: 0.05
   sfxMaxConcurrentPerSet: 4
   uiClickSFX:
-    <clips>k__BackingField: []
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: 48d646b459e7da1479de2823f2145966, type: 3}
     <volumeScale>k__BackingField: 1
     <pitchVariance>k__BackingField: 0
   globalVoiceBank: {fileID: 0}
@@ -3389,6 +3390,7 @@ MonoBehaviour:
   backToMainMenuButton: {fileID: 26228417}
   mainMenuSceneName: MainScene
   unlockAllMissionButton: {fileID: 1297760229}
+  briefingRoomSceneName: Briefing_Room
   cursorTexture: {fileID: 2800000, guid: 9c2d77e276d94de40bbf9f244dce00b8, type: 3}
   cursorHoverTexture: {fileID: 2800000, guid: a4bfefaaa0a9380408d8bd5ddda6c7c1, type: 3}
   cursorHotspot: {x: 0, y: 0}

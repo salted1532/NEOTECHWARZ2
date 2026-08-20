@@ -63,6 +63,7 @@ public class StageManager : MonoBehaviour
     {
         if (Result != StageResult.InProgress) return;
         Result = StageResult.Victory;
+        SoundManager.Instance?.PlayMissionSuccessVoice(); // 주목표 달성 나레이션 - 모든 스테이지가 이 지점을 거쳐가므로 한 곳만 훅(doc/0643)
         OnVictory?.Invoke();
     }
 

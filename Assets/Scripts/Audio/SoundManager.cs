@@ -152,11 +152,20 @@ public class SoundManager : MonoBehaviour
             // 바짝 당겨야(가까이 있을 때만) 들리도록 거리값을 게임 카메라 스케일에 맞춘다.
             // minDistance/maxDistance를 15~80에서 10~45로 좁혀서 카메라 줌 범위 전체가 감쇠 구간에
             // 들어오게 함 - 줌 아웃할수록 더 꾸준히/가파르게 작아지도록 (doc/0286).
+            //
+            // maxDistance=45는 당시 CameraControl.maxZoom(카메라 높이 상한) 35 기준이었다. 카메라가
+            // 55° 기울어져 화면 중앙을 내려다보므로 화면 중앙까지 실제 3D 거리는 높이 × 1/sin(55°) ≈
+            // 높이 × 1.221 (35 × 1.221 ≈ 45로 당시 값과 일치). 이후 maxZoom이 40으로 늘고 언덕
+            // 지형(Layer1~3)에서 tierZoomStep(5)만큼 단마다 더 올라가는 게 추가되면서 카메라 높이가
+            // 최대 55(3단)까지 올라가게 됐는데, 이 값(45)은 그대로라 화면 가운데에서 전투가 벌어져도
+            // 최대 줌아웃 상태에선 거리가 maxDistance를 넘어 완전히 무음 처리됐다(doc/0641). 55 ×
+            // 1.221 ≈ 67에 여유를 둬서 70으로 올림 - maxZoom/tierZoomStep이 또 바뀌면 이 계산식대로
+            // 다시 맞추면 된다.
             if (configureSpatialRolloff)
             {
                 source.rolloffMode = AudioRolloffMode.Linear;
                 source.minDistance = 10f;
-                source.maxDistance = 45f;
+                source.maxDistance = 70f;
             }
 
             pool.Add(new PooledSource { Source = source });
@@ -328,6 +337,18 @@ public class SoundManager : MonoBehaviour
     public void PlayActionFailedWarning()
     {
         if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.actionFailed);
+    }
+
+    // 거점 점령 완료 시(doc/0642) - CaptureSystem이 아군 점령으로 바뀌는 순간 한 번만 호출한다.
+    public void PlayTerritoryCapturedVoice()
+    {
+        if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.territoryCaptured);
+    }
+
+    // 승리화면이 실제로 표시되는 순간(doc/0645) - VictoryPanelController가 패널을 활성화할 때 호출.
+    public void PlayVictoryScreenVoice()
+    {
+        if (globalVoiceBank != null) PlayGlobalVoice(globalVoiceBank.victoryScreen);
     }
 
     // AudioSource를 반환하는 이유: PlayGlobalVoice가 "이 카테고리가 지금 재생 중인지"를 나중에

@@ -27,6 +27,9 @@ public class Stage3Objectives : MonoBehaviour
     private bool alienOutpostAssigned;
     private bool survivorsRescued;
 
+    // 서브목표 성공 사운드 - 최초 달성 순간 1회만 재생한다(doc/0643).
+    private bool survivorsRescuedSfxPlayed;
+
     private void Start()
     {
         StageManager.Instance.WireObjectiveTexts(this);
@@ -53,6 +56,17 @@ public class Stage3Objectives : MonoBehaviour
 
         if (outpostDestroyed)
             StageManager.Instance?.ReportVictory();
+
+        PlayMissionSuccessSfxOnce(survivorsRescued, ref survivorsRescuedSfxPlayed);
+    }
+
+    private void PlayMissionSuccessSfxOnce(bool objectiveComplete, ref bool alreadyPlayed)
+    {
+        if (!objectiveComplete || alreadyPlayed)
+            return;
+
+        alreadyPlayed = true;
+        SoundManager.Instance?.PlayMissionSuccessVoice();
     }
 
     private IEnumerator RescueSequence()

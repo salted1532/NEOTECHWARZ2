@@ -1,0 +1,747 @@
+{
+  "ExportTimestamp": "2026-08-20 15:26:40",
+  "Context": {
+    "sceneType": "prefab",
+    "sceneName": "Assets/prefabs/Game/GameManager.prefab",
+    "nodeCount": 69,
+    "maxDepth": 6
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "GameManager",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 69,
+        "maxDepth": 6
+      },
+      "roots": [
+        {
+          "name": "OptionPanel",
+          "isActive": false,
+          "components": [],
+          "siblingIndex": 9,
+          "tag": "Untagged",
+          "layer": 5,
+          "path": "OptionPanel",
+          "children": [
+            {
+              "name": "Input_Block",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/Input_Block",
+              "children": []
+            },
+            {
+              "name": "Close",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/Close",
+              "children": []
+            },
+            {
+              "name": "Master_Volume",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/Master_Volume",
+              "children": [
+                {
+                  "name": "Mute",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/Master_Volume/Mute",
+                  "children": [
+                    {
+                      "name": "Label",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/Master_Volume/Mute/Label",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Background",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/Master_Volume/Background",
+                  "children": []
+                },
+                {
+                  "name": "Fill Area",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/Master_Volume/Fill Area",
+                  "children": [
+                    {
+                      "name": "Fill",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/Master_Volume/Fill Area/Fill",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Handle Slide Area",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/Master_Volume/Handle Slide Area",
+                  "children": [
+                    {
+                      "name": "Handle",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/Master_Volume/Handle Slide Area/Handle",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "MasterVolume_Input",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/Master_Volume/MasterVolume_Input",
+                  "children": [
+                    {
+                      "name": "Text Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/Master_Volume/MasterVolume_Input/Text Area",
+                      "children": [
+                        {
+                          "name": "Text",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "OptionPanel/Master_Volume/MasterVolume_Input/Text Area/Text",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "BGM",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/BGM",
+              "children": [
+                {
+                  "name": "Mute",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/BGM/Mute",
+                  "children": [
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/BGM/Mute/Background",
+                      "children": [
+                        {
+                          "name": "Checkmark",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "OptionPanel/BGM/Mute/Background/Checkmark",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Label",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/BGM/Mute/Label",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Background",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/BGM/Background",
+                  "children": []
+                },
+                {
+                  "name": "Fill Area",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/BGM/Fill Area",
+                  "children": [
+                    {
+                      "name": "Fill",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/BGM/Fill Area/Fill",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Handle Slide Area",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/BGM/Handle Slide Area",
+                  "children": [
+                    {
+                      "name": "Handle",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/BGM/Handle Slide Area/Handle",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "BGM_Input",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/BGM/BGM_Input",
+                  "children": [
+                    {
+                      "name": "Text Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/BGM/BGM_Input/Text Area",
+                      "children": [
+                        {
+                          "name": "Text",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "OptionPanel/BGM/BGM_Input/Text Area/Text",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "SFX",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/SFX",
+              "children": [
+                {
+                  "name": "Mute",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/SFX/Mute",
+                  "children": [
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/SFX/Mute/Background",
+                      "children": [
+                        {
+                          "name": "Checkmark",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "OptionPanel/SFX/Mute/Background/Checkmark",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Label",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/SFX/Mute/Label",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Background",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/SFX/Background",
+                  "children": []
+                },
+                {
+                  "name": "Fill Area",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/SFX/Fill Area",
+                  "children": [
+                    {
+                      "name": "Fill",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/SFX/Fill Area/Fill",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Handle Slide Area",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/SFX/Handle Slide Area",
+                  "children": [
+                    {
+                      "name": "Handle",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/SFX/Handle Slide Area/Handle",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "SFX_Input",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/SFX/SFX_Input",
+                  "children": [
+                    {
+                      "name": "Text Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/SFX/SFX_Input/Text Area",
+                      "children": [
+                        {
+                          "name": "Text",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "OptionPanel/SFX/SFX_Input/Text Area/Text",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "VOICE",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/VOICE",
+              "children": [
+                {
+                  "name": "Mute",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/VOICE/Mute",
+                  "children": [
+                    {
+                      "name": "Background",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/VOICE/Mute/Background",
+                      "children": [
+                        {
+                          "name": "Checkmark",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "OptionPanel/VOICE/Mute/Background/Checkmark",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Label",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/VOICE/Mute/Label",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Background",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/VOICE/Background",
+                  "children": []
+                },
+                {
+                  "name": "Fill Area",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/VOICE/Fill Area",
+                  "children": [
+                    {
+                      "name": "Fill",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/VOICE/Fill Area/Fill",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Handle Slide Area",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/VOICE/Handle Slide Area",
+                  "children": [
+                    {
+                      "name": "Handle",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/VOICE/Handle Slide Area/Handle",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "VOICE_Input",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 4,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/VOICE/VOICE_Input",
+                  "children": [
+                    {
+                      "name": "Text Area",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/VOICE/VOICE_Input/Text Area",
+                      "children": [
+                        {
+                          "name": "Text",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "OptionPanel/VOICE/VOICE_Input/Text Area/Text",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Screen Resolution",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/Screen Resolution",
+              "children": [
+                {
+                  "name": "Screen Resolution_Text",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/Screen Resolution/Screen Resolution_Text",
+                  "children": []
+                },
+                {
+                  "name": "Label",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 1,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/Screen Resolution/Label",
+                  "children": []
+                },
+                {
+                  "name": "Arrow",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 2,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/Screen Resolution/Arrow",
+                  "children": []
+                },
+                {
+                  "name": "Template",
+                  "isActive": false,
+                  "components": [],
+                  "siblingIndex": 3,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/Screen Resolution/Template",
+                  "children": [
+                    {
+                      "name": "Viewport",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 0,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/Screen Resolution/Template/Viewport",
+                      "children": [
+                        {
+                          "name": "Content",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "OptionPanel/Screen Resolution/Template/Viewport/Content",
+                          "children": [
+                            {
+                              "name": "Item",
+                              "isActive": true,
+                              "components": [],
+                              "siblingIndex": 0,
+                              "tag": "Untagged",
+                              "layer": 5,
+                              "path": "OptionPanel/Screen Resolution/Template/Viewport/Content/Item",
+                              "children": [
+                                {
+                                  "name": "Item Background",
+                                  "isActive": true,
+                                  "components": [],
+                                  "siblingIndex": 0,
+                                  "tag": "Untagged",
+                                  "layer": 5,
+                                  "path": "OptionPanel/Screen Resolution/Template/Viewport/Content/Item/Item Background",
+                                  "children": []
+                                },
+                                {
+                                  "name": "Item Checkmark",
+                                  "isActive": true,
+                                  "components": [],
+                                  "siblingIndex": 1,
+                                  "tag": "Untagged",
+                                  "layer": 5,
+                                  "path": "OptionPanel/Screen Resolution/Template/Viewport/Content/Item/Item Checkmark",
+                                  "children": []
+                                },
+                                {
+                                  "name": "Item Label",
+                                  "isActive": true,
+                                  "components": [],
+                                  "siblingIndex": 2,
+                                  "tag": "Untagged",
+                                  "layer": 5,
+                                  "path": "OptionPanel/Screen Resolution/Template/Viewport/Content/Item/Item Label",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Scrollbar",
+                      "isActive": true,
+                      "components": [],
+                      "siblingIndex": 1,
+                      "tag": "Untagged",
+                      "layer": 5,
+                      "path": "OptionPanel/Screen Resolution/Template/Scrollbar",
+                      "children": [
+                        {
+                          "name": "Sliding Area",
+                          "isActive": true,
+                          "components": [],
+                          "siblingIndex": 0,
+                          "tag": "Untagged",
+                          "layer": 5,
+                          "path": "OptionPanel/Screen Resolution/Template/Scrollbar/Sliding Area",
+                          "children": [
+                            {
+                              "name": "Handle",
+                              "isActive": true,
+                              "components": [],
+                              "siblingIndex": 0,
+                              "tag": "Untagged",
+                              "layer": 5,
+                              "path": "OptionPanel/Screen Resolution/Template/Scrollbar/Sliding Area/Handle",
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "BackToMainMenu",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/BackToMainMenu",
+              "children": [
+                {
+                  "name": "Text (TMP)",
+                  "isActive": true,
+                  "components": [],
+                  "siblingIndex": 0,
+                  "tag": "Untagged",
+                  "layer": 5,
+                  "path": "OptionPanel/BackToMainMenu/Text (TMP)",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

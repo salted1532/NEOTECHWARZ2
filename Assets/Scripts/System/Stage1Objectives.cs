@@ -26,6 +26,11 @@ public class Stage1Objectives : MonoBehaviour
     private bool ocMainBaseAssigned;
     private bool allEnemyBuildingsDestroyed;
 
+    // 서브목표 성공 사운드 - 조건이 나중에 다시 깨져도 최초 달성 순간에만 1회 재생한다(doc/0643).
+    private bool oreSecuredSfxPlayed;
+    private bool radarCapturedSfxPlayed;
+    private bool allEnemyBuildingsDestroyedSfxPlayed;
+
     private void Start()
     {
         StageManager.Instance.WireObjectiveTexts(this);
@@ -56,6 +61,7 @@ public class Stage1Objectives : MonoBehaviour
 
         bool mainBaseDestroyed = ocMainBaseAssigned && ocMainBase == null;
         int oreAmount = rtsController != null ? rtsController.GetOre() : 0;
+        bool oreSecured = oreAmount >= RequiredOre;
         bool radarCaptured = radarBaseZone != null && radarBaseZone.Owner == CaptureOwner.Ally;
 
         ObjectiveTextUtil.SetObjectiveText(destroyMainBaseText, LocalizationManager.GetText("objective.stage1.main1"), mainBaseDestroyed);
@@ -65,5 +71,18 @@ public class Stage1Objectives : MonoBehaviour
 
         if (mainBaseDestroyed)
             StageManager.Instance?.ReportVictory();
+
+        PlayMissionSuccessSfxOnce(oreSecured, ref oreSecuredSfxPlayed);
+        PlayMissionSuccessSfxOnce(radarCaptured, ref radarCapturedSfxPlayed);
+        PlayMissionSuccessSfxOnce(allEnemyBuildingsDestroyed, ref allEnemyBuildingsDestroyedSfxPlayed);
+    }
+
+    private void PlayMissionSuccessSfxOnce(bool objectiveComplete, ref bool alreadyPlayed)
+    {
+        if (!objectiveComplete || alreadyPlayed)
+            return;
+
+        alreadyPlayed = true;
+        SoundManager.Instance?.PlayMissionSuccessVoice();
     }
 }

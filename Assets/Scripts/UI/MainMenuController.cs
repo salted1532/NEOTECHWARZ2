@@ -48,6 +48,13 @@ public class MainMenuController : MonoBehaviour
         optionCloseButton?.onClick.AddListener(CloseOptionsPanel);
         playerPrefsResetButton?.onClick.AddListener(ResetPlayerPrefs);
 
+        // 버튼 클릭 공통 사운드(doc/0648)
+        playButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        optionButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        exitButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        optionCloseButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+        playerPrefsResetButton?.onClick.AddListener(() => SoundManager.Instance?.PlayUIClick());
+
         mainMenuPanel?.SetActive(true);  // 꺼진 채로 저장돼있어도 시작하면 항상 켜지도록
         optionsPanel?.SetActive(false);
 

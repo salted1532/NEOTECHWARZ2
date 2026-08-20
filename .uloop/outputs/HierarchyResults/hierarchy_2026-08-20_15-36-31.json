@@ -1,0 +1,122 @@
+{
+  "ExportTimestamp": "2026-08-20 15:36:31",
+  "Context": {
+    "sceneType": "prefab",
+    "sceneName": "Assets/prefabs/Game/GameManager.prefab",
+    "nodeCount": 10,
+    "maxDepth": 1
+  },
+  "Hierarchy": [
+    {
+      "sceneName": "GameManager",
+      "stats": {
+        "rootCount": 1,
+        "nodeCount": 10,
+        "maxDepth": 1
+      },
+      "roots": [
+        {
+          "name": "OptionPanel",
+          "isActive": false,
+          "components": [],
+          "siblingIndex": 9,
+          "tag": "Untagged",
+          "layer": 5,
+          "path": "OptionPanel",
+          "children": [
+            {
+              "name": "Input_Block",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 0,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/Input_Block",
+              "children": []
+            },
+            {
+              "name": "Close",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 1,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/Close",
+              "children": []
+            },
+            {
+              "name": "Master_Volume",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 2,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/Master_Volume",
+              "children": []
+            },
+            {
+              "name": "BGM",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 3,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/BGM",
+              "children": []
+            },
+            {
+              "name": "SFX",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 4,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/SFX",
+              "children": []
+            },
+            {
+              "name": "VOICE",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 5,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/VOICE",
+              "children": []
+            },
+            {
+              "name": "Screen Resolution",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 6,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/Screen Resolution",
+              "children": []
+            },
+            {
+              "name": "GoToMissionSelect",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 7,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/GoToMissionSelect",
+              "children": []
+            },
+            {
+              "name": "BackToMainMenu",
+              "isActive": true,
+              "components": [],
+              "siblingIndex": 8,
+              "tag": "Untagged",
+              "layer": 5,
+              "path": "OptionPanel/BackToMainMenu",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
