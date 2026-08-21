@@ -1504,11 +1504,12 @@ MonoBehaviour:
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.selena
       textKey: briefing.line.1.1
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: d867e875d26a9004286ef199962cc81d, type: 3}
     - speakerSlot: 3
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.1.2
       voiceClip: {fileID: 8300000, guid: 485fa206db5b39f48acd593b64177230, type: 3}
+      fadeOutPortraitSlotAfter: 2
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.adjutant
       textKey: briefing.line.1.3
@@ -1535,7 +1536,7 @@ MonoBehaviour:
     - speakerSlot: 3
       speakerLabelKey: briefing.speaker.scout
       textKey: briefing.line.2.2
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: b8e499f2ed66b9b428fb1d171a71fa4b, type: 3}
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.2.3
@@ -1554,7 +1555,7 @@ MonoBehaviour:
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.scout
       textKey: briefing.line.3.1
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: 3c7964d8715b2a449b881660b7559d5f, type: 3}
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.adjutant
       textKey: briefing.line.3.2
@@ -1573,7 +1574,7 @@ MonoBehaviour:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.selena
       textKey: briefing.line.4.0
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: a9296398635dced42b207956e3393f05, type: 3}
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.4.1
@@ -1581,7 +1582,7 @@ MonoBehaviour:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.selena
       textKey: briefing.line.4.2
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: 96a87a12777e29548aacfe9c1aaed9bc, type: 3}
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.4.3
@@ -1593,7 +1594,7 @@ MonoBehaviour:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.selena
       textKey: briefing.line.4.5
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: 97bf1f26e24e5844591bb28fe395c702, type: 3}
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.4.6
@@ -1612,7 +1613,7 @@ MonoBehaviour:
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.selena
       textKey: briefing.line.5.1
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: b4d3cde5cae005044947f6b893edf0ba, type: 3}
     - speakerSlot: 3
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.5.2
@@ -1647,7 +1648,7 @@ MonoBehaviour:
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.detachment_leader
       textKey: briefing.line.sub1.1
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: 8d30e7c5af437e34eab3b3e46d381829, type: 3}
     - speakerSlot: 3
       speakerLabelKey: briefing.speaker.adjutant
       textKey: briefing.line.sub1.2
@@ -1655,7 +1656,7 @@ MonoBehaviour:
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.detachment_leader
       textKey: briefing.line.sub1.3
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: 94ca77ebef13ab744a154dd97f68226f, type: 3}
   - missionNumber: 2
     isSubMission: 1
     speaker1Key: soldier
@@ -1666,7 +1667,7 @@ MonoBehaviour:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.scout
       textKey: briefing.line.sub2.0
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: 1df449ecf7e8a9d459f3542e2d3b359c, type: 3}
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.sub2.1
@@ -1674,7 +1675,7 @@ MonoBehaviour:
     - speakerSlot: 3
       speakerLabelKey: briefing.speaker.detachment_leader
       textKey: briefing.line.sub2.2
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: 1aa265b4c10942f4d82b31923b8fe4ea, type: 3}
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.sub2.3
@@ -1697,7 +1698,7 @@ MonoBehaviour:
     - speakerSlot: 3
       speakerLabelKey: briefing.speaker.rescue_leader
       textKey: briefing.line.sub3.2
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: cf1d48ae3f8ee0a4aa05c8f1ade4ef4b, type: 3}
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.sub3.3
@@ -1712,7 +1713,7 @@ MonoBehaviour:
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.selena
       textKey: briefing.line.sub4.0
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: b554535422ad105488a56bfd289ed136, type: 3}
     - speakerSlot: 2
       speakerLabelKey: briefing.speaker.adrian
       textKey: briefing.line.sub4.1
@@ -1720,11 +1721,11 @@ MonoBehaviour:
     - speakerSlot: 3
       speakerLabelKey: briefing.speaker.defense_leader
       textKey: briefing.line.sub4.2
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: a686950a01da45245a7e171650109ccd, type: 3}
     - speakerSlot: 1
       speakerLabelKey: briefing.speaker.selena
       textKey: briefing.line.sub4.3
-      voiceClip: {fileID: 0}
+      voiceClip: {fileID: 8300000, guid: 414092298a1f8f6438bc47aab39d09b4, type: 3}
   speakerPortraitImage: {fileID: 1756962411}
   speakerPortraitImage2: {fileID: 301887540}
   speakerPortraitImage3: {fileID: 2079694411}

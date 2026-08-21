@@ -39,6 +39,7 @@ public class BriefingLine
     public string speakerLabelKey; // 예: "briefing.speaker.adrian" (7개 고정 키, 재사용)
     public string textKey; // 그 줄의 대사, 예: "briefing.line.1.0"
     public AudioClip voiceClip; // TTS로 뽑은 이 줄의 음성 (doc/0630). 없으면 텍스트만 타이핑되고 무음.
+    public int fadeOutPortraitSlotAfter; // 0=없음, 1~3이면 이 줄이 끝난 뒤 그 슬롯 초상화를 페이드아웃 (통신 이탈 연출, doc/0653)
 }
 
 [System.Serializable]
@@ -228,6 +229,18 @@ public class BriefingRoomController : MonoBehaviour
 
             SetTalkingIndicator(line.speakerSlot, false);
             yield return new WaitForSeconds(pauseBetweenLines);
+
+            // 특정 인물이 대화 중간에 통신에서 먼저 빠지는 연출(doc/0653) - 지정된 줄이 끝나면 그 슬롯
+            // 초상화만 페이드아웃한다. revealedSlots에서 제거해서 같은 슬롯이 나중에 다시 말하면 처음처럼
+            // 다시 페이드인되게 한다.
+            if (line.fadeOutPortraitSlotAfter != 0)
+            {
+                Image slotImage = GetSlotImage(line.fadeOutPortraitSlotAfter);
+                if (slotImage != null)
+                    StartCoroutine(FadeTo(slotImage, 0f, portraitFadeDuration));
+                revealedSlots.Remove(line.fadeOutPortraitSlotAfter);
+                SetTalkingIndicator(line.fadeOutPortraitSlotAfter, false);
+            }
         }
 
         // 마지막 대사 다음에 "브리핑 끝." 안내문을 타이핑하고, 다 끝나면 인물 이미지를 페이드아웃한다
