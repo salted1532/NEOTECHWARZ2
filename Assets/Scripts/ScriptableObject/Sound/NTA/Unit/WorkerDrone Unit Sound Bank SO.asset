@@ -49,7 +49,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 9397f5d9d2806a44cb180a7d39066523, type: 3}
     - {fileID: 8300000, guid: 74f4de6e2b4f6174fb75327dd3835522, type: 3}
     - {fileID: 8300000, guid: 49f321ceaf7f2624e9b9f51a680e8ae5, type: 3}
-    <volumeScale>k__BackingField: 1
+    <volumeScale>k__BackingField: 2
     <pitchVariance>k__BackingField: 0
   <orderVoice>k__BackingField:
     <clips>k__BackingField:
@@ -58,32 +58,37 @@ MonoBehaviour:
     - {fileID: 8300000, guid: b83b428951daa924b904b581cf8e3beb, type: 3}
     - {fileID: 8300000, guid: f535294ef16bf764ab267eaf1efc3d5b, type: 3}
     - {fileID: 8300000, guid: 8ea9153d87c4e1a4a99dd846285c9e0b, type: 3}
-    <volumeScale>k__BackingField: 1
+    <volumeScale>k__BackingField: 2
     <pitchVariance>k__BackingField: 0
   <attackOrderVoice>k__BackingField:
-    <clips>k__BackingField: []
-    <volumeScale>k__BackingField: 1
+    <clips>k__BackingField:
+    - {fileID: 8300000, guid: fa333e86b8fe3b54ea76b3ffaabcf08c, type: 3}
+    - {fileID: 8300000, guid: 44023e7d1f2adf747bd21ccddfe51776, type: 3}
+    - {fileID: 8300000, guid: b83b428951daa924b904b581cf8e3beb, type: 3}
+    - {fileID: 8300000, guid: f535294ef16bf764ab267eaf1efc3d5b, type: 3}
+    - {fileID: 8300000, guid: 8ea9153d87c4e1a4a99dd846285c9e0b, type: 3}
+    <volumeScale>k__BackingField: 2
     <pitchVariance>k__BackingField: 0
   <spawnVoice>k__BackingField:
     <clips>k__BackingField:
     - {fileID: 8300000, guid: 2497f2d8aa6589744ae4b2659131c1d1, type: 3}
-    <volumeScale>k__BackingField: 1
+    <volumeScale>k__BackingField: 2
     <pitchVariance>k__BackingField: 0
   <deathVoice>k__BackingField:
     <clips>k__BackingField: []
-    <volumeScale>k__BackingField: 1
+    <volumeScale>k__BackingField: 2
     <pitchVariance>k__BackingField: 0
   <buildCompleteVoice>k__BackingField:
     <clips>k__BackingField:
     - {fileID: 8300000, guid: 69d1da62a48ec9b4cab7550422dcbea8, type: 3}
     - {fileID: 8300000, guid: f1e77e67548c79449a3efe6dfba9f21c, type: 3}
     - {fileID: 8300000, guid: c3f9fa0eca64dec4484448c29c250675, type: 3}
-    <volumeScale>k__BackingField: 1
+    <volumeScale>k__BackingField: 2
     <pitchVariance>k__BackingField: 0
   <buildFailVoice>k__BackingField:
     <clips>k__BackingField:
     - {fileID: 8300000, guid: a5561b4a6f5f203429e7c60a8fa85510, type: 3}
     - {fileID: 8300000, guid: 1c7f672089e7392459611c153c226f9e, type: 3}
     - {fileID: 8300000, guid: d8ca10699a0ec3349a9fee02d8778318, type: 3}
-    <volumeScale>k__BackingField: 1
+    <volumeScale>k__BackingField: 2
     <pitchVariance>k__BackingField: 0
