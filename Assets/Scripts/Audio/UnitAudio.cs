@@ -96,6 +96,13 @@ public class UnitAudio : MonoBehaviour
             SoundManager.Instance?.PlaySFX(bank.skillSFX, transform.position);
     }
 
+    // UnitController.HealTick()이 회복 틱마다 호출한다 (BuildingAudio.PlayRepairTick()과 동일 패턴, doc/0661).
+    public void PlayHealTick()
+    {
+        if (bank != null)
+            SoundManager.Instance?.PlaySFX(bank.healTickSFX, transform.position);
+    }
+
     // 아래 3개는 RTSUnitController의 선택/이동/공격명령 진입점에서, "이번 명령에 영향받는 대표 유닛 1마리"에
     // 대해서만 호출된다 - 다수 선택 시 대사가 겹쳐 시끄러워지지 않도록. SoundManager.PlayOrderVoice를 통해
     // 재생되며, bank(이 유닛 "종류"의 SoundBank 에셋)를 식별자로 넘긴다 - 같은 종류의 유닛끼리는 단일

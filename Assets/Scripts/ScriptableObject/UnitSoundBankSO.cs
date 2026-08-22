@@ -19,6 +19,8 @@ public class UnitSoundBankSO : ScriptableObject
     [field: SerializeField]
     public SoundClipSet gatherSFX { get; private set; } // 워커 전용, 나머지 유닛은 비워둠
     [field: SerializeField]
+    public SoundClipSet healTickSFX { get; private set; } // 치유 유닛 전용 - 회복 틱마다 재생 (doc/0661)
+    [field: SerializeField]
     public SoundClipSet selectSFX { get; private set; } // 선택 시 대사와 별개로 같이 나는 효과음(삑 소리 등)
     // 이동/공격/순찰 등 유닛에게 내리는 모든 명령 시 대사와 별개로 같이 나는 확인음 (구 moveSFX,
     // doc/0279 - 이동 전용에서 명령 전반으로 범위 확대). FormerlySerializedAs로 기존에 채워둔

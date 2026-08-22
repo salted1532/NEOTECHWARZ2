@@ -98,6 +98,12 @@ public class UnitData
     [field: SerializeField]
     public int attackRange { get; private set; }
 
+    // ===== 치유 (doc/0661) - "Healer" 태그가 붙은 유닛만 사용. 나머지 유닛은 0으로 비워둠(무효과) =====
+    [field: SerializeField]
+    public int healRange { get; private set; }
+    [field: SerializeField]
+    public float healPerSecond { get; private set; }
+
     // 공격 1회 후 다음 공격까지 걸리는 시간(초). 값이 작을수록 더 빨리(자주) 공격한다.
     // (UnitController.timeBetweenAttacks와 동일한 의미 - "공격속도"가 아니라 "공격 간격"이지만
     // 기획 쪽 명칭인 attackSpeed를 그대로 필드명으로 씀)

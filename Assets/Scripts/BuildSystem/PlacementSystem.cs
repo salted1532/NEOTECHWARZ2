@@ -220,6 +220,8 @@ public class PlacementSystem : MonoBehaviour
         if (ghost != null)
             Destroy(ghost);
 
+        RemoveMapObjectsInFootprint(gridPos, data.Size); // 건물이 실제로 들어서는 자리의 장식 오브젝트(나무/풀 등) 제거 (doc/0657)
+
         Vector3 structureSpawnPos = groundPos + Vector3.up * GetGroundOffsetY(baseStructurePrefab); // BaseStructure 자신의 높이 기준
 
         GameObject obj = Instantiate(baseStructurePrefab, structureSpawnPos, Quaternion.identity);
@@ -232,6 +234,18 @@ public class PlacementSystem : MonoBehaviour
         placedGameObject[placedIndex] = obj;
 
         worker.BeginConstruction(structure);
+    }
+
+    // 해당 그리드 셀 범위 안에 있는 장식 오브젝트(MapObject 태그, 콜라이더 없이 메쉬만 존재)를 전부 제거한다.
+    // 콜라이더가 없어 물리 검사(IsBlockedAtCenter)로는 찾을 수 없으므로 태그로 직접 조회한다 (doc/0657).
+    private void RemoveMapObjectsInFootprint(Vector3Int gridPos, Vector2Int size)
+    {
+        HashSet<Vector3Int> occupiedCells = new(StructureData.CalculatePositionsPublic(gridPos, size));
+        foreach (GameObject deco in GameObject.FindGameObjectsWithTag("MapObject"))
+        {
+            if (occupiedCells.Contains(grid.WorldToCell(deco.transform.position)))
+                Destroy(deco);
+        }
     }
 
     // 일꾼이 도착하기 전에 다른 명령으로 건설 이동이 취소됐을 때(GoBuild 콜백) 고스트를 지우고 예약해둔 그리드 셀을 비워준다.

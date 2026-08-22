@@ -87,12 +87,29 @@ public class BuildingAudio : MonoBehaviour
             SoundManager.Instance?.PlaySFX(bank.landingSFX, transform.position);
     }
 
+    // UnitController.RepairTick()에서 일꾼이 실제로 체력을 회복시킬 때마다 호출된다 (doc/0658).
+    public void PlayRepairTick()
+    {
+        BuildingSoundBankSO bank = GetBank();
+        if (bank != null)
+            SoundManager.Instance?.PlaySFX(bank.repairTickSFX, transform.position);
+    }
+
     // RTSUnitController.SelectBuilding()에서 호출된다 ("건물 음성").
     public void PlaySelectVoice()
     {
         BuildingSoundBankSO bank = GetBank();
         if (bank != null)
             SoundManager.Instance?.PlayVoice(bank.selectVoice);
+    }
+
+    // RTSUnitController.SelectBuilding()에서 PlaySelectVoice()와 나란히 호출된다. 선택 대사와 별개로
+    // 같이 나는 확인음 - UnitAudio.PlaySelectSFX()와 동일 패턴(doc/0660), 2D 단일 채널로 재생된다.
+    public void PlaySelectSFX()
+    {
+        BuildingSoundBankSO bank = GetBank();
+        if (bank != null)
+            SoundManager.Instance?.PlaySelectSFX(bank.selectSFX);
     }
 
     // HealthManager.OnDeath는 전투로 체력이 0이 됐을 때만 발생한다(BuildingEffects.HandleDestroyed와 동일 조건).

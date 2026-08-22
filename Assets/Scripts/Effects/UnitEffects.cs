@@ -133,6 +133,12 @@ public class UnitEffects : MonoBehaviour
         EffectPlayer.PlayHit(transform, bodyCollider, attackerPosition, hitEffects.GetPrefab(attackType));
     }
 
+    // UnitController.HealTick()이 회복 틱마다, 회복받는 이 유닛 쪽에서 호출한다(doc/0664) - 건물 수리의
+    // BuildingEffects.PlayRepairSpark()와 동일하게 새 프리팹 없이 기존 laserHitPrefab을 재사용한다.
+    // healerPosition은 HandleDamaged의 attackerPosition과 동일한 역할 - "그 방향을 향한 콜라이더 표면 지점".
+    public void PlayHealSpark(Vector3 healerPosition) =>
+        EffectPlayer.PlayHit(transform, bodyCollider, healerPosition, hitEffects.GetPrefab(AttackEffectType.Laser));
+
     private void HandleDeath()
     {
         if (enemyUnitController != null && !enemyUnitController.IsEffectivelyVisible())

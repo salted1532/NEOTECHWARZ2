@@ -84,7 +84,18 @@ public class BriefingRoomController : MonoBehaviour
     [Header("시작 연출")]
     [SerializeField] private float briefingStartDelay = 1f; // 씬 진입 후 이 시간만큼 대기했다가 브리핑 시작 (doc/0623)
 
+    // 다른 씬(UserControl 등)에서 바꾼 커서가 Cursor.SetCursor의 전역 상태 때문에 씬을 넘어와도
+    // 남아있는 문제(doc/0473) - MainMenuController/MissionSelectManager와 동일한 패턴으로 이 씬
+    // 진입 시 기본 커서로 되돌리고, 버튼 호버 시에만 다시 바꾼다 (doc/0656).
+    [Header("마우스 커서 (다른 씬과 동일한 패턴)")]
+    [SerializeField] private Texture2D cursorTexture; // 비워두면 OS 기본 화살표 사용
+    [SerializeField] private Texture2D cursorHoverTexture; // 비워두면 호버해도 커서 안 바뀜
+    [SerializeField] private Vector2 cursorHotspot = Vector2.zero;
+    [SerializeField] private Camera uiCamera; // Canvas RenderMode가 Overlay면 비워둔다
+
     private readonly HashSet<int> revealedSlots = new();
+    private Button[] hoverableButtons;
+    private bool isHoveringButton;
 
     private void Awake()
     {
@@ -102,8 +113,43 @@ public class BriefingRoomController : MonoBehaviour
         SoundManager.AddHoverSound(goBackButton);
         SoundManager.AddHoverSound(startMissionButton);
 
+        hoverableButtons = new[] { goBackButton, startMissionButton };
+
+        if (cursorTexture != null)
+            Cursor.SetCursor(cursorTexture, cursorHotspot, CursorMode.Auto);
+
         if (entry != null)
             StartCoroutine(StartBriefingAfterDelay(entry));
+    }
+
+    private void Update()
+    {
+        if (cursorHoverTexture == null)
+            return;
+
+        bool hovering = IsHoveringClickableButton();
+
+        if (hovering == isHoveringButton)
+            return;
+
+        isHoveringButton = hovering;
+        Cursor.SetCursor(hovering ? cursorHoverTexture : cursorTexture, cursorHotspot, CursorMode.Auto);
+    }
+
+    private bool IsHoveringClickableButton()
+    {
+        foreach (Button button in hoverableButtons)
+        {
+            if (button == null || !button.interactable || !button.gameObject.activeInHierarchy)
+                continue;
+
+            RectTransform rect = button.transform as RectTransform;
+
+            if (rect != null && RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, uiCamera))
+                return true;
+        }
+
+        return false;
     }
 
     private IEnumerator StartBriefingAfterDelay(BriefingEntry entry)

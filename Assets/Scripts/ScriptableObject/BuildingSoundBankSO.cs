@@ -17,5 +17,9 @@ public class BuildingSoundBankSO : ScriptableObject
     [field: SerializeField]
     public SoundClipSet selectVoice { get; private set; } // "건물 음성" - 선택 시 재생
     [field: SerializeField]
+    public SoundClipSet selectSFX { get; private set; } // 선택 대사와 별개로 같이 나는 확인음(삑 소리 등) - UnitSoundBankSO.selectSFX와 동일 패턴 (doc/0660)
+    [field: SerializeField]
     public SoundClipSet placementSFX { get; private set; } // 건설모드 배치 클릭으로 프리뷰(고스트)가 그 자리에 고정되는 순간 (doc/0646)
+    [field: SerializeField]
+    public SoundClipSet repairTickSFX { get; private set; } // 일꾼이 수리 중일 때 회복 틱마다 재생 (doc/0658)
 }

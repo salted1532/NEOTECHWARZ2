@@ -22,9 +22,12 @@ MonoBehaviour:
     <tier>k__BackingField: 0
     <armorType>k__BackingField: 0
     <sizeType>k__BackingField: 0
+    <armor>k__BackingField: 0
     <hp>k__BackingField: 40
     <attackDamge>k__BackingField: 5
     <attackRange>k__BackingField: 4
+    <healRange>k__BackingField: 0
+    <healPerSecond>k__BackingField: 0
     <attackSpeed>k__BackingField: 0.6
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 0
@@ -37,6 +40,7 @@ MonoBehaviour:
     <Icon>k__BackingField: {fileID: -1930145377, guid: 58a2fd0a9315ee140b0e6ba8c57c2eb3, type: 3}
     <ProductionIcon>k__BackingField: {fileID: 373112016, guid: 8bd5135ebd0ce304aaf97e0577147c8d, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7432dc55214101e4bbe85daf415a2de7, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
     <soundBank>k__BackingField: {fileID: 11400000, guid: c3d16a6fe5c5f2748a77b13ca1ff3a61, type: 2}
     <shortcutKey>k__BackingField: 119
     <hasTraitChoice>k__BackingField: 0
@@ -69,9 +73,12 @@ MonoBehaviour:
     <tier>k__BackingField: 1
     <armorType>k__BackingField: 0
     <sizeType>k__BackingField: 0
+    <armor>k__BackingField: 0
     <hp>k__BackingField: 40
     <attackDamge>k__BackingField: 5
     <attackRange>k__BackingField: 12
+    <healRange>k__BackingField: 0
+    <healPerSecond>k__BackingField: 0
     <attackSpeed>k__BackingField: 0.6
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 1
@@ -84,6 +91,7 @@ MonoBehaviour:
     <Icon>k__BackingField: {fileID: 353291967, guid: 52a744c831c5d81448cc8f2ac58f2f0f, type: 3}
     <ProductionIcon>k__BackingField: {fileID: -948199142, guid: a66d37793f4a9f048a059f1da9246fa2, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: f94e2284bbcacae4db1782150160d0f0, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
     <soundBank>k__BackingField: {fileID: 11400000, guid: cb79657de51b2f14489d1ba9d1775831, type: 2}
     <shortcutKey>k__BackingField: 97
     <hasTraitChoice>k__BackingField: 0
@@ -116,9 +124,12 @@ MonoBehaviour:
     <tier>k__BackingField: 1
     <armorType>k__BackingField: 0
     <sizeType>k__BackingField: 0
+    <armor>k__BackingField: 0
     <hp>k__BackingField: 75
     <attackDamge>k__BackingField: 6
     <attackRange>k__BackingField: 14
+    <healRange>k__BackingField: 0
+    <healPerSecond>k__BackingField: 0
     <attackSpeed>k__BackingField: 1.2
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 0
@@ -131,6 +142,7 @@ MonoBehaviour:
     <Icon>k__BackingField: {fileID: -2110547607, guid: 57183869fbe28f34dbe17cfe2d9e9ef7, type: 3}
     <ProductionIcon>k__BackingField: {fileID: 139368506, guid: fb88dd333dc456749b665b6b5644cb8d, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 29fa38c3d700e074d872ffeea22b3a94, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
     <soundBank>k__BackingField: {fileID: 11400000, guid: c563c439be1a8e0428a34335496d47c3, type: 2}
     <shortcutKey>k__BackingField: 100
     <hasTraitChoice>k__BackingField: 0
@@ -163,9 +175,12 @@ MonoBehaviour:
     <tier>k__BackingField: 1
     <armorType>k__BackingField: 0
     <sizeType>k__BackingField: 0
+    <armor>k__BackingField: 0
     <hp>k__BackingField: 45
     <attackDamge>k__BackingField: 10
     <attackRange>k__BackingField: 20
+    <healRange>k__BackingField: 0
+    <healPerSecond>k__BackingField: 0
     <attackSpeed>k__BackingField: 1
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 1
@@ -178,6 +193,7 @@ MonoBehaviour:
     <Icon>k__BackingField: {fileID: 158385925, guid: cc17b785c9c0af54896f89be92be8696, type: 3}
     <ProductionIcon>k__BackingField: {fileID: -1441108038, guid: 361f9da4df846314cb28c95750f04fec, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 0a3d03c6c4dd93c4083d5542b823c86b, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
     <soundBank>k__BackingField: {fileID: 11400000, guid: 83e87e0e0bb357a41aad5587925ff7cf, type: 2}
     <shortcutKey>k__BackingField: 115
     <hasTraitChoice>k__BackingField: 1
@@ -216,9 +232,12 @@ MonoBehaviour:
     <tier>k__BackingField: 2
     <armorType>k__BackingField: 1
     <sizeType>k__BackingField: 1
+    <armor>k__BackingField: 0
     <hp>k__BackingField: 150
     <attackDamge>k__BackingField: 6
     <attackRange>k__BackingField: 14
+    <healRange>k__BackingField: 0
+    <healPerSecond>k__BackingField: 0
     <attackSpeed>k__BackingField: 1
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 0
@@ -231,6 +250,7 @@ MonoBehaviour:
     <Icon>k__BackingField: {fileID: -614796789, guid: 38099ccb1b4eb3c47ae637cf24687181, type: 3}
     <ProductionIcon>k__BackingField: {fileID: 1702294300, guid: 3b99a2e7bd6957b4291d0b5ad5e94f65, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: d9657408020de9a44918eef6a3214c70, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
     <soundBank>k__BackingField: {fileID: 11400000, guid: f0e6fbd3e4a32ab48921f20a3934c886, type: 2}
     <shortcutKey>k__BackingField: 114
     <hasTraitChoice>k__BackingField: 0
@@ -263,9 +283,12 @@ MonoBehaviour:
     <tier>k__BackingField: 2
     <armorType>k__BackingField: 1
     <sizeType>k__BackingField: 2
+    <armor>k__BackingField: 0
     <hp>k__BackingField: 150
     <attackDamge>k__BackingField: 20
     <attackRange>k__BackingField: 20
+    <healRange>k__BackingField: 0
+    <healPerSecond>k__BackingField: 0
     <attackSpeed>k__BackingField: 1.5
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 0
@@ -278,6 +301,7 @@ MonoBehaviour:
     <Icon>k__BackingField: {fileID: 660252552, guid: 235265e37ad87a44ca65c278d4e87503, type: 3}
     <ProductionIcon>k__BackingField: {fileID: -1216382179, guid: debdae0c7a6ab6e41b7e600e8d85d92d, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7de7e0f965690fe4d9a9131d5b833415, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
     <soundBank>k__BackingField: {fileID: 11400000, guid: cf9c66e22e11f464b84b468573b6d203, type: 2}
     <shortcutKey>k__BackingField: 112
     <hasTraitChoice>k__BackingField: 0
@@ -310,9 +334,12 @@ MonoBehaviour:
     <tier>k__BackingField: 2
     <armorType>k__BackingField: 1
     <sizeType>k__BackingField: 1
+    <armor>k__BackingField: 0
     <hp>k__BackingField: 125
     <attackDamge>k__BackingField: 8
     <attackRange>k__BackingField: 18
+    <healRange>k__BackingField: 0
+    <healPerSecond>k__BackingField: 0
     <attackSpeed>k__BackingField: 1
     <canAttackGround>k__BackingField: 0
     <canAttackAir>k__BackingField: 1
@@ -325,6 +352,7 @@ MonoBehaviour:
     <Icon>k__BackingField: {fileID: -2074401749, guid: bbeb6b55853ef70499bcf1b549e209a6, type: 3}
     <ProductionIcon>k__BackingField: {fileID: -1102957437, guid: 948612e488170fe4b89d5286e0d3d0b5, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: cf2cc00187f9ce246b71529e2a55dd05, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
     <soundBank>k__BackingField: {fileID: 11400000, guid: 7b18ba2bf8bbe6747b3c62d398c9d71d, type: 2}
     <shortcutKey>k__BackingField: 115
     <hasTraitChoice>k__BackingField: 1
@@ -361,9 +389,12 @@ MonoBehaviour:
     <tier>k__BackingField: 3
     <armorType>k__BackingField: 0
     <sizeType>k__BackingField: 1
+    <armor>k__BackingField: 0
     <hp>k__BackingField: 150
     <attackDamge>k__BackingField: 8
     <attackRange>k__BackingField: 18
+    <healRange>k__BackingField: 0
+    <healPerSecond>k__BackingField: 0
     <attackSpeed>k__BackingField: 1.2
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 1
@@ -376,6 +407,7 @@ MonoBehaviour:
     <Icon>k__BackingField: {fileID: 2039836845, guid: 27d8e8efb8924114997d2feb83a4969d, type: 3}
     <ProductionIcon>k__BackingField: {fileID: 2102141998, guid: 37942435c69a2064c8f5a36851ad0f1b, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 76fc3c92bbeec1c46a37fc8722e51676, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
     <soundBank>k__BackingField: {fileID: 11400000, guid: 44b0c2bea33c7be4495feb403cf25a85, type: 2}
     <shortcutKey>k__BackingField: 102
     <hasTraitChoice>k__BackingField: 0
@@ -408,9 +440,12 @@ MonoBehaviour:
     <tier>k__BackingField: 3
     <armorType>k__BackingField: 1
     <sizeType>k__BackingField: 2
+    <armor>k__BackingField: 0
     <hp>k__BackingField: 400
     <attackDamge>k__BackingField: 25
     <attackRange>k__BackingField: 20
+    <healRange>k__BackingField: 0
+    <healPerSecond>k__BackingField: 0
     <attackSpeed>k__BackingField: 1.2
     <canAttackGround>k__BackingField: 1
     <canAttackAir>k__BackingField: 1
@@ -423,6 +458,7 @@ MonoBehaviour:
     <Icon>k__BackingField: {fileID: -947258674, guid: 021a6410d1d66a744815dbdd88ca0a4e, type: 3}
     <ProductionIcon>k__BackingField: {fileID: 99360380, guid: b5974da6bdcc8ea4a97f86caf260d7c2, type: 3}
     <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 7c8f9a4aa9f4bf74c8f9f9d9977dcc9f, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
     <soundBank>k__BackingField: {fileID: 11400000, guid: 71760c26a25c56546a9be66a746e41af, type: 2}
     <shortcutKey>k__BackingField: 103
     <hasTraitChoice>k__BackingField: 1
@@ -447,6 +483,58 @@ MonoBehaviour:
       <isActiveSkill>k__BackingField: 1
       <shortcutKey>k__BackingField: 98
       <cooldown>k__BackingField: 60
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
+  - <unitName>k__BackingField: 'Medic Drone '
+    <description>k__BackingField: 'train Medic Drone
+
+      shortcut key [<color=yellow>M</color>]'
+    <infoDescription>k__BackingField: Unarmed repair drone. Heals nearby allied units
+      at range.
+    <ID>k__BackingField: 10
+    <tier>k__BackingField: 1
+    <armorType>k__BackingField: 0
+    <sizeType>k__BackingField: 0
+    <armor>k__BackingField: 0
+    <hp>k__BackingField: 60
+    <attackDamge>k__BackingField: 0
+    <attackRange>k__BackingField: 0
+    <healRange>k__BackingField: 12
+    <healPerSecond>k__BackingField: 3
+    <attackSpeed>k__BackingField: 0
+    <canAttackGround>k__BackingField: 0
+    <canAttackAir>k__BackingField: 0
+    <attackDelivery>k__BackingField: 0
+    <mineral>k__BackingField: 50
+    <gas>k__BackingField: 25
+    <population>k__BackingField: 1
+    <productionTime>k__BackingField: 30
+    <requiredBuildingID>k__BackingField: 0
+    <Icon>k__BackingField: {fileID: -1906640117, guid: 8be26910319a26c45993298ebf1734aa, type: 3}
+    <ProductionIcon>k__BackingField: {fileID: 1698584031, guid: 4ce71749bb617964bbbc0c4b35d418f9, type: 3}
+    <Prefab>k__BackingField: {fileID: 7069137052622472766, guid: 60edfe0d250c7e74fa067657cea33d29, type: 3}
+    <AllyPrefab>k__BackingField: {fileID: 0}
+    <soundBank>k__BackingField: {fileID: 11400000, guid: 19d8e42520f3fd114feaab2edb7d2d90, type: 2}
+    <shortcutKey>k__BackingField: 109
+    <hasTraitChoice>k__BackingField: 0
+    <traitA>k__BackingField:
+      <skillName>k__BackingField: 
+      <description>k__BackingField: 
+      <icon>k__BackingField: {fileID: 0}
+      <isActiveSkill>k__BackingField: 0
+      <shortcutKey>k__BackingField: 0
+      <cooldown>k__BackingField: 0
+      <targetType>k__BackingField: 0
+      <skillRange>k__BackingField: 0
+      <areaRadius>k__BackingField: 0
+    <traitB>k__BackingField:
+      <skillName>k__BackingField: 
+      <description>k__BackingField: 
+      <icon>k__BackingField: {fileID: 0}
+      <isActiveSkill>k__BackingField: 0
+      <shortcutKey>k__BackingField: 0
+      <cooldown>k__BackingField: 0
       <targetType>k__BackingField: 0
       <skillRange>k__BackingField: 0
       <areaRadius>k__BackingField: 0

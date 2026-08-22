@@ -52,7 +52,7 @@ public class InfantryIdleLookAround : MonoBehaviour
     private bool IsIdle()
     {
         if (unitController != null)
-            return !unitController.IsCurrentlyMoving() && !unitController.IsAttack();
+            return !unitController.IsCurrentlyMoving() && !unitController.IsAttack() && !unitController.IsHealing();
         if (enemyUnitController != null)
             return !enemyUnitController.IsCurrentlyMoving() && !enemyUnitController.IsAttack();
         if (allyController != null)

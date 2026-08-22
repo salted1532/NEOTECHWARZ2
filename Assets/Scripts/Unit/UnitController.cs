@@ -293,6 +293,46 @@ public class UnitController : MonoBehaviour, IDestructible
     private BuildingController followBuildingTarget;
     private bool hasFollowBuildingOrder;
 
+    // ===== 건물 우클릭 = 수리 (일꾼이 피해입은 아군 건물에 붙어서 체력을 회복시키며 광물을 소모, doc/0657) =====
+    // 자원 정산은 repairTickInterval마다 정수 단위로(반올림 오차 방지), 체력 자체는 BaseStructure의 건설 중
+    // 체력 차오름과 동일한 패턴으로 매 프레임 실수로 누적하다가 정수가 모이면 Heal() - 그래서 체력바가
+    // 건설 때처럼 부드럽게 올라간다 (doc/0658 후속).
+    // 초당 회복량 자체는 고정값이 아니라 건물마다 스타크래프트 공식(0.9 × 최대체력 ÷ 건설시간)으로 계산한다 -
+    // 새 매직넘버 없이 기존 BuildingData.productionTime을 재사용 (doc/0658 후속2).
+    [SerializeField] private float repairSpeedMultiplier = 0.9f; // 스타크래프트 공식의 그 0.9
+    [SerializeField] private float repairTickInterval = 0.5f; // 이 간격마다 자원을 정산
+    private BuildingController repairTarget;
+    private bool isRepairing;
+    private float repairTickTimer;
+    private bool repairPaidThisTick; // 이번 구간 자원 결제 성공 여부 - 실패하면 이번 구간엔 체력이 안 채워짐
+    private float repairHealAccumulator; // BaseStructure.healAccumulator와 동일한 패턴
+    private float repairHealthPerSecond; // 수리 시작 시 건물별로 1회 계산해서 고정
+    private int repairOreCostPerTick; // 수리 시작 시 건물 원가(광물)÷최대체력 비율로 1회 계산해서 고정
+    private bool hasShownRepairOreWarning;
+    private BuildingAudio repairAudio; // BeginRepair()에서 한 번만 캐싱 (doc/0658)
+    private BuildingEffects repairEffects;
+
+    // ===== 유닛 우클릭 없이 사거리 안 다친 아군 자동 회복 (치유 유닛 전용, doc/0661) =====
+    // 건물 수리(RepairTick)와 동일하게 체력은 매 프레임 실수로 누적하다가 정수가 모이면 Heal() - 다만
+    // 원거리(사거리 안이면 이동 불필요)이고 자원 소모가 없다는 점이 다르다. HealRange(AttackRange의
+    // 거울상)가 매 프레임 대상을 찾아 BeginHeal()을 호출해준다.
+    [SerializeField] private float healTickInterval = 0.5f; // 회복 틱(사운드) 간격 - repairTickInterval과 동일값
+    private HealRange healRangeDetector;
+    private HealBeam healBeam;
+    private float healPerSecond; // UnitData.healPerSecond를 ApplyUnitData()에서 그대로 저장
+    private HealthManager healTarget;
+    private UnitEffects healTargetEffects; // BeginHeal()에서 대상이 바뀔 때 한 번만 캐싱 (doc/0664)
+    private bool isHealing;
+    private float healTickTimer;
+    private float healAccumulator; // repairHealAccumulator와 동일 패턴
+
+    // ===== 지정 치유 (우클릭으로 다친 아군을 직접 지정, doc/0666) =====
+    // orderedTarget(지정 추격 대상)의 거울상 - 지정되면 HealRange.GetPreferredTarget()가 다른 다친
+    // 아군은 무시하고 이 대상만 최우선으로 고른다. 다 나으면 HealOrderTick()이 같은 대상을
+    // FollowUnit()으로 자동 전환한다(일꾼 건물수리와 달리, 메딕은 다 나은 뒤에도 계속 따라다님).
+    private UnitController orderedHealTarget;
+    private bool hasHealOrder;
+
     // ===== 건설 이동 (건설모드에서 위치 클릭 시 일꾼이 그 자리로 이동 후 완공) =====
     [SerializeField] private float buildInteractRange = 2f; // 건설 위치 도착 판정 거리 (gatherInteractRange와 동일한 이유)
     private Vector3 buildDestination;
@@ -336,6 +376,10 @@ public class UnitController : MonoBehaviour, IDestructible
     {
         isWorker = CompareTag("Worker");
         attackRange = GetComponentInChildren<AttackRange>();
+        // "Healer" 태그 요구 없이 HealRange 컴포넌트가 자식에 붙어있는지만으로 치유 유닛 여부가 결정된다
+        // (isWorker처럼 태그로 게이팅할 필요 없음 - 컴포넌트 자체가 이미 "Healer" 프리팹에만 붙음, doc/0661).
+        healRangeDetector = GetComponentInChildren<HealRange>();
+        healBeam = GetComponent<HealBeam>();
         turretController = GetComponentInChildren<TurretController>();
         unitEffects = GetComponent<UnitEffects>();
         unitAudio = GetComponent<UnitAudio>();
@@ -487,6 +531,9 @@ public class UnitController : MonoBehaviour, IDestructible
         FollowBuildingTick();
         BuildTick();
         ConstructionWanderTick();
+        RepairTick();
+        HealOrderTick();
+        HealTick();
 
         if (isAirUnit)
             SeparateFromOverlappingAirUnits();
@@ -798,6 +845,12 @@ public class UnitController : MonoBehaviour, IDestructible
         hasFollowOrder = false;
         followBuildingTarget = null;
         hasFollowBuildingOrder = false;
+        orderedHealTarget = null; // 지정 치유도 다른 명령이 들어오면 함께 취소 (doc/0666)
+        hasHealOrder = false;
+        StopHeal(); // 치유 도중 다른 명령이 들어오면 즉시 중단 (isHealing == false면 내부에서 그냥 무시)
+
+        isRepairing = false; // 수리 중이던 일꾼도 새 명령이 들어오면 함께 중단 (doc/0657)
+        repairTarget = null;
 
         chaseWasInAttackRange = false; // 이전 명령의 상태가 다음 명령으로 새 나가지 않도록 초기화
         chaseIsUnreachable = false; // doc/0415 - 도달 불가 상태도 함께 초기화
@@ -943,6 +996,14 @@ public class UnitController : MonoBehaviour, IDestructible
     {
         if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
 
+        // 치유 유닛이 다친 아군을 우클릭하면 따라가기 대신 지정 치유로 - 일꾼의 건물 우클릭
+        // (MoveToBuilding→IsDamaged 분기)과 동일한 패턴 (doc/0666).
+        if (healRangeDetector != null && IsDamagedUnit(target))
+        {
+            Heal(target);
+            return;
+        }
+
         CancelGatheringForNewCommand();
         CancelAttackOrder();
 
@@ -953,6 +1014,80 @@ public class UnitController : MonoBehaviour, IDestructible
         UnitcurrentState = UnitState.Idle; // Idle 유지 - AttackRange가 사거리 내 적을 자동으로 교전하게 함
 
         MoveAgentTo(target.transform.position, target.isAirUnit);
+    }
+
+    private static bool IsDamagedUnit(UnitController target)
+    {
+        HealthManager health = target.GetHealthManager();
+        return health != null && !health.IsDead() && health.GetHealth() < health.GetMaxHealth();
+    }
+
+    // 다친 아군을 지정 치유 대상으로 고정한다(우클릭, doc/0666) - AttackUnitTarget(orderedTarget)의
+    // 거울상. 사거리 밖이면 HealOrderTick이 계속 쫓아가고, 사거리 안이면 HealRange가 BeginHeal을
+    // 호출해 정지 + 치유한다. 다 나으면 HealOrderTick이 같은 대상으로 FollowUnit을 다시 호출한다.
+    public void Heal(UnitController target)
+    {
+        if (isConstructing || isRescueUnit || target == null) return;
+
+        CancelGatheringForNewCommand();
+        CancelAttackOrder();
+
+        orderedHealTarget = target;
+        hasHealOrder = true;
+
+        arrived = false;
+        UnitcurrentState = UnitState.Idle; // Idle 유지 - HealRange가 지정 대상을 최우선으로 사거리 판정
+
+        MoveAgentTo(target.transform.position, target.isAirUnit);
+    }
+
+    public UnitController GetOrderedHealTarget() => orderedHealTarget;
+
+    // 지정 치유 명령을 매 프레임 갱신한다(doc/0666) - AttackOrderTick의 orderedTarget 처리와 동일한
+    // 뼈대: 대상이 죽으면 정리, 다 나으면 같은 대상 따라가기로 전환, 치유 중이면 그대로 두고(doc/0662와
+    // 동일한 이유), 사거리 밖이면 계속 쫓아간다.
+    private void HealOrderTick()
+    {
+        if (!hasHealOrder)
+            return;
+
+        HealthManager targetHealth = orderedHealTarget != null ? orderedHealTarget.GetHealthManager() : null;
+        if (targetHealth == null || targetHealth.IsDead())
+        {
+            hasHealOrder = false;
+            orderedHealTarget = null;
+
+            arrived = true;
+            if (!isAirUnit)
+                navMeshAgent.ResetPath();
+            else
+                isMovingAirUnit = false;
+            return;
+        }
+
+        if (targetHealth.GetHealth() >= targetHealth.GetMaxHealth())
+        {
+            UnitController healedTarget = orderedHealTarget;
+            hasHealOrder = false;
+            orderedHealTarget = null;
+            FollowUnit(healedTarget); // 다 나음 - 같은 대상을 계속 따라가기로 전환
+            return;
+        }
+
+        if (isHealing)
+            return; // 치유 중이면 그대로 둔다 (BeginHeal이 정지시킨 상태 유지, doc/0662와 동일 패턴)
+
+        float healUnitRange = healRangeDetector != null ? healRangeDetector.UnitRange : 0f;
+        float sqrDistance = (transform.position - orderedHealTarget.transform.position).sqrMagnitude;
+        if (sqrDistance <= healUnitRange * healUnitRange)
+            return; // 사거리 안 - HealRange.Update()가 이번 프레임에 BeginHeal을 호출해준다
+
+        if (UpdateUnreachableChase(orderedHealTarget.transform.position, orderedHealTarget.isAirUnit, false))
+        {
+            hasHealOrder = false;
+            orderedHealTarget = null;
+            HaltInPlace();
+        }
     }
 
     // 따라다니기 명령을 매 프레임 갱신한다: 대상이 죽으면 그 자리에 멈추고, 교전 중(AttackRange가 정지시킨 상태)이면
@@ -978,6 +1113,10 @@ public class UnitController : MonoBehaviour, IDestructible
 
         if (attackRange != null && attackRange.HasEnemyInRange)
             return; // 교전 중이면 그대로 둔다 (AttackRange가 정지시킨 상태 유지)
+
+        if (isHealing)
+            return; // 치유 중이면 그대로 둔다 - 치유가 끝나면 isStopped가 남아있어 다음 FollowTick에서
+                     // 자동으로 따라가기를 재개한다 (doc/0662와 동일 패턴, doc/0665)
 
         float stopDistance;
         if (isAirUnit)
@@ -1067,6 +1206,179 @@ public class UnitController : MonoBehaviour, IDestructible
         }
 
         MoveAgentTo(approachPoint);
+    }
+
+    // ===== 건물 우클릭 = 수리 (doc/0657) =====
+    // 피해입은 아군 건물에 붙어서 체력을 회복시킨다. GoBuild(이동 후 도착하면 콜백)를 그대로 재사용 -
+    // BeginConstruction과 동일한 패턴.
+    public void Repair(BuildingController building)
+    {
+        if (isConstructing || isRescueUnit || !isWorker || building == null) return;
+
+        GoBuild(GetClosestSurfacePoint(building.transform), () => BeginRepair(building), null);
+    }
+
+    private void BeginRepair(BuildingController building)
+    {
+        HealthManager targetHealth = building.GetHealthManager();
+        if (targetHealth == null || targetHealth.GetHealth() >= targetHealth.GetMaxHealth())
+            return; // 도착 전에 이미 다 고쳐졌으면 아무 것도 안 함
+
+        // 수리 비용 = 그 건물의 실제 건설 원가(광물) ÷ 최대체력 비율 - 완전파괴 후 100% 수리하면
+        // 신축과 동일한 원가가 들도록. 건물마다 새 매직넘버를 정의하지 않고 기존 BuildingData를 재사용한다.
+        BuildingData data = rtsController.GetBuildingData(building.GetBuildingID());
+        int mineralCost = data != null ? data.mineral : 0;
+        int maxHealth = targetHealth.GetMaxHealth();
+
+        // 초당 회복량 = 스타크래프트 공식(0.9 × 최대체력 ÷ 건설시간) - 건설시간 정보가 없는 예외적인
+        // 경우에만 임의로 40초 기준 삼는다(발생할 일 거의 없음, 그냥 0으로 멈추는 것보다 나음).
+        float buildTime = data != null && data.productionTime > 0 ? data.productionTime : 40f;
+        repairHealthPerSecond = repairSpeedMultiplier * maxHealth / buildTime;
+
+        repairTarget = building;
+        isRepairing = true;
+        repairTickTimer = repairTickInterval;
+        repairPaidThisTick = false;
+        repairHealAccumulator = 0f;
+        hasShownRepairOreWarning = false;
+
+        float hpPerTick = repairHealthPerSecond * repairTickInterval;
+        repairOreCostPerTick = mineralCost > 0
+            ? Mathf.Max(1, Mathf.RoundToInt(hpPerTick * mineralCost / maxHealth))
+            : 0;
+
+        repairAudio = building.GetComponent<BuildingAudio>();
+        repairEffects = building.GetComponent<BuildingEffects>();
+    }
+
+    // repairTickInterval마다 그 구간 몫의 광물을 정수로 정산하고(반올림 오차 방지), 결제에 성공한 구간에
+    // 한해 체력은 BaseStructure의 건설 중 체력 차오름과 동일하게 매 프레임 실수로 누적하다가 정수가 모이면
+    // Heal() - 체력바가 건설 때처럼 부드럽게 올라간다. 같은 건물을 여러 일꾼이 동시에 수리해도 서로 간섭
+    // 없이 각자 독립적으로 돌아가므로 회복 속도가 자연스럽게 중첩된다.
+    private void RepairTick()
+    {
+        if (!isRepairing)
+            return;
+
+        // 건물이 파괴됐거나(null) 리프트로 떠올랐으면(위치가 더 이상 유효하지 않음) 중단
+        if (repairTarget == null || repairTarget.IsLifted())
+        {
+            isRepairing = false;
+            repairTarget = null;
+            return;
+        }
+
+        HealthManager targetHealth = repairTarget.GetHealthManager();
+        if (targetHealth == null || targetHealth.GetHealth() >= targetHealth.GetMaxHealth())
+        {
+            isRepairing = false;
+            repairTarget = null;
+            return;
+        }
+
+        FaceTransform(repairTarget.transform); // 수리 중엔 항상 건물 쪽을 바라봄 (doc/0658 후속3)
+
+        repairTickTimer -= Time.deltaTime;
+        if (repairTickTimer <= 0f)
+        {
+            repairTickTimer = repairTickInterval;
+
+            if (repairOreCostPerTick > 0 && !rtsController.TrySpendOre(repairOreCostPerTick))
+            {
+                repairPaidThisTick = false;
+                if (!hasShownRepairOreWarning)
+                {
+                    UIController.Instance?.ShowWarning(LocalizationManager.GetText("warning.resource"));
+                    hasShownRepairOreWarning = true;
+                }
+            }
+            else
+            {
+                repairPaidThisTick = true;
+                repairAudio?.PlayRepairTick();
+                repairEffects?.PlayRepairSpark(transform.position); // transform = 수리 중인 일꾼 자신의 위치
+            }
+        }
+
+        if (!repairPaidThisTick)
+            return; // 이번 구간은 자원 부족으로 건너뜀 - 다음 구간에 자동으로 재시도
+
+        repairHealAccumulator += repairHealthPerSecond * Time.deltaTime;
+        if (repairHealAccumulator >= 1f)
+        {
+            int wholeHeal = Mathf.FloorToInt(repairHealAccumulator);
+            repairHealAccumulator -= wholeHeal;
+            targetHealth.Heal(wholeHeal);
+        }
+    }
+
+    // HealRange가 매 프레임 사거리 안 대상을 찾을 때마다 호출한다(doc/0661) - 새 대상이면 이동을 멈추고
+    // 빔을 새로 켜고, 이미 치유 중이던 같은 대상이면 그대로 유지한다(HealTick이 계속 누적).
+    public void BeginHeal(GameObject target)
+    {
+        if (target == null || !target.TryGetComponent<HealthManager>(out var targetHealth))
+            return;
+
+        if (targetHealth.IsDead() || targetHealth.GetHealth() >= targetHealth.GetMaxHealth())
+            return;
+
+        if (!isAirUnit)
+            navMeshAgent.isStopped = true;
+
+        FaceTransform(target.transform);
+
+        if (healTarget != targetHealth)
+        {
+            healTarget = targetHealth;
+            healTargetEffects = target.GetComponent<UnitEffects>();
+            healAccumulator = 0f;
+            healTickTimer = healTickInterval;
+            healBeam?.StartBeam(target.transform);
+        }
+
+        isHealing = true;
+    }
+
+    // HealRange가 사거리 안에 더 이상 다친 아군이 없을 때 호출한다.
+    public void StopHeal()
+    {
+        if (!isHealing)
+            return;
+
+        isHealing = false;
+        healTarget = null;
+        healTargetEffects = null;
+        healBeam?.StopBeam();
+    }
+
+    // 자원 소모가 없다는 점을 빼면 RepairTick()과 동일한 구조(doc/0661) - 실수로 누적하다가 정수가
+    // 모이면 Heal(), 틱 간격은 사운드 재생 주기로만 쓰인다(자원 정산이 없어 결제 성공 여부를 따질 필요가 없음).
+    private void HealTick()
+    {
+        if (!isHealing)
+            return;
+
+        if (healTarget == null || healTarget.IsDead() || healTarget.GetHealth() >= healTarget.GetMaxHealth())
+        {
+            StopHeal();
+            return;
+        }
+
+        healTickTimer -= Time.deltaTime;
+        if (healTickTimer <= 0f)
+        {
+            healTickTimer = healTickInterval;
+            unitAudio?.PlayHealTick();
+            healTargetEffects?.PlayHealSpark(transform.position); // 대상 쪽에 레이저 피격 이펙트 재생 (doc/0664)
+        }
+
+        healAccumulator += healPerSecond * Time.deltaTime;
+        if (healAccumulator >= 1f)
+        {
+            int wholeHeal = Mathf.FloorToInt(healAccumulator);
+            healAccumulator -= wholeHeal;
+            healTarget.Heal(wholeHeal);
+        }
     }
 
     // 건설모드에서 건물 위치를 클릭했을 때 PlacementSystem이 호출한다.
@@ -1230,9 +1542,12 @@ public class UnitController : MonoBehaviour, IDestructible
 
     // 건설 중인 일꾼이 배회/대기 중이든 항상 건물 쪽을 바라보게 한다 - 공중 유닛 이동 방향 회전과
     // 동일한 패턴(doc/0589, doc/0590).
-    private void FaceConstructionStructure()
+    private void FaceConstructionStructure() => FaceTransform(attachedStructure.transform);
+
+    // 대상 쪽을 매 프레임 부드럽게 회전해서 바라본다 (건설 배회/수리 공용, doc/0658 후속3).
+    private void FaceTransform(Transform target)
     {
-        Vector3 dir = attachedStructure.transform.position - transform.position;
+        Vector3 dir = target.position - transform.position;
         dir.y = 0f;
 
         if (dir.sqrMagnitude > 0.001f)
@@ -1304,6 +1619,10 @@ public class UnitController : MonoBehaviour, IDestructible
 
         if (attackRange != null && attackRange.HasEnemyInRange)
             return; // 아직 교전 중이면 그대로 둔다 (AttackRange가 정지시킨 상태 유지)
+
+        if (isHealing)
+            return; // 치유 유닛(HealRange, AttackRange 없음) - 치유 중이면 그대로 둔다, 치유가 끝나면
+                     // isStopped가 여전히 true로 남아있어 아래에서 자동으로 목적지로 이동을 재개한다 (doc/0662)
 
         bool groundStopped = !isAirUnit && navMeshAgent.isStopped;
         bool airStopped = isAirUnit && !isMovingAirUnit;
@@ -1806,6 +2125,7 @@ public class UnitController : MonoBehaviour, IDestructible
     // 메인기지를 우클릭했고 자원을 들고 있으면 그 기지로 직접 반납(후 캐던 자원으로 복귀). 그 외
     // (다른 건물, 또는 메인기지라도 자원이 없음)에는 기존 그대로 건물을 계속 따라다닌다
     // (FollowBuilding, doc/0345, doc/0419).
+    // 우선순위(doc/0657): 1) 자원을 들고 있으면 반납(메인기지에 한) 2) 일꾼이고 건물이 피해입었으면 수리 3) 그냥 따라다니기
     public void MoveToBuilding(BuildingController building)
     {
         if (isConstructing || isRescueUnit) return; // 건설 중이거나 구조 전인 유닛은 다른 명령을 받지 않는다 (doc/0458)
@@ -1816,7 +2136,19 @@ public class UnitController : MonoBehaviour, IDestructible
             return;
         }
 
+        if (isWorker && IsDamaged(building))
+        {
+            Repair(building);
+            return;
+        }
+
         FollowBuilding(building);
+    }
+
+    private static bool IsDamaged(BuildingController building)
+    {
+        HealthManager health = building.GetHealthManager();
+        return health != null && health.GetHealth() < health.GetMaxHealth();
     }
 
     // ReturnCargo()와 동일하지만 "가장 가까운 기지"를 다시 찾지 않고 인자로 받은 특정 건물을 그대로
@@ -2138,6 +2470,9 @@ public class UnitController : MonoBehaviour, IDestructible
     // 공격 모션인 채로 이동해버렸다(doc/0644). Attack 상태는 그대로 항상 true.
     public bool IsAttack() => UnitcurrentState == UnitState.Attack
         || (UnitcurrentState == UnitState.Idle && attackRange != null && attackRange.HasEnemyInRange);
+
+    // InfantryIdleLookAround가 치유 중엔 개입하지 않도록(doc/0663) - IsAttack()과 동일한 용도, 치유 유닛 전용.
+    public bool IsHealing() => isHealing;
     // AttackRange.Update()의 자동교전 게이트 전용 - IsAttack()과 달리 실제 명령 상태만 본다. IsAttack()은
     // 애니메이션용으로 사거리 내 적 존재 여부까지 넓게 판정해서(doc/0451), 이동 명령(Move) 중에도 직전까지
     // 싸우던 적이 감지 범위 안에 남아있으면 true가 되어 MoveTo() 등으로 공격을 끊으려 해도 AttackRange가
@@ -2251,6 +2586,13 @@ public class UnitController : MonoBehaviour, IDestructible
         {
             attackRange.UnitRange = data.attackRange;
             attackRange.EnsureDetectionRadius(); // 감지 반경이 새 사거리보다 좁아지지 않도록 보장 (doc/0239 안전장치)
+        }
+
+        healPerSecond = data.healPerSecond;
+        if (healRangeDetector != null)
+        {
+            healRangeDetector.UnitRange = data.healRange;
+            healRangeDetector.EnsureDetectionRadius();
         }
 
         healthManager?.SetArmor(data.armor);

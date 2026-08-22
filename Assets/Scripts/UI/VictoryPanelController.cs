@@ -27,6 +27,7 @@ public class VictoryPanelController : MonoBehaviour
     [SerializeField] private string mainSceneName = "MainScene";
     [SerializeField] private string nextStageSceneName = "SampleScene"; // 다음 스테이지 씬 이름 - BriefingSelection.TargetSceneName으로 넘겨서 브리핑룸을 거친 뒤 이 씬으로 이동한다
     [SerializeField] private string briefingRoomSceneName = "Briefing_Room"; // MissionSelectManager와 동일 컨벤션 (doc/0616)
+    [SerializeField] private string missionSelectSceneName = "MissionSelect"; // BriefingRoomController.goBackButton과 동일 컨벤션 - 서브미션은 nextStageSceneName이 이 값이라 브리핑룸을 건너뛴다 (doc/0670)
 
     [Header("연출")]
     [SerializeField] private float victoryDelay = 3f;
@@ -99,6 +100,14 @@ public class VictoryPanelController : MonoBehaviour
 
         Time.timeScale = 1f;
         UserControl.IsPaused = false;
+
+        // 서브미션의 다음 목적지는 "다음 미션"이 아니라 미션 선택 화면이다 - 브리핑룸(다음 미션
+        // 브리핑 전용)을 거치지 않고 바로 이동한다 (doc/0670).
+        if (nextStageSceneName == missionSelectSceneName)
+        {
+            SceneManager.LoadScene(nextStageSceneName);
+            return;
+        }
 
         BriefingSelection.MissionNumber = missionNumber + 1;
         BriefingSelection.IsSubMission = false;

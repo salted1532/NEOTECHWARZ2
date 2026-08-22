@@ -667,6 +667,7 @@ public class RTSUnitController : MonoBehaviour
         building.SelectBuilding();
         selectedBuildingList.Add(building);
         building.GetComponent<BuildingAudio>()?.PlaySelectVoice();
+        building.GetComponent<BuildingAudio>()?.PlaySelectSFX();
 
         // 생산 건물이면 선택하는 순간 자기 랠리 포인트 위치에 이동 포인터를 잠깐 보여준다(3초 후 자동
         // 사라짐 - UserControl의 기존 이동/랠리 확정 포인터를 그대로 재사용).
@@ -2284,6 +2285,8 @@ public class RTSUnitController : MonoBehaviour
     public int GetMaxPopulation() => resourceManager.GetMaxPopulation();
     public void AddOre(int amount) => resourceManager.AddOre(amount);
     public void AddGas(int amount) => resourceManager.AddGas(amount);
+    // 건물 수리(UnitController.RepairTick) 전용 - 광물만 소모한다.
+    public bool TrySpendOre(int amount) => resourceManager.TrySpend(amount, 0);
 
     #endregion
 

@@ -50,6 +50,12 @@ public class BuildingEffects : MonoBehaviour
     public void PlayTakeoff() => EffectPlayer.SpawnAtPoints(takeoffPrefab, takeoffPoints, transform);
     public void PlayLanding() => EffectPlayer.SpawnAtPoints(landingPrefab, landingPoints, transform);
 
+    // 일꾼이 수리 중인 방향(표면)에 레이저 피격 이펙트를 재생한다 - 새 프리팹 없이 기존 laserHitPrefab을
+    // 그대로 재사용한다(doc/0658). workerPosition은 HandleDamaged의 attackerPosition과 동일한 역할 -
+    // PlayHit이 "그 방향을 향한 콜라이더 표면 지점"을 알아서 계산해준다.
+    public void PlayRepairSpark(Vector3 workerPosition) =>
+        EffectPlayer.PlayHit(transform, bodyCollider, workerPosition, hitEffects.GetPrefab(AttackEffectType.Laser));
+
     // isEnemyAttacker는 HealthManager.OnDamaged 시그니처를 맞추기 위해 받지만 여기선 안 씀(doc/0292).
     private void HandleDamaged(int amount, Vector3 attackerPosition, AttackEffectType attackType, bool isEnemyAttacker)
     {
